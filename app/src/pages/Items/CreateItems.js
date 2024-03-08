@@ -11,8 +11,6 @@ import {
 } from "reactstrap"
 import "react-toastify/dist/ReactToastify.css"
 import Dropzone from "react-dropzone"
-// import PropTypes from "prop-types"
-// import { AvField, AvForm } from "availity-reactstrap-validation"
 import { connect } from "react-redux"
 import { setBreadcrumbItems } from "../../store/actions"
 import { Link } from "react-router-dom"
@@ -24,6 +22,7 @@ import AllVariantRows from "components/CustomComponents/AllVariantRows"
 import axios from "axios"
 import { createItemReq } from "service/itemService"
 import { ToastContainer, toast } from "react-toastify"
+import Standard from "components/CustomComponents/Standard"
 
 const CreateItems = props => {
   const [selectedFiles, setselectedFiles] = useState([])
@@ -36,7 +35,14 @@ const CreateItems = props => {
     { id: uuidv4(), attributes: [] },
   ])
 
-  const notify = (type, message )=> {
+  const [otherData, setOtherData] = useState({
+    sku:'',
+    inventory:'',
+    costPrice:'',
+    sellingPrice:''
+  })
+
+  const notify = (type, message) => {
     if (type === "Error") {
       toast.error(message, {
         position: "top-center",
@@ -101,21 +107,25 @@ const CreateItems = props => {
     setVariantData(updatedVariants)
   }
 
+  const handleOtherChange = (name, value) => {
 
-  const handleItemCreation=async(values)=>{
+    setOtherData({
+      ...otherData,
+      [name]: value,
+    })
+  }
+
+  const handleItemCreation = async values => {
     try {
-      const response= await createItemReq(values);
-      if(response.success===true){
+      const response = await createItemReq(values)
+      if (response.success === true) {
         notify("Success", response.message)
-      }else{
-        console.log(response.message)
+      } else {
         notify("Error", response.message)
       }
     } catch (error) {
-      console.log(error);
+      notify("Error", error.message)
     }
-    
-    
   }
 
   const validation = useFormik({
@@ -142,40 +152,49 @@ const CreateItems = props => {
     }),
     onSubmit: values => {
       let unhandled = false
-      for (let i = 0; i < variantData.length; i++) {
-        if (
-          variantData[i].attributes.length === 0 ||
-          variantData[i].stockQuantity === ""
-        ) {
-          unhandled = true
-        } else if (
-          variantData[i].SKU === "" ||
-          variantData[i].costPrice === "" ||
-          variantData[i].sellingPrice === ""
-        ) {
-          unhandled = true
+      console.log(values.itemType);
+      if (values.itemType === "variable") {
+        for (let i = 0; i < variantData.length; i++) {
+          if (
+            variantData[i].attributes.length === 0 ||
+            variantData[i].inventory === ""
+          ) {
+            unhandled = true
+          } else if (
+            variantData[i].sku === "" ||
+            variantData[i].costPrice === "" ||
+            variantData[i].sellingPrice === ""
+          ) {
+            unhandled = true
+          }
+        }
+      }else{
+        if(otherData.sku==="" || otherData.costPrice==="" || otherData.sellingPrice==="" || otherData.inventory===""){
+          unhandled=true;
         }
       }
+
       if (unhandled) {
         setFieldInvalid(false)
         notify("Error", "Please enter all the fields")
         return
       } else {
-        const finalVariant = variantData.map(element => {
-          const { id, ...rest } = element
-          return rest
-        })
-        values.variants = [...finalVariant]
+        if(values.itemType==="variable"){
+          const finalVariant = variantData.map(element => {
+            const { id, ...rest } = element
+            return rest
+          })
+          values.variants = [...finalVariant]
+        }else{
+          values.variants=[{...otherData}];
+        }
+        
         values.images = [...selectedFiles]
         values.taxes = [...taxArr]
-        handleItemCreation(values);
-        
-       
-       
+        handleItemCreation(values)
       }
     },
   })
-
   const handleAddRow = () => {
     const newRow = { id: uuidv4() }
     setVariantOptions([...variantOptions, newRow])
@@ -537,50 +556,56 @@ const CreateItems = props => {
         </Row>
         <Row>
           <Card>
-            <CardBody>
-              {variantOptions.map(row => (
-                <AttributesRow
-                  key={row.id}
-                  _id={row.id}
-                  variantData={variantData}
-                  setVariantData={setVariantData}
-                  disabledDelete={variantOptions.length === 1}
-                  setVariantOptions={setVariantOptions}
-                  onDelete={handleDeleteRow}
-                  fieldInvalid={fieldInvalid}
-                />
-              ))}
-              <div className="mt-3">
-                <button
-                  type="button"
-                  className="btn btn-primary waves-effect waves-light "
-                  onClick={handleAddRow}
-                >
-                  <label className="card-title mx-1">Add</label>
-                  <i className=" mdi mdi-18px mdi-plus"></i>
-                </button>
-              </div>
-              {variantData.map(row => (
-                <AllVariantRows
-                  key={row.id}
-                  _id={row.id}
-                  variantOptions={variantOptions}
-                  disabledDelete={variantData.length === 1}
-                  onChange={handleVariantChange}
-                  onDelete={handleDeleteVariantData}
-                />
-              ))}
-              <div className="mt-3">
-                <button
-                  type="button"
-                  className="btn btn-primary waves-effect waves-light "
-                  onClick={handleAddVariantData}
-                >
-                  <label className="card-title mx-1">Add</label>
-                  <i className=" mdi mdi-18px mdi-plus"></i>
-                </button>
-              </div>
-            </CardBody>
+            {validation.values.itemType == "variable" ? (
+              <CardBody>
+                {variantOptions.map(row => (
+                  <AttributesRow
+                    key={row.id}
+                    _id={row.id}
+                    variantData={variantData}
+                    setVariantData={setVariantData}
+                    disabledDelete={variantOptions.length === 1}
+                    setVariantOptions={setVariantOptions}
+                    onDelete={handleDeleteRow}
+                    fieldInvalid={fieldInvalid}
+                  />
+                ))}
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    className="btn btn-primary waves-effect waves-light "
+                    onClick={handleAddRow}
+                  >
+                    <label className="card-title mx-1">Add</label>
+                    <i className=" mdi mdi-18px mdi-plus"></i>
+                  </button>
+                </div>
+                {variantData.map(row => (
+                  <AllVariantRows
+                    key={row.id}
+                    _id={row.id}
+                    variantOptions={variantOptions}
+                    disabledDelete={variantData.length === 1}
+                    onChange={handleVariantChange}
+                    onDelete={handleDeleteVariantData}
+                  />
+                ))}
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    className="btn btn-primary waves-effect waves-light "
+                    onClick={handleAddVariantData}
+                  >
+                    <label className="card-title mx-1">Add</label>
+                    <i className=" mdi mdi-18px mdi-plus"></i>
+                  </button>
+                </div>
+              </CardBody>
+            ) : (
+              <CardBody>
+                <Standard onChange={handleOtherChange} />
+              </CardBody>
+            )}
           </Card>
         </Row>
       </Form>
@@ -601,6 +626,7 @@ const AttributesRow = props => {
     variantData,
     setVariantData,
   } = props
+
   useEffect(() => {
     setVariantOptions(prevOptions =>
       prevOptions.map(e => {

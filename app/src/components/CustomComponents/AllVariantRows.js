@@ -22,7 +22,8 @@ const AllVariantRows = (props) => {
   };
 
   return (
-    <AvForm><Row>
+    <AvForm>
+    <Row>
       <Col>
       
         <label className="form-label mt-3">SKU</label>
