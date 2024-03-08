@@ -29,7 +29,7 @@ const itemLength = (props.breadcrumbItems || []).length || 1;
         </div>
       </Col>
 
-      <Col sm={6}>
+      {/*<Col sm={6}>
         <div className="state-information d-none d-sm-block">
           <div className="state-graph">
             <Sparklines
@@ -68,7 +68,7 @@ const itemLength = (props.breadcrumbItems || []).length || 1;
             <div className="info">Item Sold 1230</div>
           </div>
         </div>
-      </Col>
+      </Col>*/}
     </Row>
   )
 }

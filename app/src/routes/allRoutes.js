@@ -51,6 +51,7 @@ import BasicTables from "../pages/Tables/BasicTables"
 import DatatableTables from "../pages/Tables/DatatableTables"
 import ResponsiveTables from "../pages/Tables/ResponsiveTables"
 import EditableTables from "../pages/Tables/EditableTables"
+import AllItems from "../components/Items/AllItems"
 
 // Forms
 import FormElements from "../pages/Forms/FormElements"
@@ -130,6 +131,7 @@ const userRoutes = [
   { path: "/tables-datatable", component: <DatatableTables /> },
   { path: "/tables-responsive", component: <ResponsiveTables /> },
   { path: "/tables-editable", component: <EditableTables /> },
+  { path: "/tables-allItems", component: <AllItems /> },
 
   // // Maps
   { path: "/maps-google", component: <MapsGoogle /> },
