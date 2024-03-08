@@ -101,6 +101,23 @@ const CreateItems = props => {
     setVariantData(updatedVariants)
   }
 
+
+  const handleItemCreation=async(values)=>{
+    try {
+      const response= await createItemReq(values);
+      if(response.success===true){
+        notify("Success", response.message)
+      }else{
+        console.log(response.message)
+        notify("Error", response.message)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    
+    
+  }
+
   const validation = useFormik({
     enableReinitialize: true,
 
@@ -151,9 +168,10 @@ const CreateItems = props => {
         values.variants = [...finalVariant]
         values.images = [...selectedFiles]
         values.taxes = [...taxArr]
-        createItemReq(values)
-        notify("Success", "Item created successfully");
-        // console.log(values);
+        handleItemCreation(values);
+        
+       
+       
       }
     },
   })
