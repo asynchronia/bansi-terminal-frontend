@@ -27,6 +27,9 @@ import LockScreen from "../pages/AuthenticationInner/auth-lock-screen"
 // Dashboard
 import Dashboard from "../pages/Dashboard/index"
 
+//Items
+import CreateItems from "pages/Items/CreateItems"
+
 //Charts
 import ChartsAppex from "../pages/Charts/charts-appex";
 import ChartsJs from "../pages/Charts/charts-chartjs";
@@ -93,8 +96,10 @@ import UiOffcanvas from "pages/Ui/UiOffcanvas"
 import Chat from "pages/Chat/Chat";
 import Kanban from "pages/Kanban"
 
+
 const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
+  { path: "/create-items", component: <CreateItems /> },
 
   // //calendar
   { path: "/calendar", component: <Calendar /> },
