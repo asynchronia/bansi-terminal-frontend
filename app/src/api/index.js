@@ -4,7 +4,8 @@ const baseUrl = "http://localhost:3000"
 
 const API_URL = {
     craeteItem: "/api/items/create",
-    getItems:"/api/items/list"
+    getItems:"/api/items/list",
+    getCategories:"/api/categories/list"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -48,6 +49,19 @@ export async function getItems(body) {
             });
     });
 }
+
+export async function getCategories(body) {
+    return new Promise((resolve) => {
+        axios
+            .get(`${baseUrl}${API_URL.getCategories}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+
 // export async function stopLLMResponse() {
 //     return new Promise((resolve) => {
 //         axios

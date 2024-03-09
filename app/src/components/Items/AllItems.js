@@ -1,4 +1,4 @@
-import React,{useEffect, useState, useCallback} from "react";
+import React,{useEffect, useState, useRef,useCallback} from "react";
 import { Row, Col, Card, CardBody, CardTitle, Button } from "reactstrap"
 
 import { connect } from "react-redux";
@@ -13,7 +13,7 @@ import 'ag-grid-community/styles//ag-theme-quartz.css';
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import {getItemsReq } from "../../service/itemService";
+import {getCategoriesReq, getItemsReq } from "../../service/itemService";
 import "../../pages/Tables/datatables.scss";
 import "./styles/AllItems.scss";
 import DropdownMenuBtn from "./DropdownMenuBtn";
@@ -26,20 +26,7 @@ const AllItems = (props) => {
     { title: "All Items Order", link: "#" },
     
   ];
- 
-/*const  columnDefs =  [
-    {headerName: "Item Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true},
-    {headerName: "Type", field: "categoryN"},
-    {headerName: "Status", field: "status"},
-    {headerName: "HSN Code", field: "hsnCode"},
-    {headerName: "Category", field: "category"},
-    {headerName: "Sale Price", field: "salePrice"},
-    {headerName: "GST", field: "gst"},
-    {headerName: "Created On", field: "createdAt"},
-    {headerName: "Action", field: "action",
-    cellClass:"actions-button-cell",
-    cellRenderer: DropdownMenuBtn
-}*/
+  const gridRef = useRef();
 const columnDefs = [
     {headerName: "Item Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true},
     {headerName: "Type", field: "itemType"},
@@ -52,7 +39,6 @@ const columnDefs = [
       return <>{date.toDateString()}</>
     }},
     {headerName: "Category", field: "category"},
-    {headerName: "GST", field: "gst"},
     {headerName: "Action", field: "action",
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn
@@ -72,9 +58,43 @@ const autoSizeStrategy = {
 const pagination = true;
 
 // sets 10 rows per page (default is 100)
-const paginationPageSize = 10;
-const getListOfRowData =  useCallback(async () => {
-    const response = await getItemsReq();
+// allows the user to select the page size from a predefined list of page sizes
+const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+
+const [allCategories, setAllCategories] = useState([]);
+const [category, setCategory] = useState("");
+const [rowData, setRowData] = useState([]);
+const [searchValue, setSearchValue] = useState("");
+const [gridApi, setGridApi] = useState(null);
+const [paginationPageSize, setPaginationPageSize ]= useState(5);
+let bodyObject = {
+  "page": 1,
+  "limit": paginationPageSize
+};
+const onPaginationChanged = useCallback((event) => {
+  console.log('onPaginationPageLoaded', event);
+  // Workaround for bug in events order
+ let pageSize=  gridRef.current.api.paginationGetPageSize();
+ console.log("PAGE SIZE"+pageSize);
+ setPaginationPageSize(pageSize);
+  
+}, []);
+/*
+{
+    "page": 1,
+    "limit": 10,
+    "search": "p",
+    "sort": {
+        "key": "createdAt",
+        "order": "asc"
+    },
+    "filter": {
+        "category": "65bab211ce0f79d56447c537"
+    }
+}
+* */
+const getListOfRowData =  useCallback(async (body) => {
+    const response = await getItemsReq(body);
     console.log(response);
      response.map((val,id)=>{
         val.category = val.category.name;
@@ -84,18 +104,65 @@ const getListOfRowData =  useCallback(async () => {
     
    
 });
-// allows the user to select the page size from a predefined list of page sizes
-const paginationPageSizeSelector = [10, 20, 50, 100];
-const [rowData, setRowData] = useState([]);
 
+const getCategories = useCallback(async () => {
+  const response = await getCategoriesReq();
+  console.log("CATEGORY"+response);
+  setAllCategories(response?.payload?.categories)
+ 
+});
 useEffect(() => {
     props.setBreadcrumbItems('All Items', breadcrumbItems);
-   getListOfRowData();
-   
+   getListOfRowData(bodyObject);
+   getCategories();
   },[]);
+
+useEffect(() => {
+  props.setBreadcrumbItems('All Items', breadcrumbItems);
+  if(category && category !== undefined && category !== ""){
+    let bodyObjectWithCategory = {...bodyObject};
+    bodyObjectWithCategory.filter={};
+    bodyObjectWithCategory.filter.category = category;
+    getListOfRowData(bodyObjectWithCategory);
+    }else{
+
+    }
+},[category]);
+
+useEffect(() => {
+  props.setBreadcrumbItems('All Items', breadcrumbItems);
+  if(searchValue && searchValue !== undefined && searchValue !== ""){
+    let bodyObjectWithCategory = {...bodyObject};
+    bodyObjectWithCategory.search=searchValue;
+    getListOfRowData(bodyObjectWithCategory);
+    }else{
+
+    }
+},[searchValue]);
+
+useEffect(() => {
+  props.setBreadcrumbItems('All Items', breadcrumbItems);
+  if(paginationPageSize && paginationPageSize !== undefined){
+    let bodyObjectWithCategory = {...bodyObject};
+    bodyObjectWithCategory.limit=paginationPageSize;
+    getListOfRowData(bodyObjectWithCategory);
+    }else{
+
+    }
+},[paginationPageSize]);
+
+const handleChange = (e) =>{
+ console.log("handle change category"+e.target.value);
+ setCategory(e.target.value);
+}
+const handleInputChange = (e) =>{
+  console.log("handle search"+e.target.value);
+  setSearchValue(e.target.value);
+ }
 
 /*
 const onGridReady = useCallback((params) => {
+  setGridApi(e.api);
     createItemReq
       .then((resp) => resp.json())
       .then((data) => {
@@ -120,17 +187,41 @@ const onGridReady = useCallback((params) => {
             <Col className="col-12">
               <Card>
                 <CardBody>
-                    <div>
-                    <Button
-                      color="primary"
-                    >
-                     Create Item
-                    </Button>
-                    <Button
-                      color="secondary"
-                    >
-                     Import Items
-                    </Button>
+                    <div className="button-section">
+                      <Button className="all-items-btn" color="primary">
+                      Create Item
+                      </Button>
+                      <Button color="secondary">
+                      Import Items
+                      </Button>
+                      <div className="button-right-section">
+                      <div class="input-group">
+                      <input
+                        className="form-control border-end-0 border"
+                          placeholder="Search for..."
+                          value={searchValue}
+                          onChange={handleInputChange}
+                        />
+                          <span class="input-group-append">
+                              <button class="btn btn-outline-secondary bg-white border-start-0 border ms-n5" type="button">
+                                  <i class="fa fa-search"></i>
+                              </button>
+                          </span>
+                      </div>
+                        <select
+                          onChange={handleChange}
+                          id="category"
+                          name="category"
+                          value={category}
+                          className="form-select focus-width"
+                        >
+                          <option value="" selected disabled>Category</option>
+                          {allCategories.map(e => (
+                            <option value={e._id}>{e.name}</option>
+                          ))}
+                        </select>
+                  </div>
+                  
                     </div>
                     <div
                             className="ag-theme-quartz"
@@ -140,6 +231,7 @@ const onGridReady = useCallback((params) => {
                             }}
                         >
                             <AgGridReact
+                                ref={gridRef}
                                 suppressRowClickSelection={true}
                                 columnDefs={columnDefs}
                                 pagination={pagination}
@@ -148,8 +240,8 @@ const onGridReady = useCallback((params) => {
                                 rowSelection="multiple"
                                 reactiveCustomComponents
                                 autoSizeStrategy={autoSizeStrategy}
-                                rowData={rowData}>
-
+                                rowData={rowData}
+                                onPaginationChanged={onPaginationChanged}>
                             </AgGridReact>
                         </div>
             </CardBody>
