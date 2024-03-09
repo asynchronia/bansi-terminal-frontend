@@ -275,13 +275,6 @@ const CreateItems = props => {
           return false
         }}
       >
-        {/* {item && item ? (
-          <Alert color="success">Register Item Successfully</Alert>
-        ) : null}
-
-        {registrationError && registrationError ? (
-          <Alert color="danger">{registrationError}</Alert>
-        ) : null} */}
         <Row>
           <Col xl="4">
             <Card>

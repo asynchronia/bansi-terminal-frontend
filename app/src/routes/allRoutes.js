@@ -95,11 +95,13 @@ import UiColors from "pages/Ui/UiColors"
 import UiOffcanvas from "pages/Ui/UiOffcanvas"
 import Chat from "pages/Chat/Chat";
 import Kanban from "pages/Kanban"
+import CreateClient from "pages/Client/CreateClient"
 
 
 const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/create-items", component: <CreateItems /> },
+  { path: "/client/add", component: <CreateClient/>},
 
   // //calendar
   { path: "/calendar", component: <Calendar /> },
