@@ -51,7 +51,7 @@ import BasicTables from "../pages/Tables/BasicTables"
 import DatatableTables from "../pages/Tables/DatatableTables"
 import ResponsiveTables from "../pages/Tables/ResponsiveTables"
 import EditableTables from "../pages/Tables/EditableTables"
-import AllItems from "../components/Items/AllItems"
+import AllItems from "../pages/Items/AllItems"
 
 // Forms
 import FormElements from "../pages/Forms/FormElements"
