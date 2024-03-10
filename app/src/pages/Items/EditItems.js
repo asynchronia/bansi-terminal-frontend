@@ -24,17 +24,61 @@ import { createItemReq } from "service/itemService"
 import { ToastContainer, toast } from "react-toastify"
 import Standard from "components/CustomComponents/Standard"
 
-const CreateItems = props => {
+const EditItems = props => {
   const [selectedFiles, setselectedFiles] = useState([])
   const [allCategories, setAllCategories] = useState([])
   const [allTaxes, setAllTaxes] = useState([])
   const [taxArr, setTaxArr] = useState([])
-  const [variantOptions, setVariantOptions] = useState([{ id: uuidv4() }])
+  
   const [fieldInvalid, setFieldInvalid] = useState(false)
-  const [variantData, setVariantData] = useState([
-    { id: uuidv4(), attributes: [] },
-  ])
+  
 
+  const itemsData = {
+    _id: "65bab211ce0f79d56447c537",
+    title: "pen",
+    description: "ball point pen",
+    itemType:'variable',
+    tags: [],
+    taxes: ["65bd55d4ca85581065ffe66f"],
+    category: "65bab211ce0f79d56447c537",
+    itemUnit: "kg",
+    hsnCode: "hsnCode5",
+    taxPreference: "exempt",
+    status: "draft",
+    images: ["image link 1", "image link 2"],
+    deletedVariants: ["65eb06c18451bef14368534d"],
+    variants: [
+      {
+        _id: "65bab211ce0f79d56447c537",
+        sku: "sku-5",
+        attributes: [
+          {
+            name: "color",
+            value: "black",
+          },
+        ],
+        costPrice: 5,
+        sellingPrice: 10,
+        inventory: 50,
+      },
+      {
+        sku: "sku-6",
+        attributes: [
+          {
+            name: "color",
+            value: "blue",
+          },
+        ],
+        costPrice: 10,
+        sellingPrice: 15,
+        inventory: 600,
+      },
+    ],
+  }
+  const [variantData, setVariantData] = useState(itemsData.variants)
+
+  const [variantOptions, setVariantOptions] = useState([])
+ 
   const [otherData, setOtherData] = useState({
     sku: "",
     inventory: "",
@@ -131,17 +175,17 @@ const CreateItems = props => {
     enableReinitialize: true,
 
     initialValues: {
-      title: "",
-      hsnCode: "",
-      category: "category",
-      description: "",
-      itemType: "standard",
-      itemUnit: "unit",
-      taxPreference: "taxable",
-      taxes: [],
-      status: "published",
-      images: [],
-      variants: [],
+      title: itemsData.title,
+      hsnCode: itemsData.hsnCode,
+      category: itemsData.category,
+      description: itemsData.description,
+      itemType: itemsData.itemType,
+      itemUnit: itemsData.itemUnit,
+      taxPreference: itemsData.taxPreference,
+      taxes: itemsData.taxes[0],
+      status: itemsData.status,
+      images: itemsData.images,
+      variants: itemsData.variants,
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Please Enter Item Name"),
@@ -151,7 +195,7 @@ const CreateItems = props => {
     }),
     onSubmit: values => {
       let unhandled = false
-      console.log(values.itemType)
+      //   console.log(values.itemType);
       if (values.itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
           if (
@@ -237,7 +281,7 @@ const CreateItems = props => {
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Lexa", link: "#" },
-    { title: "Create Items", link: "/create-items" },
+    { title: "Edit Items", link: "/edit-items" },
   ]
 
   useEffect(() => {
@@ -254,6 +298,8 @@ const CreateItems = props => {
     )
     setselectedFiles([...selectedFiles, updatedFiles[0]])
   }
+
+//   console.log(validation.values)
 
   /**
    * Formats the size
@@ -400,7 +446,7 @@ const CreateItems = props => {
                       <select
                         id="taxPreference"
                         name="taxPreference"
-                        value={validation.values.taxPreference || ""}
+                        value={validation.values.taxPreference}
                         onChange={validation.handleChange}
                         onBlur={validation.handleBlur}
                         className="form-control"
@@ -558,6 +604,7 @@ const CreateItems = props => {
                     key={row.id}
                     _id={row.id}
                     variantData={variantData}
+                    variantOptions={variantOptions}
                     setVariantData={setVariantData}
                     disabledDelete={variantOptions.length === 1}
                     setVariantOptions={setVariantOptions}
@@ -577,6 +624,7 @@ const CreateItems = props => {
                 </div>
                 {variantData.map(row => (
                   <AllVariantRows
+                    data={row}
                     key={row.id}
                     _id={row.id}
                     variantOptions={variantOptions}
@@ -618,9 +666,12 @@ const AttributesRow = props => {
     onDelete,
     disabledDelete,
     setVariantOptions,
+    variantOptions,
     variantData,
     setVariantData,
   } = props
+
+  console.log(variantOptions);
 
   useEffect(() => {
     setVariantOptions(prevOptions =>
@@ -703,4 +754,4 @@ const AttributesRow = props => {
   )
 }
 
-export default connect(null, { setBreadcrumbItems })(CreateItems)
+export default connect(null, { setBreadcrumbItems })(EditItems)

@@ -5,6 +5,10 @@ import { Card, CardBody, Col, Form, Row } from "reactstrap"
 import Dropzone from "react-dropzone"
 import AddBranch from "components/CustomComponents/AddBranch"
 import AddUser from "components/CustomComponents/AddUser"
+import { ToastContainer, toast } from "react-toastify"
+import { useFormik } from "formik"
+import * as Yup from "yup"
+import { createClientReq } from "service/clientService"
 
 const CreateClient = props => {
   const breadcrumbItems = [
@@ -14,6 +18,66 @@ const CreateClient = props => {
   ]
 
   const [selectedFiles, setselectedFiles] = useState([])
+
+  const notify = (type, message) => {
+    if (type === "Error") {
+      toast.error(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    }
+  }
+
+  const handleCreateClient = async values => {
+    try {
+      const response = await createClientReq(values)
+      if (response.success === true) {
+        notify("Success", response.message)
+      } else {
+        notify("Error", response.message)
+      }
+    } catch (error) {
+      notify("Error", error.message)
+    }
+  }
+
+  const validation = useFormik({
+    enableReinitialize: true,
+
+    initialValues: {
+      name: null,
+      contact: null,
+      email: null,
+      clientType: "business",
+      logo: null,
+      gstin: null,
+      pan: null,
+      bankAccountName: null,
+      bankAccountNumber: null,
+      ifscCode: null,
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required("Please Enter Client Name"),
+      contact: Yup.string().required("Please Enter Valid Contact Number"),
+      email: Yup.string().required("Please Enter Client Email"),
+      gstin: Yup.string().required("Please Enter GST Number"),
+      pan: Yup.string().required("Please Enter PAN Number"),
+      bankAccountName: Yup.string().required("Please EnterBank Account Name"),
+      bankAccountNumber: Yup.string().required(
+        "Please Enter Back Account Number",
+      ),
+      ifscCode: Yup.string().required("Please Enter IFSC Code"),
+    }),
+    onSubmit: values => {
+      values.logo=`${selectedFiles[0].preview}`
+      handleCreateClient(values);
+    },
+  })
 
   function handleAcceptedFiles(files) {
     files.map(file =>
@@ -39,7 +103,16 @@ const CreateClient = props => {
     props.setBreadcrumbItems("CreateItems", breadcrumbItems)
   })
   return (
+    <Form
+    className="form-horizontal mt-4"
+    onSubmit={e => {
+      e.preventDefault()
+      validation.handleSubmit()
+      return false
+    }}
+  >
     <div style={{ position: "relative" }}>
+    <ToastContainer position="top-center" theme="colored" />
       <div
         style={{
           position: "absolute",
@@ -104,12 +177,21 @@ const CreateClient = props => {
                   <div className="mt-4">
                     <label className="item-name">Client Name</label>
                     <input
-                      name="title"
-                      id="title"
+                      name="name"
+                      id="name"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      value={validation.values.name || ""}
+                      invalid={
+                        validation.touched.name && validation.errors.name
+                      }
                       className="form-control"
                       type="text"
                       placeholder="Enter Item Name"
                     />
+                    {validation.errors.name ? (
+                      <p style={{ color: "red" }}>{validation.errors.name}</p>
+                    ) : null}
                   </div>
                 </Col>
               </Row>
@@ -118,35 +200,71 @@ const CreateClient = props => {
                   <div className="mt-3">
                     <label className="item-name">Client Phone Number</label>
                     <input
-                      name="title"
-                      id="title"
+                      name="contact"
+                      id="contact"
                       className="form-control"
                       type="text"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      value={validation.values.contact || ""}
+                      invalid={
+                        validation.touched.contact && validation.errors.contact
+                      }
                       placeholder="Enter Item Name"
                     />
+                    {validation.errors.contact ? (
+                      <p style={{ color: "red" }}>
+                        {validation.errors.contact}
+                      </p>
+                    ) : null}
                   </div>
                 </Col>
                 <Col>
                   <div className="mt-3">
                     <label className="item-name">Primary Email</label>
                     <input
-                      name="title"
-                      id="title"
+                      name="email"
+                      id="email"
                       className="form-control"
                       type="text"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      value={validation.values.email || ""}
+                      invalid={
+                        validation.touched.email && validation.errors.email
+                      }
                       placeholder="Enter Item Name"
                     />
+                    {validation.errors.email ? (
+                      <p style={{ color: "red" }}>{validation.errors.email}</p>
+                    ) : null}
                   </div>
                 </Col>
               </Row>
               <Row className="mt-3">
                 <div>
                   <label className="col-form-label">Client Type</label>
-                  <select className="form-control">
-                    <option>Select</option>
-                    <option>Option 1</option>
+                  <select
+                    name="clientType"
+                    id="clinetType"
+                    onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.clientType || ""}
+                    invalid={
+                      validation.touched.clientType &&
+                      validation.errors.clientType
+                    }
+                    className="form-control"
+                  >
+                    <option>Select Client Type</option>
+                    <option value="business">Business</option>
                     <option>Option 2</option>
                   </select>
+                  {validation.errors.clientType ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.clientType}
+                    </p>
+                  ) : null}
                 </div>
               </Row>
             </CardBody>
@@ -160,52 +278,112 @@ const CreateClient = props => {
               <div className="mt-4">
                 <label className="item-name">Account Number</label>
                 <input
-                  name="title"
-                  id="title"
+                  name="bankAccountNumber"
+                  id="bankAccountNumber"
                   className="form-control"
                   type="text"
+                  onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.bankAccountNumber }
+                    invalid={
+                      validation.touched.bankAccountNumber &&
+                      validation.errors.bankAccountNumber
+                    }
                   placeholder="Enter Account Number"
                 />
+                {validation.errors.bankAccountNumber ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.bankAccountNumber}
+                    </p>
+                  ) : null}
               </div>
               <div className="mt-3">
                 <label className="item-name">Account Name</label>
                 <input
-                  name="title"
-                  id="title"
+                  name="bankAccountName"
+                  id="bankAccountName"
                   className="form-control"
                   type="text"
                   placeholder="Enter Account Name"
+                  onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.bankAccountName}
+                    invalid={
+                      validation.touched.bankAccountName &&
+                      validation.errors.bankAccountName
+                    }
                 />
+                {validation.errors.bankAccountName ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.bankAccountName}
+                    </p>
+                  ) : null}
               </div>
               <div className="mt-3">
                 <label className="item-name">IFSC</label>
                 <input
-                  name="title"
-                  id="title"
+                  name="ifscCode"
+                  id="ifscCode"
                   className="form-control"
                   type="text"
                   placeholder="Enter IFSC Code"
+                  onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.ifscCode }
+                    invalid={
+                      validation.touched.ifscCode &&
+                      validation.errors.ifscCode
+                    }
                 />
+                {validation.errors.ifscCode ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.ifscCode}
+                    </p>
+                  ) : null}
               </div>
               <div className="mt-3">
                 <label className="item-name">PAN</label>
                 <input
-                  name="title"
-                  id="title"
+                  name="pan"
+                  id="pan"
                   className="form-control"
                   type="text"
                   placeholder="Enter PAN Number"
+                  onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.pan}
+                    invalid={
+                      validation.touched.pan &&
+                      validation.errors.pan
+                    }
                 />
+                {validation.errors.pan ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.pan}
+                    </p>
+                  ) : null}
               </div>
               <div className="mt-3">
                 <label className="item-name">GST Number</label>
                 <input
-                  name="title"
-                  id="title"
+                  name="gstin"
+                  id="gstin"
                   className="form-control"
                   type="text"
                   placeholder="Enter GST Number"
+                  onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.gstin}
+                    invalid={
+                      validation.touched.gstin &&
+                      validation.errors.gstin
+                    }
                 />
+                {validation.errors.gstin ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.gstin}
+                    </p>
+                  ) : null}
               </div>
             </CardBody>
           </Card>
@@ -213,6 +391,7 @@ const CreateClient = props => {
         </Col>
       </Row>
     </div>
+    </Form>
   )
 }
 

@@ -1,7 +1,26 @@
-import React from "react"
+import axios from "axios"
+import React, { useEffect, useState } from "react"
 import { Card, CardBody, Col, Input, Label, Row } from "reactstrap"
 
 const AddBranch = () => {
+  const [warehouseList, setWarehouseList] = useState([])
+
+  const searchAllWareHouses = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/branches/warehouse-list",
+      )
+      let data = await response.data
+      setWarehouseList(data?.payload?.warehouses)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    searchAllWareHouses()
+  }, [])
+
   return (
     <Card>
       <CardBody>
@@ -24,8 +43,9 @@ const AddBranch = () => {
               <label className="col-form-label">Associated Warehouse</label>
               <select className="form-control">
                 <option>Select Associated Warehouse</option>
-                <option>Option 1</option>
-                <option>Option 2</option>
+                {warehouseList.map(e => (
+                  <option value={e._id}>{e.name}</option>
+                ))}
               </select>
             </div>
           </Col>

@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Row, Col } from "reactstrap";
 
 const AllVariantRows = (props) => {
-  const { _id, onDelete, variantOptions, disabledDelete, onChange } = props;
+  const { _id, onDelete, variantOptions, disabledDelete, onChange, data } = props;
 
 
   const handleInputChange = (e) => {
@@ -29,6 +29,7 @@ const AllVariantRows = (props) => {
         <label className="form-label mt-3">SKU</label>
         <AvField
           validate={{ required: { value: true } }}
+          value={data?.sku || ""}
           errorMessage=" Please enter SKU"
           name="sku"
           className="form-control"
@@ -41,6 +42,7 @@ const AllVariantRows = (props) => {
         <label className="form-label mt-3">Stock Quantity</label>
         <AvField
           name="inventory"
+          value={data?.inventory || ""}
           validate={{ required: { value: true } }}
           errorMessage=" Please enter Stock Quantity"
           className="form-control"
@@ -84,6 +86,7 @@ const AllVariantRows = (props) => {
           validate={{ required: { value: true } }}
           errorMessage=" Please enter Cost Price"
           name="costPrice"
+          value={data?.costPrice || ""}
           className="form-control"
           type="text"
           placeholder="Enter Price"
@@ -99,6 +102,7 @@ const AllVariantRows = (props) => {
           className="form-control"
           type="text"
           placeholder="Enter Price"
+          value={data?.sellingPrice ||""}
           onChange={handleInputChange}
         />
       </Col>
