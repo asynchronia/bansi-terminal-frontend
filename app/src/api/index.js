@@ -5,7 +5,8 @@ const baseUrl = "http://localhost:3000"
 const API_URL = {
     craeteItem: "/api/items/create",
     getItems:"/api/items/list",
-    getCategories:"/api/categories/list"
+    getCategories:"/api/categories/list",
+    createCategory:"/api/categories/create"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -54,6 +55,17 @@ export async function getCategories(body) {
     return new Promise((resolve) => {
         axios
             .get(`${baseUrl}${API_URL.getCategories}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function createCategory(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.createCategory}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;

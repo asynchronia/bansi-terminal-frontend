@@ -1,5 +1,5 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
-import { Row, Col, Card, CardBody, CardTitle, Button } from "reactstrap"
+import { Row, Col, Card, CardBody, CardTitle, Button, Input } from "reactstrap"
 
 import { connect } from "react-redux";
 
@@ -136,7 +136,7 @@ useEffect(() => {
     bodyObjectWithCategory.search=searchValue;
     getListOfRowData(bodyObjectWithCategory);
     }else{
-
+      getListOfRowData(bodyObject);
     }
 },[searchValue]);
 
@@ -146,9 +146,7 @@ useEffect(() => {
     let bodyObjectWithCategory = {...bodyObject};
     bodyObjectWithCategory.limit=paginationPageSize;
     getListOfRowData(bodyObjectWithCategory);
-    }else{
-
-    }
+  }
 },[paginationPageSize]);
 
 const handleChange = (e) =>{
@@ -196,7 +194,14 @@ const onGridReady = useCallback((params) => {
                       </Button>
                       <div className="button-right-section">
                       <div class="input-group">
-                      <input
+
+                      <div className="search-box position-relative">
+                            <Input type="text"
+                              value={searchValue}
+                              onChange={handleInputChange} className="form-control rounded border" placeholder="Search..." />
+                            <i className="mdi mdi-magnify search-icon"></i>
+                        </div>
+                      {/*<input
                         className="form-control border-end-0 border"
                           placeholder="Search for..."
                           value={searchValue}
@@ -206,7 +211,7 @@ const onGridReady = useCallback((params) => {
                               <button class="btn btn-outline-secondary bg-white border-start-0 border ms-n5" type="button">
                                   <i class="fa fa-search"></i>
                               </button>
-                          </span>
+                        </span>*/}
                       </div>
                         <select
                           onChange={handleChange}
