@@ -4,6 +4,8 @@ import { Row, Col, Card, CardBody, CardTitle, Form, Input, Label, FormFeedback, 
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { connect } from "react-redux";
+
+import { ToastContainer, toast } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import {AgGridReact} from 'ag-grid-react';
 import {getCategoriesReq } from "../../service/itemService";
@@ -11,6 +13,7 @@ import { createCategoryReq } from "../../service/categoryService";
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 import 'ag-grid-enterprise';
+import 'react-toastify/dist/ReactToastify.css';
 import plusIcon from "../../assets/images/small/plus-icon.png";
 import minusIcon from "../../assets/images/small/minus-icon.png";
 const AddCategory = (props) =>{
@@ -109,29 +112,57 @@ const AddCategory = (props) =>{
     validationSchema: Yup.object({
         categoryName: Yup.string().required("Please Enter Category Name"),
         categoryParent: Yup.string().required("Please Enter Category Parent"),
-        categoryDescription: Yup.string().required("Please Enter Category Description"),
+       // categoryDescription: Yup.string().required("Please Enter Category Description"),
     }),
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       console.log("ON SUBMIT VALUES >> "+values);
        // dispatch(registerUser(values));
        let body = {
         name:  values.categoryName,
        description: values.categoryDescription,
        parentCategoryId: values.categoryParent};
-       createCategoryReq(body);
+       handleSubmit(body, resetForm);
     }
-
+    
     });
-    const autoSizeStrategy = {
-      type: 'fitGridWidth'
+  const autoSizeStrategy = {
+    type: 'fitGridWidth'
   };
+  const handleSubmit = async(values, resetForm) => {
+    try {
+      const response = await createCategoryReq(values);
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.payload[0].message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
+    resetForm();
+    getCategories();
 
+  }
+  const notify = (type, message) => {
+    if (type === "Error") {
+      toast.error(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    }
+  }
   const icons = {
     groupExpanded: '<img src="'+ minusIcon+' "style="width: 15px;"/>',
     groupContracted: '<img src="'+ plusIcon+' "style="width: 15px;"/>',
   };
     return(
         <React.Fragment>
+          <ToastContainer position="top-center" theme="colored" />
       <Row>
         <Col md={6}>
           <Card>

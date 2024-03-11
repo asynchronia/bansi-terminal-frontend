@@ -63,13 +63,19 @@ export async function getCategories(body) {
 }
 
 export async function createCategory(body) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         axios
             .post(`${baseUrl}${API_URL.createCategory}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;
+            })
+            .catch(error => {
+                reject(error);
             });
+    }).catch(error =>{
+        console.log(error);
+        return error.response.data;
     });
 }
 
