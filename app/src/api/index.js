@@ -4,6 +4,7 @@ const baseUrl = "http://localhost:3000"
 
 const API_URL = {
     craeteItem: "/api/items/create",
+    createClient: "/api/clients/create"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -36,6 +37,18 @@ export async function createItem(body) {
             });
     });
 }
+
+export async function createClient(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.createClient}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
 
 // export async function stopLLMResponse() {
 //     return new Promise((resolve) => {
