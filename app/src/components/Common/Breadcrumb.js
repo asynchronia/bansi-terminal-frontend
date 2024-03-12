@@ -1,12 +1,12 @@
 import React from "react"
 import { Row, Col } from "reactstrap"
 import { connect } from 'react-redux';
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 
 
 const Breadcrumb = props => {
 
-const itemLength = (props.breadcrumbItems || []).length || 1;
+  const itemLength = (props.breadcrumbItems || []).length || 1;
 
   return (
     <Row>
@@ -25,6 +25,47 @@ const itemLength = (props.breadcrumbItems || []).length || 1;
           </ol>
         </div>
       </Col>
+
+      {/*<Col sm={6}>
+        <div className="state-information d-none d-sm-block">
+          <div className="state-graph">
+            <Sparklines
+              data={[8, 6, 4, 7, 10, 12, 7, 4, 9, 12, 13, 11, 12]}
+              margin={3}
+              svgWidth={101}
+              svgHeight={32}
+            >
+              <SparklinesBars
+                margin={3}
+                style={{
+                  strokeWidth: 5,
+                  stroke: "#7A6FBE",
+                  fill: "#7A6FBE"
+                }}
+              />
+            </Sparklines>
+            <div className="info">Balance $ 2,317</div>
+          </div>
+          <div className="state-graph">
+            <Sparklines
+              data={[8, 6, 4, 7, 10, 12, 7, 4, 9, 12, 13, 11, 12]}
+              margin={3}
+              svgWidth={101}
+              svgHeight={32}
+            >
+              <SparklinesBars
+                margin={3}
+                style={{
+                  strokeWidth: 5,
+                  stroke: "#29bbe3",
+                  fill: "#29bbe3"
+                }}
+              />
+            </Sparklines>
+            <div className="info">Item Sold 1230</div>
+          </div>
+        </div>
+      </Col>*/}
     </Row>
   )
 }
