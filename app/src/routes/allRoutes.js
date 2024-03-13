@@ -27,6 +27,9 @@ import LockScreen from "../pages/AuthenticationInner/auth-lock-screen"
 // Dashboard
 import Dashboard from "../pages/Dashboard/index"
 
+//Items
+import CreateItems from "pages/Items/CreateItems"
+
 //Charts
 import ChartsAppex from "../pages/Charts/charts-appex";
 import ChartsJs from "../pages/Charts/charts-chartjs";
@@ -51,6 +54,8 @@ import BasicTables from "../pages/Tables/BasicTables"
 import DatatableTables from "../pages/Tables/DatatableTables"
 import ResponsiveTables from "../pages/Tables/ResponsiveTables"
 import EditableTables from "../pages/Tables/EditableTables"
+import AllItems from "../pages/Items/AllItems"
+import AddCategory from "../pages/Categories/AddCategory"
 
 // Forms
 import FormElements from "../pages/Forms/FormElements"
@@ -92,9 +97,15 @@ import UiColors from "pages/Ui/UiColors"
 import UiOffcanvas from "pages/Ui/UiOffcanvas"
 import Chat from "pages/Chat/Chat";
 import Kanban from "pages/Kanban"
+import CreateClient from "pages/Client/CreateClient"
+import EditItems from "pages/Items/EditItems"
+
 
 const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
+  { path: "/create-items", component: <CreateItems /> },
+  { path: "/edit-items", component: <EditItems /> },
+  { path: "/client/add", component: <CreateClient/>},
 
   // //calendar
   { path: "/calendar", component: <Calendar /> },
@@ -130,6 +141,8 @@ const userRoutes = [
   { path: "/tables-datatable", component: <DatatableTables /> },
   { path: "/tables-responsive", component: <ResponsiveTables /> },
   { path: "/tables-editable", component: <EditableTables /> },
+  { path: "/tables-allItems", component: <AllItems /> },
+  { path: "/add-category", component: <AddCategory /> },
 
   // // Maps
   { path: "/maps-google", component: <MapsGoogle /> },
