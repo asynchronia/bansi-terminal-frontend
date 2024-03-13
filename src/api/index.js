@@ -3,7 +3,7 @@ import axios from "axios";
 const baseUrl = "http://localhost:3000"
 
 const API_URL = {
-    craeteItem: "/api/items/create",
+    createItem: "/api/items/create",
     createClient: "/api/clients/create",
     getItems:"/api/items/list",
     getCategories:"/api/categories/list",
@@ -33,7 +33,7 @@ const getHeaders = () => {
 export async function createItem(body) {
     return new Promise((resolve) => {
         axios
-            .post(`${baseUrl}${API_URL.craeteItem}`, body)
+            .post(`${baseUrl}${API_URL.createItem}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;
