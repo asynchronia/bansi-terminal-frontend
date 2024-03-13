@@ -1,4 +1,4 @@
-import { createCategory } from "api";
+import { createCategory } from "../api";
 
 export const createCategoryReq = async (body) => {
     
