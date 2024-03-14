@@ -55,7 +55,7 @@ const AllVariantRows = (props) => {
       {variantOptions.map((option, idx) =>  (
        
         <Col key={option.id}>
-        {console.log(option)}
+        
           <div>
             <label className="col-form-label mt-2">
               {option.name !== null && option.name !== ""
