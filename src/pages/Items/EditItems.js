@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react";
 import {
   Row,
   Col,
@@ -8,36 +8,35 @@ import {
   Input,
   CardTitle,
   Form,
-} from "reactstrap"
-import "react-toastify/dist/ReactToastify.css"
-import Dropzone from "react-dropzone"
-import { connect } from "react-redux"
-import { setBreadcrumbItems } from "../../store/actions"
-import { Link } from "react-router-dom"
-import InputWithChips from "../../components/CustomComponents/InputWithChips"
-import { v4 as uuidv4 } from "uuid"
-import * as Yup from "yup"
-import { useFormik } from "formik"
-import AllVariantRows from "../../components/CustomComponents/AllVariantRows"
-import axios from "axios"
-import { createItemReq } from "../../service/itemService"
-import { ToastContainer, toast } from "react-toastify"
-import Standard from "../../components/CustomComponents/Standard"
+} from "reactstrap";
+import "react-toastify/dist/ReactToastify.css";
+import Dropzone from "react-dropzone";
+import { connect } from "react-redux";
+import { setBreadcrumbItems } from "../../store/actions";
+import { Link } from "react-router-dom";
+import InputWithChips from "../../components/CustomComponents/InputWithChips";
+import { v4 as uuidv4 } from "uuid";
+import * as Yup from "yup";
+import { useFormik } from "formik";
+import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
+import axios from "axios";
+import { createItemReq } from "../../service/itemService";
+import { ToastContainer, toast } from "react-toastify";
+import Standard from "../../components/CustomComponents/Standard";
 
-const EditItems = props => {
-  const [selectedFiles, setselectedFiles] = useState([])
-  const [allCategories, setAllCategories] = useState([])
-  const [allTaxes, setAllTaxes] = useState([])
-  const [taxArr, setTaxArr] = useState([])
-  
-  const [fieldInvalid, setFieldInvalid] = useState(false)
-  
+const EditItems = (props) => {
+  const [selectedFiles, setselectedFiles] = useState([]);
+  const [allCategories, setAllCategories] = useState([]);
+  const [allTaxes, setAllTaxes] = useState([]);
+  const [taxArr, setTaxArr] = useState([]);
+
+  const [fieldInvalid, setFieldInvalid] = useState(false);
 
   const itemsData = {
     _id: "65bab211ce0f79d56447c537",
     title: "pen",
     description: "ball point pen",
-    itemType:'variable',
+    itemType: "variable",
     tags: [],
     taxes: ["65bd55d4ca85581065ffe66f"],
     category: "65bab211ce0f79d56447c537",
@@ -55,7 +54,8 @@ const EditItems = props => {
           {
             name: "color",
             value: "black",
-          },{
+          },
+          {
             name: "size",
             value: "XL",
           },
@@ -75,125 +75,130 @@ const EditItems = props => {
         costPrice: 10,
         sellingPrice: 15,
         inventory: 600,
-      }
+      },
     ],
-  }
-  const [variantData, setVariantData] = useState(itemsData.variants)
+  };
+  const [variantData, setVariantData] = useState(itemsData.variants);
 
   const [variantOptions, setVariantOptions] = useState([]);
 
-  useEffect(()=>{
-    let options= [];
-    let products= variantData;
-     products.forEach(product => {
-      product.attributes.forEach(attribute => {
-          const existingOption = options.find(option => option.name === attribute.name);
-          
-          if (!existingOption) {
-              options.push({ id:uuidv4(), name: attribute.name, chips: [attribute.value] });
-          } else {
-              if (!existingOption.chips.includes(attribute.value)) {
-                  existingOption.chips.push(attribute.value);
-              }
-          }
-      });
-  });
-  
-  setVariantOptions(options);
+  useEffect(() => {
+    let options = [];
+    let products = variantData;
+    products.forEach((product) => {
+      product.attributes.forEach((attribute) => {
+        const existingOption = options.find(
+          (option) => option.name === attribute.name
+        );
 
-  }, [])
- 
+        if (!existingOption) {
+          options.push({
+            id: uuidv4(),
+            name: attribute.name,
+            chips: [attribute.value],
+          });
+        } else {
+          if (!existingOption.chips.includes(attribute.value)) {
+            existingOption.chips.push(attribute.value);
+          }
+        }
+      });
+    });
+
+    setVariantOptions(options);
+  }, []);
+
   const [otherData, setOtherData] = useState({
     sku: "",
     inventory: "",
     costPrice: "",
     sellingPrice: "",
-  })
+  });
 
   const notify = (type, message) => {
     if (type === "Error") {
       toast.error(message, {
         position: "top-center",
         theme: "colored",
-      })
+      });
     } else {
       toast.success(message, {
         position: "top-center",
         theme: "colored",
-      })
+      });
     }
-  }
+  };
 
-  const handleTaxes = e => {
-    const value = e.target.value
-    setTaxArr([...taxArr, value])
-  }
+  const handleTaxes = (e) => {
+    const value = e.target.value;
+    setTaxArr([...taxArr, value]);
+  };
 
   const searchCategories = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/categories/list",
-      )
-      let data = await response.data
-      setAllCategories(data?.payload?.categories)
+        "http://localhost:3000/api/categories/list"
+      );
+      let data = await response.data;
+      setAllCategories(data?.payload?.categories);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const searchAllTaxes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/taxes/list")
-      let data = await response.data
-      setAllTaxes(data?.payload?.taxes)
+      const response = await axios.get("http://localhost:3000/api/taxes/list");
+      let data = await response.data;
+      setAllTaxes(data?.payload?.taxes);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
-    searchCategories()
-    searchAllTaxes()
-  }, [])
+    searchCategories();
+    searchAllTaxes();
+  }, []);
 
   const handleVariantChange = (id, name, value) => {
-    const updatedVariants = variantData.map(variant => {
+    const updatedVariants = variantData.map((variant) => {
       if (variant.id === id) {
         if (name === "attributes") {
           return {
             ...variant,
             attributes: [...variant.attributes, value],
-          }
+          };
         }
         return {
           ...variant,
           [name]: value,
-        }
+        };
       }
-      return variant
-    })
-    setVariantData(updatedVariants)
-  }
+      return variant;
+    });
+    setVariantData(updatedVariants);
+  };
 
   const handleOtherChange = (name, value) => {
     setOtherData({
       ...otherData,
       [name]: value,
-    })
-  }
+    });
+  };
 
-  const handleItemCreation = async values => {
+  const handleItemCreation = async (values) => {
     try {
-      const response = await createItemReq(values)
+      const response = await createItemReq(values);
       if (response.success === true) {
-        notify("Success", response.message)
+        notify("Success", response.message);
       } else {
-        notify("Error", response.message)
+        notify("Error", response.message);
       }
     } catch (error) {
-      notify("Error", error.message)
+      notify("Error", error.message);
     }
-  }
+  };
 
   const validation = useFormik({
     enableReinitialize: true,
@@ -217,22 +222,22 @@ const EditItems = props => {
       category: Yup.string().required("Please Select Category"),
       itemType: Yup.string().required("Please Select Item Type"),
     }),
-    onSubmit: values => {
-      let unhandled = false
-        
+    onSubmit: (values) => {
+      let unhandled = false;
+
       if (values.itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
           if (
             variantData[i].attributes.length === 0 ||
             variantData[i].inventory === ""
           ) {
-            unhandled = true
+            unhandled = true;
           } else if (
             variantData[i].sku === "" ||
             variantData[i].costPrice === "" ||
             variantData[i].sellingPrice === ""
           ) {
-            unhandled = true
+            unhandled = true;
           }
         }
       } else {
@@ -242,100 +247,100 @@ const EditItems = props => {
           otherData.sellingPrice === "" ||
           otherData.inventory === ""
         ) {
-          unhandled = true
+          unhandled = true;
         }
       }
 
       if (unhandled) {
-        setFieldInvalid(false)
-        notify("Error", "Please enter all the fields")
-        return
+        setFieldInvalid(false);
+        notify("Error", "Please enter all the fields");
+        return;
       } else {
         if (values.itemType === "variable") {
-          const finalVariant = variantData.map(element => {
-            const { id, ...rest } = element
-            return rest
-          })
-          values.variants = [...finalVariant]
+          const finalVariant = variantData.map((element) => {
+            const { id, ...rest } = element;
+            return rest;
+          });
+          values.variants = [...finalVariant];
         } else {
-          values.variants = [{ ...otherData }]
+          values.variants = [{ ...otherData }];
         }
 
-        values.images = [...selectedFiles]
-        values.taxes = [...taxArr]
+        values.images = [...selectedFiles];
+        values.taxes = [...taxArr];
         console.log(values);
       }
     },
-  })
+  });
   const handleAddRow = () => {
-    const newRow = { id: uuidv4() }
-    setVariantOptions([...variantOptions, newRow])
-  }
+    const newRow = { id: uuidv4() };
+    setVariantOptions([...variantOptions, newRow]);
+  };
 
   const handleAddVariantData = () => {
-    const newRow = { id: uuidv4(), attributes: [] }
-    setVariantData([...variantData, newRow])
-  }
+    const newRow = { id: uuidv4(), attributes: [] };
+    setVariantData([...variantData, newRow]);
+  };
 
-  const handleDeleteRow = id => {
-    const deletedOption = variantOptions.find(option => option.id === id)
-    const updatedRows = variantOptions.filter(row => row.id !== id)
-    setVariantOptions(updatedRows)
+  const handleDeleteRow = (id) => {
+    const deletedOption = variantOptions.find((option) => option.id === id);
+    const updatedRows = variantOptions.filter((row) => row.id !== id);
+    setVariantOptions(updatedRows);
 
     if (deletedOption) {
-      const deletedAttributeName = deletedOption.name
-      const updatedVariantData = variantData.map(el => {
+      const deletedAttributeName = deletedOption.name;
+      const updatedVariantData = variantData.map((el) => {
         if (el.attributes) {
           el.attributes = el.attributes.filter(
-            attr => !attr.hasOwnProperty(deletedAttributeName),
-          )
+            (attr) => !attr.hasOwnProperty(deletedAttributeName)
+          );
         }
-        return el
-      })
+        return el;
+      });
 
-      setVariantData(updatedVariantData)
+      setVariantData(updatedVariantData);
     }
-  }
+  };
 
-  const handleDeleteVariantData = id => {
-    const updatedRows = variantData.filter(row => row.id !== id)
-    setVariantData(updatedRows)
-  }
+  const handleDeleteVariantData = (id) => {
+    const updatedRows = variantData.filter((row) => row.id !== id);
+    setVariantData(updatedRows);
+  };
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Lexa", link: "#" },
     { title: "Edit Items", link: "/edit-items" },
-  ]
+  ];
 
   useEffect(() => {
-    props.setBreadcrumbItems("CreateItems", breadcrumbItems)
-  })
+    props.setBreadcrumbItems("CreateItems", breadcrumbItems);
+  });
 
   //Handle File Upload
   function handleAcceptedFiles(files) {
-    const updatedFiles = files.map(file =>
+    const updatedFiles = files.map((file) =>
       Object.assign(file, {
         preview: URL.createObjectURL(file),
         formattedSize: formatBytes(file.size),
-      }),
-    )
-    setselectedFiles([...selectedFiles, updatedFiles[0]])
+      })
+    );
+    setselectedFiles([...selectedFiles, updatedFiles[0]]);
   }
 
-//   console.log(validation.values)
+  //   console.log(validation.values)
 
   /**
    * Formats the size
    */
   function formatBytes(bytes, decimals = 2) {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
 
   return (
@@ -343,10 +348,10 @@ const EditItems = props => {
       <ToastContainer position="top-center" theme="colored" />
       <Form
         className="form-horizontal mt-4"
-        onSubmit={e => {
-          e.preventDefault()
-          validation.handleSubmit()
-          return false
+        onSubmit={(e) => {
+          e.preventDefault();
+          validation.handleSubmit();
+          return false;
         }}
       >
         <Row>
@@ -407,7 +412,7 @@ const EditItems = props => {
                       className="form-control"
                     >
                       <option>Category</option>
-                      {allCategories.map(e => (
+                      {allCategories.map((e) => (
                         <option value={e._id}>{e.name}</option>
                       ))}
                     </select>
@@ -494,7 +499,7 @@ const EditItems = props => {
                         className="form-control"
                       >
                         <option>Select Tax</option>
-                        {allTaxes.map(e => (
+                        {allTaxes.map((e) => (
                           <option value={e._id}>{e.name}</option>
                         ))}
                       </select>
@@ -532,8 +537,8 @@ const EditItems = props => {
                   style={{ display: "flex", justifyContent: "space-evenly" }}
                 >
                   <Dropzone
-                    onDrop={acceptedFiles => {
-                      handleAcceptedFiles(acceptedFiles)
+                    onDrop={(acceptedFiles) => {
+                      handleAcceptedFiles(acceptedFiles);
                     }}
                   >
                     {({ getRootProps, getInputProps }) => (
@@ -583,7 +588,7 @@ const EditItems = props => {
                             </Row>
                           </div>
                         </Card>
-                      )
+                      );
                     })}
                   </div>
                 </Form>
@@ -603,7 +608,7 @@ const EditItems = props => {
                 <h4 className="card-title">Type</h4>
                 <div className="mb-1">
                   <select
-                  disabled="true"
+                    disabled="true"
                     name="itemType"
                     id="itemType"
                     value={validation.values.itemType}
@@ -624,7 +629,7 @@ const EditItems = props => {
           <Card>
             {validation.values.itemType == "variable" ? (
               <CardBody>
-                {variantOptions.map(row => (
+                {variantOptions.map((row) => (
                   <AttributesRow
                     key={row.id}
                     _id={row.id}
@@ -645,7 +650,7 @@ const EditItems = props => {
                     <i className=" mdi mdi-18px mdi-plus"></i>
                   </button>
                 </div>
-                {variantData.map(row => (
+                {variantData.map((row) => (
                   <AllVariantRows
                     data={row}
                     key={row.id}
@@ -669,42 +674,36 @@ const EditItems = props => {
               </CardBody>
             ) : (
               <CardBody>
-                <Standard onChange={handleOtherChange} />
+                <Standard
+                  type={validation.values.itemType}
+                  onChange={handleOtherChange}
+                />
               </CardBody>
             )}
           </Card>
         </Row>
       </Form>
     </div>
-  )
-}
+  );
+};
 
-const AttributesRow = props => {
-  const {
-    _id,
-    onDelete,
-    disabledDelete,
-    setVariantOptions,
-    data,
-
-  } = props
+const AttributesRow = (props) => {
+  const { _id, onDelete, disabledDelete, setVariantOptions, data } = props;
   const nameRef = useRef(data.name || "");
-  const [inputValue, setInputValue] = useState("")
+  const [inputValue, setInputValue] = useState("");
   const [chips, setChips] = useState(data.chips || []);
 
-
-
-
   useEffect(() => {
-    setVariantOptions(prevOptions =>
-      prevOptions.map(e => {
+    setVariantOptions((prevOptions) =>
+      prevOptions.map((e) => {
         if (e.id === _id) {
           return {
             ...e,
-            name: data.name ? data.name : 
-              nameRef.current.placeholder !== "Enter Variant Key"
-                ? nameRef.current.value
-                : null,
+            name: data.name
+              ? data.name
+              : nameRef.current.placeholder !== "Enter Variant Key"
+              ? nameRef.current.value
+              : null,
             chips: [...chips],
           };
         }
@@ -713,29 +712,29 @@ const AttributesRow = props => {
     );
   }, [chips]);
 
-  const handleInputChange = event => {
-    setInputValue(event.target.value)
-  }
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
 
-  const setNameRef = event => {
-    nameRef.current = event.target.value
-  }
+  const setNameRef = (event) => {
+    nameRef.current = event.target.value;
+  };
 
   //Handling Chips Creation on space or enter
-  const handleInputKeyPress = event => {
+  const handleInputKeyPress = (event) => {
     if (
       (event.key === "Enter" || event.key === " ") &&
       inputValue.trim() !== ""
     ) {
-      event.preventDefault()
-      setChips([...chips, inputValue.trim()])
-      setInputValue("")
+      event.preventDefault();
+      setChips([...chips, inputValue.trim()]);
+      setInputValue("");
     }
-  }
+  };
 
-  const handleChipDelete = chipIndex => {
-    setChips(chips.filter((_, index) => index !== chipIndex))
-  }
+  const handleChipDelete = (chipIndex) => {
+    setChips(chips.filter((_, index) => index !== chipIndex));
+  };
 
   return (
     <div>
@@ -774,7 +773,7 @@ const AttributesRow = props => {
         </Col>
       </Row>
     </div>
-  )
-}
+  );
+};
 
-export default connect(null, { setBreadcrumbItems })(EditItems)
+export default connect(null, { setBreadcrumbItems })(EditItems);

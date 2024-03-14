@@ -151,7 +151,6 @@ const CreateItems = props => {
     }),
     onSubmit: values => {
       let unhandled = false
-      console.log(values.itemType)
       if (values.itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
           if (
@@ -598,7 +597,7 @@ const CreateItems = props => {
               </CardBody>
             ) : (
               <CardBody>
-                <Standard onChange={handleOtherChange} />
+                <Standard type={validation.values.itemType} onChange={handleOtherChange} />
               </CardBody>
             )}
           </Card>

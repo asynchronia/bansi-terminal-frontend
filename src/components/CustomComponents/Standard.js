@@ -4,8 +4,7 @@ import { Col, Row } from 'reactstrap'
 
 const Standard = (props) => {
 
-    const {onChange}=props
-
+    const {type, onChange}=props
     const handleInputChange = (e) => {
         const {name, value } = e.target;
         onChange(name, value);
@@ -25,7 +24,7 @@ const Standard = (props) => {
           onChange={handleInputChange}
         />
       </Col>
-      <Col>
+     { type === "standard" ? <Col>
         <label className="form-label mt-3">Stock Quantity</label>
         <AvField
           name="inventory"
@@ -36,7 +35,7 @@ const Standard = (props) => {
           placeholder="Enter Quantity"
           onChange={handleInputChange}
         />
-      </Col>
+      </Col>:null}
       <Col>
         <label className="form-label mt-3">Cost Price</label>
         <AvField
