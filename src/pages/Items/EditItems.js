@@ -55,6 +55,9 @@ const EditItems = props => {
           {
             name: "color",
             value: "black",
+          },{
+            name: "size",
+            value: "XL",
           },
         ],
         costPrice: 5,
@@ -72,12 +75,33 @@ const EditItems = props => {
         costPrice: 10,
         sellingPrice: 15,
         inventory: 600,
-      },
+      }
     ],
   }
   const [variantData, setVariantData] = useState(itemsData.variants)
 
-  const [variantOptions, setVariantOptions] = useState([])
+  const [variantOptions, setVariantOptions] = useState([]);
+
+  useEffect(()=>{
+    let options= [];
+    let products= variantData;
+     products.forEach(product => {
+      product.attributes.forEach(attribute => {
+          const existingOption = options.find(option => option.name === attribute.name);
+          
+          if (!existingOption) {
+              options.push({ id:uuidv4(), name: attribute.name, chips: [attribute.value] });
+          } else {
+              if (!existingOption.chips.includes(attribute.value)) {
+                  existingOption.chips.push(attribute.value);
+              }
+          }
+      });
+  });
+  
+  setVariantOptions(options);
+
+  }, [])
  
   const [otherData, setOtherData] = useState({
     sku: "",
@@ -195,7 +219,7 @@ const EditItems = props => {
     }),
     onSubmit: values => {
       let unhandled = false
-      //   console.log(values.itemType);
+        
       if (values.itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
           if (
@@ -239,7 +263,7 @@ const EditItems = props => {
 
         values.images = [...selectedFiles]
         values.taxes = [...taxArr]
-        handleItemCreation(values)
+        console.log(values);
       }
     },
   })
@@ -579,6 +603,7 @@ const EditItems = props => {
                 <h4 className="card-title">Type</h4>
                 <div className="mb-1">
                   <select
+                  disabled="true"
                     name="itemType"
                     id="itemType"
                     value={validation.values.itemType}
@@ -603,9 +628,7 @@ const EditItems = props => {
                   <AttributesRow
                     key={row.id}
                     _id={row.id}
-                    variantData={variantData}
-                    variantOptions={variantOptions}
-                    setVariantData={setVariantData}
+                    data={row}
                     disabledDelete={variantOptions.length === 1}
                     setVariantOptions={setVariantOptions}
                     onDelete={handleDeleteRow}
@@ -657,21 +680,20 @@ const EditItems = props => {
 }
 
 const AttributesRow = props => {
-  const nameRef = useRef("")
-  const [inputValue, setInputValue] = useState("")
-  const [chips, setChips] = useState([])
-
   const {
     _id,
     onDelete,
     disabledDelete,
     setVariantOptions,
-    variantOptions,
-    variantData,
-    setVariantData,
-  } = props
+    data,
 
-  console.log(variantOptions);
+  } = props
+  const nameRef = useRef(data.name || "");
+  const [inputValue, setInputValue] = useState("")
+  const [chips, setChips] = useState(data.chips || []);
+
+
+
 
   useEffect(() => {
     setVariantOptions(prevOptions =>
@@ -679,17 +701,17 @@ const AttributesRow = props => {
         if (e.id === _id) {
           return {
             ...e,
-            name:
+            name: data.name ? data.name : 
               nameRef.current.placeholder !== "Enter Variant Key"
-                ? nameRef.current
+                ? nameRef.current.value
                 : null,
             chips: [...chips],
-          }
+          };
         }
-        return e
-      }),
-    )
-  }, [chips, nameRef])
+        return e;
+      })
+    );
+  }, [chips]);
 
   const handleInputChange = event => {
     setInputValue(event.target.value)
@@ -724,9 +746,10 @@ const AttributesRow = props => {
             name="variantKey"
             className="form-control"
             type="text"
+            value={data.name}
             placeholder="Enter Variant Key"
             onChange={setNameRef}
-            ref={nameRef}
+            // ref={nameRef}
           />
         </Col>
         <Col xs="8">
