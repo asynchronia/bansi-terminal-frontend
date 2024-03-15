@@ -1,10 +1,9 @@
-import { AvField, AvForm, AvInput } from "availity-reactstrap-validation";
-import React, { useEffect } from "react";
+import { AvField, AvForm } from "availity-reactstrap-validation";
+import React from "react";
 import { Row, Col } from "reactstrap";
 
 const AllVariantRows = (props) => {
   const { _id, onDelete, variantOptions, disabledDelete, onChange, data } = props;
-
 
   const handleInputChange = (e) => {
     const {name, value } = e.target;
@@ -17,9 +16,10 @@ const AllVariantRows = (props) => {
     }else{
         onChange(_id,name, value);
     }
-    
-    
+ 
   };
+ 
+
 
   return (
     <AvForm>
@@ -52,8 +52,10 @@ const AllVariantRows = (props) => {
         />
       </Col>
 
-      {variantOptions.map((option) => (
+      {variantOptions.map((option, idx) =>  (
+       
         <Col key={option.id}>
+        {console.log(option)}
           <div>
             <label className="col-form-label mt-2">
               {option.name !== null && option.name !== ""
@@ -61,12 +63,14 @@ const AllVariantRows = (props) => {
                 : "Attribute"}
             </label>
             <AvField type="select"
+            value={data?.attributes[idx]?.value}
             validate={{ required: { value: true } }}
             errorMessage="Please select valid option"
             onChange={handleInputChange}
             name={`attribute-${option.name}`} id={`attribute-${option.name}`} className="form-control">
             <option>Select</option>
               {option.chips ? (
+                
                 option.chips.map((chip) => (
                   <option key={chip} value={chip}>
                     {chip}
