@@ -1,8 +1,9 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
+import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, CardTitle, Button, Input } from "reactstrap"
 
 import { connect } from "react-redux";
-
+import { ToastContainer, toast } from "react-toastify";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
@@ -20,6 +21,33 @@ import DropdownMenuBtn from "./DropdownMenuBtn";
 
 const AllItems = (props) => {
   document.title = "All Items";
+  let navigate = useNavigate(); 
+  const effectCalled = useRef(false);
+  const redirectToCreateItem = () =>{ 
+    let path = "/create-item"; 
+    navigate(path);
+  }
+
+  const redirectToEditPage = (id) =>{
+    let path = "/edit-item"; 
+     setTimeout(() => {
+      navigate(path, id);
+     }, 300); 
+      
+  }
+  const notify = (type, message) => {
+    if (type === "Error") {
+      toast.error(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    }
+  }
   const breadcrumbItems = [
     
     { title: "Dashboard", link: "#" },
@@ -27,6 +55,19 @@ const AllItems = (props) => {
     
   ];
   const gridRef = useRef();
+  const handleDeleteResponse = (response) =>{
+    if (response.success === true) {
+      notify("Success", response.message);
+    } else {
+      notify("Error", response.message);
+    }
+    getListOfRowData();
+  } 
+  const handleEditClick = (id) =>{
+    console.log("GRID OBJECT >>>"+id);
+    redirectToEditPage(id);
+  }
+
 const columnDefs = [
     {headerName: "Item Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true},
     {headerName: "Type", field: "itemType"},
@@ -41,8 +82,12 @@ const columnDefs = [
     {headerName: "Category", field: "category"},
     {headerName: "Action", field: "action",
     cellClass:"actions-button-cell",
-    cellRenderer: DropdownMenuBtn
-}
+    cellRenderer: DropdownMenuBtn,
+    cellRendererParams: {
+      handleResponse: handleDeleteResponse,
+      handleEditClick: handleEditClick
+    }
+  }
 ],
  agRowData =  [
     {itemName: "Byju's", type: "Variable", status: 'published', hsnCode:"ABU-123888", category: 'electronics', salePrice: '500', gst: '18%', created: '13 march 2010'},
@@ -113,8 +158,11 @@ const getCategories = useCallback(async () => {
 });
 useEffect(() => {
     props.setBreadcrumbItems('All Items', breadcrumbItems);
-   getListOfRowData(bodyObject);
-   getCategories();
+    if (!effectCalled.current) {
+      getListOfRowData(bodyObject);
+      getCategories();
+      effectCalled.current=true;
+    }
   },[]);
 
 useEffect(() => {
@@ -180,13 +228,14 @@ const onGridReady = useCallback((params) => {
 */
   return (
     <React.Fragment>
-        
+       <ToastContainer position="top-center" theme="colored" />
+        <div className="all-items">
           <Row>
             <Col className="col-12">
               <Card>
                 <CardBody>
                     <div className="button-section">
-                      <Button className="all-items-btn" color="primary">
+                      <Button className="all-items-btn" color="primary" onClick={redirectToCreateItem}>
                       Create Item
                       </Button>
                       <Button color="secondary">
@@ -253,6 +302,7 @@ const onGridReady = useCallback((params) => {
               </Card>
             </Col>
           </Row>
+          </div>
     </React.Fragment>
   )
 }
