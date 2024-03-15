@@ -12,7 +12,8 @@ const AllVariantRows = (props) => {
         var obj={};
         obj.name=arr[1];
         obj.value=value;
-        onChange(_id, "attributes", obj );
+       
+        onChange(data._id, "attributes", obj );
     }else{
         onChange(_id,name, value);
     }
