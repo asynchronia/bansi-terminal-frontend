@@ -23,12 +23,18 @@ import axios from "axios";
 import { createItemReq } from "../../service/itemService";
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
+import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 
 const EditItems = (props) => {
   const [selectedFiles, setselectedFiles] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
   const [allTaxes, setAllTaxes] = useState([]);
   const [taxArr, setTaxArr] = useState([]);
+  const [categoryData, setCategoryData] = useState({
+    name: "",
+    id: null,
+    show: false,
+  });
 
   const [fieldInvalid, setFieldInvalid] = useState(false);
 
@@ -141,10 +147,30 @@ const EditItems = (props) => {
       );
       let data = await response.data;
       setAllCategories(data?.payload?.categories);
+      let categoriesArr= data?.payload?.categories;
+      const categoryName = findCategoryName(categoriesArr, itemsData.category);
+     
+      setCategoryData({name:categoryName, id:itemsData.category, show:false})
+      
     } catch (error) {
       console.log(error);
     }
   };
+
+  function findCategoryName(categories, categoryId) {
+    for (const category of categories) {
+      if (category._id === categoryId) {
+        return category.name;
+      }
+      if (category.children) {
+        const foundInChildren = findCategoryName(category.children, categoryId);
+        if (foundInChildren) {
+          return foundInChildren;
+        }
+      }
+    }
+    return null;
+  }
 
   const searchAllTaxes = async () => {
     try {
@@ -224,7 +250,6 @@ const EditItems = (props) => {
     }),
     onSubmit: (values) => {
       let unhandled = false;
-
       if (values.itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
           if (
@@ -239,6 +264,14 @@ const EditItems = (props) => {
           ) {
             unhandled = true;
           }
+        }
+      } else if (values.itemType === "service") {
+        if (
+          otherData.sku === "" ||
+          otherData.costPrice === "" ||
+          otherData.sellingPrice === ""
+        ) {
+          unhandled = true;
         }
       } else {
         if (
@@ -262,13 +295,18 @@ const EditItems = (props) => {
             return rest;
           });
           values.variants = [...finalVariant];
-        } else {
+        } else if(values.itemType === "standard"){
           values.variants = [{ ...otherData }];
+        }else{
+          const{ inventory, ...rest}= otherData;
+          values.variants=[{...rest}];
         }
 
         values.images = [...selectedFiles];
         values.taxes = [...taxArr];
+        values.category = categoryData.id;
         console.log(values);
+        // handleItemCreation(values)
       }
     },
   });
@@ -402,25 +440,29 @@ const EditItems = (props) => {
                     ) : null}
                   </div>
                   <div className="mt-3 mb-0">
-                    <label className="col-form-label">Choose Category</label>
-                    <select
-                      onChange={validation.handleChange}
-                      id="category"
+                    <label className="form-label">Select Category</label>
+                    <label
                       name="category"
-                      value={validation.values.category}
-                      onBlur={validation.handleBlur}
+                      id="category"
+                      onClick={() => {
+                        setCategoryData({
+                          ...categoryData,
+                          show: !categoryData.show,
+                        });
+                      }}
                       className="form-control"
                     >
-                      <option>Category</option>
-                      {allCategories.map((e) => (
-                        <option value={e._id}>{e.name}</option>
-                      ))}
-                    </select>
-                    {validation.errors.category ? (
-                      <p style={{ color: "red" }}>
-                        {validation.errors.category}
-                      </p>
+                      {categoryData.name !== ""
+                        ? `Category: ${categoryData.name}`
+                        : `Select Category`}
+                    </label>
+                    {categoryData.show ? (
+                      <MultipleLayerSelect
+                        categories={allCategories}
+                        setCategoryData={setCategoryData}
+                      />
                     ) : null}
+
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
