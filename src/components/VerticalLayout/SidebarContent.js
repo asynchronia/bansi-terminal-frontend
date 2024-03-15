@@ -12,6 +12,9 @@ import { Link } from "react-router-dom"
 //i18n
 //import { withTranslation } from "react-i18next"
 
+import APP_ENV from "../../utility/env";
+
+
 const SidebarContent = props => {
   const ref = useRef();
   const activateParentDropdown = useCallback((item) => {
@@ -97,7 +100,9 @@ const SidebarContent = props => {
   };
 
   const activeMenu = useCallback(() => {
-    const pathName = process.env.PUBLIC_URL + props.router.location.pathname;
+    console.log(APP_ENV);
+    const pathName = APP_ENV.PUBLIC_URL + props.router.location.pathname;
+    console.log(pathName);
     let matchingMenuItem = null;
     const ul = document.getElementById("side-menu");
     const items = ul.getElementsByTagName("a");
