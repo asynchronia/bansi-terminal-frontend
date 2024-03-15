@@ -58,10 +58,12 @@ const EditItems = (props) => {
         sku: "sku-5",
         attributes: [
           {
+		        
             name: "color",
             value: "black",
           },
           {
+            
             name: "size",
             value: "XL",
           },
@@ -71,9 +73,11 @@ const EditItems = (props) => {
         inventory: 50,
       },
       {
+        _id: "75cbc211ce0f79d564789478",
         sku: "sku-6",
         attributes: [
           {
+            
             name: "color",
             value: "blue",
           },
@@ -104,6 +108,7 @@ const EditItems = (props) => {
             chips: [attribute.value],
           });
         } else {
+          
           if (!existingOption.chips.includes(attribute.value)) {
             existingOption.chips.push(attribute.value);
           }
@@ -189,12 +194,24 @@ const EditItems = (props) => {
 
   const handleVariantChange = (id, name, value) => {
     const updatedVariants = variantData.map((variant) => {
-      if (variant.id === id) {
+      if (variant._id === id) {
         if (name === "attributes") {
-          return {
-            ...variant,
-            attributes: [...variant.attributes, value],
-          };
+          const attributeIndex = variant.attributes.findIndex(attr => attr.name === value.name);
+          if (attributeIndex !== -1) {
+            // Update the value if the attribute name already exists
+            const updatedAttributes = [...variant.attributes];
+            updatedAttributes[attributeIndex] = value;
+            return {
+              ...variant,
+              attributes: updatedAttributes,
+            };
+          } else {
+            // Add the new attribute if it doesn't exist
+            return {
+              ...variant,
+              attributes: [...variant.attributes, value],
+            };
+          }
         }
         return {
           ...variant,
@@ -366,7 +383,7 @@ const EditItems = (props) => {
     setselectedFiles([...selectedFiles, updatedFiles[0]]);
   }
 
-  //   console.log(validation.values)
+
 
   /**
    * Formats the size
@@ -693,6 +710,7 @@ const EditItems = (props) => {
                   </button>
                 </div>
                 {variantData.map((row) => (
+                  
                   <AllVariantRows
                     data={row}
                     key={row.id}
