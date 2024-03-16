@@ -105,7 +105,7 @@ import ClientView from "../pages/Clients/ClientView";
 
 const userRoutes = [
   { path: "/create-item", component: <CreateItems /> },
-  { path: "/edit-item", component: <EditItems /> },
+  { path: "/edit-item/:id", component: <EditItems /> },
   { path: "/client/add", component: <CreateClient /> },
   { path: "/items", component: <AllItems /> },
   { path: "/clients", component: <AllClients /> },

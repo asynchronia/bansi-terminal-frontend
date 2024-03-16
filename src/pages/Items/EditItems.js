@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import InputWithChips from "../../components/CustomComponents/InputWithChips";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
@@ -24,73 +24,60 @@ import { createItemReq } from "../../service/itemService";
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
+import { CircularProgress } from "@mui/material";
 
 const EditItems = (props) => {
+  const [itemsData, setItemsData] = useState({});
+  const [loadedItem, setLoadedItems] = useState(false);
   const [selectedFiles, setselectedFiles] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
   const [allTaxes, setAllTaxes] = useState([]);
-  const [taxArr, setTaxArr] = useState([]);
+  const [variantData, setVariantData] = useState([]);
+  const [taxArr, setTaxArr] = useState(null);
+  const [variantOptions, setVariantOptions] = useState([]);
+  const[deletedVariant, setDeletedVariant]= useState([])
+
   const [categoryData, setCategoryData] = useState({
     name: "",
     id: null,
     show: false,
   });
 
+  const [otherData, setOtherData] = useState({
+    sku: "",
+    inventory: "",
+    costPrice: "",
+    sellingPrice: "",
+  });
+
   const [fieldInvalid, setFieldInvalid] = useState(false);
 
-  const itemsData = {
-    _id: "65bab211ce0f79d56447c537",
-    title: "pen",
-    description: "ball point pen",
-    itemType: "variable",
-    tags: [],
-    taxes: ["65bd55d4ca85581065ffe66f"],
-    category: "65bab211ce0f79d56447c537",
-    itemUnit: "kg",
-    hsnCode: "hsnCode5",
-    taxPreference: "exempt",
-    status: "draft",
-    images: ["image link 1", "image link 2"],
-    deletedVariants: ["65eb06c18451bef14368534d"],
-    variants: [
-      {
-        _id: "65bab211ce0f79d56447c537",
-        sku: "sku-5",
-        attributes: [
-          {
-		        
-            name: "color",
-            value: "black",
-          },
-          {
-            
-            name: "size",
-            value: "XL",
-          },
-        ],
-        costPrice: 5,
-        sellingPrice: 10,
-        inventory: 50,
-      },
-      {
-        _id: "75cbc211ce0f79d564789478",
-        sku: "sku-6",
-        attributes: [
-          {
-            
-            name: "color",
-            value: "blue",
-          },
-        ],
-        costPrice: 10,
-        sellingPrice: 15,
-        inventory: 600,
-      },
-    ],
-  };
-  const [variantData, setVariantData] = useState(itemsData.variants);
+  const { id } = useParams();
 
-  const [variantOptions, setVariantOptions] = useState([]);
+  const searchItemData = async (id) => {
+    const url = `http://localhost:3000/api/items/get`;
+    const data = { _id: id };
+    try {
+      const res = await axios.post(url, data);
+      setItemsData(res.data);
+      setVariantData(res.data?.payload?.variants);
+      setTaxArr(res.data?.payload?.item?.taxes);
+
+      setOtherData({
+        sku: res.data.payload.variants[0]?.sku  , 
+        inventory: res.data.payload.variants[0]?.inventory,
+        costPrice:res.data.payload.variants[0]?.costPrice,
+        sellingPrice:res.data.payload.variants[0]?.sellingPrice
+      });
+      setLoadedItems(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    searchItemData(id);
+  }, [loadedItem]);
 
   useEffect(() => {
     let options = [];
@@ -108,7 +95,6 @@ const EditItems = (props) => {
             chips: [attribute.value],
           });
         } else {
-          
           if (!existingOption.chips.includes(attribute.value)) {
             existingOption.chips.push(attribute.value);
           }
@@ -117,14 +103,7 @@ const EditItems = (props) => {
     });
 
     setVariantOptions(options);
-  }, []);
-
-  const [otherData, setOtherData] = useState({
-    sku: "",
-    inventory: "",
-    costPrice: "",
-    sellingPrice: "",
-  });
+  }, [variantData]);
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -151,12 +130,19 @@ const EditItems = (props) => {
         "http://localhost:3000/api/categories/list"
       );
       let data = await response.data;
-      setAllCategories(data?.payload?.categories);
-      let categoriesArr= data?.payload?.categories;
-      const categoryName = findCategoryName(categoriesArr, itemsData.category);
-     
-      setCategoryData({name:categoryName, id:itemsData.category, show:false})
       
+      setAllCategories(data?.payload?.categories);
+      let categoriesArr = data?.payload?.categories;
+      const categoryName = findCategoryName(
+        categoriesArr,
+        itemsData.payload?.item?.category
+      );
+
+      setCategoryData({
+        name: categoryName,
+        id: itemsData.payload?.item?.category,
+        show: false,
+      });
     } catch (error) {
       console.log(error);
     }
@@ -190,13 +176,16 @@ const EditItems = (props) => {
   useEffect(() => {
     searchCategories();
     searchAllTaxes();
-  }, []);
+  }, [loadedItem]);
 
   const handleVariantChange = (id, name, value) => {
+  
     const updatedVariants = variantData.map((variant) => {
       if (variant._id === id) {
         if (name === "attributes") {
-          const attributeIndex = variant.attributes.findIndex(attr => attr.name === value.name);
+          const attributeIndex = variant.attributes.findIndex(
+            (attr) => attr.name === value.name
+          );
           if (attributeIndex !== -1) {
             // Update the value if the attribute name already exists
             const updatedAttributes = [...variant.attributes];
@@ -247,17 +236,19 @@ const EditItems = (props) => {
     enableReinitialize: true,
 
     initialValues: {
-      title: itemsData.title,
-      hsnCode: itemsData.hsnCode,
-      category: itemsData.category,
-      description: itemsData.description,
-      itemType: itemsData.itemType,
-      itemUnit: itemsData.itemUnit,
-      taxPreference: itemsData.taxPreference,
-      taxes: itemsData.taxes[0],
-      status: itemsData.status,
-      images: itemsData.images,
-      variants: itemsData.variants,
+      _id:id,
+      title: itemsData.payload?.item?.title,
+      hsnCode: itemsData.payload?.item?.hsnCode,
+      category: itemsData.payload?.item?.category,
+      description: itemsData.payload?.item?.description,
+      itemType: itemsData.payload?.item?.itemType,
+      itemUnit: itemsData.payload?.item?.itemUnit,
+      taxPreference: itemsData.payload?.item?.taxPreference,
+      taxes: itemsData.payload?.item?.taxes[0],
+      status: itemsData.payload?.item?.status,
+      images: itemsData.payload?.item?.images,
+      variants: itemsData.payload?.variants,
+      deletedVariant:[]
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Please Enter Item Name"),
@@ -312,21 +303,35 @@ const EditItems = (props) => {
             return rest;
           });
           values.variants = [...finalVariant];
-        } else if(values.itemType === "standard"){
+        } else if (values.itemType === "standard") {
           values.variants = [{ ...otherData }];
-        }else{
-          const{ inventory, ...rest}= otherData;
-          values.variants=[{...rest}];
+        } else {
+          const { inventory, ...rest } = otherData;
+          values.variants = [{ ...rest }];
         }
 
         values.images = [...selectedFiles];
         values.taxes = [...taxArr];
         values.category = categoryData.id;
-        console.log(values);
-        // handleItemCreation(values)
+        values.deletedVariant=[...deletedVariant];
+        // console.log(values);
+        handleItemEdit(values)
       }
     },
   });
+
+  const handleItemEdit=async(values)=>{
+    const url = `http://localhost:3000/api/items/update`;
+    const data = values;
+    try {
+      const res = await axios.post(url, data);
+      console.log(res)
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
+
   const handleAddRow = () => {
     const newRow = { id: uuidv4() };
     setVariantOptions([...variantOptions, newRow]);
@@ -358,14 +363,16 @@ const EditItems = (props) => {
   };
 
   const handleDeleteVariantData = (id) => {
-    const updatedRows = variantData.filter((row) => row.id !== id);
+    const deletedRow= variantData.filter((row)=> row._id===id);
+    setDeletedVariant([...deletedVariant, deletedRow[0]._id]);
+    const updatedRows = variantData.filter((row) => row._id !== id);
     setVariantData(updatedRows);
   };
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Lexa", link: "#" },
-    { title: "Edit Items", link: "/edit-items" },
+    { title: "Edit Items", link: `/edit-item/:${id}` },
   ];
 
   useEffect(() => {
@@ -383,8 +390,6 @@ const EditItems = (props) => {
     setselectedFiles([...selectedFiles, updatedFiles[0]]);
   }
 
-
-
   /**
    * Formats the size
    */
@@ -397,6 +402,14 @@ const EditItems = (props) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
+
+  // if(!loadedItem){
+  //   return (
+  //     <div>
+  //       <CircularProgress/>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div style={{ position: "relative" }}>
@@ -479,7 +492,6 @@ const EditItems = (props) => {
                         setCategoryData={setCategoryData}
                       />
                     ) : null}
-
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
@@ -552,7 +564,7 @@ const EditItems = (props) => {
                       <select
                         id="taxes"
                         name="taxes"
-                        value={validation.values.taxes[0]}
+                        value={validation.values.taxes}
                         onChange={handleTaxes}
                         onBlur={validation.handleBlur}
                         className="form-control"
@@ -710,7 +722,6 @@ const EditItems = (props) => {
                   </button>
                 </div>
                 {variantData.map((row) => (
-                  
                   <AllVariantRows
                     data={row}
                     key={row.id}
@@ -735,6 +746,7 @@ const EditItems = (props) => {
             ) : (
               <CardBody>
                 <Standard
+                  data={otherData}
                   type={validation.values.itemType}
                   onChange={handleOtherChange}
                 />
@@ -749,9 +761,11 @@ const EditItems = (props) => {
 
 const AttributesRow = (props) => {
   const { _id, onDelete, disabledDelete, setVariantOptions, data } = props;
+  const [displayValue, setDisplayValue]= useState(data.name || "")
   const nameRef = useRef(data.name || "");
   const [inputValue, setInputValue] = useState("");
   const [chips, setChips] = useState(data.chips || []);
+  
 
   useEffect(() => {
     setVariantOptions((prevOptions) =>
@@ -761,9 +775,7 @@ const AttributesRow = (props) => {
             ...e,
             name: data.name
               ? data.name
-              : nameRef.current.placeholder !== "Enter Variant Key"
-              ? nameRef.current.value
-              : null,
+              : displayValue,
             chips: [...chips],
           };
         }
@@ -778,6 +790,7 @@ const AttributesRow = (props) => {
 
   const setNameRef = (event) => {
     nameRef.current = event.target.value;
+    setDisplayValue(nameRef.current)
   };
 
   //Handling Chips Creation on space or enter
@@ -805,10 +818,10 @@ const AttributesRow = (props) => {
             name="variantKey"
             className="form-control"
             type="text"
-            value={data.name}
             placeholder="Enter Variant Key"
             onChange={setNameRef}
-            // ref={nameRef}
+            value={displayValue}
+            ref={nameRef}
           />
         </Col>
         <Col xs="8">
