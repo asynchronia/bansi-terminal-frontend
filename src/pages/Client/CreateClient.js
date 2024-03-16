@@ -33,7 +33,7 @@ const CreateClient = props => {
     }
   }
 
-  const handleCreateClient = async values => {
+  const handleCreateClient = async (values) => {
     try {
       const response = await createClientReq(values)
       if (response.success === true) {
@@ -53,17 +53,18 @@ const CreateClient = props => {
       name: null,
       contact: null,
       email: null,
-      clientType: "business",
-      logo: null,
+      clientType: "individual",
+      logo: "",
       gstin: null,
       pan: null,
       bankAccountName: null,
       bankAccountNumber: null,
       ifscCode: null,
+      status:'active',
       primaryBranch:{
         name: null,
         address:null,
-        associatedWarehouse:null,
+        associatedWarehouse:"65f4b5d66959ec3852a37e60",
         contact:null
       },
       primaryUser:{
@@ -71,9 +72,9 @@ const CreateClient = props => {
         lastName:null,
         email:null,
         password:null,
-        conatct:null,
+        contact:null,
         gender:null,
-        role:null,
+        role:"65b4e43b671d73cc3c1bbf8e",
       }
     },
     validationSchema: Yup.object({
@@ -87,6 +88,20 @@ const CreateClient = props => {
         "Please Enter Back Account Number",
       ),
       ifscCode: Yup.string().required("Please Enter IFSC Code"),
+      primaryBranch: Yup.object().shape({
+        name:Yup.string().required("Please Enter Branch Name"),
+        address:Yup.string().required("Please Enter Branch Address"),
+        contact:Yup.string().required("Please Enter Valid Contact Number"),
+      }),
+      primaryUser: Yup.object().shape({
+        firstName:Yup.string().required("Please Enter First Name"),
+        lastName:Yup.string().required("Please Enter Last Name"),
+        email:Yup.string().required("Please Enter Email Id"),
+        password:Yup.string().required("Please Enter Password"),
+        contact:Yup.string().required("Please Enter Valid Contact Number"),
+        gender:Yup.string().required("Please Enter Gender"),
+        
+      })
     }),
     onSubmit: values => {
       values.logo=`${selectedFiles[0].preview}`
@@ -113,6 +128,7 @@ const CreateClient = props => {
     const i = Math.floor(Math.log(bytes) / Math.log(k))
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
   }
+  console.log(validation.values)
 
   useEffect(() => {
     props.setBreadcrumbItems("CreateItems", breadcrumbItems)
@@ -136,8 +152,8 @@ const CreateClient = props => {
           display: "flex",
         }}
       >
-        <select className="form-control" name="status">
-          <option value="published">Published</option>
+        <select className="form-select focus-width" name="status">
+          <option value="active">Published</option>
           <option value="draft">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
@@ -269,11 +285,11 @@ const CreateClient = props => {
                       validation.touched.clientType &&
                       validation.errors.clientType
                     }
-                    className="form-control"
+                    className="form-select focus-width"
                   >
                     <option>Select Client Type</option>
                     <option value="business">Business</option>
-                    <option>Option 2</option>
+                    <option value="individual">Individual</option>
                   </select>
                   {validation.errors.clientType ? (
                     <p style={{ color: "red" }}>
@@ -284,7 +300,7 @@ const CreateClient = props => {
               </Row>
             </CardBody>
           </Card>
-          <AddBranch />
+          <AddBranch validation={validation} />
         </Col>
         <Col xs="4">
           <Card>
@@ -402,7 +418,7 @@ const CreateClient = props => {
               </div>
             </CardBody>
           </Card>
-          <AddUser />
+          <AddUser validation={validation} />
         </Col>
       </Row>
     </div>
