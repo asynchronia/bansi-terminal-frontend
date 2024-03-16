@@ -1,5 +1,5 @@
 import React,{useEffect, useState, useRef,useCallback, useMemo} from "react";
-import { Row, Col, Card, CardBody, CardTitle, Form, Input, Label, FormFeedback, Button } from "reactstrap"
+import { Row, Col, Card, CardBody, CardTitle, Form, Input, Label, FormFeedback, Button } from "reactstrap";
 // Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
@@ -16,9 +16,10 @@ import 'ag-grid-enterprise';
 import 'react-toastify/dist/ReactToastify.css';
 import plusIcon from "../../assets/images/small/plus-icon.png";
 import minusIcon from "../../assets/images/small/minus-icon.png";
+import CategoryList from "./CategoryList";
 const AddCategory = (props) =>{
   const gridRef = useRef();
-    document.title = "All Items";
+    document.title = "Categories";
     const breadcrumbItems = [
       
       { title: "Dashboard", link: "#" },
@@ -250,7 +251,7 @@ const AddCategory = (props) =>{
         <Col xl={6}>
         <Card>
                 <CardBody>
-                  
+                  {/*<CategoryList {...rowData:rowData}/>*/}
                     <div
                             className="ag-theme-quartz"
                             style={{
@@ -269,7 +270,7 @@ const AddCategory = (props) =>{
                               getDataPath={getDataPath}
                               icons={icons}
                             />
-                        </div>
+                          </div>
             </CardBody>
               </Card>
         </Col>

@@ -1,25 +1,39 @@
-.MuiTablePagination-selectLabel {
-    margin-bottom : 0px !important;
-}
-.actions-button-cell { 
-    overflow:visible; 
-}
+.all-items{
+    .MuiTablePagination-selectLabel {
+        margin-bottom : 0px !important;
+    }
+    .actions-button-cell { 
+        overflow:visible; 
+    }
 
-.ag-row {
-    z-index: 0;
-}
+    .ag-row {
+        z-index: 0;
+    }
 
-.ag-row.ag-row-focus {
-    z-index: 1;
-}
-.button-section{
-    display: block;
-    padding-bottom: 10px;
-}
-.button-right-section{
-    float: right;
-    display: inline-flex;
-}
-.all-items-btn{
-    margin-right: 10px;
+    .ag-row.ag-row-focus {
+        z-index: 1;
+    }
+    .button-section{
+        display: block;
+        padding-bottom: 10px;
+    }
+    .button-right-section{
+        float: right;
+        display: inline-flex;
+    }
+    .all-items-btn{
+        margin-right: 10px;
+    }
+    .search-box .form-control{
+        padding-left: 10px;
+    }
+    .search-box .search-icon {
+        font-size: 18px;
+        position: absolute;
+        top: 0px;
+        right: 13px;
+        left: auto;
+        color: var(--bs-gray-600);
+        line-height: 34px;
+    }
 }
