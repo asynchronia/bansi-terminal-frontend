@@ -4,22 +4,23 @@ import { Row, Col } from "reactstrap";
 
 const AllVariantRows = (props) => {
   const { _id, onDelete, variantOptions, disabledDelete, onChange, data } = props;
-
+  const reqId= data?._id? data?._id : _id;
+  
   const handleInputChange = (e) => {
     const {name, value } = e.target;
+    
     if(name.startsWith('attribute-')){
         var arr= name.trim().split("-");
         var obj={};
         obj.name=arr[1];
         obj.value=value;
        
-        onChange(data._id, "attributes", obj );
+        onChange(reqId, "attributes", obj );
     }else{
-        onChange(_id,name, value);
+        onChange(reqId, name, value);
     }
  
   };
- 
 
 
   return (
@@ -56,7 +57,6 @@ const AllVariantRows = (props) => {
       {variantOptions.map((option, idx) =>  (
        
         <Col key={option.id}>
-        
           <div>
             <label className="col-form-label mt-2">
               {option.name !== null && option.name !== ""
@@ -71,7 +71,6 @@ const AllVariantRows = (props) => {
             name={`attribute-${option.name}`} id={`attribute-${option.name}`} className="form-control">
             <option>Select</option>
               {option.chips ? (
-                
                 option.chips.map((chip) => (
                   <option key={chip} value={chip}>
                     {chip}
@@ -115,7 +114,7 @@ const AllVariantRows = (props) => {
         <button
           type="button"
           className="btn btn-primary waves-effect waves-light mt-5"
-          onClick={() => onDelete(_id)}
+          onClick={() => onDelete(reqId)}
           disabled={disabledDelete}
         >
           <i className="mdi mdi-18px mdi-delete"></i>

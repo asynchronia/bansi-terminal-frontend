@@ -4,7 +4,7 @@ import { Col, Row } from 'reactstrap'
 
 const Standard = (props) => {
 
-    const {type, onChange}=props
+    const {data, type, onChange}=props
     const handleInputChange = (e) => {
         const {name, value } = e.target;
         onChange(name, value);
@@ -22,6 +22,7 @@ const Standard = (props) => {
           type="text"
           placeholder="Enter SKU"
           onChange={handleInputChange}
+          value={data?.sku ||""}
         />
       </Col>
      { type === "standard" ? <Col>
@@ -34,6 +35,7 @@ const Standard = (props) => {
           type="text"
           placeholder="Enter Quantity"
           onChange={handleInputChange}
+          value={data?.inventory ||""}
         />
       </Col>:null}
       <Col>
@@ -46,6 +48,7 @@ const Standard = (props) => {
           type="text"
           placeholder="Enter Price"
           onChange={handleInputChange}
+          value={data?.costPrice||""}
         />
       </Col>
       <Col>
@@ -58,6 +61,7 @@ const Standard = (props) => {
           type="text"
           placeholder="Enter Price"
           onChange={handleInputChange}
+          value={data?.sellingPrice || ""}
         />
       </Col>
       
