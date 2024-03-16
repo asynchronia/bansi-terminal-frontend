@@ -33,7 +33,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
           className="option"
           onClick={() => handleCategoryClick(category._id, category.name)}
         >
-          {`➡ ${category.name}`}
+          {` ${category.name}`}
           {category.children && (
             <div className="child-options">
               {category.children.map((child) => (
@@ -49,7 +49,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
                     handleChildClick(event, child._id, child.name)
                   }
                 >
-                  → {child.name}
+                {` ${child.name}`}
                   {child.children && (
                     <div
                       style={{
@@ -71,7 +71,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
                             )
                           }
                         >
-                          → {grandchild.name}
+                           {` ${grandchild.name}`}
                         </div>
                       ))}
                     </div>
