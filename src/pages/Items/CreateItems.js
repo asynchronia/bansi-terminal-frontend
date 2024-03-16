@@ -25,6 +25,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import YourComponent from "../../components/CustomComponents/MultipleLayerSelect";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
+import { Box, Grid } from "@mui/material";
 
 const CreateItems = (props) => {
   const [selectedFiles, setselectedFiles] = useState([]);
@@ -206,18 +207,18 @@ const CreateItems = (props) => {
             return rest;
           });
           values.variants = [...finalVariant];
-        } else if(values.itemType === "standard"){
+        } else if (values.itemType === "standard") {
           values.variants = [{ ...otherData }];
-        }else{
-          const{ inventory, ...rest}= otherData;
-          values.variants=[{...rest}];
+        } else {
+          const { inventory, ...rest } = otherData;
+          values.variants = [{ ...rest }];
         }
 
         values.images = [...selectedFiles];
         values.taxes = [...taxArr];
         values.category = categoryData.id;
         // console.log(values);
-        handleItemCreation(values)
+        handleItemCreation(values);
       }
     },
   });
@@ -372,8 +373,6 @@ const CreateItems = (props) => {
                         setCategoryData={setCategoryData}
                       />
                     ) : null}
-
-                   
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
@@ -487,7 +486,7 @@ const CreateItems = (props) => {
               <CardBody>
                 <CardTitle className="h4">Item Gallery</CardTitle>
                 <Form
-                  style={{ display: "flex", justifyContent: "space-evenly" }}
+                  style={{ display: "flex", justifyContent: "center", gap:'20px' }}
                 >
                   <Dropzone
                     onDrop={(acceptedFiles) => {
@@ -509,40 +508,26 @@ const CreateItems = (props) => {
                       </div>
                     )}
                   </Dropzone>
-                  <div className="dropzone-previews mt-3" id="file-previews">
-                    {selectedFiles.map((f, i) => {
-                      return (
-                        <Card
-                          className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete"
-                          key={i + "-file"}
-                        >
-                          <div className="p-2">
-                            <Row className="align-items-center">
-                              <Col className="col-auto">
-                                <img
-                                  data-dz-thumbnail=""
-                                  height="80"
-                                  className="avatar-sm rounded bg-light"
-                                  alt={f.name}
-                                  src={f.preview}
-                                />
-                              </Col>
-                              <Col>
-                                <Link
-                                  to="#"
-                                  className="text-muted font-weight-bold"
-                                >
-                                  {f.name}
-                                </Link>
-                                <p className="mb-0">
-                                  <strong>{f.formattedSize}</strong>
-                                </p>
-                              </Col>
-                            </Row>
-                          </div>
-                        </Card>
-                      );
-                    })}
+                  <div style={{maxWidth:'50%'}} className="dropzone-previews mt-3" id="file-previews">
+                    <Box 
+                    sx={{display:'flex', flexWrap:'wrap', gap:'10px'}}
+                      
+                      className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete"
+                    >
+                      {selectedFiles.map((f, i) => {
+                        return (
+                          <Box key={i + "-file"} className="p-2">
+                            <img
+                              data-dz-thumbnail=""
+                              height="80"
+                              className="avatar-sm rounded bg-light"
+                              alt={f.name}
+                              src={f.preview}
+                            />
+                          </Box>
+                        );
+                      })}
+                    </Box>
                   </div>
                 </Form>
 
