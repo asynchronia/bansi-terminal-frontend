@@ -470,7 +470,7 @@ const EditItems = (props) => {
                     ) : null}
                   </div>
                   <div className="mt-3 mb-0">
-                    <label className="form-label">Select Category</label>
+                    <label className="form-select focus-width">Select Category</label>
                     <label
                       name="category"
                       id="category"
@@ -522,7 +522,7 @@ const EditItems = (props) => {
               }}
             >
               <select
-                className="form-control"
+                className="form-select focus-width"
                 name="status"
                 // id = "status"
                 value={validation.values.status}
@@ -549,7 +549,7 @@ const EditItems = (props) => {
                         value={validation.values.taxPreference}
                         onChange={validation.handleChange}
                         onBlur={validation.handleBlur}
-                        className="form-control"
+                        className="form-select focus-width"
                       >
                         <option value="taxable">Taxable</option>
                         <option value="exempt">Exempt</option>
@@ -567,7 +567,7 @@ const EditItems = (props) => {
                         value={validation.values.taxes}
                         onChange={handleTaxes}
                         onBlur={validation.handleBlur}
-                        className="form-control"
+                        className="form-select focus-width"
                       >
                         <option>Select Tax</option>
                         {allTaxes.map((e) => (
@@ -585,7 +585,7 @@ const EditItems = (props) => {
                         value={validation.values.itemUnit || ""}
                         onChange={validation.handleChange}
                         onBlur={validation.handleBlur}
-                        className="form-control"
+                        className="form-select focus-width"
                       >
                         <option value="unit">unit</option>
                         <option value="kg">kg</option>
@@ -671,7 +671,7 @@ const EditItems = (props) => {
                     value={validation.values.itemType}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}
-                    className="form-control"
+                    className="form-select focus-width"
                   >
                     <option value="variable">Variable Item</option>
                     <option value="standard">Standard Item</option>

@@ -60,6 +60,21 @@ const CreateClient = props => {
       bankAccountName: null,
       bankAccountNumber: null,
       ifscCode: null,
+      primaryBranch:{
+        name: null,
+        address:null,
+        associatedWarehouse:null,
+        contact:null
+      },
+      primaryUser:{
+        firstName:null,
+        lastName:null,
+        email:null,
+        password:null,
+        conatct:null,
+        gender:null,
+        role:null,
+      }
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please Enter Client Name"),
