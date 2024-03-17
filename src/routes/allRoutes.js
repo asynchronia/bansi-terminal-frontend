@@ -33,6 +33,7 @@ import AllItems from "../pages/Items/AllItems"
 import AddCategory from "../pages/Categories/AddCategory"
 import CreateClient from "../pages/Client/CreateClient"
 import EditItems from "../pages/Items/EditItems"
+import ViewClient from "../pages/Client/ViewClient"
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -108,6 +109,7 @@ const userRoutes = [
   { path: "/items", component: <AllItems /> },
   { path: "/categories", component: <AddCategory /> },
   { path: "/dashboard", component: <Dashboard /> },
+  { path: "/client/:id", component: <ViewClient />}
   // // this route should be at the end of all other routes
   // {
   //   path: "/",
