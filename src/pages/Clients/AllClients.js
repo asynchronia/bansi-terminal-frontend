@@ -46,6 +46,7 @@ const columnDefs = [
     cellRendererParams : {
         handleViewClick: onViewClick
     }
+
 }
 ],
  agRowData =  [
@@ -71,7 +72,6 @@ const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
 const [gridApi, setGridApi] = useState(null);
 const [paginationPageSize, setPaginationPageSize ]= useState(5);
-
 let bodyObject = {
   "page": 1,
   "limit": paginationPageSize
@@ -84,7 +84,6 @@ const onPaginationChanged = useCallback((event) => {
  setPaginationPageSize(pageSize);
   
 }, []);
-
 /*
 {
     "page": 1,
@@ -119,6 +118,7 @@ const getListOfRowData =  useCallback(async (body) => {
     setAllStatuses(statusArr);
    
 });
+
 
 
 
@@ -198,6 +198,7 @@ const onGridReady = useCallback((params) => {
                 <CardBody>
                     <div className="button-section">
                       <Button className="all-items-btn" color="primary" onClick={redirectToCreateClient}>
+
                       <img src={plusIcon} style={{width: 15}}/>
                       Add New Client
                       </Button>
@@ -265,7 +266,6 @@ const onGridReady = useCallback((params) => {
               </Card>
             </Col>
           </Row>
-
     </React.Fragment>
   )
 }
