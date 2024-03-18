@@ -259,7 +259,7 @@ const CreateItems = (props) => {
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
-    { title: "Lexa", link: "#" },
+    { title: "All Items", link: "#" },
     { title: "Create Items", link: "/create-items" },
   ];
 

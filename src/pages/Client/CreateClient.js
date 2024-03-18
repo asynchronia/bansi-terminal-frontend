@@ -12,7 +12,7 @@ import { createClientReq } from "../../service/clientService"
 
 const CreateClient = props => {
   const breadcrumbItems = [
-    { title: "Lexa", link: "#" },
+    { title: "Dashboard", link: "#" },
     { title: "Client", link: "/client" },
     { title: "Add new Client", link: "/client/add" },
   ]
