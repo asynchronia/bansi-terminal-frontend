@@ -117,15 +117,13 @@ const Header = props => {
                     className="btn btn-light"
                     tag="button"
                   >
-                    All Branches <i className="mdi mdi-chevron-down"></i>
+                    All Warehouses <i className="mdi mdi-chevron-down"></i>
                   </DropdownToggle>
 
                   <DropdownMenu className="dropdown-menu-end">
-                    <DropdownItem tag="a" href="#">Action</DropdownItem>
-                    <DropdownItem tag="a" href="#">Another action</DropdownItem>
-                    <DropdownItem tag="a" href="#">Something else here</DropdownItem>
-                    <div className="dropdown-divider"></div>
-                    <DropdownItem tag="a" href="#">Separated link</DropdownItem>
+                    <DropdownItem tag="a" href="#">Banglore</DropdownItem>
+                    <DropdownItem tag="a" href="#">Mumbai</DropdownItem>
+                    <DropdownItem tag="a" href="#">Pune</DropdownItem>
                   </DropdownMenu>
 
                 </div>
