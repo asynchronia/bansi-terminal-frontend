@@ -373,6 +373,8 @@ const CreateItems = (props) => {
                         setCategoryData={setCategoryData}
                       />
                     ) : null}
+
+                   
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
