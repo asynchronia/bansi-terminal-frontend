@@ -7,7 +7,8 @@ const API_URL = {
     createClient: "/api/clients/create",
     getItems:"/api/items/list",
     getCategories:"/api/categories/list",
-    createCategory:"/api/categories/create"
+    createCategory:"/api/categories/create",
+    deleteItem:"/api/items/delete"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -90,7 +91,22 @@ export async function createCategory(body) {
         return error.response.data;
     });
 }
-
+export async function deleteItem(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.deleteItem}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            })
+            .catch(error => {
+                reject(error);
+            });
+    }).catch(error =>{
+        console.log(error);
+        return error.response.data;
+    });
+}
 // export async function stopLLMResponse() {
 //     return new Promise((resolve) => {
 //         axios

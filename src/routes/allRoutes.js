@@ -32,7 +32,8 @@ import CreateItems from "../pages/Items/CreateItems"
 import AllItems from "../pages/Items/AllItems"
 import AddCategory from "../pages/Categories/AddCategory"
 import CreateClient from "../pages/Client/CreateClient"
-import EditItems from "../pages/Items/EditItems"
+import EditItems from "../pages/Items/EditItems";
+import AllClients from "../pages/Clients/AllClients";
 import ViewClient from "../pages/Client/ViewClient"
 
 //Charts
@@ -107,7 +108,9 @@ const userRoutes = [
   { path: "/edit-item/:id", component: <EditItems /> },
   { path: "/client/add", component: <CreateClient /> },
   { path: "/items", component: <AllItems /> },
+  { path: "/clients", component: <AllClients /> },
   { path: "/categories", component: <AddCategory /> },
+  { path: "/client/view", component: <ClientView /> },
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/client/:id", component: <ViewClient />}
   // // this route should be at the end of all other routes
