@@ -73,14 +73,14 @@ const columnDefs = [
     {headerName: "Type", field: "itemType"},
     {headerName: "HSN Code", field: "hsnCode"},
     {headerName: "Status", field: "status"},
-    {headerName: "Sale Price", field: "salePrice"},
+    {headerName: "Sale Price", field: "salePrice", sortable: false},
     {headerName: "Created On", field: "createdAt", cellRenderer: (props)=>{
       console.log("created on props"+props.data);
       let date= new Date(props.value);
       return <>{date.toDateString()}</>
     }},
     {headerName: "Category", field: "category"},
-    {headerName: "Action", field: "action",
+    {headerName: "Action", field: "action", sortable: false,
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
     cellRendererParams: {
