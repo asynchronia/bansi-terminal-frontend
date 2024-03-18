@@ -7,24 +7,14 @@ import {
     DropdownMenu,
     DropdownItem,
   } from 'reactstrap';
-  import {deletItemReq } from "../../service/itemService";
+ 
 import "./styles/DropdownMenuBtn.scss";
 const DropdownMenuBtn = (props) =>{
 
-    const {handleResponse, handleEditClick, data} = props;
+    const {deleteItem, handleEditClick, data} = props;
    const [menu, setMenu] = useState(false);
-    const onDeleteItem = async() => {
-      try {
-        const response = await deletItemReq({"_id":data._id});
-        if (response.success === true) {
-         handleResponse(response);
-        } else {
-          handleResponse(response);
-        }
-      } catch (error) {
-        console.log("ERROR  "+error);
-        handleResponse(error);
-      }
+    const onDeleteItem = () => {
+      deleteItem(data);
     }
     const onEditClick = () =>{
       console.log("id passed for " + data.title + " with id "+data._id);

@@ -1,19 +1,12 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
-import { Row, Col, Card, CardBody, CardTitle, Button, Input } from "reactstrap"
-
+import { Row, Col, Card, CardBody, CardTitle, Button, Input , Modal} from "reactstrap"
 import { connect } from "react-redux";
-
+import { useNavigate } from "react-router-dom";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
-
-/*.dropdown-toggle::after {
-  display: none !important; 
-}*/
-
-//Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import {getCategoriesReq, getItemsReq } from "../../service/itemService";
+import {getClientsReq } from "../../service/clientService";
 import "./styles/datatables.scss";
 import "./styles/AllClients.scss";
 
@@ -30,16 +23,30 @@ const AllClients = (props) => {
     
   ];
   const gridRef = useRef();
+  let navigate = useNavigate(); 
+  const redirectToCreateClient= () =>{ 
+    let path = "/client/add"; 
+    navigate(path);
+  }
+const onViewClick = (id) =>{
+    let path = "/client/view"; 
+    setTimeout(() => {
+        navigate(path, id);
+       }, 300); 
+}
 const columnDefs = [
-    {headerName: "Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true},
+    {headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true},
     {headerName: "Status", field: "status"},
     {headerName: "Primary Email", field: "email"},
-    {headerName: "Type", field: "type"},
-    {headerName: "GST Number", field: "gst"},
-    {headerName: "Total Amount", field: "amount"},
+    {headerName: "Type", field: "clientType"},
+    {headerName: "GST Number", field: "gstin"},
     {headerName: "Action", field: "action",
     cellClass:"actions-button-cell",
-    cellRenderer: ClientActionField
+    cellRenderer: ClientActionField,
+    cellRendererParams : {
+        handleViewClick: onViewClick
+    }
+
 }
 ],
  agRowData =  [
@@ -59,7 +66,7 @@ const pagination = true;
 // allows the user to select the page size from a predefined list of page sizes
 const paginationPageSizeSelector = [5, 10, 20, 50, 100];
 
-const [allStatuses, setallStatuses] = useState([]);
+const [allStatuses, setAllStatuses] = useState([]);
 const [status, setStatus] = useState("");
 const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
@@ -91,24 +98,30 @@ const onPaginationChanged = useCallback((event) => {
     }
 }
 * */
+
+const handleViewClick = () =>{
+
+}
 const getListOfRowData =  useCallback(async (body) => {
-    const response = await getItemsReq(body);
-    console.log(response);
-     response.map((val,id)=>{
-        val.status = val.status.name;
-        val.amount = val.variant.sellingPrice;
-    });
-    setRowData(agRowData);
-    
+    const response = await getClientsReq(body);
+    console.log("CLients response >>>>>"+response);
+    let statusList = new Set();
+     response?.payload?.clients.map((it, idx) => {
+        statusList.add(it.status);
+     });
+    let statusArr = [];
+    {statusList?.forEach((val,key,set) => {
+        console.log("Status values"+val);
+        statusArr.push(val);
+     })}
+    setRowData(response.payload?.clients);
+    setAllStatuses(statusArr);
    
 });
 
-const getCategories = useCallback(async () => {
-  const response = await getCategoriesReq();
-  console.log("status"+response);
-  setallStatuses(response?.payload?.categories)
- 
-});
+
+
+
 useEffect(() => {
     props.setBreadcrumbItems('Clients', breadcrumbItems);
    getListOfRowData(bodyObject);
@@ -184,7 +197,8 @@ const onGridReady = useCallback((params) => {
               <Card>
                 <CardBody>
                     <div className="button-section">
-                      <Button className="all-items-btn" color="primary">
+                      <Button className="all-items-btn" color="primary" onClick={redirectToCreateClient}>
+
                       <img src={plusIcon} style={{width: 15}}/>
                       Add New Client
                       </Button>
@@ -212,25 +226,25 @@ const onGridReady = useCallback((params) => {
                               </button>
                         </span>*/}
                       </div>
-                        <select
+                       <select
                           onChange={handleChange}
-                          id="status"
-                          name="status"
+                          id="client-status"
+                          name="client-status"
                           value={status}
                           className="form-select focus-width"
                         >
                           <option value="" selected disabled>{"Status"}</option>
-                          {allStatuses.map(e => (
-                            <option value={e._id}>{e.name}</option>
+                          {allStatuses.map(ele => (
+                            <option value={ele}>{ele}</option>
                           ))}
-                        </select>
+                          </select>
                   </div>
                   
                     </div>
                     <div
                             className="ag-theme-quartz"
                             style={{
-                                height: '500,600px',
+                                height: '500px',
                                 width: '100%'
                             }}
                         >

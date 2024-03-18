@@ -112,7 +112,7 @@ const AddCategory = (props) =>{
     },
     validationSchema: Yup.object({
         categoryName: Yup.string().required("Please Enter Category Name"),
-        categoryParent: Yup.string().required("Please Enter Category Parent"),
+        categoryParent: Yup.string().required("Please Enter Parent Category"),
        // categoryDescription: Yup.string().required("Please Enter Category Description"),
     }),
     onSubmit: (values, { resetForm }) => {
@@ -198,7 +198,7 @@ const AddCategory = (props) =>{
                     ) : null}
                 </div>
                 <div className="mb-3">
-                    <Label htmlFor="categoryParent">Category Parent</Label>
+                    <Label htmlFor="categoryParent">Parent Category</Label>
                     <select
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
