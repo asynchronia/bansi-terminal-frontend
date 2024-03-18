@@ -25,6 +25,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 
 const EditItems = (props) => {
   const [itemsData, setItemsData] = useState({});
@@ -470,7 +471,7 @@ const EditItems = (props) => {
                     ) : null}
                   </div>
                   <div className="mt-3 mb-0">
-                    <label className="form-label">Select Category</label>
+                    <label className="form-select focus-width">Select Category</label>
                     <label
                       name="category"
                       id="category"
@@ -522,7 +523,7 @@ const EditItems = (props) => {
               }}
             >
               <select
-                className="form-control"
+                className="form-select focus-width"
                 name="status"
                 // id = "status"
                 value={validation.values.status}
@@ -549,7 +550,7 @@ const EditItems = (props) => {
                         value={validation.values.taxPreference}
                         onChange={validation.handleChange}
                         onBlur={validation.handleBlur}
-                        className="form-control"
+                        className="form-select focus-width"
                       >
                         <option value="taxable">Taxable</option>
                         <option value="exempt">Exempt</option>
@@ -567,7 +568,7 @@ const EditItems = (props) => {
                         value={validation.values.taxes}
                         onChange={handleTaxes}
                         onBlur={validation.handleBlur}
-                        className="form-control"
+                        className="form-select focus-width"
                       >
                         <option>Select Tax</option>
                         {allTaxes.map((e) => (
@@ -585,7 +586,7 @@ const EditItems = (props) => {
                         value={validation.values.itemUnit || ""}
                         onChange={validation.handleChange}
                         onBlur={validation.handleBlur}
-                        className="form-control"
+                        className="form-select focus-width"
                       >
                         <option value="unit">unit</option>
                         <option value="kg">kg</option>
@@ -605,7 +606,7 @@ const EditItems = (props) => {
               <CardBody>
                 <CardTitle className="h4">Item Gallery</CardTitle>
                 <Form
-                  style={{ display: "flex", justifyContent: "space-evenly" }}
+                  style={{ display: "flex", justifyContent: "center", gap:'20px' }}
                 >
                   <Dropzone
                     onDrop={(acceptedFiles) => {
@@ -627,40 +628,26 @@ const EditItems = (props) => {
                       </div>
                     )}
                   </Dropzone>
-                  <div className="dropzone-previews mt-3" id="file-previews">
-                    {selectedFiles.map((f, i) => {
-                      return (
-                        <Card
-                          className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete"
-                          key={i + "-file"}
-                        >
-                          <div className="p-2">
-                            <Row className="align-items-center">
-                              <Col className="col-auto">
-                                <img
-                                  data-dz-thumbnail=""
-                                  height="80"
-                                  className="avatar-sm rounded bg-light"
-                                  alt={f.name}
-                                  src={f.preview}
-                                />
-                              </Col>
-                              <Col>
-                                <Link
-                                  to="#"
-                                  className="text-muted font-weight-bold"
-                                >
-                                  {f.name}
-                                </Link>
-                                <p className="mb-0">
-                                  <strong>{f.formattedSize}</strong>
-                                </p>
-                              </Col>
-                            </Row>
-                          </div>
-                        </Card>
-                      );
-                    })}
+                  <div style={{maxWidth:'50%'}} className="dropzone-previews mt-3" id="file-previews">
+                    <Box 
+                    sx={{display:'flex', flexWrap:'wrap', gap:'10px'}}
+                      
+                      className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete"
+                    >
+                      {selectedFiles.map((f, i) => {
+                        return (
+                          <Box key={i + "-file"} className="p-2">
+                            <img
+                              data-dz-thumbnail=""
+                              height="80"
+                              className="avatar-sm rounded bg-light"
+                              alt={f.name}
+                              src={f.preview}
+                            />
+                          </Box>
+                        );
+                      })}
+                    </Box>
                   </div>
                 </Form>
 
@@ -685,7 +672,7 @@ const EditItems = (props) => {
                     value={validation.values.itemType}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}
-                    className="form-control"
+                    className="form-select focus-width"
                   >
                     <option value="variable">Variable Item</option>
                     <option value="standard">Standard Item</option>

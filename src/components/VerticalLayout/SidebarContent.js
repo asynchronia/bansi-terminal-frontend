@@ -179,6 +179,24 @@ const SidebarContent = props => {
                 </li>
               </ul>
             </li>
+            <li>
+              <Link to="/#" className="has-arrow waves-effect">
+                <i className="mdi mdi-cart-outline"></i>
+                <span>Sales Order</span>
+              </Link>
+              <ul className="sub-menu" >
+                <li>
+                  <Link to="/create-order">Create Order</Link>
+                </li>
+                <li>
+                  <Link to="/orders">All Orders</Link>
+                </li>
+                <li>
+                  <Link to="/quotations">Quotations</Link>
+                </li>
+              </ul>
+            </li>
+            
           </ul>
         </div>
       </SimpleBar>
