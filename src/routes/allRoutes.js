@@ -119,13 +119,13 @@ const userRoutes = [
   { path: "/quotations", component: <Quotations /> },
   { path: "/orders", component: <Allorders /> },
   { path: "/create-order", component: <Createorder /> },
-  { path: "/client/:id", component: <ViewClient />}
+  { path: "/client/:id", component: <ViewClient />},
   // // this route should be at the end of all other routes
-  // {
-  //   path: "/",
-  //   exact: true,
-  //   component: <Navigate to="/dashboard" />,
-  // },
+  {
+    path: "/",
+    exact: true,
+    component: <Navigate to="/dashboard" />,
+  },
 
   // // //calendar
   // { path: "/calendar", component: <Calendar /> },
