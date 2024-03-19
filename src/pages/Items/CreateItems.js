@@ -13,7 +13,6 @@ import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { Link } from "react-router-dom";
 import InputWithChips from "../../components/CustomComponents/InputWithChips";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
@@ -23,9 +22,8 @@ import axios from "axios";
 import { createItemReq } from "../../service/itemService";
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
-import YourComponent from "../../components/CustomComponents/MultipleLayerSelect";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
-import { Box, Grid } from "@mui/material";
+import { Box } from "@mui/material";
 
 const CreateItems = (props) => {
   const [selectedFiles, setselectedFiles] = useState([]);
