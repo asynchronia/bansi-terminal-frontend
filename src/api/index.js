@@ -9,7 +9,8 @@ const API_URL = {
     getCategories:"/api/categories/list",
     createCategory:"/api/categories/create",
     deleteItem:"/api/items/delete",
-    getClients:"/api/clients/list"
+    getClients:"/api/clients/list",
+    searchItem:"/api/items/search"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -117,6 +118,17 @@ export async function deleteItem(body) {
     }).catch(error =>{
         console.log(error);
         return error.response.data;
+    });
+}
+
+export async function searchItem(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.searchItem}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
     });
 }
 // export async function stopLLMResponse() {

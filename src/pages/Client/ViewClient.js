@@ -4,8 +4,9 @@ import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Img404 from "../../assets/images/Img404.png";
-import { Card, CardBody, CardHeader, Col, Row, Table } from "reactstrap";
+import { Card, CardBody, CardHeader, Col, Modal, Row, Table } from "reactstrap";
 import { Avatar } from "@mui/material";
+import Agreement from "../../components/CustomComponents/Agreement";
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
   const { id } = useParams();
@@ -14,6 +15,15 @@ const ViewClient = (props) => {
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];
+  const [openModal, setOpenModal]= useState(false);
+
+  const handleModalToggle=()=>{
+    setOpenModal(!openModal);
+    removeBodyCss()
+  }
+  function removeBodyCss() {
+    document.body.classList.add("no_padding")
+  }
 
   useEffect(() => {
     searchClient(id);
@@ -30,13 +40,16 @@ const ViewClient = (props) => {
       console.log(error);
     }
   };
-  console.log(clientData);
+  // console.log(clientData);
   useEffect(() => {
     props.setBreadcrumbItems("EditClient", breadcrumbItems);
   });
 
   return (
     <div style={{ position: "relative" }}>
+    <Modal size="lg" isOpen={openModal} toggle={()=>{handleModalToggle()}}>
+      <Agreement setOpenModal={setOpenModal}/>
+    </Modal>
       <div
         style={{
           position: "absolute",
@@ -84,7 +97,9 @@ const ViewClient = (props) => {
                   <button
                     type="button"
                     className="btn btn-primary waves-effect waves-light "
-                    // onClick={handleAddRow}
+                    onClick={()=>{
+                      setOpenModal(true);
+                    }}
                   >
                     <i className=" mdi mdi-18px mdi-plus"></i>
                     <label className="card-title mx-1">
@@ -166,19 +181,21 @@ const ViewClient = (props) => {
                     <p>
                       **********
                       {
+                        clientData?.bankAccountNumber?
                         clientData?.bankAccountNumber[
                           clientData?.bankAccountNumber.length - 3
-                        ]
+                        ]:null
                       }
                       {
-                        clientData?.bankAccountNumber[
+                        clientData?.bankAccountNumber? clientData?.bankAccountNumber[
                           clientData?.bankAccountNumber.length - 2
-                        ]
+                        ]:null
                       }
                       {
+                        clientData?.bankAccountNumber?
                         clientData?.bankAccountNumber[
-                          clientData?.bankAccountNumber.length - 1
-                        ]
+                          clientData?.bankAccountNumber?.length - 1
+                        ]:null
                       }
                     </p>
                   </Col>
