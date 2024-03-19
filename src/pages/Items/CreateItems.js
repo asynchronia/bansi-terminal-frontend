@@ -259,7 +259,7 @@ const CreateItems = (props) => {
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
-    { title: "Lexa", link: "#" },
+    { title: "All Items", link: "#" },
     { title: "Create Items", link: "/create-items" },
   ];
 
@@ -373,6 +373,8 @@ const CreateItems = (props) => {
                         setCategoryData={setCategoryData}
                       />
                     ) : null}
+
+                   
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>

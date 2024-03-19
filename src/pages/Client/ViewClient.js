@@ -7,7 +7,7 @@ const ViewClient = (props) => {
     const [clientData, setClientData]= useState({});
    const {id}= useParams();
    const breadcrumbItems = [
-    { title: "Lexa", link: "#" },
+    { title: "Dashboard", link: "#" },
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];

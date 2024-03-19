@@ -10,6 +10,7 @@ const API_URL = {
     createCategory:"/api/categories/create",
     deleteItem:"/api/items/delete",
     getOrderList:"/api/orders/list",
+    getClients:"/api/clients/list"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -58,6 +59,17 @@ export async function getItems(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.getItems}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getClients(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getClients}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;

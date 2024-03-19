@@ -1,6 +1,6 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Card, CardBody, CardTitle, Button, Input } from "reactstrap"
+import { Row, Col, Card, CardBody, CardTitle, Button, Input, Modal } from "reactstrap"
 
 import { connect } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,7 +14,7 @@ import 'ag-grid-community/styles//ag-theme-quartz.css';
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import {getCategoriesReq, getItemsReq } from "../../service/itemService";
+import {getCategoriesReq, getItemsReq , deletItemReq} from "../../service/itemService";
 import "./styles/datatables.scss";
 import "./styles/AllItems.scss";
 import DropdownMenuBtn from "./DropdownMenuBtn";
@@ -61,11 +61,29 @@ const AllItems = (props) => {
     } else {
       notify("Error", response.message);
     }
+    setmodal_standard(false);
     getListOfRowData();
   } 
   const handleEditClick = (id) =>{
     console.log("GRID OBJECT >>>"+id);
     redirectToEditPage(id);
+  }
+  const deleteItem = async(data) => {
+    try {
+      const response = await deletItemReq({"_id":data._id});
+      if (response.success === true) {
+       handleDeleteResponse(response);
+      } else {
+        handleDeleteResponse(response);
+      }
+    } catch (error) {
+      console.log("ERROR  "+error);
+      handleDeleteResponse(error);
+    }
+  }
+  const onDeleteItem = (data) =>{
+    setCurrRowItem(data);
+    setmodal_standard(true);
   }
 
 const columnDefs = [
@@ -84,7 +102,7 @@ const columnDefs = [
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
     cellRendererParams: {
-      handleResponse: handleDeleteResponse,
+      deleteItem: onDeleteItem,
       handleEditClick: handleEditClick
     }
   }
@@ -112,10 +130,20 @@ const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
 const [gridApi, setGridApi] = useState(null);
 const [paginationPageSize, setPaginationPageSize ]= useState(5);
+const [currRowItem, setCurrRowItem] = useState(null);
+const [modal_standard, setmodal_standard] = useState(false)
+
 let bodyObject = {
   "page": 1,
   "limit": paginationPageSize
 };
+const  tog_standard = () => {
+  setmodal_standard(!modal_standard)
+  removeBodyCss()
+}
+function removeBodyCss() {
+  document.body.classList.add("no_padding")
+}
 const onPaginationChanged = useCallback((event) => {
   console.log('onPaginationPageLoaded', event);
   // Workaround for bug in events order
@@ -156,6 +184,8 @@ const getCategories = useCallback(async () => {
   setAllCategories(response?.payload?.categories)
  
 });
+
+
 useEffect(() => {
     props.setBreadcrumbItems('All Items', breadcrumbItems);
     if (!effectCalled.current) {
@@ -229,6 +259,53 @@ const onGridReady = useCallback((params) => {
   return (
     <React.Fragment>
        <ToastContainer position="top-center" theme="colored" />
+       <Modal
+                      isOpen={modal_standard}
+                      toggle={() => {
+                        tog_standard()
+                      }}
+                    >
+                      <div className="modal-header">
+                        <h5 className="modal-title mt-0" id="myModalLabel">
+                          Confirm
+                            </h5>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setmodal_standard(false)
+                          }}
+                          className="close"
+                          data-dismiss="modal"
+                          aria-label="Close"
+                        >
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div className="modal-body">
+                        <h5>Are you sure you want to delete {currRowItem?.title} ? </h5>
+                      </div>
+                      <div className="modal-footer">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setmodal_standard(false);
+                          }}
+                          className="btn btn-secondary waves-effect"
+                          data-dismiss="modal"
+                        >
+                          Close
+                            </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary waves-effect waves-light"
+                          onClick={() => {
+                            deleteItem(currRowItem)
+                          }}
+                        >
+                          Delete
+                            </button>
+                      </div>
+                    </Modal>
         <div className="all-items">
           <Row>
             <Col className="col-12">

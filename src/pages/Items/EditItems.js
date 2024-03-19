@@ -371,7 +371,7 @@ const EditItems = (props) => {
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
-    { title: "Lexa", link: "#" },
+    { title: "All Items", link: "#" },
     { title: "Edit Items", link: `/edit-item/:${id}` },
   ];
 
