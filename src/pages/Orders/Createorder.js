@@ -13,7 +13,7 @@ const CreateOrder = (props) => {
   const breadcrumbItems = [
     
     { title: "Dashboard", link: "#" },
-    { title: "Sales-Order", link: "#" },
+    { title: "Purchase Order", link: "#" },
     { title: "Create Order", link: "#" },
     
   ];

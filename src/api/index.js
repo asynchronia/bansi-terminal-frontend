@@ -3,14 +3,17 @@ import axios from "axios";
 const baseUrl = "http://localhost:3000"
 
 const API_URL = {
-    craeteItem: "/api/items/create",
+    createItem: "/api/items/create",
     createClient: "/api/clients/create",
     getItems:"/api/items/list",
     getCategories:"/api/categories/list",
     createCategory:"/api/categories/create",
     deleteItem:"/api/items/delete",
     getClients:"/api/clients/list",
-    searchItem:"/api/items/search"
+    searchItem:"/api/items/search",
+    getOrderList:"/api/orders/list",
+    getClients:"/api/clients/list"
+
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -36,7 +39,7 @@ const getHeaders = () => {
 export async function createItem(body) {
     return new Promise((resolve) => {
         axios
-            .post(`${baseUrl}${API_URL.craeteItem}`, body)
+            .post(`${baseUrl}${API_URL.createItem}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -125,6 +128,17 @@ export async function searchItem(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.searchItem}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getOrderList(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getOrderList}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;
