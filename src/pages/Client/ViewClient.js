@@ -7,24 +7,25 @@ import Img404 from "../../assets/images/Img404.png";
 import { Card, CardBody, CardHeader, Col, Modal, Row, Table } from "reactstrap";
 import { Avatar } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
+import AgreementTable from "../../components/CustomComponents/AgreementTable";
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
+  const [agreementData, setAgreementData] = useState([]);
   const { id } = useParams();
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];
-  const [openModal, setOpenModal]= useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
-  const handleModalToggle=()=>{
+  const handleModalToggle = () => {
     setOpenModal(!openModal);
-    removeBodyCss()
-  }
+    removeBodyCss();
+  };
   function removeBodyCss() {
-    document.body.classList.add("no_padding")
+    document.body.classList.add("no_padding");
   }
-
   useEffect(() => {
     searchClient(id);
   }, []);
@@ -47,9 +48,19 @@ const ViewClient = (props) => {
 
   return (
     <div style={{ position: "relative" }}>
-    <Modal size="lg" isOpen={openModal} toggle={()=>{handleModalToggle()}}>
-      <Agreement setOpenModal={setOpenModal}/>
-    </Modal>
+      <Modal
+        size="lg"
+        isOpen={openModal}
+        toggle={() => {
+          handleModalToggle();
+        }}
+      >
+        <Agreement
+          agreementData={agreementData}
+          setAgreementData={setAgreementData}
+          setOpenModal={setOpenModal}
+        />
+      </Modal>
       <div
         style={{
           position: "absolute",
@@ -71,43 +82,54 @@ const ViewClient = (props) => {
           <Card style={{ border: "2px solid #7a6ebe" }}>
             <CardBody>
               <h4 className="card-title">Agreement</h4>
-              <CardHeader className="mt-3">
-                <Row>
-                  <Col xs="6">Product name</Col>
-                  <Col xs="3">SKU</Col>
-                  <Col xs="3">Cost</Col>
-                </Row>
-              </CardHeader>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  textAlign: "center",
-                }}
-              >
-                <img
-                  src={Img404}
-                  height={"300px"}
-                  width={"300px"}
-                  style={{ margin: "auto" }}
-                  alt="404"
-                ></img>
-                <label className="text-label">No Agreement found</label>
-                <div className="mt-1">
-                  <button
-                    type="button"
-                    className="btn btn-primary waves-effect waves-light "
-                    onClick={()=>{
-                      setOpenModal(true);
+
+              {agreementData.length === 0 ? (
+                <div>
+                  <CardHeader className="mt-3">
+                    <Row>
+                      <Col >Product name</Col>
+                      <Col >SKU</Col>
+                      <Col >Cost Price</Col>
+                      <Col > Selling Price</Col>
+                    </Row>
+                  </CardHeader>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      textAlign: "center",
                     }}
                   >
-                    <i className=" mdi mdi-18px mdi-plus"></i>
-                    <label className="card-title mx-1">
-                      Create New Agreement
-                    </label>
-                  </button>
+                    <img
+                      src={Img404}
+                      height={"300px"}
+                      width={"300px"}
+                      style={{ margin: "auto" }}
+                      alt="404"
+                    ></img>
+                    <label className="text-label">No Agreement found</label>
+                    <div className="mt-1">
+                      <button
+                        type="button"
+                        className="btn btn-primary waves-effect waves-light "
+                        onClick={() => {
+                          setOpenModal(true);
+                        }}
+                      >
+                        <i className=" mdi mdi-18px mdi-plus"></i>
+                        <label className="card-title mx-1">
+                          Create New Agreement
+                        </label>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <AgreementTable
+                  agreementData={agreementData}
+                  setAgreementData={setAgreementData}
+                />
+              )}
             </CardBody>
           </Card>
         </Col>
@@ -180,28 +202,26 @@ const ViewClient = (props) => {
                   <Col xs="8">
                     <p>
                       **********
-                      {
-                        clientData?.bankAccountNumber?
-                        clientData?.bankAccountNumber[
-                          clientData?.bankAccountNumber.length - 3
-                        ]:null
-                      }
-                      {
-                        clientData?.bankAccountNumber? clientData?.bankAccountNumber[
-                          clientData?.bankAccountNumber.length - 2
-                        ]:null
-                      }
-                      {
-                        clientData?.bankAccountNumber?
-                        clientData?.bankAccountNumber[
-                          clientData?.bankAccountNumber?.length - 1
-                        ]:null
-                      }
+                      {clientData?.bankAccountNumber
+                        ? clientData?.bankAccountNumber[
+                            clientData?.bankAccountNumber.length - 3
+                          ]
+                        : null}
+                      {clientData?.bankAccountNumber
+                        ? clientData?.bankAccountNumber[
+                            clientData?.bankAccountNumber.length - 2
+                          ]
+                        : null}
+                      {clientData?.bankAccountNumber
+                        ? clientData?.bankAccountNumber[
+                            clientData?.bankAccountNumber?.length - 1
+                          ]
+                        : null}
                     </p>
                   </Col>
                 </Row>
               </div>
-              <div >
+              <div>
                 <Row>
                   <Col xs="4">
                     <p>IFSC:</p>
@@ -221,7 +241,7 @@ const ViewClient = (props) => {
                   </Col>
                 </Row>
               </div>
-              <div >
+              <div>
                 <Row>
                   <Col xs="4">
                     <p>PAN:</p>
