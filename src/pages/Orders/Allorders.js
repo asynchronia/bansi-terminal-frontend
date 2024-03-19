@@ -9,7 +9,8 @@ import { connect } from "react-redux";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { getOrdersReq } from "../../service/orderService";
-
+import OrderStatusRenderer from "./OrderStatusRenderer";
+import CircleRenderer from "./CircleRenderer";
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -30,7 +31,7 @@ const AllOrders = (props) => {
   const [paginationPageSize, setPaginationPageSize ]= useState(5);
   let bodyObject = {
     "page": 1,
-    "limit": 100
+    "limit": 200
   };
 
   useEffect(() => {
@@ -99,11 +100,11 @@ const AllOrders = (props) => {
     {headerName: "Order Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true},
     {headerName: "Order No.", field: "salesorder_id"},
     {headerName: "Client", field: "customer_name"},
-    {headerName: "Order Status", field: "order_status"},
+    {headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer},
     {headerName: "Total Amount", field: "total"},
-    {headerName: "Inovice", field: "invoiced_status"},
-    {headerName: "Payment", field: "paid_status"},
-    {headerName: "Shipment", field: "shipped_status"},
+    {headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer},
+    {headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer},
+    {headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer},
     {headerName: "Action", field: "action", sortable: false,
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
