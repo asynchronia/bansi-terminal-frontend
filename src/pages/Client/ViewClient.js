@@ -221,7 +221,7 @@ const ViewClient = (props) => {
                   </Col>
                 </Row>
               </div>
-              <div className="mt-3">
+              <div >
                 <Row>
                   <Col xs="4">
                     <p>PAN:</p>
