@@ -88,13 +88,15 @@ const columnDefs = [
         let curr_date = new Date();
         let status_msg = "";
         let statusClass = "status-msg ";
-        if(ifOverDue(due_date, curr_date)){
+        if(ifOverDue(curr_date, due_date)){
           let days= getDifferenceInDays(curr_date, due_date);
           status_msg = "Overdue by "+days+" day(s)";
           statusClass = statusClass + "red";
         }else{
-          let days= getDifferenceInDays( due_date, curr_date);
+          let days= getDifferenceInDays(curr_date, due_date);
+          console.log("Pending days"+days);
           days>0 ? status_msg = "Pending in "+days+" day(s)" : status_msg="";
+          console.log("Pending days status"+status_msg);
           statusClass = statusClass + "green";
         }
         return <><p className="status-field">{getDateInFormat(due_date)}</p><p className={statusClass}>{status_msg}</p> </>
