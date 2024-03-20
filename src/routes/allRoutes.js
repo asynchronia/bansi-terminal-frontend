@@ -34,7 +34,6 @@ import AddCategory from "../pages/Categories/AddCategory"
 import CreateClient from "../pages/Client/CreateClient"
 import EditItems from "../pages/Items/EditItems";
 import AllClients from "../pages/Clients/AllClients";
-import ClientView from "../pages/Clients/ClientView";
 import Quotations from "../pages/Orders/Quotations";
 import Allorders from "../pages/Orders/Allorders";
 import Createorder from "../pages/Orders/Createorder";
