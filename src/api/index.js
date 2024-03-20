@@ -9,8 +9,10 @@ const API_URL = {
     getCategories:"/api/categories/list",
     createCategory:"/api/categories/create",
     deleteItem:"/api/items/delete",
+    getClients:"/api/clients/list",
+    getInvoices:"/api/invoices/list",
+    searchItem:"/api/items/search",
     getOrderList:"/api/orders/list",
-    getClients:"/api/clients/list"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -66,6 +68,22 @@ export async function getItems(body) {
     });
 }
 
+export async function getInvoices(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.getInvoices}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            }).catch(error => {
+                reject(error);
+            });
+    }).catch(error =>{
+        console.log(error);
+        return error?.response;
+    });
+}
+
 export async function getClients(body) {
     return new Promise((resolve) => {
         axios
@@ -73,7 +91,7 @@ export async function getClients(body) {
             .then((res) => {
                 resolve(res.data);
                 return res.data;
-            });
+            })
     });
 }
 
@@ -118,6 +136,17 @@ export async function deleteItem(body) {
     }).catch(error =>{
         console.log(error);
         return error.response.data;
+    });
+}
+
+export async function searchItem(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.searchItem}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
     });
 }
 

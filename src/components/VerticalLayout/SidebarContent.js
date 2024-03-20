@@ -196,6 +196,18 @@ const SidebarContent = props => {
                 </li>
               </ul>
             </li>
+            <li>
+              <Link to="/#" className="has-arrow waves-effect">
+                <i className="mdi mdi-receipt" ></i>
+                <span>Invoices</span>
+              </Link>
+              <ul className="sub-menu" >
+                <li>
+                  <Link to="/invoices">All Invoices</Link>
+                </li>
+                
+              </ul>
+            </li>
             
           </ul>
         </div>

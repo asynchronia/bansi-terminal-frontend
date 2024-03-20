@@ -29,7 +29,7 @@ const AllClients = (props) => {
     navigate(path);
   }
 const onViewClick = (id) =>{
-    let path = "/client/view"; 
+    let path = `/client/${id}`; 
     setTimeout(() => {
         navigate(path, id);
        }, 300); 
@@ -191,7 +191,7 @@ const onGridReady = useCallback((params) => {
 */
   return (
     <React.Fragment>
-        
+        <div className="all-clients">
           <Row>
             <Col className="col-12">
               <Card>
@@ -233,7 +233,7 @@ const onGridReady = useCallback((params) => {
                           value={status}
                           className="form-select focus-width"
                         >
-                          <option value="" selected disabled>{"Status"}</option>
+                          <option value="" selected>{"Status"}</option>
                           {allStatuses.map(ele => (
                             <option value={ele}>{ele}</option>
                           ))}
@@ -266,6 +266,7 @@ const onGridReady = useCallback((params) => {
               </Card>
             </Col>
           </Row>
+          </div>
     </React.Fragment>
   )
 }
