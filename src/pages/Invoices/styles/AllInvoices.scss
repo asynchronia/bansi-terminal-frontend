@@ -1,0 +1,58 @@
+.all-invoices{
+    .MuiTablePagination-selectLabel {
+        margin-bottom : 0px !important;
+    }
+    .actions-button-cell { 
+        overflow:visible; 
+    }
+
+    .ag-row {
+        z-index: 0;
+    }
+
+    .ag-row.ag-row-focus {
+        z-index: 1;
+    }
+    .button-section{
+        display: block;
+        padding-bottom: 10px;
+    }
+    .button-right-section{
+        display: inline-flex;
+        padding-left: 50%;
+        width: 100%;
+    }
+    .invoice-search-box{
+        width: 100%;
+        margin-right: 5px;
+    }
+    .all-invoices-btn{
+        margin-right: 10px;
+    }
+    .search-box .form-control{
+        padding-left: 10px;
+    }
+    .search-box .search-icon {
+        font-size: 18px;
+        position: absolute;
+        top: 0px;
+        right: 13px;
+        left: auto;
+        color: var(--bs-gray-600);
+        line-height: 34px;
+    }
+    .status-field{
+        display: block;
+        margin: 0;
+    }
+    .status-msg{
+        display: block;
+        margin: 0;
+    }
+    .status-msg.green{
+        color: green;
+    }
+    .status-msg.red{
+        color: red;
+    }
+}

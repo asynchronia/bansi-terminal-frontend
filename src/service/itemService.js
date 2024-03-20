@@ -6,7 +6,10 @@ export const createItemReq = async (body) => {
 };
 export const getItemsReq = async (body = {}) => {
     const response = await getItems(body);
-    return response.payload.items;
+    if(response.success && response.success === true){
+        return response.payload.items;
+    }
+    return [];
 };
 export const getCategoriesReq = async () => {
     const response = await getCategories();

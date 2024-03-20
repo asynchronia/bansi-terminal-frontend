@@ -91,18 +91,19 @@ const columnDefs = [
     {headerName: "Type", field: "itemType"},
     {headerName: "HSN Code", field: "hsnCode"},
     {headerName: "Status", field: "status"},
-    {headerName: "Sale Price", field: "salePrice", sortable: false},
+    {headerName: "Sale Price", field: "salePrice"},
     {headerName: "Created On", field: "createdAt", cellRenderer: (props)=>{
       console.log("created on props"+props.data);
       let date= new Date(props.value);
       return <>{date.toDateString()}</>
     }},
     {headerName: "Category", field: "category"},
-    {headerName: "Action", field: "action", sortable: false,
+    {headerName: "Action", field: "action",
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
     cellRendererParams: {
       deleteItem: onDeleteItem,
+      handleResponse: handleDeleteResponse,
       handleEditClick: handleEditClick
     }
   }
@@ -137,6 +138,8 @@ let bodyObject = {
   "page": 1,
   "limit": paginationPageSize
 };
+
+const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
 const  tog_standard = () => {
   setmodal_standard(!modal_standard)
   removeBodyCss()
@@ -174,7 +177,7 @@ const getListOfRowData =  useCallback(async (body) => {
         val.salePrice = val.variant.sellingPrice;
     });
     setRowData(response);
-    
+    setBodyObjectReq(body);
    
 });
 
@@ -199,11 +202,14 @@ useEffect(() => {
   props.setBreadcrumbItems('All Items', breadcrumbItems);
   if(category && category !== undefined && category !== ""){
     let bodyObjectWithCategory = {...bodyObject};
-    bodyObjectWithCategory.filter={};
-    bodyObjectWithCategory.filter.category = category;
-    getListOfRowData(bodyObjectWithCategory);
+        bodyObjectWithCategory.filter={};
+        bodyObjectWithCategory.filter.category = category;
+        getListOfRowData(bodyObjectWithCategory);
     }else{
-
+       
+          let bodyObjectWithCategory = {...bodyObjectReq};
+          delete bodyObjectWithCategory["filter"];
+          getListOfRowData(bodyObjectWithCategory);
     }
 },[category]);
 
@@ -344,9 +350,11 @@ const onGridReady = useCallback((params) => {
                           id="category"
                           name="category"
                           value={category}
+                          defaultValue="none"
                           className="form-select focus-width"
+                          showClearButton={true}
                         >
-                          <option value="" selected disabled>Category</option>
+                          <option value="" selected>Select Category</option>
                           {allCategories.map(e => (
                             <option value={e._id}>{e.name}</option>
                           ))}
