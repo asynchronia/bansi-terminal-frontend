@@ -37,7 +37,8 @@ import AllClients from "../pages/Clients/AllClients";
 import Quotations from "../pages/Orders/Quotations";
 import Allorders from "../pages/Orders/Allorders";
 import Createorder from "../pages/Orders/Createorder";
-import ViewClient from "../pages/Client/ViewClient"
+import ViewClient from "../pages/Client/ViewClient";
+import AllInvoices from "../pages/Invoices/AllInvoices";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -118,6 +119,7 @@ const userRoutes = [
   { path: "/orders", component: <Allorders /> },
   { path: "/create-order", component: <Createorder /> },
   { path: "/client/:id", component: <ViewClient />},
+  { path: "/invoices", component: <AllInvoices />},
   // // this route should be at the end of all other routes
   {
     path: "/",
