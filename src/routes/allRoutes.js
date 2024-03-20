@@ -114,7 +114,6 @@ const userRoutes = [
   { path: "/items", component: <AllItems /> },
   { path: "/clients", component: <AllClients /> },
   { path: "/categories", component: <AddCategory /> },
-  { path: "/client/view", component: <ClientView /> },
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/quotations", component: <Quotations /> },
   { path: "/orders", component: <Allorders /> },

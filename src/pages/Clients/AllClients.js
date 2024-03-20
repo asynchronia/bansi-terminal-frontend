@@ -29,7 +29,7 @@ const AllClients = (props) => {
     navigate(path);
   }
 const onViewClick = (id) =>{
-    let path = "/client/view"; 
+    let path = `/client/:${id}`; 
     setTimeout(() => {
         navigate(path, id);
        }, 300); 
