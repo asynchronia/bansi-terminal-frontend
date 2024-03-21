@@ -40,7 +40,6 @@ const AgreementTable = (props) => {
   };
 
 
-
   const handleDeleteAgreement = (variantId) => {
     const newArr = displayTableData.filter((e) => {
       return e.id !== variantId;
