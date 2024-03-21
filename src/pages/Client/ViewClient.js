@@ -39,25 +39,31 @@ const ViewClient = (props) => {
     const data = { clientId: id };
     try {
       const res = await axios.post(url, data);
-
-      let array = res.data.payload.items.flatMap((item) => {
-        return item.variants.map((variant) => {
-          return {
-            id: variant.variant._id,
-            itemId: variant.variant.itemId,
-            title: item.item.title,
-            sku: variant.variant.sku,
-            costPrice: variant.variant.costPrice,
-            sellingPrice: variant.variant.sellingPrice,
-          };
+      let array=[];
+      if(res?.data?.payload?.items){
+        array = res?.data?.payload?.items?.flatMap((item) => {
+          return item.variants.map((variant) => {
+            return {
+              id: variant.variant._id,
+              itemId: variant.variant.itemId,
+              title: item.item.title,
+              sku: variant.variant.sku,
+              costPrice: variant.variant.costPrice,
+              sellingPrice: variant.variant.sellingPrice,
+            };
+          });
         });
-      });
+  
+      }
 
-      setDisplayTableData(array);
       if (array.length > 0) {
+        setDisplayTableData(array);
         setAgreementAvailable({ loading: false, value: true });
+      }else{
+        setAgreementAvailable({ loading: false, value: false });
       }
     } catch (error) {
+      setAgreementAvailable({ loading: false, value: false });
       console.log(error);
     }
   };

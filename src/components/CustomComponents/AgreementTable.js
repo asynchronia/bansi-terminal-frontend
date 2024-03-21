@@ -2,7 +2,12 @@ import React, { useRef } from "react";
 import { CardHeader, Table } from "reactstrap";
 
 const AgreementTable = (props) => {
-  const { displayTableData, setDisplayTableData, agreementData, setAgreementData } = props;
+  const {
+    displayTableData,
+    setDisplayTableData,
+    agreementData,
+    setAgreementData,
+  } = props;
 
   // const sellingPriceRef = useRef("");
 
@@ -18,8 +23,8 @@ const AgreementTable = (props) => {
 
     setDisplayTableData(updatedDisplayTableData);
 
-    const updatedAgreementData = agreementData.map((agreement) => {   
-      if (agreement.item === itemId) { 
+    const updatedAgreementData = agreementData.map((agreement) => {
+      if (agreement.item === itemId) {
         const updatedVariants = agreement.variants.map((variant) => {
           if (variant.variant === variantId) {
             return { ...variant, price: value };
@@ -34,15 +39,30 @@ const AgreementTable = (props) => {
     setAgreementData(updatedAgreementData);
   };
 
+  console.log("AgreementData", agreementData);
 
-  
-
-  const handleDeleteAgreement = (agreementId) => {
+  const handleDeleteAgreement = (variantId) => {
     const newArr = displayTableData.filter((e) => {
-      return e.id !== agreementId;
+      return e.id !== variantId;
     });
 
     setDisplayTableData(newArr);
+
+    const updatedAgreementData = agreementData
+      .map((agreement) => {
+        const updatedVariants = agreement.variants.filter(
+          (variant) => variant.variant !== variantId
+        );
+        if (updatedVariants.length === 0) {
+          // Remove the entire agreement object if variants array becomes empty
+          return null;
+        } else {
+          return { ...agreement, variants: updatedVariants };
+        }
+      })
+      .filter(Boolean); // Filter out null values
+
+    setAgreementData(updatedAgreementData);
   };
   return (
     <Table>
