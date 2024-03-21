@@ -34,7 +34,7 @@ const AgreementTable = (props) => {
     setAgreementData(updatedAgreementData);
   };
 
-console.log(displayTableData)
+
   
 
   const handleDeleteAgreement = (agreementId) => {

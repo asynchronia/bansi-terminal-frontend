@@ -28,7 +28,7 @@ const handleDisplayData =(itemId, id, variant, title)=>{
 }
 
 const handleAddToAgreement = (itemId, variantId, price) => {
-  // Check if itemId already exists in agreementArray
+  
   const itemIndex = agreementData.findIndex(item => item.item === itemId);
 
   if (itemIndex === -1) {
