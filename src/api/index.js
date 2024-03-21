@@ -13,7 +13,8 @@ const API_URL = {
     getInvoices:"/api/invoices/list",
     searchItem:"/api/items/search",
     getOrderList:"/api/orders/list",
-    getPaymentList:"/api/payments/list"
+    getPaymentList:"/api/payments/list",
+    createAgreement:'/api/agreements/create'
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -51,6 +52,17 @@ export async function createClient(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.createClient}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function createAgreement(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.createAgreement}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;
