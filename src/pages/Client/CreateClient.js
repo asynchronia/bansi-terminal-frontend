@@ -9,8 +9,10 @@ import { ToastContainer, toast } from "react-toastify"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { createClientReq } from "../../service/clientService"
+import { useNavigate } from 'react-router-dom';
 
 const CreateClient = props => {
+  const navigate = useNavigate();
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
     { title: "Client", link: "/client" },
@@ -31,6 +33,10 @@ const CreateClient = props => {
         theme: "colored",
       })
     }
+
+    setTimeout(()=>{
+      navigate('/clients');
+    }, [5000])
   }
 
   const handleCreateClient = async (values) => {
@@ -104,7 +110,7 @@ const CreateClient = props => {
       })
     }),
     onSubmit: values => {
-      values.logo=`${selectedFiles[0].preview}`
+      values.logo=`${selectedFiles[0]?.preview}`
       handleCreateClient(values);
     },
   })
@@ -128,7 +134,6 @@ const CreateClient = props => {
     const i = Math.floor(Math.log(bytes) / Math.log(k))
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
   }
-  console.log(validation.values)
 
   useEffect(() => {
     props.setBreadcrumbItems("CreateItems", breadcrumbItems)

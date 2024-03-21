@@ -32,7 +32,12 @@ const ViewClient = (props) => {
         theme: "colored",
       });
     }
+    setTimeout(()=>{
+      window.location.reload();
+    }, [5000])
   };
+
+  
 
   const getAgreement = async (id) => {
     const url = `http://localhost:3000/api/agreements/agreement`;
@@ -82,6 +87,7 @@ const ViewClient = (props) => {
         clientId: id,
         items: [...agreementData],
       };
+      
       const response = await createAgreementReq(values);
       if (response.success === true) {
         notify("Success", response.message);
@@ -131,6 +137,7 @@ const ViewClient = (props) => {
         }}
       >
         <Agreement
+          handleSubmitAgreement={handleSubmitAgreement}
           displayTableData={displayTableData}
           setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
@@ -151,9 +158,6 @@ const ViewClient = (props) => {
           <option value="draft">Draft</option>
         </select>
         <button
-          onClick={() => {
-            handleSubmitAgreement();
-          }}
           type="submit"
           className="btn btn-primary w-xl mx-3"
         >
@@ -168,7 +172,7 @@ const ViewClient = (props) => {
 
               {agreementAvailable.loading ? (
                 <CircularProgress style={{ marginLeft: "50%" }} />
-              ) : !agreementAvailable.value && agreementData.length === 0 ? (
+              ) : !agreementAvailable.value  ? (
                 <div>
                   <CardHeader className="mt-3">
                     <Row>
