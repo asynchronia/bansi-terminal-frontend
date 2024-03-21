@@ -205,7 +205,9 @@ const SidebarContent = props => {
                 <li>
                   <Link to="/invoices">All Invoices</Link>
                 </li>
-                
+                <li>
+                  <Link to="/payments">Payments</Link>
+                </li>
               </ul>
             </li>
             
