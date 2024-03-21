@@ -8,9 +8,42 @@ import { Card, CardBody, CardHeader, Col, Modal, Row, Table } from "reactstrap";
 import { Avatar } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
 import AgreementTable from "../../components/CustomComponents/AgreementTable";
+import { ToastContainer, toast } from "react-toastify"
+import { createAgreementReq } from "../../service/clientService";
+
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
   const [agreementData, setAgreementData] = useState([]);
+  const [displayTableData, setDisplayTableData]= useState([]);
+
+  
+
+  const notify = (type, message) => {
+    if (type === "Error") {
+      toast.error(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      })
+    }
+  }
+
+  const getAgreement = async (id) => {
+    const url = `http://localhost:3000/api/agreements/agreement`;
+    const data = { agreementId: id };
+    try {
+      const res = await axios.post(url, data);
+
+      setClientData(res?.data?.payload?.client);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const { id } = useParams();
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
@@ -18,6 +51,26 @@ const ViewClient = (props) => {
     { title: "View", link: "/client/:id" },
   ];
   const [openModal, setOpenModal] = useState(false);
+
+ 
+  const handleSubmitAgreement = async()=>{
+      try {
+        let values={
+          clientId:id,
+          items:[...agreementData]
+        }
+        console.log(values);
+        const response = await createAgreementReq(values)
+        if (response.success === true) {
+          notify("Success", response.message)
+        } else {
+          notify("Error", response.message)
+        }
+      } catch (error) {
+        notify("Error", error.message)
+      }
+    
+  }
 
   const handleModalToggle = () => {
     setOpenModal(!openModal);
@@ -28,6 +81,7 @@ const ViewClient = (props) => {
   }
   useEffect(() => {
     searchClient(id);
+    getAgreement(id)
   }, []);
 
   const searchClient = async (id) => {
@@ -41,13 +95,14 @@ const ViewClient = (props) => {
       console.log(error);
     }
   };
-  // console.log(clientData);
   useEffect(() => {
     props.setBreadcrumbItems("EditClient", breadcrumbItems);
   });
 
+
   return (
     <div style={{ position: "relative" }}>
+     <ToastContainer position="top-center" theme="colored" />
       <Modal
         size="lg"
         isOpen={openModal}
@@ -56,6 +111,8 @@ const ViewClient = (props) => {
         }}
       >
         <Agreement
+          displayTableData={displayTableData}
+          setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
           setAgreementData={setAgreementData}
           setOpenModal={setOpenModal}
@@ -73,7 +130,7 @@ const ViewClient = (props) => {
           <option value="active">Published</option>
           <option value="draft">Draft</option>
         </select>
-        <button type="submit" className="btn btn-primary w-xl mx-3">
+        <button onClick={()=>{handleSubmitAgreement()}} type="submit" className="btn btn-primary w-xl mx-3">
           Submit
         </button>
       </div>
@@ -128,6 +185,8 @@ const ViewClient = (props) => {
                 <AgreementTable
                   agreementData={agreementData}
                   setAgreementData={setAgreementData}
+                  displayTableData={displayTableData}
+                  setDisplayTableData={setDisplayTableData}
                 />
               )}
             </CardBody>
