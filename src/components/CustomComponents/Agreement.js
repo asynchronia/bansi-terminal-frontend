@@ -6,7 +6,7 @@ import AgreementTable from "./AgreementTable";
 
 const Agreement = (props) => {
 
-  const {agreementData, setAgreementData,displayTableData, setDisplayTableData, setOpenModal }= props;
+  const {handleSubmitAgreement,agreementData, setAgreementData,displayTableData, setDisplayTableData, setOpenModal }= props;
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
 
@@ -104,6 +104,7 @@ const handleAddToAgreement = (itemId, variantId, price) => {
                 type="button"
                 className="btn btn-primary waves-effect waves-light "
                 onClick={() => {
+                  handleSubmitAgreement();
                   setOpenModal(false);
                 }}
               >
@@ -133,7 +134,7 @@ const handleAddToAgreement = (itemId, variantId, price) => {
                 width: "750px",
               }}
             >
-              {rowData.map((item) =>
+              {rowData.length ===0 ? <Row><p className="form-text-lg text-center">No Data Found</p>  </Row>:rowData.map((item) =>
                 item.variant.map((variant) => (
                   <Row
                     onClick={() => {
