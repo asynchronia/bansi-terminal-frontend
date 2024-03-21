@@ -39,7 +39,7 @@ const AgreementTable = (props) => {
     setAgreementData(updatedAgreementData);
   };
 
-  console.log("AgreementData", agreementData);
+
 
   const handleDeleteAgreement = (variantId) => {
     const newArr = displayTableData.filter((e) => {
