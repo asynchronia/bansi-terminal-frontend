@@ -15,6 +15,7 @@ const API_URL = {
     getOrderList: "/api/orders/list",
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
+    createAgreement: '/api/agreements/create'
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -52,6 +53,17 @@ export async function createClient(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.createClient}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function createAgreement(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.createAgreement}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;

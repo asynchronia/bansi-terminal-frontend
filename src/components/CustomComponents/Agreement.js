@@ -6,7 +6,7 @@ import AgreementTable from "./AgreementTable";
 
 const Agreement = (props) => {
 
-  const {agreementData, setAgreementData, setOpenModal }= props;
+  const {handleSubmitAgreement,agreementData, setAgreementData,displayTableData, setDisplayTableData, setOpenModal }= props;
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
 
@@ -14,17 +14,54 @@ const Agreement = (props) => {
     setShowRowData(value);
   };
 
-  const handleAddToAgreement = (id, variant, title) => {
-    let obj = {
-      id: id,
-      title: title,
-      sku: variant.sku,
-      costPrice: variant.costPrice,
-      sellingPrice: variant.sellingPrice,
-    };
-    setAgreementData([...agreementData, obj]);
-    handleShowData(false);
+const handleDisplayData =(itemId, id, variant, title)=>{
+  let obj = {
+    id: id,
+    itemId:itemId,
+    title: title,
+    sku: variant.sku,
+    costPrice: variant.costPrice,
+    sellingPrice: variant.sellingPrice,
   };
+  setDisplayTableData([...displayTableData, obj]);
+  handleShowData(false)
+}
+
+const handleAddToAgreement = (itemId, variantId, price) => {
+  
+  const itemIndex = agreementData.findIndex(item => item.item === itemId);
+
+  if (itemIndex === -1) {
+    // If itemId doesn't exist, create a new object and add it to agreementArray
+    setAgreementData(prevArray => [
+      ...prevArray,
+      {
+        item: itemId,
+        variants: [{
+          variant: variantId,
+          price: price
+        }]
+      }
+    ]);
+  } else {
+    // If itemId exists, check if variantId exists in variants array
+    const variantIndex = agreementData[itemIndex].variants.findIndex(variant => variant.variant === variantId);
+
+    if (variantIndex === -1) {
+      // If variantId doesn't exist, add it to variants array
+      setAgreementData(prevArray => {
+        const newArray = [...prevArray];
+        newArray[itemIndex].variants.push({
+          variant: variantId,
+          price: price
+        });
+        return newArray;
+      });
+    }
+    handleShowData(false)
+    // If variantId exists, do nothing
+  }
+};
 
   const handleSearchQuery = (event) => {
     if (event.key === "Enter") {
@@ -67,6 +104,7 @@ const Agreement = (props) => {
                 type="button"
                 className="btn btn-primary waves-effect waves-light "
                 onClick={() => {
+                  handleSubmitAgreement();
                   setOpenModal(false);
                 }}
               >
@@ -96,11 +134,12 @@ const Agreement = (props) => {
                 width: "750px",
               }}
             >
-              {rowData.map((item) =>
+              {rowData.length ===0 ? <Row><p className="form-text-lg text-center">No Data Found</p>  </Row>:rowData.map((item) =>
                 item.variant.map((variant) => (
                   <Row
                     onClick={() => {
-                      handleAddToAgreement(variant._id, variant, item.title);
+                      handleAddToAgreement(item._id,variant._id, variant.sellingPrice);
+                      handleDisplayData(item._id, variant._id, variant, item.title)
                     }}
                     className="py-3"
                     style={{
@@ -120,7 +159,7 @@ const Agreement = (props) => {
           ) : null}
         </div>
 
-        <AgreementTable agreementData={agreementData} setAgreementData={setAgreementData}/>
+        <AgreementTable agreementData={agreementData} displayTableData={displayTableData} setAgreementData={setAgreementData} setDisplayTableData={setDisplayTableData}/>
       </CardBody>
     </Card>
   );

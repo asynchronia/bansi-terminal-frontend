@@ -5,12 +5,74 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Img404 from "../../assets/images/Img404.png";
 import { Card, CardBody, CardHeader, Col, Modal, Row, Table } from "reactstrap";
-import { Avatar } from "@mui/material";
+import { Avatar, CircularProgress } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
 import AgreementTable from "../../components/CustomComponents/AgreementTable";
+import { ToastContainer, toast } from "react-toastify";
+import { createAgreementReq } from "../../service/clientService";
+
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
   const [agreementData, setAgreementData] = useState([]);
+  const [displayTableData, setDisplayTableData] = useState([]);
+  const [agreementAvailable, setAgreementAvailable] = useState({
+    loading: true,
+    value: false,
+  });
+
+  const notify = (type, message) => {
+    if (type === "Error") {
+      toast.error(message, {
+        position: "top-center",
+        theme: "colored",
+      });
+    } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      });
+    }
+    setTimeout(()=>{
+      window.location.reload();
+    }, [5000])
+  };
+
+  
+
+  const getAgreement = async (id) => {
+    const url = `http://localhost:3000/api/agreements/agreement`;
+    const data = { clientId: id };
+    try {
+      const res = await axios.post(url, data);
+      let array=[];
+      if(res?.data?.payload?.items){
+        array = res?.data?.payload?.items?.flatMap((item) => {
+          return item.variants.map((variant) => {
+            return {
+              id: variant.variant._id,
+              itemId: variant.variant.itemId,
+              title: item.item.title,
+              sku: variant.variant.sku,
+              costPrice: variant.variant.costPrice,
+              sellingPrice: variant.variant.sellingPrice,
+            };
+          });
+        });
+  
+      }
+
+      if (array.length > 0) {
+        setDisplayTableData(array);
+        setAgreementAvailable({ loading: false, value: true });
+      }else{
+        setAgreementAvailable({ loading: false, value: false });
+      }
+    } catch (error) {
+      setAgreementAvailable({ loading: false, value: false });
+      console.log(error);
+    }
+  };
+
   const { id } = useParams();
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
@@ -18,6 +80,24 @@ const ViewClient = (props) => {
     { title: "View", link: "/client/:id" },
   ];
   const [openModal, setOpenModal] = useState(false);
+
+  const handleSubmitAgreement = async () => {
+    try {
+      let values = {
+        clientId: id,
+        items: [...agreementData],
+      };
+      
+      const response = await createAgreementReq(values);
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
+  };
 
   const handleModalToggle = () => {
     setOpenModal(!openModal);
@@ -28,6 +108,7 @@ const ViewClient = (props) => {
   }
   useEffect(() => {
     searchClient(id);
+    getAgreement(id);
   }, []);
 
   const searchClient = async (id) => {
@@ -41,13 +122,13 @@ const ViewClient = (props) => {
       console.log(error);
     }
   };
-  // console.log(clientData);
   useEffect(() => {
     props.setBreadcrumbItems("EditClient", breadcrumbItems);
   });
 
   return (
     <div style={{ position: "relative" }}>
+      <ToastContainer position="top-center" theme="colored" />
       <Modal
         size="lg"
         isOpen={openModal}
@@ -56,6 +137,9 @@ const ViewClient = (props) => {
         }}
       >
         <Agreement
+          handleSubmitAgreement={handleSubmitAgreement}
+          displayTableData={displayTableData}
+          setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
           setAgreementData={setAgreementData}
           setOpenModal={setOpenModal}
@@ -73,7 +157,10 @@ const ViewClient = (props) => {
           <option value="active">Published</option>
           <option value="draft">Draft</option>
         </select>
-        <button type="submit" className="btn btn-primary w-xl mx-3">
+        <button
+          type="submit"
+          className="btn btn-primary w-xl mx-3"
+        >
           Submit
         </button>
       </div>
@@ -83,14 +170,16 @@ const ViewClient = (props) => {
             <CardBody>
               <h4 className="card-title">Agreement</h4>
 
-              {agreementData.length === 0 ? (
+              {agreementAvailable.loading ? (
+                <CircularProgress style={{ marginLeft: "50%" }} />
+              ) : !agreementAvailable.value  ? (
                 <div>
                   <CardHeader className="mt-3">
                     <Row>
-                      <Col >Product name</Col>
-                      <Col >SKU</Col>
-                      <Col >Cost Price</Col>
-                      <Col > Selling Price</Col>
+                      <Col>Product name</Col>
+                      <Col>SKU</Col>
+                      <Col>Cost Price</Col>
+                      <Col> Selling Price</Col>
                     </Row>
                   </CardHeader>
                   <div
@@ -128,6 +217,8 @@ const ViewClient = (props) => {
                 <AgreementTable
                   agreementData={agreementData}
                   setAgreementData={setAgreementData}
+                  displayTableData={displayTableData}
+                  setDisplayTableData={setDisplayTableData}
                 />
               )}
             </CardBody>
@@ -140,7 +231,7 @@ const ViewClient = (props) => {
               <hr></hr>
               <div className="mt-3" style={{ display: "flex", gap: "20px" }}>
                 <Avatar variant="rounded" sx={{ bgcolor: "#7a6ebe" }}>
-                  {clientData?.name?.match(/\b\w/g).join("")}
+                  {clientData?.name?.match(/\b\w/g)?.join("") || "UN"}
                 </Avatar>
                 <h4 className="my-auto">{clientData?.name}</h4>
               </div>
