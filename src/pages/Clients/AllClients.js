@@ -35,10 +35,10 @@ const AllClients = (props) => {
     }, 300);
   }
   const columnDefs = [
-    { headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true },
+    { headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true, comparator: () => false },
     { headerName: "Status", field: "status", sortable: false },
-    { headerName: "Primary Email", field: "email", sortable: false  },
-    { headerName: "Type", field: "clientType" },
+    { headerName: "Primary Email", field: "email", sortable: false },
+    { headerName: "Type", field: "clientType", comparator: () => false },
     { headerName: "GST Number", field: "gstin", sortable: false },
     {
       headerName: "Action", field: "action",
@@ -49,97 +49,111 @@ const AllClients = (props) => {
       },
       sortable: false,
     }
-  ],
-    agRowData = [
-      { name: "Byju's", type: "Business", status: 'enabled', email: "rampal@byjus.com", gst: 'IMQWE978612312578', amount: '500,600' },
-      { name: "Byju's", type: "Business", status: 'enabled', email: "rampal@byjus.com", gst: 'IMQWE978612312578', amount: '500,600' },
-      { name: "Byju's", type: "Business", status: 'enabled', email: "rampal@byjus.com", gst: 'IMQWE978612312578', amount: '500,600' },
-      { name: "Byju's", type: "Business", status: 'enabled', email: "rampal@byjus.com", gst: 'IMQWE978612312578', amount: '500,600' },
-      { name: "Byju's", type: "Business", status: 'enabled', email: "rampal@byjus.com", gst: 'IMQWE978612312578', amount: '500,600' },
-    ];
+  ];
+  
+  //TODO to check for autoSizeStrategy
   const autoSizeStrategy = {
     type: 'fitGridWidth'
   };
-  // enables pagination in the grid
-  const pagination = true;
 
-  // sets 10 rows per page (default is 100)
-  // allows the user to select the page size from a predefined list of page sizes
   // const paginationPageSizeSelector = [5, 10, 20, 50, 100];
   const paginationPageSizeSelector = [1, 2, 3, 4, 5];
 
+  // TODO check from where status will come.
   const [allStatuses, setAllStatuses] = useState(['active', 'inactive']);
   const [status, setStatus] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [gridApi, setGridApi] = useState(null);
   const [paginationPageSize, setPaginationPageSize] = useState(5);
   const [sortData, setSortData] = useState(null);
+  const [page, setPage] = useState(1);
 
-  let bodyObject = {
-    "page": 1,
-    "limit": paginationPageSize
-  };
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
     setPaginationPageSize(pageSize);
+    const page = gridRef.current.api.paginationGetCurrentPage() + 1;
+    setPage(page);
   }, []);
-
-  /*
-  {
-      "page": 1,
-      "limit": 10,
-      "search": "p",
-      "sort": {
-          "key": "createdAt",
-          "order": "asc"
-      },
-      "filter": {
-          "gst": "65bab211ce0f79d56447c537"
-      }
-  }
-  * */
-
-
-
-
 
   useEffect(() => {
     props.setBreadcrumbItems('Clients', breadcrumbItems);
-    // getListOfRowData(bodyObject);
-    // getCategories();
+    getListOfRowData();
   }, []);
+
+  useEffect(() => {
+    getListOfRowData();
+  }, [page, paginationPageSize]);
 
   useEffect(() => {
     props.setBreadcrumbItems('Clients', breadcrumbItems);
     if (status && status !== undefined && status !== "") {
-      let bodyObjectWithgst = { ...bodyObject };
-      bodyObjectWithgst.filter = {};
-      bodyObjectWithgst.filter.status = status;
-      // getListOfRowData(bodyObjectWithgst);
-      setPaginationPageSize(paginationPageSize);
-      // gridApi.refreshCells(params);
-    } else {
-
+      getListOfRowData();
     }
   }, [status]);
 
   useEffect(() => {
     props.setBreadcrumbItems('Clients', breadcrumbItems);
     if (searchValue && searchValue !== undefined && searchValue !== "") {
-      let bodyObjectWithgst = { ...bodyObject };
-      bodyObjectWithgst.search = searchValue;
-      setPaginationPageSize(paginationPageSize);
+      getListOfRowData();
     } else {
       setPaginationPageSize(paginationPageSize);
+      getListOfRowData();
     }
   }, [searchValue]);
 
+  useEffect(() => {
+    if (sortData?.key && sortData?.order) {
+      getListOfRowData();
+    }
+  }, [sortData]);
+
+  const getListOfRowData = useCallback(async () => {
+    const response = await getClientsReq({
+      page,
+      limit: paginationPageSize,
+      ...(status ? ({
+        filter: {
+          status,
+        }
+      }
+      ) : {}),
+      ...(searchValue ? ({
+        search: searchValue
+      }
+      ) : {}),
+      ...(sortData ? ({
+        sort: sortData,
+      }) : {}),
+    });
+
+    if (response) {
+      const { payload: { clients, total } } = response;
+      const emptyCount = total - clients.length;
+      const emptyObjects = Array.from({ length: emptyCount }, () => ({}));
+
+      // Combine clients and empty objects
+
+      let filledClients = [...clients];
+      if (rowData.length === 0) {
+        filledClients = [...clients, ...emptyObjects];
+      }
+
+      // Replace the section of data for the current page
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledClients);
+      setRowData(newData);
+    }
+  });
+
   const handleChange = (e) => {
+    setRowData([]);
+    setPage(1);
     setStatus(e.target.value);
   }
   const handleInputChange = (e) => {
+    setRowData([]);
+    setPage(1);
     setSearchValue(e.target.value);
   }
 
@@ -148,54 +162,14 @@ const AllClients = (props) => {
     const ele = columns.find(ele => ele.sort === 'asc' || ele.sort === 'desc');
 
     if (ele) {
+      setRowData([]);
+      setPage(1);
       setSortData({
         key: ele.colId,
         order: ele.sort,
       });
     }
   }
-  const serverSideDatasource = {
-    // called by the grid when more rows are required
-    getRows: async (params) => {
-
-      // get data for request from server
-      const response = await getClientsReq({
-        page: Math.max(params.request.endRow / paginationPageSize, 1),
-        limit: paginationPageSize,
-        ...(status ? ({
-            filter: {
-              status,
-            }
-          }
-        ) : {}),
-        ...(searchValue ? ({
-            search: searchValue
-          }
-        ) : {}),
-        ...(sortData ? ({
-          sort: sortData,
-        }) : {}),
-      })
-
-      if (response.success) {
-        // supply rows for requested block to grid
-        // setRowData(response.payload.client);
-        params.success({
-          rowData: response.payload.clients,
-          rowCount: response.payload.total,
-        });
-      } else {
-        // inform grid request failed
-        params.fail();
-      }
-    },
-  };
-
-  useEffect(() => {
-    if (sortData?.key && sortData?.order) {
-      setPaginationPageSize(paginationPageSize);
-    }
-  }, [sortData]);
 
   return (
     <React.Fragment>
@@ -222,17 +196,6 @@ const AllClients = (props) => {
                           onChange={handleInputChange} className="form-control rounded border" placeholder="Search..." />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
-                      {/*<input
-                        className="form-control border-end-0 border"
-                          placeholder="Search for..."
-                          value={searchValue}
-                          onChange={handleInputChange}
-                        />
-                          <span class="input-group-append">
-                              <button class="btn btn-outline-secondary bg-white border-start-0 border ms-n5" type="button">
-                                  <i class="fa fa-search"></i>
-                              </button>
-                        </span>*/}
                     </div>
                     <select
                       onChange={handleChange}
@@ -260,17 +223,13 @@ const AllClients = (props) => {
                     ref={gridRef}
                     suppressRowClickSelection={true}
                     columnDefs={columnDefs}
-                    pagination={pagination}
+                    pagination
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
                     rowSelection="multiple"
                     reactiveCustomComponents
-                    autoSizeStrategy={autoSizeStrategy}
-                    // rowData={rowData}
+                    rowData={rowData}
                     onPaginationChanged={onPaginationChanged}
-                    rowModelType={'serverSide'}
-                    serverSideDatasource={serverSideDatasource}
-                    cacheBlockSize={paginationPageSize}
                     onSortChanged={handleSortChange}
                   >
                   </AgGridReact>
