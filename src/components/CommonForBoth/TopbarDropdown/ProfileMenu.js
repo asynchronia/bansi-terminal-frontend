@@ -15,12 +15,16 @@ import {  Link } from "react-router-dom";
 import withRouter from "../../Common/withRouter";
 
 // users
-import user1 from "../../../assets/images/users/user-1.jpg"
+import user1 from "../../../assets/images/users/user.png"
 
 const ProfileMenu = props => {
   // Declare a new state variable, which we'll call "menu"
   const [menu, setMenu] = useState(false)
 
+  function handleLogout() {
+    localStorage.clear()
+    props.router.navigate("/login")
+  }
 
   return (
     <React.Fragment>
@@ -56,13 +60,13 @@ const ProfileMenu = props => {
           <DropdownItem tag="a" href="auth-lock-screen">
             <i className="mdi mdi-lock-open-outline font-size-17 text-muted align-middle me-1"/>
             {("Lock screen")}
-          </DropdownItem> */}
+          </DropdownItem>
           
-          <div className="dropdown-divider"/>
-          <Link to="/logout" className="dropdown-item text-danger">
+          <div className="dropdown-divider"/> */}
+          <DropdownItem onClick={handleLogout} className="dropdown-item text-danger">
             <i className="mdi mdi-power font-size-17 text-muted align-middle me-1 text-danger"/>
             <span>{("Logout")}</span>
-          </Link>
+          </DropdownItem>
         </DropdownMenu>
       </Dropdown>
     </React.Fragment>
