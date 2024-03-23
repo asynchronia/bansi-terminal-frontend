@@ -145,11 +145,14 @@ const AllClients = (props) => {
 
   const handleSortChange = (e) => {
     const columns = gridRef.current.api.getColumnState();
-    const { colId, sort } = columns.find(ele => ele.sort === 'asc' || ele.sort === 'desc');
-    setSortData({
-      key: colId,
-      order: sort,
-    });
+    const ele = columns.find(ele => ele.sort === 'asc' || ele.sort === 'desc');
+
+    if (ele) {
+      setSortData({
+        key: ele.colId,
+        order: ele.sort,
+      });
+    }
   }
   const serverSideDatasource = {
     // called by the grid when more rows are required
