@@ -36,18 +36,18 @@ const AllClients = (props) => {
   }
   const columnDefs = [
     { headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true },
-    { headerName: "Status", field: "status" },
-    { headerName: "Primary Email", field: "email" },
+    { headerName: "Status", field: "status", sortable: false },
+    { headerName: "Primary Email", field: "email", sortable: false  },
     { headerName: "Type", field: "clientType" },
-    { headerName: "GST Number", field: "gstin" },
+    { headerName: "GST Number", field: "gstin", sortable: false },
     {
       headerName: "Action", field: "action",
       cellClass: "actions-button-cell",
       cellRenderer: ClientActionField,
       cellRendererParams: {
         handleViewClick: onViewClick
-      }
-
+      },
+      sortable: false,
     }
   ],
     agRowData = [
@@ -74,6 +74,8 @@ const AllClients = (props) => {
   const [searchValue, setSearchValue] = useState("");
   const [gridApi, setGridApi] = useState(null);
   const [paginationPageSize, setPaginationPageSize] = useState(5);
+  const [sortData, setSortData] = useState(null);
+
   let bodyObject = {
     "page": 1,
     "limit": paginationPageSize
@@ -141,6 +143,14 @@ const AllClients = (props) => {
     setSearchValue(e.target.value);
   }
 
+  const handleSortChange = (e) => {
+    const columns = gridRef.current.api.getColumnState();
+    const { colId, sort } = columns.find(ele => ele.sort === 'asc' || ele.sort === 'desc');
+    setSortData({
+      key: colId,
+      order: sort,
+    });
+  }
   const serverSideDatasource = {
     // called by the grid when more rows are required
     getRows: async (params) => {
@@ -159,6 +169,9 @@ const AllClients = (props) => {
             search: searchValue
           }
         ) : {}),
+        ...(sortData ? ({
+          sort: sortData,
+        }) : {}),
       })
 
       if (response.success) {
@@ -174,6 +187,12 @@ const AllClients = (props) => {
       }
     },
   };
+
+  useEffect(() => {
+    if (sortData?.key && sortData?.order) {
+      setPaginationPageSize(paginationPageSize);
+    }
+  }, [sortData]);
 
   return (
     <React.Fragment>
@@ -249,6 +268,7 @@ const AllClients = (props) => {
                     rowModelType={'serverSide'}
                     serverSideDatasource={serverSideDatasource}
                     cacheBlockSize={paginationPageSize}
+                    onSortChanged={handleSortChange}
                   >
                   </AgGridReact>
                 </div>
