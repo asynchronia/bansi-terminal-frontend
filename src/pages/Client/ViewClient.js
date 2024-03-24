@@ -79,7 +79,11 @@ const ViewClient = (props) => {
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];
-  const [openModal, setOpenModal] = useState(false);
+  const [openModal, setOpenModal] = useState({
+    agreement:false,
+    branch:false,
+    user:false,
+  });
 
   const handleSubmitAgreement = async () => {
     try {
@@ -99,10 +103,12 @@ const ViewClient = (props) => {
     }
   };
 
-  const handleModalToggle = () => {
-    setOpenModal(!openModal);
+  const handleModalToggle = (key) => {
+    setOpenModal({...openModal, key:!openModal[key]});
     removeBodyCss();
   };
+
+  console.log(openModal)
   function removeBodyCss() {
     document.body.classList.add("no_padding");
   }
@@ -131,7 +137,7 @@ const ViewClient = (props) => {
       <ToastContainer position="top-center" theme="colored" />
       <Modal
         size="lg"
-        isOpen={openModal}
+        isOpen={openModal.agreement}
         toggle={() => {
           handleModalToggle();
         }}
@@ -142,6 +148,7 @@ const ViewClient = (props) => {
           setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
           setAgreementData={setAgreementData}
+          openModal={openModal}
           setOpenModal={setOpenModal}
         />
       </Modal>
@@ -202,7 +209,7 @@ const ViewClient = (props) => {
                         type="button"
                         className="btn btn-primary waves-effect waves-light "
                         onClick={() => {
-                          setOpenModal(true);
+                          setOpenModal({...openModal, agreement:true});
                         }}
                       >
                         <i className=" mdi mdi-18px mdi-plus"></i>
