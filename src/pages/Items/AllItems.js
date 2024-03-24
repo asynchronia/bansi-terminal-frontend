@@ -1,6 +1,6 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Card, CardBody, CardTitle, Button, Input, Modal } from "reactstrap"
+import { Row, Col, Card, CardBody,  Button, Input, Modal } from "reactstrap"
 
 import { connect } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,7 +14,8 @@ import 'ag-grid-community/styles//ag-theme-quartz.css';
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import {getCategoriesReq, getItemsReq , deletItemReq} from "../../service/itemService";
+import { getItemsReq , deletItemReq} from "../../service/itemService";
+import { getCategoriesReq } from "../../service/categoryService";
 import "./styles/datatables.scss";
 import "./styles/AllItems.scss";
 import DropdownMenuBtn from "./DropdownMenuBtn";

@@ -1,17 +1,15 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Card, CardBody, Col, Input, Label, Row } from "reactstrap";
+import { getWarehouseListReq } from "../../service/branchService";
 
 const AddBranch = ({ validation }) => {
   const [warehouseList, setWarehouseList] = useState([]);
 
   const searchAllWareHouses = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/api/branches/warehouse-list"
-      );
-      let data = await response.data;
-      setWarehouseList(data?.payload?.warehouses);
+     const response= await getWarehouseListReq();
+      setWarehouseList(response?.payload?.warehouses);
     } catch (error) {
       console.log(error);
     }
@@ -35,21 +33,21 @@ const AddBranch = ({ validation }) => {
                 placeholder="Enter Branch Name"
                 onChange={validation.handleChange}
                 onBlur={validation.handleBlur}
-                value={validation.values.primaryBranch.name || ""}
+                value={validation?.values?.primaryBranch?.name || ""}
                 name="primaryBranch.name" 
                 invalid={
-                  validation.touched.primaryBranch &&
-                  validation.touched.primaryBranch.name &&
-                  validation.errors.primaryBranch &&
-                  validation.errors.primaryBranch.name
+                  validation?.touched?.primaryBranch &&
+                  validation?.touched?.primaryBranch?.name &&
+                  validation?.errors?.primaryBranch &&
+                  validation?.errors?.primaryBranch?.name
                 }
               />
-              {validation.touched.primaryBranch &&
-              validation.touched.primaryBranch.name &&
-              validation.errors.primaryBranch &&
-              validation.errors.primaryBranch.name ? (
+              {validation?.touched?.primaryBranch &&
+              validation?.touched?.primaryBranch?.name &&
+              validation?.errors?.primaryBranch &&
+              validation?.errors?.primaryBranch?.name ? (
                 <p style={{ color: "red" }}>
-                  {validation.errors.primaryBranch.name}
+                  {validation.errors?.primaryBranch?.name}
                 </p>
               ) : null}
             </div>
@@ -63,12 +61,12 @@ const AddBranch = ({ validation }) => {
                 className="form-select focus-width"
                 onChange={validation.handleChange}
                 onBlur={validation.handleBlur}
-                value={validation.values.primaryBranch.associatedWarehouse || ""}
+                value={validation?.values?.primaryBranch?.associatedWarehouse || ""}
                 invalid={
-                  validation.touched.primaryBranch &&
-                  validation.touched.primaryBranch.associatedWarehouse &&
-                  validation.errors.primaryBranch &&
-                  validation.errors.primaryBranch.associatedWarehouse
+                  validation?.touched?.primaryBranch &&
+                  validation?.touched?.primaryBranch?.associatedWarehouse &&
+                  validation?.errors?.primaryBranch &&
+                  validation?.errors?.primaryBranch?.associatedWarehouse
                 }
               >
                 <option>Select Associated Warehouse</option>
@@ -76,12 +74,12 @@ const AddBranch = ({ validation }) => {
                   <option value={e._id}>{e.name}</option>
                 ))}
               </select>
-              {validation.touched.primaryBranch &&
-              validation.touched.primaryBranch.associatedWarehouse &&
-              validation.errors.primaryBranch &&
-              validation.errors.primaryBranch.associatedWarehouse ? (
+              {validation?.touched?.primaryBranch &&
+              validation?.touched?.primaryBranch?.associatedWarehouse &&
+              validation?.errors?.primaryBranch &&
+              validation?.errors?.primaryBranch?.associatedWarehouse ? (
                 <p style={{ color: "red" }}>
-                  {validation.errors.primaryBranch.associatedWarehouse}
+                  {validation?.errors?.primaryBranch?.associatedWarehouse}
                 </p>
               ) : null}
             </div>
@@ -98,20 +96,20 @@ const AddBranch = ({ validation }) => {
               placeholder="Enter Branch Contact Number"
               onChange={validation.handleChange}
               onBlur={validation.handleBlur}
-              value={validation.values.primaryBranch.contact || ""}
+              value={validation?.values?.primaryBranch?.contact || ""}
               invalid={
-                validation.touched.primaryBranch &&
-                validation.touched.primaryBranch.contact &&
-                validation.errors.primaryBranch &&
-                validation.errors.primaryBranch.contact
+                validation?.touched?.primaryBranch &&
+                validation?.touched?.primaryBranch?.contact &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.contact
               }
             />
-            {validation.touched.primaryBranch &&
-            validation.touched.primaryBranch.contact &&
-            validation.errors.primaryBranch &&
-            validation.errors.primaryBranch.contact ? (
+            {validation?.touched?.primaryBranch &&
+            validation?.touched?.primaryBranch?.contact &&
+            validation?.errors?.primaryBranch &&
+            validation?.errors?.primaryBranch?.contact ? (
               <p style={{ color: "red" }}>
-                {validation.errors.primaryBranch.contact}
+                {validation?.errors?.primaryBranch?.contact}
               </p>
             ) : null}
           </div>
@@ -127,21 +125,21 @@ const AddBranch = ({ validation }) => {
               placeholder="Enter Branch Address"
               onChange={validation.handleChange}
               onBlur={validation.handleBlur}
-              value={validation.values.primaryBranch.address || ""}
+              value={validation.values.primaryBranch?.address || ""}
               invalid={
-                validation.touched.primaryBranch &&
-                validation.touched.primaryBranch.address &&
-                validation.errors.primaryBranch &&
-                validation.errors.primaryBranch.address
+                validation.touched?.primaryBranch &&
+                validation.touched?.primaryBranch?.address &&
+                validation.errors?.primaryBranch &&
+                validation.errors?.primaryBranch?.address
               }
             />
             <span className="badgecount badge badge-success"></span>
-            {validation.touched.primaryBranch &&
-            validation.touched.primaryBranch.address &&
-            validation.errors.primaryBranch &&
-            validation.errors.primaryBranch.address ? (
+            {validation.touched?.primaryBranch &&
+            validation.touched?.primaryBranch?.address &&
+            validation.errors?.primaryBranch &&
+            validation.errors?.primaryBranch?.address ? (
               <p style={{ color: "red" }}>
-                {validation.errors.primaryBranch.address}
+                {validation.errors?.primaryBranch?.address}
               </p>
             ) : null}
           </div>
