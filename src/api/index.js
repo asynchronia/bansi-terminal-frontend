@@ -18,6 +18,7 @@ const API_URL = {
     createAgreement: '/api/agreements/create',
     getBranchList: '/api/branch/list',
     createBranch: '/api/branch/create',
+    getWarehouseList :'/api/branch/warehouse-list'
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -94,6 +95,19 @@ export async function getBranchList(body) {
             });
     });
 }
+
+export async function getWarehouseList() {
+    return new Promise((resolve) => {
+        axios
+            .get(`${baseUrl}${API_URL.getWarehouseList}`, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+
 
 export async function createBranch(body) {
     return new Promise((resolve) => {
