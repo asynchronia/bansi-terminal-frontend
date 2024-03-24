@@ -4,12 +4,24 @@ import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Img404 from "../../assets/images/Img404.png";
-import { Card, CardBody, CardHeader, Col, Modal, Row, Table } from "reactstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Modal,
+  Row,
+  Table,
+} from "reactstrap";
 import { Avatar, CircularProgress } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
 import AgreementTable from "../../components/CustomComponents/AgreementTable";
 import { ToastContainer, toast } from "react-toastify";
 import { createAgreementReq } from "../../service/clientService";
+import AddBranch from "../../components/CustomComponents/AddBranch";
+import BranchData from "../../components/CustomComponents/BranchData";
+import UserData from "../../components/CustomComponents/UserData";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -19,6 +31,18 @@ const ViewClient = (props) => {
     loading: true,
     value: false,
   });
+  const [openModal, setOpenModal] = useState({
+    agreement: false,
+    branch: false,
+    user: false,
+  });
+  const { id } = useParams();
+
+  const [seletedData, setSelectedData] = useState({
+    branch: true,
+    user: false,
+  });
+
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -32,20 +56,18 @@ const ViewClient = (props) => {
         theme: "colored",
       });
     }
-    setTimeout(()=>{
+    setTimeout(() => {
       window.location.reload();
-    }, [5000])
+    }, [5000]);
   };
-
-  
 
   const getAgreement = async (id) => {
     const url = `http://localhost:3000/api/agreements/agreement`;
     const data = { clientId: id };
     try {
       const res = await axios.post(url, data);
-      let array=[];
-      if(res?.data?.payload?.items){
+      let array = [];
+      if (res?.data?.payload?.items) {
         array = res?.data?.payload?.items?.flatMap((item) => {
           return item.variants.map((variant) => {
             return {
@@ -58,13 +80,12 @@ const ViewClient = (props) => {
             };
           });
         });
-  
       }
 
       if (array.length > 0) {
         setDisplayTableData(array);
         setAgreementAvailable({ loading: false, value: true });
-      }else{
+      } else {
         setAgreementAvailable({ loading: false, value: false });
       }
     } catch (error) {
@@ -73,17 +94,13 @@ const ViewClient = (props) => {
     }
   };
 
-  const { id } = useParams();
+ 
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];
-  const [openModal, setOpenModal] = useState({
-    agreement:false,
-    branch:false,
-    user:false,
-  });
+ 
 
   const handleSubmitAgreement = async () => {
     try {
@@ -91,7 +108,7 @@ const ViewClient = (props) => {
         clientId: id,
         items: [...agreementData],
       };
-      
+
       const response = await createAgreementReq(values);
       if (response.success === true) {
         notify("Success", response.message);
@@ -104,11 +121,11 @@ const ViewClient = (props) => {
   };
 
   const handleModalToggle = (key) => {
-    setOpenModal({...openModal, key:!openModal[key]});
+    setOpenModal({ ...openModal, key: !openModal[key] });
     removeBodyCss();
   };
 
-  console.log(openModal)
+
   function removeBodyCss() {
     document.body.classList.add("no_padding");
   }
@@ -139,7 +156,7 @@ const ViewClient = (props) => {
         size="lg"
         isOpen={openModal.agreement}
         toggle={() => {
-          handleModalToggle();
+          handleModalToggle("agreement");
         }}
       >
         <Agreement
@@ -151,6 +168,9 @@ const ViewClient = (props) => {
           openModal={openModal}
           setOpenModal={setOpenModal}
         />
+      </Modal>
+      <Modal>
+        <AddBranch />
       </Modal>
       <div
         style={{
@@ -164,10 +184,7 @@ const ViewClient = (props) => {
           <option value="active">Published</option>
           <option value="draft">Draft</option>
         </select>
-        <button
-          type="submit"
-          className="btn btn-primary w-xl mx-3"
-        >
+        <button type="submit" className="btn btn-primary w-xl mx-3">
           Submit
         </button>
       </div>
@@ -179,7 +196,7 @@ const ViewClient = (props) => {
 
               {agreementAvailable.loading ? (
                 <CircularProgress style={{ marginLeft: "50%" }} />
-              ) : !agreementAvailable.value  ? (
+              ) : !agreementAvailable.value ? (
                 <div>
                   <CardHeader className="mt-3">
                     <Row>
@@ -209,7 +226,7 @@ const ViewClient = (props) => {
                         type="button"
                         className="btn btn-primary waves-effect waves-light "
                         onClick={() => {
-                          setOpenModal({...openModal, agreement:true});
+                          setOpenModal({ ...openModal, agreement: true });
                         }}
                       >
                         <i className=" mdi mdi-18px mdi-plus"></i>
@@ -228,6 +245,46 @@ const ViewClient = (props) => {
                   setDisplayTableData={setDisplayTableData}
                 />
               )}
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <div>
+                  <label
+                    onClick={() => {
+                      setSelectedData({
+                        branch:true,
+                        user:false
+                      })
+                    }}
+                    className={seletedData.branch?"text-primary card-title mx-1 ":"card-title mx-1" }
+                    
+                  >
+                    Branch
+                  </label>
+                </div>
+
+                <div>
+                  <label
+                    onClick={() => {
+                      setSelectedData({
+                        branch:false,
+                        user:true
+                      })
+                    }}
+                    className={seletedData.user?"text-primary card-title mx-1":"card-title mx-1"}
+                    
+                  >
+                    Users
+                  </label>
+                </div>
+              </div>
+              {
+                seletedData.branch?
+                <BranchData clientId={id} openModal={openModal} setOpenModal={setOpenModal} handleToggle={handleModalToggle}/>:
+                <UserData/>
+              }
             </CardBody>
           </Card>
         </Col>
