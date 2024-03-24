@@ -16,7 +16,8 @@ const API_URL = {
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
     createAgreement: '/api/agreements/create',
-    getBranchList: '/api/branch/list'
+    getBranchList: '/api/branch/list',
+    createBranch: '/api/branch/create',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -94,7 +95,16 @@ export async function getBranchList(body) {
     });
 }
 
-
+export async function createBranch(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.createBranch}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
 
 export async function getInvoices(body) {
     return new Promise((resolve, reject) => {

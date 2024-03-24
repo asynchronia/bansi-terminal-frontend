@@ -22,6 +22,7 @@ import { createAgreementReq } from "../../service/clientService";
 import AddBranch from "../../components/CustomComponents/AddBranch";
 import BranchData from "../../components/CustomComponents/BranchData";
 import UserData from "../../components/CustomComponents/UserData";
+import { createBranchReq } from "../../service/branchService";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -42,7 +43,6 @@ const ViewClient = (props) => {
     branch: true,
     user: false,
   });
-
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -94,13 +94,11 @@ const ViewClient = (props) => {
     }
   };
 
- 
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];
- 
 
   const handleSubmitAgreement = async () => {
     try {
@@ -120,11 +118,23 @@ const ViewClient = (props) => {
     }
   };
 
+  const handleSubmitBranch = async (data) => {
+    try {
+      const response = await createBranchReq(data);
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
+  };
+
   const handleModalToggle = (key) => {
     setOpenModal({ ...openModal, key: !openModal[key] });
     removeBodyCss();
   };
-
 
   function removeBodyCss() {
     document.body.classList.add("no_padding");
@@ -254,12 +264,15 @@ const ViewClient = (props) => {
                   <label
                     onClick={() => {
                       setSelectedData({
-                        branch:true,
-                        user:false
-                      })
+                        branch: true,
+                        user: false,
+                      });
                     }}
-                    className={seletedData.branch?"text-primary card-title mx-1 ":"card-title mx-1" }
-                    
+                    className={
+                      seletedData.branch
+                        ? "text-primary card-title mx-1 "
+                        : "card-title mx-1"
+                    }
                   >
                     Branch
                   </label>
@@ -269,22 +282,31 @@ const ViewClient = (props) => {
                   <label
                     onClick={() => {
                       setSelectedData({
-                        branch:false,
-                        user:true
-                      })
+                        branch: false,
+                        user: true,
+                      });
                     }}
-                    className={seletedData.user?"text-primary card-title mx-1":"card-title mx-1"}
-                    
+                    className={
+                      seletedData.user
+                        ? "text-primary card-title mx-1"
+                        : "card-title mx-1"
+                    }
                   >
                     Users
                   </label>
                 </div>
               </div>
-              {
-                seletedData.branch?
-                <BranchData clientId={id} openModal={openModal} setOpenModal={setOpenModal} handleToggle={handleModalToggle}/>:
-                <UserData/>
-              }
+              {seletedData.branch ? (
+                <BranchData
+                  handleSubmit={handleSubmitBranch}
+                  clientId={id}
+                  openModal={openModal}
+                  setOpenModal={setOpenModal}
+                  handleToggle={handleModalToggle}
+                />
+              ) : (
+                <UserData />
+              )}
             </CardBody>
           </Card>
         </Col>

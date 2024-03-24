@@ -19,7 +19,8 @@ import AddBranch from "./AddBranch";
 import * as Yup from "yup";
 
 const BranchData = (props) => {
-  const { clientId, openModal, setOpenModal, handleToggle } = props;
+  const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
+    props;
 
   const gridRef = useRef();
   const [branchData, setBranchData] = useState([]);
@@ -54,9 +55,9 @@ const BranchData = (props) => {
   }, []);
 
   const [colDefs, setColDefs] = useState([
-    { field: "Name", minWidth: 150 },
-    { field: "AssociatedWarehouse", minWidth: 150 },
-    { field: "Contact", minWidth: 150 },
+    { field: "Name", minWidth: 220 },
+    { field: "AssociatedWarehouse", minWidth: 220 },
+    { field: "Contact", minWidth: 220 },
     // { field: "Action", minWidth:150},
   ]);
 
@@ -79,7 +80,8 @@ const BranchData = (props) => {
       }),
     }),
     onSubmit: (values) => {
-      console.log(values);
+      const newBranch = { ...values.primaryBranch, clientId: clientId };
+      handleSubmit(newBranch);
     },
   });
 
@@ -93,8 +95,21 @@ const BranchData = (props) => {
         }}
       >
         <div>
-         
-            <div style={{ display: "flex", justifyContent: "space-between" , padding:'15px 15px 0px'}}>
+          <Form
+            className="form-horizontal mt-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              validation.handleSubmit();
+              return false;
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "15px 15px 0px",
+              }}
+            >
               <h4 className="card-title mt-2">Add Branch</h4>
               <Row>
                 <Col>
@@ -113,7 +128,7 @@ const BranchData = (props) => {
                 <Col>
                   {" "}
                   <button
-                    type="button"
+                    type="submit"
                     className="btn btn-primary waves-effect waves-light "
                     onClick={() => {
                       //   handleSubmitAgreement();
@@ -125,17 +140,8 @@ const BranchData = (props) => {
                 </Col>
               </Row>
             </div>
-            <Form
-              className="form-horizontal mt-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                validation.handleSubmit();
-                return false;
-              }}
-            >
-              <AddBranch validation={validation} />
-            </Form>
-          
+            <AddBranch validation={validation} />
+          </Form>
         </div>
       </Modal>
       <div className="ag-theme-quartz" style={{ height: 309 }}>
