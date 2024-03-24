@@ -166,7 +166,7 @@ const ViewClient = (props) => {
       </div>
       <Row>
         <Col xs="8">
-          <Card style={{ border: "2px solid #7a6ebe" }}>
+          <Card style={{ border: "2px solid #0053FF" }}>
             <CardBody>
               <h4 className="card-title">Agreement</h4>
 
@@ -230,7 +230,7 @@ const ViewClient = (props) => {
               <h4 className="card-title">Client Details</h4>
               <hr></hr>
               <div className="mt-3" style={{ display: "flex", gap: "20px" }}>
-                <Avatar variant="rounded" sx={{ bgcolor: "#7a6ebe" }}>
+                <Avatar variant="rounded" sx={{ bgcolor: "#0053FF" }}>
                   {clientData?.name?.match(/\b\w/g)?.join("") || "UN"}
                 </Avatar>
                 <h4 className="my-auto">{clientData?.name}</h4>
