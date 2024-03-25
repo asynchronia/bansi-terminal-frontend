@@ -132,6 +132,19 @@ const ViewClient = (props) => {
       notify("Error", error.message);
     }
   };
+  const handleSubmitUser = async (data) => {
+    // try {
+      // const response = await (data);
+      console.log(data)
+    //   if (response.success === true) {
+    //     notify("Success", response.message);
+    //   } else {
+    //     notify("Error", response.message);
+    //   }
+    // } catch (error) {
+    //   notify("Error", error.message);
+    // }
+  };
 
   const handleModalToggle = (key) => {
     setOpenModal({ ...openModal, key: !openModal[key] });
@@ -335,7 +348,12 @@ const ViewClient = (props) => {
                   handleToggle={handleModalToggle}
                 />
               ) : (
-                <UserData />
+                <UserData
+                handleSubmit={handleSubmitUser}
+                clientId={id}
+                openModal={openModal}
+                setOpenModal={setOpenModal}
+                handleToggle={handleModalToggle} />
               )}
             </CardBody>
           </Card>
