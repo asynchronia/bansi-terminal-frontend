@@ -23,6 +23,8 @@ import AddBranch from "../../components/CustomComponents/AddBranch";
 import BranchData from "../../components/CustomComponents/BranchData";
 import UserData from "../../components/CustomComponents/UserData";
 import { createBranchReq } from "../../service/branchService";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -155,6 +157,22 @@ const ViewClient = (props) => {
       console.log(error);
     }
   };
+
+  const downloadPDF = () => {
+    const data = [...displayTableData];
+
+    const doc = new jsPDF();
+    const tableColumn = Object.keys(data[0]);
+    const tableRows = data.map((obj) => Object.values(obj));
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    doc.save("Agreement.pdf");
+  };
+
   useEffect(() => {
     props.setBreadcrumbItems("EditClient", breadcrumbItems);
   });
@@ -248,13 +266,24 @@ const ViewClient = (props) => {
                   </div>
                 </div>
               ) : (
-                <AgreementTable
-                  editable={false}
-                  agreementData={agreementData}
-                  setAgreementData={setAgreementData}
-                  displayTableData={displayTableData}
-                  setDisplayTableData={setDisplayTableData}
-                />
+                <div>
+                  
+                    <button
+                    style={{float:'right'}}
+                      className="btn btn-primary w-xl mb-1"
+                      onClick={downloadPDF}
+                    >
+                      Download PDF
+                    </button>
+                 
+                  <AgreementTable
+                    editable={false}
+                    agreementData={agreementData}
+                    setAgreementData={setAgreementData}
+                    displayTableData={displayTableData}
+                    setDisplayTableData={setDisplayTableData}
+                  />
+                </div>
               )}
             </CardBody>
           </Card>

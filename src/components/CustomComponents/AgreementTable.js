@@ -76,7 +76,6 @@ const AgreementTable = (props) => {
           <th></th>
         </tr>
       </thead>
-
       <tbody id="agreementBody">
         {displayTableData?.length > 0
           ? displayTableData.map((data) => (
