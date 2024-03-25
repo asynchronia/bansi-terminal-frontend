@@ -4,12 +4,27 @@ import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Img404 from "../../assets/images/Img404.png";
-import { Card, CardBody, CardHeader, Col, Modal, Row, Table } from "reactstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Modal,
+  Row,
+  Table,
+} from "reactstrap";
 import { Avatar, CircularProgress } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
 import AgreementTable from "../../components/CustomComponents/AgreementTable";
 import { ToastContainer, toast } from "react-toastify";
 import { createAgreementReq } from "../../service/clientService";
+import AddBranch from "../../components/CustomComponents/AddBranch";
+import BranchData from "../../components/CustomComponents/BranchData";
+import UserData from "../../components/CustomComponents/UserData";
+import { createBranchReq } from "../../service/branchService";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -18,6 +33,17 @@ const ViewClient = (props) => {
   const [agreementAvailable, setAgreementAvailable] = useState({
     loading: true,
     value: false,
+  });
+  const [openModal, setOpenModal] = useState({
+    agreement: false,
+    branch: false,
+    user: false,
+  });
+  const { id } = useParams();
+
+  const [seletedData, setSelectedData] = useState({
+    branch: true,
+    user: false,
   });
 
   const notify = (type, message) => {
@@ -32,20 +58,18 @@ const ViewClient = (props) => {
         theme: "colored",
       });
     }
-    setTimeout(()=>{
+    setTimeout(() => {
       window.location.reload();
-    }, [5000])
+    }, [5000]);
   };
-
-  
 
   const getAgreement = async (id) => {
     const url = `http://localhost:3000/api/agreements/agreement`;
     const data = { clientId: id };
     try {
       const res = await axios.post(url, data);
-      let array=[];
-      if(res?.data?.payload?.items){
+      let array = [];
+      if (res?.data?.payload?.items) {
         array = res?.data?.payload?.items?.flatMap((item) => {
           return item.variants.map((variant) => {
             return {
@@ -58,13 +82,12 @@ const ViewClient = (props) => {
             };
           });
         });
-  
       }
 
       if (array.length > 0) {
         setDisplayTableData(array);
         setAgreementAvailable({ loading: false, value: true });
-      }else{
+      } else {
         setAgreementAvailable({ loading: false, value: false });
       }
     } catch (error) {
@@ -73,13 +96,11 @@ const ViewClient = (props) => {
     }
   };
 
-  const { id } = useParams();
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];
-  const [openModal, setOpenModal] = useState(false);
 
   const handleSubmitAgreement = async () => {
     try {
@@ -87,7 +108,7 @@ const ViewClient = (props) => {
         clientId: id,
         items: [...agreementData],
       };
-      
+
       const response = await createAgreementReq(values);
       if (response.success === true) {
         notify("Success", response.message);
@@ -99,10 +120,37 @@ const ViewClient = (props) => {
     }
   };
 
-  const handleModalToggle = () => {
-    setOpenModal(!openModal);
+  const handleSubmitBranch = async (data) => {
+    try {
+      const response = await createBranchReq(data);
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
+  };
+  const handleSubmitUser = async (data) => {
+    // try {
+      // const response = await (data);
+      console.log(data)
+    //   if (response.success === true) {
+    //     notify("Success", response.message);
+    //   } else {
+    //     notify("Error", response.message);
+    //   }
+    // } catch (error) {
+    //   notify("Error", error.message);
+    // }
+  };
+
+  const handleModalToggle = (key) => {
+    setOpenModal({ ...openModal, key: !openModal[key] });
     removeBodyCss();
   };
+
   function removeBodyCss() {
     document.body.classList.add("no_padding");
   }
@@ -122,6 +170,22 @@ const ViewClient = (props) => {
       console.log(error);
     }
   };
+
+  const downloadPDF = () => {
+    const data = [...displayTableData];
+
+    const doc = new jsPDF();
+    const tableColumn = Object.keys(data[0]);
+    const tableRows = data.map((obj) => Object.values(obj));
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    doc.save("Agreement.pdf");
+  };
+
   useEffect(() => {
     props.setBreadcrumbItems("EditClient", breadcrumbItems);
   });
@@ -131,9 +195,9 @@ const ViewClient = (props) => {
       <ToastContainer position="top-center" theme="colored" />
       <Modal
         size="lg"
-        isOpen={openModal}
+        isOpen={openModal.agreement}
         toggle={() => {
-          handleModalToggle();
+          handleModalToggle("agreement");
         }}
       >
         <Agreement
@@ -142,8 +206,12 @@ const ViewClient = (props) => {
           setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
           setAgreementData={setAgreementData}
+          openModal={openModal}
           setOpenModal={setOpenModal}
         />
+      </Modal>
+      <Modal>
+        <AddBranch />
       </Modal>
       <div
         style={{
@@ -157,22 +225,19 @@ const ViewClient = (props) => {
           <option value="active">Published</option>
           <option value="draft">Draft</option>
         </select>
-        <button
-          type="submit"
-          className="btn btn-primary w-xl mx-3"
-        >
-          Submit
+        <button type="submit" className="btn btn-primary w-xl mx-3">
+          Edit
         </button>
       </div>
       <Row>
         <Col xs="8">
-          <Card style={{ border: "2px solid #7a6ebe" }}>
+          <Card style={{ border: "2px solid #0053FF" }}>
             <CardBody>
               <h4 className="card-title">Agreement</h4>
 
               {agreementAvailable.loading ? (
                 <CircularProgress style={{ marginLeft: "50%" }} />
-              ) : !agreementAvailable.value  ? (
+              ) : !agreementAvailable.value ? (
                 <div>
                   <CardHeader className="mt-3">
                     <Row>
@@ -202,7 +267,7 @@ const ViewClient = (props) => {
                         type="button"
                         className="btn btn-primary waves-effect waves-light "
                         onClick={() => {
-                          setOpenModal(true);
+                          setOpenModal({ ...openModal, agreement: true });
                         }}
                       >
                         <i className=" mdi mdi-18px mdi-plus"></i>
@@ -214,12 +279,81 @@ const ViewClient = (props) => {
                   </div>
                 </div>
               ) : (
-                <AgreementTable
-                  agreementData={agreementData}
-                  setAgreementData={setAgreementData}
-                  displayTableData={displayTableData}
-                  setDisplayTableData={setDisplayTableData}
+                <div>
+                  
+                    <button
+                    style={{float:'right'}}
+                      className="btn btn-primary w-xl mb-1"
+                      onClick={downloadPDF}
+                    >
+                      Download PDF
+                    </button>
+                 
+                  <AgreementTable
+                    editable={false}
+                    agreementData={agreementData}
+                    setAgreementData={setAgreementData}
+                    displayTableData={displayTableData}
+                    setDisplayTableData={setDisplayTableData}
+                  />
+                </div>
+              )}
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <div>
+                  <label
+                    onClick={() => {
+                      setSelectedData({
+                        branch: true,
+                        user: false,
+                      });
+                    }}
+                    className={
+                      seletedData.branch
+                        ? "text-primary card-title mx-1 "
+                        : "card-title mx-1"
+                    }
+                  >
+                    Branch
+                  </label>
+                </div>
+
+                <div>
+                  <label
+                    onClick={() => {
+                      setSelectedData({
+                        branch: false,
+                        user: true,
+                      });
+                    }}
+                    className={
+                      seletedData.user
+                        ? "text-primary card-title mx-1"
+                        : "card-title mx-1"
+                    }
+                  >
+                    Users
+                  </label>
+                </div>
+              </div>
+              {seletedData.branch ? (
+                <BranchData
+                  handleSubmit={handleSubmitBranch}
+                  clientId={id}
+                  openModal={openModal}
+                  setOpenModal={setOpenModal}
+                  handleToggle={handleModalToggle}
                 />
+              ) : (
+                <UserData
+                handleSubmit={handleSubmitUser}
+                clientId={id}
+                openModal={openModal}
+                setOpenModal={setOpenModal}
+                handleToggle={handleModalToggle} />
               )}
             </CardBody>
           </Card>
@@ -230,7 +364,7 @@ const ViewClient = (props) => {
               <h4 className="card-title">Client Details</h4>
               <hr></hr>
               <div className="mt-3" style={{ display: "flex", gap: "20px" }}>
-                <Avatar variant="rounded" sx={{ bgcolor: "#7a6ebe" }}>
+                <Avatar variant="rounded" sx={{ bgcolor: "#0053FF" }}>
                   {clientData?.name?.match(/\b\w/g)?.join("") || "UN"}
                 </Avatar>
                 <h4 className="my-auto">{clientData?.name}</h4>

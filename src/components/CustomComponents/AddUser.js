@@ -1,7 +1,22 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Card, CardBody } from "reactstrap"
+import { getUserRoleReq } from "../../service/branchService";
 
 const AddUser = ({ validation }) => {
+  const [roleList, setRolelist] = useState([]);
+
+  const searchAllRole = async () => {
+    try {
+     const response= await getUserRoleReq();
+      setRolelist(response?.payload?.roles);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    searchAllRole();
+  }, []);
   return (
     <Card>
       <CardBody>
@@ -133,8 +148,9 @@ const AddUser = ({ validation }) => {
             }
           >
             <option>Select User Role</option>
-            <option>Option 1</option>
-            <option>Option 2</option>
+            {roleList.map((e) => (
+                  <option value={e._id}>{e.title}</option>
+                ))}
           </select>
           {validation.touched.primaryUser &&
           validation.touched.primaryUser.role &&

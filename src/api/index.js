@@ -15,7 +15,12 @@ const API_URL = {
     getOrderList: "/api/orders/list",
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
-    createAgreement: '/api/agreements/create'
+    createAgreement: '/api/agreements/create',
+    getBranchList: '/api/branch/list',
+    createBranch: '/api/branch/create',
+    getWarehouseList :'/api/branch/warehouse-list',
+    getUserList:'/api/users/get/users',
+    getUserRole: '/api/roles/list'
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -75,6 +80,63 @@ export async function getItems(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.getItems}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getUserList(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getUserList}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getUserRole() {
+    return new Promise((resolve) => {
+        axios
+            .get(`${baseUrl}${API_URL.getUserRole}`, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getBranchList(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getBranchList}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getWarehouseList() {
+    return new Promise((resolve) => {
+        axios
+            .get(`${baseUrl}${API_URL.getWarehouseList}`, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+
+
+export async function createBranch(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.createBranch}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

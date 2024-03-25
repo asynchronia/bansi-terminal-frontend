@@ -17,6 +17,8 @@
     "dotenv": "^16.3.1",
     "formik": "2.4.5",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "lodash": "^4.17.21",
     "mdbreact": "^5.2.0",
     "metismenujs": "^1.4.0",

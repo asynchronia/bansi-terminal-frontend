@@ -6,7 +6,7 @@ import AgreementTable from "./AgreementTable";
 
 const Agreement = (props) => {
 
-  const {handleSubmitAgreement,agreementData, setAgreementData,displayTableData, setDisplayTableData, setOpenModal }= props;
+  const {handleSubmitAgreement,agreementData, setAgreementData,displayTableData, setDisplayTableData,openModal, setOpenModal }= props;
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
 
@@ -92,7 +92,7 @@ const handleAddToAgreement = (itemId, variantId, price) => {
                 color="danger"
                 className="waves-effect waves-light"
                 onClick={() => {
-                  setOpenModal(false);
+                  setOpenModal({...openModal, agreement:false});
                 }}
               >
                 Close
@@ -105,7 +105,7 @@ const handleAddToAgreement = (itemId, variantId, price) => {
                 className="btn btn-primary waves-effect waves-light "
                 onClick={() => {
                   handleSubmitAgreement();
-                  setOpenModal(false);
+                  setOpenModal({...openModal, agreement:false});
                 }}
               >
                 Save
@@ -159,7 +159,7 @@ const handleAddToAgreement = (itemId, variantId, price) => {
           ) : null}
         </div>
 
-        <AgreementTable agreementData={agreementData} displayTableData={displayTableData} setAgreementData={setAgreementData} setDisplayTableData={setDisplayTableData}/>
+        <AgreementTable editable={true} agreementData={agreementData} displayTableData={displayTableData} setAgreementData={setAgreementData} setDisplayTableData={setDisplayTableData}/>
       </CardBody>
     </Card>
   );
