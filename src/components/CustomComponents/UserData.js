@@ -18,6 +18,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import * as Yup from "yup";
 import AddUser from "./AddUser";
+import { getUserRoleReq } from "../../service/branchService";
 
 const UserData = (props) => {
   const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
@@ -26,6 +27,23 @@ const UserData = (props) => {
   const gridRef = useRef();
   const [userData, setUserData] = useState([]);
   const [page, setPage] = useState(1);
+
+  const getRoleName=(roleId)=>{
+   if(roleId==="65b4e43b671d73cc3c1bbf8c"){
+    return "Super Admin";
+   }else if(roleId==="65b4e43b671d73cc3c1bbf8d"){
+    return "Admin"
+   }else if(roleId==="65b4e43b671d73cc3c1bbf8e"){
+    return "Client Admin"
+   }else if(roleId==="65b4e43b671d73cc3c1bbf8f"){
+    return "Client Manager"
+   }else if( roleId ==="65b4e43b671d73cc3c1bbf90"){
+    return "Client User"
+   }else{
+    return "User"
+   }
+
+  }
 
   const getUserData = async () => {
     try {
@@ -36,7 +54,7 @@ const UserData = (props) => {
       
       const newArray = array.map((item) => ({
         UserName: item.firstName+" "+item.lastName,
-        UserRole: item.role,
+        UserRole:  getRoleName(item.role),
         Contact: item.contact,  
       }));
 
