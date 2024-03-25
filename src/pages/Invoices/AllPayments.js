@@ -4,7 +4,7 @@ import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap"
 
 import { connect } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
-// import {AgGridReact} from 'ag-grid-react';
+import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 
@@ -311,7 +311,7 @@ const handleInputChange = (e) =>{
                                 width: '100%'
                             }}
                         >
-                            {/* <AgGridReact
+                            <AgGridReact
                                 ref={gridRef}
                                 rowHeight={60}
                                 suppressRowClickSelection={true}
@@ -324,7 +324,7 @@ const handleInputChange = (e) =>{
                                 autoSizeStrategy={autoSizeStrategy}
                                 rowData={rowData}
                                 onPaginationChanged={onPaginationChanged}>
-                            </AgGridReact> */}
+                            </AgGridReact>
                         </div>
             </CardBody>
               </Card>

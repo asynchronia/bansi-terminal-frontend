@@ -7,12 +7,12 @@ import { connect } from "react-redux";
 
 import { ToastContainer, toast } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-// import {AgGridReact} from 'ag-grid-react';
+import {AgGridReact} from 'ag-grid-react';
 import {getCategoriesReq } from "../../service/itemService";
 import { createCategoryReq } from "../../service/categoryService";
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-// import 'ag-grid-enterprise';
+import 'ag-grid-enterprise';
 import 'react-toastify/dist/ReactToastify.css';
 import plusIcon from "../../assets/images/small/plus-icon.png";
 import minusIcon from "../../assets/images/small/minus-icon.png";
@@ -259,7 +259,7 @@ const AddCategory = (props) =>{
                                 width: '100%'
                             }}
                         >
-                            {/* <AgGridReact
+                            <AgGridReact
                               ref={gridRef}
                               rowData={rowData}
                               columnDefs={columnDefs}
@@ -269,7 +269,7 @@ const AddCategory = (props) =>{
                               groupDefaultExpanded={-1}
                               getDataPath={getDataPath}
                               icons={icons}
-                            /> */}
+                            />
                           </div>
             </CardBody>
               </Card>
