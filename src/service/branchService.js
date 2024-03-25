@@ -1,4 +1,4 @@
-import { getBranchList, createBranch, getWarehouseList } from "../api";
+import { getBranchList, createBranch, getWarehouseList, getUserRole } from "../api";
 
 export const getBranchListReq = async (body) => {
     const response = await getBranchList(body);
@@ -12,5 +12,10 @@ export const createBranchReq = async (body) => {
 
 export const getWarehouseListReq = async () => {
     const response = await getWarehouseList();
+    return response;
+};
+
+export const getUserRoleReq = async () => {
+    const response = await getUserRole();
     return response;
 };

@@ -18,7 +18,9 @@ const API_URL = {
     createAgreement: '/api/agreements/create',
     getBranchList: '/api/branch/list',
     createBranch: '/api/branch/create',
-    getWarehouseList :'/api/branch/warehouse-list'
+    getWarehouseList :'/api/branch/warehouse-list',
+    getUserList:'/api/users/get/users',
+    getUserRole: '/api/roles/list'
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -78,6 +80,28 @@ export async function getItems(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.getItems}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getUserList(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getUserList}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getUserRole() {
+    return new Promise((resolve) => {
+        axios
+            .get(`${baseUrl}${API_URL.getUserRole}`, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

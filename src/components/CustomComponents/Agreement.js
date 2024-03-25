@@ -159,7 +159,7 @@ const handleAddToAgreement = (itemId, variantId, price) => {
           ) : null}
         </div>
 
-        <AgreementTable agreementData={agreementData} displayTableData={displayTableData} setAgreementData={setAgreementData} setDisplayTableData={setDisplayTableData}/>
+        <AgreementTable editable={true} agreementData={agreementData} displayTableData={displayTableData} setAgreementData={setAgreementData} setDisplayTableData={setDisplayTableData}/>
       </CardBody>
     </Card>
   );
