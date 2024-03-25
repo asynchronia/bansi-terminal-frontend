@@ -213,7 +213,7 @@ const ViewClient = (props) => {
           <option value="draft">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
-          Submit
+          Edit
         </button>
       </div>
       <Row>
