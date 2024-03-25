@@ -3,6 +3,7 @@ import { CardHeader, Table } from "reactstrap";
 
 const AgreementTable = (props) => {
   const {
+    editable,
     displayTableData,
     setDisplayTableData,
     agreementData,
@@ -63,6 +64,7 @@ const AgreementTable = (props) => {
 
     setAgreementData(updatedAgreementData);
   };
+
   return (
     <Table>
       <thead>
@@ -83,7 +85,7 @@ const AgreementTable = (props) => {
                 <td className="pt-4">{data.sku}</td>
                 <td className="pt-4">{data.costPrice}</td>
                 <td>
-                  <input
+                  {editable?<input
                     type="text"
                     value={data?.sellingPrice || ""}
                     className="form-control"
@@ -91,8 +93,10 @@ const AgreementTable = (props) => {
                       handleSellingPrice(event, data.id, data.itemId);
                     }}
                   />
+                  :
+                  data?.sellingPrice || ""}
                 </td>
-                <td>
+                {editable?<td>
                   <button
                     type="button"
                     className="btn btn-primary waves-effect waves-light"
@@ -102,7 +106,7 @@ const AgreementTable = (props) => {
                   >
                     <i className="mdi mdi-18px mdi-delete"></i>
                   </button>
-                </td>
+                </td>:null}
               </tr>
             ))
           : null}

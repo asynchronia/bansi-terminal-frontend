@@ -249,6 +249,7 @@ const ViewClient = (props) => {
                 </div>
               ) : (
                 <AgreementTable
+                  editable={false}
                   agreementData={agreementData}
                   setAgreementData={setAgreementData}
                   displayTableData={displayTableData}
