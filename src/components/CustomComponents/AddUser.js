@@ -167,7 +167,7 @@ const AddUser = ({ validation }) => {
             name="primaryUser.contact" // Update the name attribute
             id="contact"
             className="form-control"
-            type="number"
+            type="text"
             placeholder="Enter User Contact Number"
             onChange={validation.handleChange}
             onBlur={validation.handleBlur}

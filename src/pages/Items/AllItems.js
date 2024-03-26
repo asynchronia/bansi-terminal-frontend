@@ -19,6 +19,7 @@ import { getCategoriesReq } from "../../service/categoryService";
 import "./styles/datatables.scss";
 import "./styles/AllItems.scss";
 import DropdownMenuBtn from "./DropdownMenuBtn";
+import { AgGridReact } from "ag-grid-react";
 
 const AllItems = (props) => {
   document.title = "All Items";
@@ -30,7 +31,7 @@ const AllItems = (props) => {
   }
 
   const redirectToEditPage = (id) =>{
-    let path = "/edit-item"; 
+    let path = `/edit-item/${id}`; 
      setTimeout(() => {
       navigate(path, id);
      }, 300); 
@@ -320,7 +321,7 @@ const onGridReady = useCallback((params) => {
                 <CardBody>
                     <div className="button-section">
                       <Button className="all-items-btn" color="primary" onClick={redirectToCreateItem}>
-                      Create Item
+                      <i className=" mdi mdi-20px mdi-plus mx-1"></i>Create Item
                       </Button>
                       <Button color="secondary">
                       Import Items
@@ -334,7 +335,7 @@ const onGridReady = useCallback((params) => {
                               onChange={handleInputChange} className="form-control rounded border" placeholder="Search..." />
                             <i className="mdi mdi-magnify search-icon"></i>
                         </div>
-                      {/*<input
+                      {/* <input
                         className="form-control border-end-0 border"
                           placeholder="Search for..."
                           value={searchValue}
@@ -344,7 +345,7 @@ const onGridReady = useCallback((params) => {
                               <button class="btn btn-outline-secondary bg-white border-start-0 border ms-n5" type="button">
                                   <i class="fa fa-search"></i>
                               </button>
-                        </span>*/}
+                        </span> */}
                       </div>
                         <select
                           onChange={handleChange}

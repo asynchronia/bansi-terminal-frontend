@@ -15,6 +15,7 @@ const API_URL = {
     getOrderList: "/api/orders/list",
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
+    signin:'/api/users/signup',
     createAgreement: '/api/agreements/create',
     getBranchList: '/api/branch/list',
     createBranch: '/api/branch/create',
@@ -267,3 +268,20 @@ export async function login(body) {
             });
     });
 }
+
+
+export async function signin(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.signin}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            })
+            .catch((error) => {
+                console.log(error);
+                resolve(error.response.data);
+            });
+    });
+}
+
