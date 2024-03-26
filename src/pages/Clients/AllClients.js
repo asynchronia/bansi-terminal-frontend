@@ -76,7 +76,7 @@ const AllClients = (props) => {
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState(null);
   const [gridApi, setGridApi] = useState(null);
-  const [paginationPageSize, setPaginationPageSize] = useState(5);
+  const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [sortData, setSortData] = useState(null);
   const [page, setPage] = useState(1);
 
