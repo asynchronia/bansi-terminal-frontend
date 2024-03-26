@@ -17,6 +17,18 @@
         background-color: white;
         color: black;
     }
-
+    .btn-check:checked + &,
+    :not(.btn-check) + &:active,
+    &:first-child:active,
+    &.active,
+    &.show { 
+        // override for the checkbox/radio buttons
+        color: black !important;
+        background-color: white !important;
+        border-color: #D3D3D3 !important;
+        width: 30px;
+        padding-right: 6px;
+        padding-left: 6px;
+      }
 
 }

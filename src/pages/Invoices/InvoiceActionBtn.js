@@ -11,7 +11,7 @@ import {
 import "./styles/InvoiceActionBtn.scss";
 const InvoiceActionBtn = (props) =>{
 
-    const {deleteItem, handleEditClick, data} = props;
+    const {data} = props;
    const [menu, setMenu] = useState(false);
   
     return (
@@ -19,10 +19,7 @@ const InvoiceActionBtn = (props) =>{
           <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
             <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
             <DropdownMenu>
-              <DropdownItem >Edit Item</DropdownItem>
-              <DropdownItem>View Item</DropdownItem>
-              <DropdownItem>Change Status</DropdownItem>
-              <DropdownItem >Delete Item</DropdownItem>
+              <DropdownItem>View Invoice</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </div>
