@@ -56,7 +56,7 @@ const Agreement = (props) => {
         },
       ]);
     } else {
-      // If itemId exists, check if variantId exists in variants array
+      
       const variantIndex = agreementData[itemIndex].variants.findIndex(
         (variant) => variant.variant === variantId
       );
