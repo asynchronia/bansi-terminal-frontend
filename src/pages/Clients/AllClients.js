@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Row, Col, Card, CardBody, CardTitle, Button, Input, Modal } from "reactstrap"
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
@@ -13,9 +13,12 @@ import "./styles/AllClients.scss";
 import plusIcon from "../../assets/images/small/plus-icon.png";
 import minusIcon from "../../assets/images/small/minus-icon.png";
 import ClientActionField from "./ClientActionField";
+import { changePreloader } from "../../store/actions";
 
 const AllClients = (props) => {
   document.title = "Clients";
+  const dispatch = useDispatch();
+
   const breadcrumbItems = [
 
     { title: "Dashboard", link: "#" },
@@ -108,7 +111,9 @@ const AllClients = (props) => {
     }
   }, [sortData]);
 
+  
   const getListOfRowData = useCallback(async () => {
+    dispatch(changePreloader(true));
     const response = await getClientsReq({
       page,
       limit: paginationPageSize,
@@ -126,6 +131,10 @@ const AllClients = (props) => {
         sort: sortData,
       }) : {}),
     });
+
+    setTimeout(() => {
+      dispatch(changePreloader(false));
+    }, 1000);
 
     if (response) {
       const { payload: { clients, total } } = response;
