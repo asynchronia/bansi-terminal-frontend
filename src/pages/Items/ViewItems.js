@@ -96,6 +96,22 @@ const ViewItems = (props,{route,navigate}) => {
     <>
       <div style={{ position: "relative" }}>
         <ToastContainer position="top-center" theme="colored" />
+        <div
+          style={{
+            position: "absolute",
+            top: -50,
+            right: 10,
+            display: "flex",
+          }}
+        >
+          <select className="form-select focus-width" name="status">
+            <option value="active">Published</option>
+            <option value="draft">Draft</option>
+          </select>
+          <button type="submit" className="btn btn-primary w-xl mx-3">
+            Edit
+          </button>
+          </div>
         <Col>
           <Card>
             <CardBody>
