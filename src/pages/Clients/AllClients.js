@@ -35,11 +35,16 @@ const AllClients = (props) => {
     }, 300);
   }
   const columnDefs = [
-    { headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true },
-    { headerName: "Status", field: "status", sortable: false },
-    { headerName: "Primary Email", field: "email", sortable: false  },
-    { headerName: "Type", field: "clientType" },
-    { headerName: "GST Number", field: "gstin", sortable: false },
+    { headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    { headerName: "Status", field: "status", sortable: false ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    { headerName: "Primary Email", field: "email", sortable: false ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true} },
+    { headerName: "Type", field: "clientType" ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    { headerName: "GST Number", field: "gstin", sortable: false,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true} },
     {
       headerName: "Action", field: "action",
       cellClass: "actions-button-cell",
@@ -47,7 +52,8 @@ const AllClients = (props) => {
       cellRendererParams: {
         handleViewClick: onViewClick
       },
-      sortable: false,
+      sortable: false,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}
     }
   ],
     agRowData = [
@@ -66,19 +72,19 @@ const AllClients = (props) => {
   // sets 10 rows per page (default is 100)
   // allows the user to select the page size from a predefined list of page sizes
   // const paginationPageSizeSelector = [5, 10, 20, 50, 100];
-  const paginationPageSizeSelector = [1, 2, 3, 4, 5];
+  const paginationPageSizeSelector = [25,50,100];
 
   const [allStatuses, setAllStatuses] = useState(['active', 'inactive']);
   const [status, setStatus] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [gridApi, setGridApi] = useState(null);
-  const [paginationPageSize, setPaginationPageSize] = useState(5);
+  const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [sortData, setSortData] = useState(null);
 
   let bodyObject = {
     "page": 1,
-    "limit": paginationPageSize
+    "limit": 200
   };
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order

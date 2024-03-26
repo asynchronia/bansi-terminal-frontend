@@ -1,3 +1,22 @@
 .table-action-btn{
     display:inline-block;
 }
+.drop-down-item{
+    .btn{
+        width: 30px;
+        padding-right: 6px;
+        padding-left: 6px;
+        color: black;
+        
+    }
+    .btn-secondary{
+        border: 2px solid  #D3D3D3;
+        background-color: white;
+    }
+    .btn-secondary:hover{
+        background-color: white;
+        color: black;
+    }
+
+
+}

@@ -18,7 +18,7 @@ const DropdownMenuBtn = (props) =>{
     
     }
     return (
-        <div>
+        <div className="drop-down-item">
           <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
             <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
             <DropdownMenu>

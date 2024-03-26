@@ -76,10 +76,14 @@ const columnDefs = [
         console.log("created on props"+props.data);
         let date= new Date(props.value);
         return <>{date.toDateString()}</>
-      }},
-    {headerName: "Invoice No.", field: "invoice_number"},
-    {headerName: "Order No.", field: "reference_number"},
-    {headerName: "Client", field: "customer_name"},
+      },suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Invoice No.", field: "invoice_number",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Order No.", field: "reference_number",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Client", field: "customer_name",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Status", field: "status", width:200,
      cellRenderer: (props)=>{
         console.log("created on props"+props.data);
@@ -100,12 +104,17 @@ const columnDefs = [
           statusClass = statusClass + "green";
         }
         return <><p className="status-field">{getDateInFormat(due_date)}</p><p className={statusClass}>{status_msg}</p> </>
-      }},
-    {headerName: "Total Amount", field: "total", sortable: false},
-    {headerName: "Amount Due", field: "balance"},
+      },suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Total Amount", field: "total", sortable: false,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Amount Due", field: "balance",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "", field: "action", sortable: false,
     cellClass:"actions-button-cell",
-    cellRenderer: InvoiceActionBtn
+    cellRenderer: InvoiceActionBtn,
+    suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}
   } 
 ]
 const autoSizeStrategy = {
@@ -116,20 +125,20 @@ const pagination = true;
 
 // sets 10 rows per page (default is 100)
 // allows the user to select the page size from a predefined list of page sizes
-const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+const paginationPageSizeSelector = [ 25, 50, 100];
 
 const [allCustomers, setAllCustomers] = useState([]);
 const [customer, setCustomer] = useState("");
 const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
 const [gridApi, setGridApi] = useState(null);
-const [paginationPageSize, setPaginationPageSize ]= useState(5);
+const [paginationPageSize, setPaginationPageSize ]= useState(25);
 const [currRowItem, setCurrRowItem] = useState(null);
 const [modal_standard, setmodal_standard] = useState(false)
 
 let bodyObject = {
   "page": 1,
-  "limit": paginationPageSize
+  "limit": 200
 };
 
 const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
