@@ -180,9 +180,7 @@ const AllClients = (props) => {
               <CardBody>
                 <div className="button-section">
                   <Button className="all-items-btn" color="primary" onClick={redirectToCreateClient}>
-
-                    <img src={plusIcon} style={{ width: 15 }} />
-                    Add New Client
+                  <i className=" mdi mdi-20px mdi-plus mx-1"></i>Add New Client
                   </Button>
                   <Button color="secondary">
                     Import Customers
