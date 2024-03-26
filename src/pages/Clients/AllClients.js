@@ -35,11 +35,18 @@ const AllClients = (props) => {
     }, 300);
   }
   const columnDefs = [
-    { headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true, comparator: () => false },
-    { headerName: "Status", field: "status", sortable: false },
-    { headerName: "Primary Email", field: "email", sortable: false },
-    { headerName: "Type", field: "clientType", comparator: () => false },
-    { headerName: "GST Number", field: "gstin", sortable: false },
+
+    { headerName: "Name", field: "name", headerCheckboxSelection: true, checkboxSelection: true ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}, comparator: () => false},
+    { headerName: "Status", field: "status", sortable: false ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    { headerName: "Primary Email", field: "email", sortable: false ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true} },
+    { headerName: "Type", field: "clientType" ,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    { headerName: "GST Number", field: "gstin", sortable: false,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true} },
+
     {
       headerName: "Action", field: "action",
       cellClass: "actions-button-cell",
@@ -47,7 +54,8 @@ const AllClients = (props) => {
       cellRendererParams: {
         handleViewClick: onViewClick
       },
-      sortable: false,
+      sortable: false,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}
     }
   ];
   
@@ -57,14 +65,15 @@ const AllClients = (props) => {
   };
 
   // const paginationPageSizeSelector = [5, 10, 20, 50, 100];
-  const paginationPageSizeSelector = [1, 2, 3, 4, 5];
+  const paginationPageSizeSelector = [25,50,100];
 
   // TODO check from where status will come.
   const [allStatuses, setAllStatuses] = useState(['active', 'inactive']);
   const [status, setStatus] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [paginationPageSize, setPaginationPageSize] = useState(5);
+  const [gridApi, setGridApi] = useState(null);
+  const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [sortData, setSortData] = useState(null);
   const [page, setPage] = useState(1);
 

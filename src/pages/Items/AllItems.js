@@ -89,17 +89,24 @@ const AllItems = (props) => {
   }
 
 const columnDefs = [
-    {headerName: "Item Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true},
-    {headerName: "Type", field: "itemType"},
-    {headerName: "HSN Code", field: "hsnCode"},
-    {headerName: "Status", field: "status"},
-    {headerName: "Sale Price", field: "salePrice", sortable: false},
+    {headerName: "Item Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Type", field: "itemType",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "HSN Code", field: "hsnCode",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Status", field: "status",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Sale Price", field: "salePrice", sortable: false,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Created On", field: "createdAt", cellRenderer: (props)=>{
       console.log("created on props"+props.data);
       let date= new Date(props.value);
       return <>{date.toDateString()}</>
-    }},
-    {headerName: "Category", field: "category"},
+    },suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Category", field: "category",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Action", field: "action",sortable:false,
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
@@ -107,7 +114,8 @@ const columnDefs = [
       deleteItem: onDeleteItem,
       handleResponse: handleDeleteResponse,
       handleEditClick: handleEditClick
-    }
+    },suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}
   }
 ],
  agRowData =  [
@@ -125,20 +133,20 @@ const pagination = true;
 
 // sets 10 rows per page (default is 100)
 // allows the user to select the page size from a predefined list of page sizes
-const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+const paginationPageSizeSelector = [ 25, 50, 100];
 
 const [allCategories, setAllCategories] = useState([]);
 const [category, setCategory] = useState("");
 const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
 const [gridApi, setGridApi] = useState(null);
-const [paginationPageSize, setPaginationPageSize ]= useState(5);
+const [paginationPageSize, setPaginationPageSize ]= useState(25);
 const [currRowItem, setCurrRowItem] = useState(null);
 const [modal_standard, setmodal_standard] = useState(false)
 
 let bodyObject = {
   "page": 1,
-  "limit": paginationPageSize
+  "limit": 200
 };
 
 const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
@@ -373,6 +381,7 @@ const onGridReady = useCallback((params) => {
                         >
                             <AgGridReact
                                 ref={gridRef}
+                                floatingFilter={true}
                                 suppressRowClickSelection={true}
                                 columnDefs={columnDefs}
                                 pagination={pagination}
