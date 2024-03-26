@@ -25,6 +25,7 @@ import UserData from "../../components/CustomComponents/UserData";
 import { createBranchReq } from "../../service/branchService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { signinReq } from "../../service/authService";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -133,17 +134,17 @@ const ViewClient = (props) => {
     }
   };
   const handleSubmitUser = async (data) => {
-    // try {
-      // const response = await (data);
-      console.log(data)
-    //   if (response.success === true) {
-    //     notify("Success", response.message);
-    //   } else {
-    //     notify("Error", response.message);
-    //   }
-    // } catch (error) {
-    //   notify("Error", error.message);
-    // }
+    try {
+      const response = await signinReq(data);
+      console.log(response)
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
   };
 
   const handleModalToggle = (key) => {
