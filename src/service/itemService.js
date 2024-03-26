@@ -1,4 +1,4 @@
-import { createItem , getItems, getCategories, deleteItem, searchItem} from "../api";
+import { createItem , getItems, getCategories, deleteItem, searchItem, getItemData} from "../api";
 
 export const createItemReq = async (body) => {
     const response = await createItem(body);
@@ -8,6 +8,13 @@ export const getItemsReq = async (body = {}) => {
     const response = await getItems(body);
     if(response.success && response.success === true){
         return response.payload.items;
+    }
+    return [];
+};
+export const getItemById = async (body = {}) => {
+    const response = await getItemData(body);
+    if(response.success && response.success === true){
+        return response;
     }
     return [];
 };

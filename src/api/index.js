@@ -13,7 +13,9 @@ const API_URL = {
     getInvoices:"/api/invoices/list",
     searchItem:"/api/items/search",
     getOrderList:"/api/orders/list",
-    getPaymentList:"/api/payments/list"
+    getPaymentList:"/api/payments/list",
+    getItemData:"/api/items/get",
+    
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -62,6 +64,17 @@ export async function getItems(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.getItems}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getItemData(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getItemData}`, body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;

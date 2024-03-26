@@ -33,7 +33,12 @@ const AllItems = (props) => {
      setTimeout(() => {
       navigate(path, id);
      }, 300); 
-      
+  }
+  const redirectToViewPage = (data) =>{
+    let path = "/view-item"; 
+     setTimeout(() => {
+      navigate(path,{state:{data:data}});
+     }, 300); 
   }
   const notify = (type, message) => {
     if (type === "Error") {
@@ -64,6 +69,9 @@ const AllItems = (props) => {
     setmodal_standard(false);
     getListOfRowData();
   } 
+  const handleViewClick = (data) =>{
+    redirectToViewPage(data);
+  }
   const handleEditClick = (id) =>{
     console.log("GRID OBJECT >>>"+id);
     redirectToEditPage(id);
@@ -104,7 +112,8 @@ const columnDefs = [
     cellRendererParams: {
       deleteItem: onDeleteItem,
       handleResponse: handleDeleteResponse,
-      handleEditClick: handleEditClick
+      handleEditClick: handleEditClick,
+      handleViewClick: handleViewClick
     }
   }
 ],
@@ -192,7 +201,7 @@ const getCategories = useCallback(async () => {
 useEffect(() => {
     props.setBreadcrumbItems('All Items', breadcrumbItems);
     if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
+      getListOfRowData(bodyObject); 
       getCategories();
       effectCalled.current=true;
     }

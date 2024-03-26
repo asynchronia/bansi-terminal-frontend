@@ -40,6 +40,7 @@ import Createorder from "../pages/Orders/Createorder";
 import ViewClient from "../pages/Client/ViewClient";
 import AllInvoices from "../pages/Invoices/AllInvoices";
 import AllPayments from "../pages/Invoices/AllPayments"
+import ViewItems from "../pages/Items/ViewItems"
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -113,6 +114,7 @@ const userRoutes = [
   { path: "/edit-item/:id", component: <EditItems /> },
   { path: "/client/add", component: <CreateClient /> },
   { path: "/items", component: <AllItems /> },
+  { path: "/view-item", component: <ViewItems />},
   { path: "/clients", component: <AllClients /> },
   { path: "/categories", component: <AddCategory /> },
   { path: "/dashboard", component: <Dashboard /> },
