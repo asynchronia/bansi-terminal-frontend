@@ -45,7 +45,7 @@ const AllClients = (props) => {
     floatingFilterComponentParams: {suppressFilterButton:true}},
     { headerName: "Primary Email", field: "email", sortable: false ,suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true} },
-    { headerName: "Type", field: "clientType" ,suppressMenu: true,
+    { headerName: "Type", field: "clientType" ,suppressMenu: true, comparator: () => false,
     floatingFilterComponentParams: {suppressFilterButton:true}},
     { headerName: "GST Number", field: "gstin", sortable: false,suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true} },
@@ -67,68 +67,70 @@ const AllClients = (props) => {
     type: 'fitGridWidth'
   };
 
-  // const paginationPageSizeSelector = [5, 10, 20, 50, 100];
-  const paginationPageSizeSelector = [25,50,100];
+  const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+  // const paginationPageSizeSelector = [25,50,100];
 
   // TODO check from where status will come.
-  const [allStatuses, setAllStatuses] = useState(['active', 'inactive']);
+  const [allStatuses, setAllStatuses] = useState(['Active', 'Inactive']);
   const [status, setStatus] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(null);
   const [gridApi, setGridApi] = useState(null);
-  const [paginationPageSize, setPaginationPageSize] = useState(25);
+  const [paginationPageSize, setPaginationPageSize] = useState(5);
   const [sortData, setSortData] = useState(null);
   const [page, setPage] = useState(1);
 
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
-    let pageSize = gridRef.current.api.paginationGetPageSize();
-    setPaginationPageSize(pageSize);
-    const page = gridRef.current.api.paginationGetCurrentPage() + 1;
-    setPage(page);
+    const pageSize = gridRef.current.api.paginationGetPageSize();
+
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
+    }
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
+
+    if (page !== newPage) {
+      setPage(newPage);
+    }
   }, []);
 
   useEffect(() => {
-    props.setBreadcrumbItems('Clients', breadcrumbItems);
-    getListOfRowData();
-  }, []);
-
-  useEffect(() => {
-    getListOfRowData();
+    getListOfRowData('page');
   }, [page, paginationPageSize]);
 
   useEffect(() => {
     props.setBreadcrumbItems('Clients', breadcrumbItems);
     if (status && status !== undefined && status !== "") {
-      getListOfRowData();
+      getListOfRowData('status');
     }
   }, [status]);
 
   useEffect(() => {
     props.setBreadcrumbItems('Clients', breadcrumbItems);
-    if (searchValue && searchValue !== undefined && searchValue !== "") {
-      getListOfRowData();
-    } else {
-      setPaginationPageSize(paginationPageSize);
-      getListOfRowData();
+    if (searchValue || searchValue === "") {
+      getListOfRowData('search');
     }
   }, [searchValue]);
 
   useEffect(() => {
     if (sortData?.key && sortData?.order) {
-      getListOfRowData();
+      getListOfRowData('sort');
     }
   }, [sortData]);
 
   
-  const getListOfRowData = useCallback(async () => {
+  const getListOfRowData = useCallback(async (param) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
+
     dispatch(changePreloader(true));
     const response = await getClientsReq({
       page,
       limit: paginationPageSize,
       ...(status ? ({
         filter: {
-          status,
+          status: status.toLowerCase(),
         }
       }
       ) : {}),
@@ -148,7 +150,7 @@ const AllClients = (props) => {
     if (response) {
       const { payload: { clients, total } } = response;
       const emptyCount = total - clients.length;
-      const emptyObjects = Array.from({ length: emptyCount }, () => ({}));
+      const emptyObjects = Array.from({ length: emptyCount }, () => (null));
 
       // Combine clients and empty objects
 
@@ -162,7 +164,7 @@ const AllClients = (props) => {
       newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledClients);
       setRowData(newData);
     }
-  });
+  }, [page, paginationPageSize, status, searchValue, sortData]);
 
   const handleChange = (e) => {
     setRowData([]);
@@ -172,7 +174,7 @@ const AllClients = (props) => {
   const handleInputChange = (e) => {
     setRowData([]);
     setPage(1);
-    setSearchValue(e.target.value);
+    setSearchValue(e.target.value?.trim());
   }
 
   const handleSortChange = (e) => {
@@ -247,6 +249,7 @@ const AllClients = (props) => {
                     rowData={rowData}
                     onPaginationChanged={onPaginationChanged}
                     onSortChanged={handleSortChange}
+                    sortingOrder={["desc", "asc"]}
                   >
                   </AgGridReact>
                 </div>
