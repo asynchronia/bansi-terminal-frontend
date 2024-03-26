@@ -67,8 +67,8 @@ const AllClients = (props) => {
     type: 'fitGridWidth'
   };
 
-  const paginationPageSizeSelector = [5, 10, 20, 50, 100];
-  // const paginationPageSizeSelector = [25,50,100];
+// const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+  const paginationPageSizeSelector = [25,50,100];
 
   // TODO check from where status will come.
   const [allStatuses, setAllStatuses] = useState(['Active', 'Inactive']);
