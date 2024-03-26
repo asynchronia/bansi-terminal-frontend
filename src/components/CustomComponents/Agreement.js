@@ -190,8 +190,8 @@ const Agreement = (props) => {
                   <p className="form-text-lg text-center">No Data Found</p>{" "}
                 </Row>
               ) : (
-                rowData.map((item) =>
-                  item.variant.map((variant) => (
+                rowData?.map((item) =>
+                  item?.variant?.map((variant) => (
                     <Row
                       onClick={() => {
                         handleAddToAgreement(
