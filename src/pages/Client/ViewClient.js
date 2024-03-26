@@ -25,6 +25,7 @@ import UserData from "../../components/CustomComponents/UserData";
 import { createBranchReq } from "../../service/branchService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { signinReq } from "../../service/authService";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -63,12 +64,21 @@ const ViewClient = (props) => {
     }, [5000]);
   };
 
+  console.log(agreementData)
+
   const getAgreement = async (id) => {
     const url = `http://localhost:3000/api/agreements/agreement`;
     const data = { clientId: id };
     try {
       const res = await axios.post(url, data);
+     console.log(res.data.payload.items)
+      
+
       let array = [];
+      let rowData=[...res?.data?.payload?.items];
+
+     
+
       if (res?.data?.payload?.items) {
         array = res?.data?.payload?.items?.flatMap((item) => {
           return item.variants.map((variant) => {
@@ -82,6 +92,23 @@ const ViewClient = (props) => {
             };
           });
         });
+
+        const items = res.data.payload.items;
+
+        // Iterate over items and their variants
+        for (const item of items) {
+          const { item: { _id: itemId }, variants } = item;
+          
+          for (const variantItem of variants) {
+            const { variant: { _id: variantId, sellingPrice: price } } = variantItem;
+  
+            // Wait for handleAddToAgreement to complete
+            await handleAddToAgreement(itemId, variantId, price);
+          }
+        }
+
+        
+        
       }
 
       if (array.length > 0) {
@@ -93,6 +120,44 @@ const ViewClient = (props) => {
     } catch (error) {
       setAgreementAvailable({ loading: false, value: false });
       console.log(error);
+    }
+  };
+
+  
+
+  const handleAddToAgreement = (itemId, variantId, price) => {
+    const itemIndex = agreementData.findIndex((item) => item.item === itemId);
+
+    if (itemIndex === -1) {
+      // If itemId doesn't exist, create a new object and add it to agreementArray
+      setAgreementData((prevArray) => [
+        ...prevArray,
+        {
+          item: itemId,
+          variants: [
+            {
+              variant: variantId,
+              price: price,
+            },
+          ],
+        },
+      ]);
+    } else {
+      const variantIndex = agreementData[itemIndex].variants.findIndex(
+        (variant) => variant.variant === variantId
+      );
+
+      if (variantIndex === -1) {
+        // If variantId doesn't exist, add it to variants array
+        setAgreementData((prevArray) => {
+          const newArray = [...prevArray];
+          newArray[itemIndex].variants.push({
+            variant: variantId,
+            price: price,
+          });
+          return newArray;
+        });
+      }
     }
   };
 
@@ -133,21 +198,24 @@ const ViewClient = (props) => {
     }
   };
   const handleSubmitUser = async (data) => {
-    // try {
-      // const response = await (data);
-      console.log(data)
-    //   if (response.success === true) {
-    //     notify("Success", response.message);
-    //   } else {
-    //     notify("Error", response.message);
-    //   }
-    // } catch (error) {
-    //   notify("Error", error.message);
-    // }
+    try {
+      const response = await signinReq(data);
+      console.log(response);
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
   };
 
   const handleModalToggle = (key) => {
-    setOpenModal({ ...openModal, key: !openModal[key] });
+    setOpenModal((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
     removeBodyCss();
   };
 
@@ -233,7 +301,29 @@ const ViewClient = (props) => {
         <Col xs="8">
           <Card style={{ border: "2px solid #0053FF" }}>
             <CardBody>
-              <h4 className="card-title">Agreement</h4>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <h4 className="card-title">Agreement</h4>
+                {!agreementAvailable.loading && agreementAvailable.value ? (
+                  <div style={{ display: "flex", gap: "20px" }}>
+                    <Button
+                      className="btn btn-primary w-xl mb-1"
+                      onClick={downloadPDF}
+                    >
+                      <i className="mdi mdi-download mx-2"></i>
+                      Download PDF
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        handleModalToggle("agreement");
+                      }}
+                      className="btn-primary"
+                    >
+                      <i className="mdi mdi-book-edit mx-2"></i>
+                      Rework Agreement
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
 
               {agreementAvailable.loading ? (
                 <CircularProgress style={{ marginLeft: "50%" }} />
@@ -280,15 +370,6 @@ const ViewClient = (props) => {
                 </div>
               ) : (
                 <div>
-                  
-                    <button
-                    style={{float:'right'}}
-                      className="btn btn-primary w-xl mb-1"
-                      onClick={downloadPDF}
-                    >
-                      Download PDF
-                    </button>
-                 
                   <AgreementTable
                     editable={false}
                     agreementData={agreementData}
@@ -349,11 +430,12 @@ const ViewClient = (props) => {
                 />
               ) : (
                 <UserData
-                handleSubmit={handleSubmitUser}
-                clientId={id}
-                openModal={openModal}
-                setOpenModal={setOpenModal}
-                handleToggle={handleModalToggle} />
+                  handleSubmit={handleSubmitUser}
+                  clientId={id}
+                  openModal={openModal}
+                  setOpenModal={setOpenModal}
+                  handleToggle={handleModalToggle}
+                />
               )}
             </CardBody>
           </Card>

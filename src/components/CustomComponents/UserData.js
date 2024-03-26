@@ -27,6 +27,7 @@ const UserData = (props) => {
   const gridRef = useRef();
   const [userData, setUserData] = useState([]);
   const [page, setPage] = useState(1);
+  const [associatedBranch, setAssociatedBranch]= useState("")
 
   const getRoleName=(roleId)=>{
    if(roleId==="65b4e43b671d73cc3c1bbf8c"){
@@ -44,14 +45,15 @@ const UserData = (props) => {
    }
 
   }
-
+// console.log(associatedBranch)
   const getUserData = async () => {
     try {
       const response = await getUserListReq({
         clientId: clientId,
       });
       let array = response?.payload;
-      
+      setAssociatedBranch(array[0]?.associatedBranch._id);
+
       const newArray = array.map((item) => ({
         UserName: item.firstName+" "+item.lastName,
         UserRole:  getRoleName(item.role),
@@ -90,6 +92,8 @@ const UserData = (props) => {
             contact:null,
             gender:null,
             role:"65b4e43b671d73cc3c1bbf90",
+            clientId:clientId,
+            associatedBranch:''
           }
     },
     validationSchema: Yup.object({
@@ -104,7 +108,7 @@ const UserData = (props) => {
           })
     }),
     onSubmit: (values) => {
-      const newUser = { ...values.primaryUser, clientId: clientId };
+      const newUser = { ...values.primaryUser, clientId: clientId.toString(), associatedBranch:associatedBranch };
       handleSubmit(newUser);
     },
   });

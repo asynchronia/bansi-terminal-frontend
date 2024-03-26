@@ -470,7 +470,7 @@ const EditItems = (props) => {
                     ) : null}
                   </div>
                   <div className="mt-3 mb-0">
-                    <label className="form-select focus-width">Select Category</label>
+                    <label className="form-label focus-width">Select Category</label>
                     <label
                       name="category"
                       id="category"
