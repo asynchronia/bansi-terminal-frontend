@@ -15,7 +15,8 @@ const API_URL = {
     getOrderList:"/api/orders/list",
     getPaymentList:"/api/payments/list",
     getItemData:"/api/items/get",
-    
+    getInvoiceDetails:"/api/invoices/id/",
+    getPaymentDetails : "/api/payments/id"
 };
 
 const getIdToken = () => localStorage.getItem("id_token");
@@ -86,6 +87,22 @@ export async function getInvoices(body) {
     return new Promise((resolve, reject) => {
         axios
             .post(`${baseUrl}${API_URL.getInvoices}`, body)
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            }).catch(error => {
+                reject(error);
+            });
+    }).catch(error =>{
+        console.log(error);
+        return error?.response;
+    });
+}
+
+export async function getPaymentDetails(id,body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(`${baseUrl}${API_URL.getPaymentDetails}/${id}`,body)
             .then((res) => {
                 resolve(res.data);
                 return res.data;

@@ -2,6 +2,7 @@ import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap"
 
+import DropdownMenuBtn from "./DropdownMenuBtn";
 import { connect } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import {AgGridReact} from 'ag-grid-react';
@@ -19,18 +20,14 @@ const AllPayments = (props) => {
   document.title = "Payments";
   let navigate = useNavigate(); 
   const effectCalled = useRef(false);
-  const redirectToCreateItem = () =>{ 
-    let path = "/create-item"; 
-    navigate(path);
+
+  const redirectToViewPage = (id) =>{
+    let path = `/payment/${id.payment_id}`; 
+     setTimeout(() => {
+      navigate(path,id);
+     }, 300); 
   }
 
-  const redirectToEditPage = (id) =>{
-    let path = "/edit-item"; 
-     setTimeout(() => {
-      navigate(path, id);
-     }, 300); 
-      
-  }
   const notify = (type, message) => {
     if (type === "Error") {
       toast.error(message, {
@@ -51,18 +48,8 @@ const AllPayments = (props) => {
     
   ];
   const gridRef = useRef();
-  const handleDeleteResponse = (response) =>{
-    if (response.success === true) {
-      notify("Success", response.message);
-    } else {
-      notify("Error", response.message);
-    }
-    setmodal_standard(false);
-    getListOfRowData();
-  } 
-  const handleEditClick = (id) =>{
-    console.log("GRID OBJECT >>>"+id);
-    redirectToEditPage(id);
+  const handleViewClick = (data) =>{
+    redirectToViewPage(data);
   }
 
 const columnDefs = [
@@ -77,7 +64,14 @@ const columnDefs = [
     {headerName: "Client", field: "customer_name"},
     {headerName: "Invoice#", field: "invoice_numbers"},
     {headerName: "Payment Mode", field: "payment_mode"},
-    {headerName: "Amount Paid", field: "amount"} 
+    {headerName: "Amount Paid", field: "amount"},
+    {headerName: "Action", field: "action",sortable:false,
+    cellClass:"actions-button-cell",
+    cellRenderer: DropdownMenuBtn,
+    cellRendererParams: {
+      handleViewClick: handleViewClick
+    }
+  }
 ]
 const autoSizeStrategy = {
     type: 'fitGridWidth'
@@ -102,47 +96,6 @@ let bodyObject = {
   "limit": 200
 };
 
-const agrowdata= [
-  {
-      "payment_id": "2859757000291745387",
-      "payment_number": "BLR-CP-7054",
-      "retainerinvoice_id": "",
-      "invoice_numbers": "BLR-08549,BLR-08550,BLR-08551",
-      "date": "2024-03-20",
-      "payment_mode": "Bank Transfer",
-      "payment_mode_formatted": "Bank Transfer",
-      "amount": 86321,
-      "bcy_amount": 86321,
-      "unused_amount": 0.06,
-      "bcy_unused_amount": 0.06,
-      "account_id": "2859757000002161315",
-      "account_name": "HDFC -59299900002537",
-      "description": "",
-      "product_description": "",
-      "reference_number": "000196226732",
-      "branch_id": "2859757000000128107",
-      "branch_name": "HSR",
-      "customer_id": "2859757000234672071",
-      "customer_name": "Tomillo Technologies Pvt. Ltd.",
-      "created_time": "2024-03-20T11:18:55+0530",
-      "last_modified_time": "2024-03-20T11:18:55+0530",
-      "last_four_digits": "",
-      "gateway_transaction_id": "",
-      "payment_gateway": "",
-      "bcy_refunded_amount": 0,
-      "applied_invoices": [],
-      "is_advance_payment": false,
-      "has_attachment": false,
-      "documents": "",
-      "custom_fields_list": "",
-      "tax_account_id": "",
-      "tax_account_name": "",
-      "tax_amount_withheld": 0,
-      "payment_type": "Invoice Payment",
-      "settlement_status": ""
-  }
-]
-
 const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
 const  tog_standard = () => {
   setmodal_standard(!modal_standard)
@@ -157,6 +110,7 @@ const onPaginationChanged = useCallback((event) => {
  setPaginationPageSize(pageSize);
   
 }, []);
+
 const getListOfRowData =  useCallback(async (body) => {
     const response = await getPaymentReq(body);
     console.log(response);
@@ -166,10 +120,9 @@ const getListOfRowData =  useCallback(async (body) => {
       custList.add(val.customer_name);
     });
     let custArr = [];
-    {custList?.forEach((val,key,set) => {
-      console.log("CUSTOMER "+val);
+    custList?.forEach((val,key,set) => {
        custArr.push(val);
-     })}
+     })
     setAllCustomers([...custArr]);
     setRowData(response);
     setBodyObjectReq(body);
