@@ -21,15 +21,17 @@ import { getPaymentDetailsReq } from "../../service/invoiceService";
 import {numberToIndianWords,formatNumberWithCommasAndDecimal} from "./invoiceUtil";
 const PaymentDetails = (props) => {
   const { id } = useParams();
-  const location = useLocation();
   const [paymentData, setPaymentData] = useState();
+  const [amountReceived ,setAmountReceived] = useState(0);
   const effectCalled = useRef(false);
   const gridRef = useRef();
   const data = id ;
-  
-  const totalInvoicesAmount = paymentData?.invoices.reduce((total, invoice) => total + invoice.total, 0);
-  const totalBalanceAmount =  paymentData?.invoices.reduce((total, invoice) => total + invoice.balance, 0);
-  const amountReceived = totalInvoicesAmount - totalBalanceAmount;
+  if (paymentData && paymentData.invoices  && !isNaN(paymentData)) {
+    console.log(paymentData);
+    const totalInvoicesAmount = paymentData.invoices.reduce((total, invoice) => total + invoice.total, 0);
+    const totalBalanceAmount = paymentData.invoices.reduce((total, invoice) => total + invoice.balance, 0);
+    setAmountReceived(totalInvoicesAmount - totalBalanceAmount);
+  }
   //Handles BreadCrumbs
   const breadcrumbItems = [
       { title: "Dashboard", link: "#" },
@@ -66,18 +68,6 @@ const PaymentDetails = (props) => {
       const response = await getPaymentDetailsReq(body);
       setPaymentData(response);
   });
-
-  // const getPaymentData = useCallback (async (id) => {
-  //   const url = `http://localhost:3000/api/payments/id/${id}`;
-  //   try {
-  //     const res = await axios.get(url, data);
-
-  //     setPaymentData(res);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
-    
 
     useEffect(() => {
       props.setBreadcrumbItems("View Item Details", breadcrumbItems);

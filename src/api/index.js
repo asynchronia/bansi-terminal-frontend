@@ -73,7 +73,7 @@ export async function createClient(body) {
 export async function createAgreement(body) {
     return new Promise((resolve) => {
         axios
-            .post(`${baseUrl}${API_URL.createAgreement}`, body)
+            .post(`${baseUrl}${API_URL.createAgreement}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -152,7 +152,7 @@ export async function createBranch(body) {
 export async function getItemData(body) {
     return new Promise((resolve) => {
         axios
-            .post(`${baseUrl}${API_URL.getItemData}`, body)
+            .post(`${baseUrl}${API_URL.getItemData}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -179,7 +179,7 @@ export async function getInvoices(body) {
 export async function getPaymentDetails(id,body) {
     return new Promise((resolve, reject) => {
         axios
-            .post(`${baseUrl}${API_URL.getPaymentDetails}/${id}`,)
+            .get(`${baseUrl}${API_URL.getPaymentDetails}/${id}`, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

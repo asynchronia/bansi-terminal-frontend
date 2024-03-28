@@ -14,14 +14,14 @@ import { getCategoriesReq, getItemById } from "../../service/itemService";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
-import { attributesCellRenderer,findCategoryNameById } from './ItemsUtils';
+import { attributesCellRenderer} from './ItemsUtils';
  
 
 const ViewItems = (props,{route,navigate}) => {
   const location = useLocation();
   const [itemsData, setItemsData] = useState();
   const [variantData, setVariantData] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [taxData, setTaxData] = useState();
   const data = location.state.data;  
   const effectCalled = useRef(false);
   const gridRef = useRef();
@@ -40,19 +40,25 @@ const ViewItems = (props,{route,navigate}) => {
     let bodyObject = {
         "_id": data._id
     };
-    const getItemData =  useCallback(async (body) => {
+
+    const getItemData = useCallback(async (body) => {
       const response = await getItemById(bodyObject);
-      setItemsData(response.payload.item);
-      console.log("response"+JSON.stringify(response.payload.item));
-      setVariantData(response.payload.variants);
+      
+      if (response && response.payload && response.payload.item && response.payload.variants ) {
+        const item = response.payload.item;
+        setItemsData(item);
+        const variants = Object.values(response.payload.variants);
+        setVariantData(variants);
+        if (item.taxes) {
+          setTaxData(item?.taxes);
+        }
+      } 
     });
     const pagination = true;
 
     // sets 10 rows per page (default is 100)
     // allows the user to select the page size from a predefined list of page sizes
     const paginationPageSizeSelector = [5, 10, 25, 50];
-  
-    const [rowData, setRowData] = useState([]);
     const [paginationPageSize, setPaginationPageSize ]= useState(5);
   
 
@@ -70,16 +76,16 @@ const ViewItems = (props,{route,navigate}) => {
      setPaginationPageSize(pageSize)
     }, []);
 
-    const getCategories = useCallback(async () => {
-      const response = await getCategoriesReq();
-      setCategories(response?.payload?.categories)
-    });
+    // const getCategories = useCallback(async () => {
+    //   const response = await getCategoriesReq();
+    //   // setCategories(response?.payload?.categories)
+    // });
 
     useEffect(() => {
       props.setBreadcrumbItems("View Item Details", breadcrumbItems);
       if (!effectCalled.current) {
         getItemData(bodyObject);
-        getCategories();
+        // getCategories();
         effectCalled.current=true;
       }
     },[]); 
@@ -88,7 +94,7 @@ const ViewItems = (props,{route,navigate}) => {
       props.setBreadcrumbItems("View Item Details", breadcrumbItems);
       if(paginationPageSize && paginationPageSize !== undefined){
         getItemData(bodyObject);
-        getCategories();
+        // getCategories();
       }
     },[paginationPageSize]);
 
@@ -145,7 +151,7 @@ const ViewItems = (props,{route,navigate}) => {
                       <p>Category:</p>
                     </Col>
                     <Col xs="8">
-                      <p>{findCategoryNameById(itemsData?.category, categories)}</p>
+                      <p>{itemsData?.category?.name}</p>
                     </Col>
                   </Row>
                 </div>
@@ -186,7 +192,9 @@ const ViewItems = (props,{route,navigate}) => {
                       <p>Tax Bracket:</p>
                     </Col>
                     <Col xs="8">
-                      <p>{itemsData?.category}</p>
+                      <p>{taxData && taxData[0] && (
+                          <p>{taxData[0].name}</p>
+                        )}</p>
                     </Col>
                   </Row>
                 </div>
