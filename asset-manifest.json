@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/bansi-terminal-frontend/static/css/main.8a357070.css",
-    "main.js": "/bansi-terminal-frontend/static/js/main.91ec7122.js",
+    "main.js": "/bansi-terminal-frontend/static/js/main.e36a4d95.js",
     "static/js/239.d93958df.chunk.js": "/bansi-terminal-frontend/static/js/239.d93958df.chunk.js",
     "static/js/213.db05f555.chunk.js": "/bansi-terminal-frontend/static/js/213.db05f555.chunk.js",
     "static/js/455.a24da58e.chunk.js": "/bansi-terminal-frontend/static/js/455.a24da58e.chunk.js",
@@ -51,7 +51,7 @@
     "index.html": "/bansi-terminal-frontend/index.html",
     "static/media/three-dots-vertical.svg": "/bansi-terminal-frontend/static/media/three-dots-vertical.3b9464fcdfd564bd9d841e79c9ec2f65.svg",
     "main.8a357070.css.map": "/bansi-terminal-frontend/static/css/main.8a357070.css.map",
-    "main.91ec7122.js.map": "/bansi-terminal-frontend/static/js/main.91ec7122.js.map",
+    "main.e36a4d95.js.map": "/bansi-terminal-frontend/static/js/main.e36a4d95.js.map",
     "239.d93958df.chunk.js.map": "/bansi-terminal-frontend/static/js/239.d93958df.chunk.js.map",
     "213.db05f555.chunk.js.map": "/bansi-terminal-frontend/static/js/213.db05f555.chunk.js.map",
     "455.a24da58e.chunk.js.map": "/bansi-terminal-frontend/static/js/455.a24da58e.chunk.js.map",
@@ -59,6 +59,6 @@
   },
   "entrypoints": [
     "static/css/main.8a357070.css",
-    "static/js/main.91ec7122.js"
+    "static/js/main.e36a4d95.js"
   ]
 }
