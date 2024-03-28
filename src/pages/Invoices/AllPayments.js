@@ -58,20 +58,29 @@ const columnDefs = [
         console.log("created on props"+props.data);
         let date= new Date(props.value);
         return <>{date.toDateString()}</>
-      }},
-    {headerName: "Payment#", field: "payment_number"},
-    {headerName: "Type", field: "payment_type"},
-    {headerName: "Client", field: "customer_name"},
-    {headerName: "Invoice#", field: "invoice_numbers"},
-    {headerName: "Payment Mode", field: "payment_mode"},
-    {headerName: "Amount Paid", field: "amount"},
+     },suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Payment#", field: "payment_number",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Type", field: "payment_type",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Client", field: "customer_name",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Invoice#", field: "invoice_numbers",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Payment Mode", field: "payment_mode",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Amount Paid", field: "amount",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Action", field: "action",sortable:false,
+    suppressMenu: true, floatingFilterComponentParams: {suppressFilterButton:true},
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
     cellRendererParams: {
       handleViewClick: handleViewClick
     }
   }
+       
 ]
 const autoSizeStrategy = {
     type: 'fitGridWidth'
@@ -81,13 +90,13 @@ const pagination = true;
 
 // sets 10 rows per page (default is 100)
 // allows the user to select the page size from a predefined list of page sizes
-const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+const paginationPageSizeSelector = [25, 50, 100];
 
 const [allCustomers, setAllCustomers] = useState([]);
 const [customer, setCustomer] = useState("");
 const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
-const [paginationPageSize, setPaginationPageSize ]= useState(5);
+const [paginationPageSize, setPaginationPageSize ]= useState(25);
 const [currRowItem, setCurrRowItem] = useState(null);
 const [modal_standard, setmodal_standard] = useState(false)
 

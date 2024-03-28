@@ -2,30 +2,69 @@ import React, { useRef } from "react";
 import { CardHeader, Table } from "reactstrap";
 
 const AgreementTable = (props) => {
-  const sellingPriceRef = useRef("");
+  const {
+    editable,
+    displayTableData,
+    setDisplayTableData,
+    agreementData,
+    setAgreementData,
+  } = props;
 
-  const handleSellingPrice = (event, agreementId) => {
+  // const sellingPriceRef = useRef("");
+
+  const handleSellingPrice = (event, variantId, itemId) => {
     const { value } = event.target;
 
-    const updatedAgreementData = agreementData.map((data) => {
-      if (data.id === agreementId) {
+    const updatedDisplayTableData = displayTableData.map((data) => {
+      if (data.id === variantId) {
         return { ...data, sellingPrice: value };
       }
       return data;
     });
 
+    setDisplayTableData(updatedDisplayTableData);
+
+    const updatedAgreementData = agreementData.map((agreement) => {
+      if (agreement.item === itemId) {
+        const updatedVariants = agreement.variants.map((variant) => {
+          if (variant.variant === variantId) {
+            return { ...variant, price: value };
+          }
+          return variant;
+        });
+        return { ...agreement, variants: updatedVariants };
+      }
+      return agreement;
+    });
+
     setAgreementData(updatedAgreementData);
   };
 
-  const { agreementData, setAgreementData } = props;
 
-  const handleDeleteAgreement = (agreementId) => {
-    const newArr = agreementData.filter((e) => {
-      return e.id !== agreementId;
+  const handleDeleteAgreement = (variantId) => {
+    const newArr = displayTableData.filter((e) => {
+      return e.id !== variantId;
     });
 
-    setAgreementData(newArr);
+    setDisplayTableData(newArr);
+
+    const updatedAgreementData = agreementData
+      .map((agreement) => {
+        const updatedVariants = agreement.variants.filter(
+          (variant) => variant.variant !== variantId
+        );
+        if (updatedVariants.length === 0) {
+          // Remove the entire agreement object if variants array becomes empty
+          return null;
+        } else {
+          return { ...agreement, variants: updatedVariants };
+        }
+      })
+      .filter(Boolean); // Filter out null values
+
+    setAgreementData(updatedAgreementData);
   };
+
   return (
     <Table>
       <thead>
@@ -37,25 +76,26 @@ const AgreementTable = (props) => {
           <th></th>
         </tr>
       </thead>
-
       <tbody id="agreementBody">
-        {agreementData.length > 0
-          ? agreementData.map((data) => (
+        {displayTableData?.length > 0
+          ? displayTableData.map((data) => (
               <tr key={data.id}>
                 <td className="pt-4">{data.title}</td>
                 <td className="pt-4">{data.sku}</td>
                 <td className="pt-4">{data.costPrice}</td>
                 <td>
-                  <input
+                  {editable?<input
                     type="text"
                     value={data?.sellingPrice || ""}
                     className="form-control"
                     onChange={(event) => {
-                      handleSellingPrice(event, data.id);
+                      handleSellingPrice(event, data.id, data.itemId);
                     }}
                   />
+                  :
+                  data?.sellingPrice || ""}
                 </td>
-                <td>
+                {editable?<td>
                   <button
                     type="button"
                     className="btn btn-primary waves-effect waves-light"
@@ -65,7 +105,7 @@ const AgreementTable = (props) => {
                   >
                     <i className="mdi mdi-18px mdi-delete"></i>
                   </button>
-                </td>
+                </td>:null}
               </tr>
             ))
           : null}

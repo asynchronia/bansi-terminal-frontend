@@ -25,10 +25,10 @@ const AllOrders = (props) => {
 
   // sets 10 rows per page (default is 100)
   // allows the user to select the page size from a predefined list of page sizes
-  const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+  const paginationPageSizeSelector = [25, 50, 100];
 
   const [rowData, setRowData] = useState([]);
-  const [paginationPageSize, setPaginationPageSize ]= useState(5);
+  const [paginationPageSize, setPaginationPageSize ]= useState(25);
   let bodyObject = {
     "page": 1,
     "limit": 200
@@ -97,21 +97,30 @@ const AllOrders = (props) => {
   }
   ]
   const columnDefs = [
-    {headerName: "Order Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true},
-    {headerName: "Order No.", field: "salesorder_id"},
-    {headerName: "Client", field: "customer_name"},
-    {headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer},
-    {headerName: "Total Amount", field: "total"},
-    {headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer},
-    {headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer},
-    {headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer},
+    {headerName: "Order Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Order No.", field: "salesorder_id",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Client", field: "customer_name",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Total Amount", field: "total",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Action", field: "action", sortable: false,
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
     cellRendererParams: {
       handleResponse: handleDeleteResponse,
       handleEditClick: handleEditClick
-    }
+    },suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}
   }
   ]
   const notify = (type, message) => {

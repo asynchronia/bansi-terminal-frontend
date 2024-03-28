@@ -1,4 +1,4 @@
-import { createClient, getClients} from "../api";
+import { createAgreement, createClient, getClients} from "../api";
 
 export const createClientReq = async (body) => {
     const response = await createClient(body);
@@ -7,5 +7,10 @@ export const createClientReq = async (body) => {
 
 export const getClientsReq = async (body) => {
     const response = await getClients(body);
+    return response;
+};
+
+export const createAgreementReq = async (body) => {
+    const response = await createAgreement(body);
     return response;
 };

@@ -39,7 +39,8 @@ const Layout = (props) => {
       leftSideBarType: layout.leftSideBarType,
       topbarTheme: layout.topbarTheme,
       layoutColor: layout.layoutColor,
-      layoutMode:layout.layoutMode
+      layoutMode:layout.layoutMode,
+      isPreloader: layout.isPreloader,
     }));
 
   const {
@@ -48,7 +49,8 @@ const Layout = (props) => {
     leftSideBarType,
     topbarTheme,
     layoutColor,
-    layoutMode
+    layoutMode,
+    isPreloader,
   } = useSelector(selectLayoutProperties);
 
   useEffect(() => {
@@ -132,7 +134,9 @@ const Layout = (props) => {
 
   return (
     <React.Fragment>
-      {/* <div id="preloader">
+      {isPreloader && (
+
+        <div id="preloader">
         <div id="status">
           <div className="spinner-chase">
             <div className="chase-dot"></div>
@@ -143,7 +147,8 @@ const Layout = (props) => {
             <div className="chase-dot"></div>
           </div>
         </div>
-      </div> */}
+      </div>
+        )}
 
       <div id="layout-wrapper">
         <Header toggleMenuCallback={toggleMenuCallback} />

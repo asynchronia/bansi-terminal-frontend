@@ -1,10 +1,10 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Card, CardBody, CardTitle, Button, Input, Modal } from "reactstrap"
+import { Row, Col, Card, CardBody,  Button, Input, Modal } from "reactstrap"
 
 import { connect } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
-import {AgGridReact} from 'ag-grid-react';
+// import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 
@@ -14,10 +14,12 @@ import 'ag-grid-community/styles//ag-theme-quartz.css';
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import {getCategoriesReq, getItemsReq , deletItemReq} from "../../service/itemService";
+import { getItemsReq , deletItemReq} from "../../service/itemService";
+import { getCategoriesReq } from "../../service/categoryService";
 import "./styles/datatables.scss";
 import "./styles/AllItems.scss";
 import DropdownMenuBtn from "./DropdownMenuBtn";
+import { AgGridReact } from "ag-grid-react";
 
 const AllItems = (props) => {
   document.title = "All Items";
@@ -29,7 +31,7 @@ const AllItems = (props) => {
   }
 
   const redirectToEditPage = (id) =>{
-    let path = "/edit-item"; 
+    let path = `/edit-item/${id}`; 
      setTimeout(() => {
       navigate(path, id);
      }, 300); 
@@ -95,17 +97,24 @@ const AllItems = (props) => {
   }
 
 const columnDefs = [
-    {headerName: "Item Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true},
-    {headerName: "Type", field: "itemType"},
-    {headerName: "HSN Code", field: "hsnCode"},
-    {headerName: "Status", field: "status"},
-    {headerName: "Sale Price", field: "salePrice", sortable: false},
+    {headerName: "Item Name", field: "title", headerCheckboxSelection: true, checkboxSelection: true,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Type", field: "itemType",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "HSN Code", field: "hsnCode",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Status", field: "status",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Sale Price", field: "salePrice", sortable: false,suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Created On", field: "createdAt", cellRenderer: (props)=>{
       console.log("created on props"+props.data);
       let date= new Date(props.value);
       return <>{date.toDateString()}</>
-    }},
-    {headerName: "Category", field: "category"},
+    },suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
+    {headerName: "Category", field: "category",suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Action", field: "action",sortable:false,
     cellClass:"actions-button-cell",
     cellRenderer: DropdownMenuBtn,
@@ -114,7 +123,8 @@ const columnDefs = [
       handleResponse: handleDeleteResponse,
       handleEditClick: handleEditClick,
       handleViewClick: handleViewClick
-    }
+    },suppressMenu: true,
+    floatingFilterComponentParams: {suppressFilterButton:true}
   }
 ],
  agRowData =  [
@@ -132,20 +142,20 @@ const pagination = true;
 
 // sets 10 rows per page (default is 100)
 // allows the user to select the page size from a predefined list of page sizes
-const paginationPageSizeSelector = [5, 10, 20, 50, 100];
+const paginationPageSizeSelector = [ 25, 50, 100];
 
 const [allCategories, setAllCategories] = useState([]);
 const [category, setCategory] = useState("");
 const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
 const [gridApi, setGridApi] = useState(null);
-const [paginationPageSize, setPaginationPageSize ]= useState(5);
+const [paginationPageSize, setPaginationPageSize ]= useState(25);
 const [currRowItem, setCurrRowItem] = useState(null);
 const [modal_standard, setmodal_standard] = useState(false)
 
 let bodyObject = {
   "page": 1,
-  "limit": paginationPageSize
+  "limit": 200
 };
 
 const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
@@ -328,7 +338,7 @@ const onGridReady = useCallback((params) => {
                 <CardBody>
                     <div className="button-section">
                       <Button className="all-items-btn" color="primary" onClick={redirectToCreateItem}>
-                      Create Item
+                      <i className=" mdi mdi-20px mdi-plus mx-1"></i>Create Item
                       </Button>
                       <Button color="secondary">
                       Import Items
@@ -342,7 +352,7 @@ const onGridReady = useCallback((params) => {
                               onChange={handleInputChange} className="form-control rounded border" placeholder="Search..." />
                             <i className="mdi mdi-magnify search-icon"></i>
                         </div>
-                      {/*<input
+                      {/* <input
                         className="form-control border-end-0 border"
                           placeholder="Search for..."
                           value={searchValue}
@@ -352,7 +362,7 @@ const onGridReady = useCallback((params) => {
                               <button class="btn btn-outline-secondary bg-white border-start-0 border ms-n5" type="button">
                                   <i class="fa fa-search"></i>
                               </button>
-                        </span>*/}
+                        </span> */}
                       </div>
                         <select
                           onChange={handleChange}
@@ -380,6 +390,7 @@ const onGridReady = useCallback((params) => {
                         >
                             <AgGridReact
                                 ref={gridRef}
+                                floatingFilter={true}
                                 suppressRowClickSelection={true}
                                 columnDefs={columnDefs}
                                 pagination={pagination}
