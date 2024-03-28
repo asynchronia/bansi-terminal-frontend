@@ -9,8 +9,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
 import {useLocation} from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { getCategoriesReq, getItemById } from "../../service/itemService";
+import { getItemById } from "../../service/itemService";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
@@ -19,6 +20,7 @@ import { attributesCellRenderer} from './ItemsUtils';
 
 const ViewItems = (props,{route,navigate}) => {
   const location = useLocation();
+  let navigateTo = useNavigate(); 
   const [itemsData, setItemsData] = useState();
   const [variantData, setVariantData] = useState([]);
   const [taxData, setTaxData] = useState();
@@ -29,7 +31,7 @@ const ViewItems = (props,{route,navigate}) => {
   //Handles BreadCrumbs
   const breadcrumbItems = [
       { title: "Dashboard", link: "#" },
-      { title: "View-Items", link: "#" },
+      { title: "Items", link: "#" },
       { title: data.title, link: "#" },
     ];
   
@@ -40,6 +42,17 @@ const ViewItems = (props,{route,navigate}) => {
     let bodyObject = {
         "_id": data._id
     };
+
+    const redirectToEditPage = (id) =>{
+      let path = `/edit-item/${id}`; 
+       setTimeout(() => {
+        navigateTo(path, id);
+       }, 300); 
+    }
+    
+    const handleEditClick = (id) =>{
+      redirectToEditPage(id);
+    }
 
     const getItemData = useCallback(async (body) => {
       const response = await getItemById(bodyObject);
@@ -54,7 +67,7 @@ const ViewItems = (props,{route,navigate}) => {
         }
       } 
     });
-    const pagination = true;
+    const pagination = false;
 
     // sets 10 rows per page (default is 100)
     // allows the user to select the page size from a predefined list of page sizes
@@ -63,11 +76,16 @@ const ViewItems = (props,{route,navigate}) => {
   
 
     const columnDefs = [
-      {headerName: "SKU", field: "sku", headerCheckboxSelection: true, checkboxSelection: true},
-      {headerName: "Stock Quantity", field: "inventory"},
-      {headerName: "Cost Price", field: "costPrice"},
-      {headerName: "Selling Price", field: "sellingPrice"},
-      {headerName: "Variant Info", field: "attributes",cellRenderer: attributesCellRenderer}
+      {headerName: "SKU", field: "sku",sortable:false,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+      {headerName: "Stock Quantity",sortable:false, field: "inventory",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+      {headerName: "Cost Price",sortable:false, field: "costPrice",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+      {headerName: "Selling Price",sortable:false, field: "sellingPrice",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+      {headerName: "Variant Info", field: "attributes",sortable:false,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},cellRenderer: attributesCellRenderer}
     ]
     
     const onPaginationChanged = useCallback((event) => {
@@ -91,7 +109,7 @@ const ViewItems = (props,{route,navigate}) => {
     },[]); 
 
     useEffect(() => {
-      props.setBreadcrumbItems("View Item Details", breadcrumbItems);
+      props.setBreadcrumbItems(data.title, breadcrumbItems);
       if(paginationPageSize && paginationPageSize !== undefined){
         getItemData(bodyObject);
         // getCategories();
@@ -114,15 +132,17 @@ const ViewItems = (props,{route,navigate}) => {
             <option value="active">Published</option>
             <option value="draft">Draft</option>
           </select>
-          <button type="submit" className="btn btn-primary w-xl mx-3">
+          <button type="submit" onClick={() => handleEditClick(data?._id)} className="btn btn-primary w-xl mx-3">
             Edit
           </button>
           </div>
         <Col>
           <Card>
             <CardBody>
-              <h4 className="card-title">{data.title}</h4>
+              <h6 className="secondary">Product Name</h6>
+              <h className="card-title">{data.title}</h>
               <hr></hr>
+              <h6 className="secondary">Description</h6>
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
                   {itemsData?.description}
               </div>

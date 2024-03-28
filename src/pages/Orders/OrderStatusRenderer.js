@@ -1,29 +1,31 @@
-import React from 'react'
+import React from 'react';
+import Chip from '@mui/material/Chip';
 
 const OrderStatusRenderer = ({ value }) => {
-  let btnClass = '';
-
+  let color = '';
+  let label = '';
   switch (value) {
     case 'draft':
-      btnClass = 'btn-outline-primary';
+      color = "primary";
+      label = "Draft";
       break;
-    case 'closed':
-      btnClass = 'btn-outline-danger';
+    case "closed":
+      color = "error";
+      label = "Closed";
       break;
-    case 'open':
-      btnClass = 'btn-outline-success';
+    case "open":
+      color = "success";
+      label = "Open";
       break;
     default:
-      btnClass = 'btn-outline-secondary';
+      color = "default";
   }
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <button className={`btn ${btnClass}`} style={{ display: 'block', margin: 'auto' }}>
-        {value}
-      </button>
+      <Chip color={color} label={label} variant="outlined" />
     </div>
   );
 }
 
-export default OrderStatusRenderer 
+export default OrderStatusRenderer;

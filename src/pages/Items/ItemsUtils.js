@@ -1,16 +1,22 @@
 //Function to List Attributes in ViewItem Table
+import React from 'react';
+import Chip from '@mui/material/Chip';
+
 export function attributesCellRenderer(params) {
     const attributes = params.value;
 
-    let formattedAttributes = '';
-
-    attributes.forEach(attribute => {
-        formattedAttributes += `${attribute.name}: ${attribute.value}, `;
-    });
-
-    formattedAttributes = formattedAttributes.slice(0, -2);
-
-    return formattedAttributes;
+    return (
+        <div >
+            {attributes.map((attribute, index) => (
+                <Chip
+                    key={index}
+                    label={`${attribute.name}: ${attribute.value}`}
+                    variant="outlined"
+                    style={{ margin: '4px' }}
+                />
+            ))}
+        </div>
+    );
 }
 
 // Function to find category name by ID

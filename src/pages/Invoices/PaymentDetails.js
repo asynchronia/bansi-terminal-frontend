@@ -5,12 +5,10 @@ import {
   Card,
   CardBody,
 } from "reactstrap";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import {useLocation} from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
 
 import {AgGridReact} from 'ag-grid-react';
@@ -18,7 +16,7 @@ import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 import './styles/PaymentDetailsCard.scss' 
 import { getPaymentDetailsReq } from "../../service/invoiceService";
-import {numberToIndianWords,formatNumberWithCommasAndDecimal} from "./invoiceUtil";
+import {indianNumberWords,formatNumberWithCommasAndDecimal} from "./invoiceUtil";
 const PaymentDetails = (props) => {
   const { id } = useParams();
   const [paymentData, setPaymentData] = useState();
@@ -26,12 +24,6 @@ const PaymentDetails = (props) => {
   const effectCalled = useRef(false);
   const gridRef = useRef();
   const data = id ;
-  if (paymentData && paymentData.invoices  && !isNaN(paymentData)) {
-    console.log(paymentData);
-    const totalInvoicesAmount = paymentData.invoices.reduce((total, invoice) => total + invoice.total, 0);
-    const totalBalanceAmount = paymentData.invoices.reduce((total, invoice) => total + invoice.balance, 0);
-    setAmountReceived(totalInvoicesAmount - totalBalanceAmount);
-  }
   //Handles BreadCrumbs
   const breadcrumbItems = [
       { title: "Dashboard", link: "#" },
@@ -43,7 +35,7 @@ const PaymentDetails = (props) => {
       type: 'fitGridWidth'
     };
 
-    const pagination = true;
+    const pagination = false;
 
     // sets 10 rows per page (default is 100)
     // allows the user to select the page size from a predefined list of page sizes
@@ -52,10 +44,14 @@ const PaymentDetails = (props) => {
   
 
     const columnDefs = [
-      {headerName: "Invoice No.", field: "invoice_number", headerCheckboxSelection: true, checkboxSelection: true},
-      {headerName: "Invoice Date", field: "date"},
-      {headerName: "Invoice Amount", field: "total"},
-      {headerName: "Payment Amount", field: "total"}
+      {headerName: "Invoice No.", field: "invoice_number",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+      {headerName: "Invoice Date", field: "date",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+      {headerName: "Invoice Amount", field: "total",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}},
+      {headerName: "Payment Amount", field: "total",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true}}
     ]
     
     const onPaginationChanged = useCallback((event) => {
@@ -67,10 +63,22 @@ const PaymentDetails = (props) => {
     const getPaymentData =  useCallback(async (body) => {
       const response = await getPaymentDetailsReq(body);
       setPaymentData(response);
+      props.setBreadcrumbItems(response?.payment_number, breadcrumbItems);
+      if (response) {
+        console.log("Payment Data"+ paymentData?.invoices);
+        let totalInvoicesAmount = 0;
+        let totalBalanceAmount = 0;
+        for (const invoice of response.invoices) {
+            totalInvoicesAmount += invoice?.total || 0;
+            totalBalanceAmount += invoice?.balance || 0;
+        }
+        const amountReceived = totalInvoicesAmount - totalBalanceAmount;
+        setAmountReceived(amountReceived);
+      }
   });
 
     useEffect(() => {
-      props.setBreadcrumbItems("View Item Details", breadcrumbItems);
+      props.setBreadcrumbItems(paymentData?.payment_number, breadcrumbItems);
       if (!effectCalled.current) {
         getPaymentData(data);
         effectCalled.current=true;
@@ -78,7 +86,7 @@ const PaymentDetails = (props) => {
     },[]); 
 
     useEffect(() => {
-      props.setBreadcrumbItems("View Item Details", breadcrumbItems);
+      props.setBreadcrumbItems(paymentData?.payment_number, breadcrumbItems);
       if(paginationPageSize && paginationPageSize !== undefined){
         getPaymentData(data);
       }
@@ -96,7 +104,7 @@ const PaymentDetails = (props) => {
             display: "flex",
           }}
         >
-          <button type="secondary" className="btn btn-primary w-xl mx-3">
+          <button type="submit" className="btn btn-outline-primary w-xl mx-3">
             Download PDF
           </button>
           <button type="submit" className="btn btn-primary w-xl mx-3">
@@ -111,12 +119,10 @@ const PaymentDetails = (props) => {
                   <img src={require('../../assets/images/Willsmeet-Logo.png')} alt="Company Logo" class="card-image"/>
                 </div>
                 <div class="details">
-                  
                     <h3>
-                      <p/><span>Bansi Office Solutions Private Limited</span>
+                      <br/><span>Bansi Office Solutions Private Limited</span>
                     </h3>
                     #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India
-                  
                     <br/>GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142<br/>
                     MSME No : UDYAM-KR-03-0065095<br/>
                     Web: www.willsmeet.com, Email:sales@willsmeet.com<br/>
@@ -171,7 +177,7 @@ const PaymentDetails = (props) => {
                       </Col>
                       <Col xs="6">
                         {" "}
-                        <p><span>{numberToIndianWords(amountReceived)}</span></p>
+                        <p><span> {indianNumberWords(amountReceived)}</span></p>
                       </Col>
                     </Row>
                   </div>
@@ -186,12 +192,12 @@ const PaymentDetails = (props) => {
         <div className="mt-3">
           <Row>
             <Col xs="12" className="text-white">
-              <p><span>Amount Received</span></p>
+              <p><span><h4>Amount Received</h4></span></p>
             </Col>
           </Row>
           <Row>
             <Col xs="12">
-              <p className="text-white" style={{fontSize: "28px"}}>{formatNumberWithCommasAndDecimal(paymentData?.amount)}</p>
+              <p className="text-white" style={{fontSize: "28px"}}>₹{formatNumberWithCommasAndDecimal(amountReceived)}</p>
             </Col>
           </Row>
         </div>
@@ -228,7 +234,6 @@ const PaymentDetails = (props) => {
             <Card>
               <CardBody>
                 <h4 className="card-title">Payment For</h4>
-                <hr></hr>
                 <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
                 <div
                               className="ag-theme-quartz"
