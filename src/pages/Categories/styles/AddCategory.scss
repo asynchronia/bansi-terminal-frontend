@@ -1,0 +1,14 @@
+.option, .child-option{
+    padding: 15px 20px;
+    cursor: pointer;  
+}
+.grandchild-option{
+    padding: 15px 20px 0px;
+    cursor: pointer;  
+}
+.option{
+    border-bottom: 1px solid #dee2e6;
+}
+.opened{
+    // background-color: #ecf2ff;
+}

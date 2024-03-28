@@ -1,134 +1,86 @@
-import React,{useEffect, useState, useRef,useCallback, useMemo} from "react";
-import { Row, Col, Card, CardBody, CardTitle, Form, Input, Label, FormFeedback, Button } from "reactstrap";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  Row,
+  Col,
+  Card,
+  CardBody,
+  CardTitle,
+  Form,
+  Input,
+  Label,
+  FormFeedback,
+  Button,
+  CardHeader,
+  Table,
+} from "reactstrap";
 // Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { connect } from "react-redux";
-
+import "./styles/AddCategory.scss";
 import { ToastContainer, toast } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import {AgGridReact} from 'ag-grid-react';
-import { createCategoryReq, getCategoriesReq } from "../../service/categoryService";
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-import 'ag-grid-enterprise';
-import 'react-toastify/dist/ReactToastify.css';
+import { AgGridReact } from "ag-grid-react";
+import {
+  createCategoryReq,
+  getCategoriesReq,
+} from "../../service/categoryService";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import "react-toastify/dist/ReactToastify.css";
 import plusIcon from "../../assets/images/small/plus-icon.png";
 import minusIcon from "../../assets/images/small/minus-icon.png";
-import CategoryList from "./CategoryList";
-const AddCategory = (props) =>{
-  const gridRef = useRef();
-    document.title = "Categories";
-    const breadcrumbItems = [
-      
-      { title: "Dashboard", link: "#" },
-      { title: "Items", link: "#" },
-      { title: "Category", link: "#" },
-    ];
-    const [allCategories, setAllCategories] = useState([]);
-    const [category, setCategory] = useState("");
-    const [rowData, setRowData] = useState([]);
-    const getParentHierarchy = (rowData, it) =>{
-      if(it?.children && it.children.length > 0) {
-        it.children.map((itr, idx) =>{
-          
-          itr.parentHierarchy = [...it.parentHierarchy];
-          itr.parentHierarchy.push(itr.name);
-          rowData.push(itr);
-          getParentHierarchy(rowData, itr);
-            
-        }); 
-        }
-        
-      }
+// import CategoryList from "./CategoryList";
+const AddCategory = (props) => {
+  document.title = "Categories";
+  const breadcrumbItems = [
+    { title: "Dashboard", link: "#" },
+    { title: "Items", link: "#" },
+    { title: "Category", link: "#" },
+  ];
+  const [allCategories, setAllCategories] = useState([]);
 
-    const getCategories = useCallback(async () => {
-        const response = await getCategoriesReq();
-        let categories = response?.payload?.categories;
-        let rowData  = response?.payload?.categories;
-        rowData.map((it, id) =>{
-           it.parentHierarchy = [it.name];
-           console.log("Item Name"+it.name);
-            getParentHierarchy(rowData, it);
+  const getCategories = useCallback(async () => {
+    const response = await getCategoriesReq();
+    let categories = response?.payload?.categories;
+    //  console.log(categories);
+    setAllCategories(categories);
+  });
+  useEffect(() => {
+    props.setBreadcrumbItems("Category", breadcrumbItems);
+    getCategories();
+  }, []);
 
-        });
-        console.log("ROWDATA>>> "+rowData);
-        setRowData(rowData);
-        setAllCategories(categories);
-       
-      });
-    useEffect(() => {
-        props.setBreadcrumbItems('Category', breadcrumbItems);
-        getCategories();
-      },[]);
-
-      const getDataPath = useMemo(() => {
-        return (data) => {
-          console.log("getDATA>>"+data.parentHierarchy);
-          return data.parentHierarchy;
-        };
-      }, []);
-      const columnDefs =  [
-          { headerName:'Category Description', field:'description'}
-        ];
-    
-    
-    const autoGroupColumnDef = useMemo(() => {
-      return {
-        headerName: 'Category Name',
-        minWidth: 300,
-        cellRendererParams: {
-          suppressCount: true,
-        },
-      };
-    }, []);
-    /*  const autoGroupColumnDef = useMemo(() => {
-        return {
-          headerName: 'Category Name',
-          field:'name',
-          minWidth: 300,
-          cellRendererParams: {
-            suppressCount: true,
-          },
-        };
-      }, []);*/
-      const defaultColDef = useMemo(() => {
-        return {
-          flex: 1,
-        };
-      }, []);
-      
-  
-   
-    const validation = useFormik({
+  const validation = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
     initialValues: {
-        categoryName: '',
-        categoryParent: '',
-        categoryDescription: '',
+      categoryName: "",
+      categoryParent: "",
+      categoryDescription: "",
     },
     validationSchema: Yup.object({
-        categoryName: Yup.string().required("Please Enter Category Name"),
-        categoryParent: Yup.string().required("Please Enter Parent Category"),
-       // categoryDescription: Yup.string().required("Please Enter Category Description"),
+      categoryName: Yup.string().required("Please Enter Category Name"),
+      categoryParent: Yup.string().required("Please Enter Parent Category"),
     }),
     onSubmit: (values, { resetForm }) => {
-      console.log("ON SUBMIT VALUES >> "+values);
-       // dispatch(registerUser(values));
-       let body = {
-        name:  values.categoryName,
-       description: values.categoryDescription,
-       parentCategoryId: values.categoryParent};
-       handleSubmit(body, resetForm);
-    }
-    
-    });
-  const autoSizeStrategy = {
-    type: 'fitGridWidth'
-  };
-  const handleSubmit = async(values, resetForm) => {
+      let body = {
+        name: values.categoryName,
+        description: values.categoryDescription,
+        parentCategoryId: values.categoryParent,
+      };
+      handleSubmit(body, resetForm);
+    },
+  });
+
+  const handleSubmit = async (values, resetForm) => {
     try {
       const response = await createCategoryReq(values);
       if (response.success === true) {
@@ -141,30 +93,53 @@ const AddCategory = (props) =>{
     }
     resetForm();
     getCategories();
-
-  }
+  };
   const notify = (type, message) => {
     if (type === "Error") {
       toast.error(message, {
         position: "top-center",
         theme: "colored",
-      })
+      });
     } else {
       toast.success(message, {
         position: "top-center",
         theme: "colored",
-      })
+      });
     }
-  }
-  const icons = {
-    groupExpanded: '<img src="'+ minusIcon+' "style="width: 15px;"/>',
-    groupContracted: '<img src="'+ plusIcon+' "style="width: 15px;"/>',
   };
-    return(
-        <React.Fragment>
-          <ToastContainer position="top-center" theme="colored" />
+
+  const [openCategories, setOpenCategories] = useState([]);
+
+  const handleCategoryClick = (categoryId) => {
+    setOpenCategories((prevOpenCategories) => {
+      if (prevOpenCategories.includes(categoryId)) {
+        return prevOpenCategories.filter((id) => id !== categoryId);
+      } else {
+        return [...prevOpenCategories, categoryId];
+      }
+    });
+  };
+
+  const handleChildClick = (event, childId) => {
+    event.stopPropagation();
+    setOpenCategories((prevOpenCategories) => {
+      if (prevOpenCategories.includes(childId)) {
+        return prevOpenCategories.filter((id) => id !== childId);
+      } else {
+        return [...prevOpenCategories, childId];
+      }
+    });
+  };
+
+  // const icons = {
+  //   groupExpanded: '<img src="'+ minusIcon+' "style="width: 15px;"/>',
+  //   groupContracted: '<img src="'+ plusIcon+' "style="width: 15px;"/>',
+  // };
+  return (
+    <React.Fragment>
+      <ToastContainer position="top-center" theme="colored" />
       <Row>
-        <Col md={6}>
+        <Col md={5}>
           <Card>
             <CardBody>
               <CardTitle className="h4">Item Primary</CardTitle>
@@ -172,110 +147,210 @@ const AddCategory = (props) =>{
               <Form
                 className="form-horizontal mt-4"
                 onSubmit={(e) => {
-                e.preventDefault();
-                validation.handleSubmit();
-                return false;
+                  e.preventDefault();
+                  validation.handleSubmit();
+                  return false;
                 }}
-            >
+              >
                 <div className="mb-3">
-                    <Label>Category Name</Label>
-                    <Input
-                        id="categoryName"
-                        name="categoryName"
-                        className="form-control"
-                        placeholder="Enter Category Name"
-                        type="text"
-                        onChange={validation.handleChange}
-                        onBlur={validation.handleBlur}
-                        value={validation.values.categoryName || ""}
-                        invalid={
-                        validation.touched.categoryName && validation.errors.categoryName ? true : false
-                        }
-                    />
-                    {validation.touched.categoryName && validation.errors.categoryName ? (
-                        <FormFeedback type="invalid">{validation.errors.categoryName}</FormFeedback>
-                    ) : null}
+                  <Label>Category Name</Label>
+                  <Input
+                    id="categoryName"
+                    name="categoryName"
+                    className="form-control"
+                    placeholder="Enter Category Name"
+                    type="text"
+                    onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.categoryName || ""}
+                    invalid={
+                      validation.touched.categoryName &&
+                      validation.errors.categoryName
+                        ? true
+                        : false
+                    }
+                  />
+                  {validation.touched.categoryName &&
+                  validation.errors.categoryName ? (
+                    <FormFeedback type="invalid">
+                      {validation.errors.categoryName}
+                    </FormFeedback>
+                  ) : null}
                 </div>
                 <div className="mb-3">
-                    <Label htmlFor="categoryParent">Parent Category</Label>
-                    <select
-                          onChange={validation.handleChange}
-                          onBlur={validation.handleBlur}
-                          id="categoryParent"
-                          name="categoryParent"
-                          value={validation.values.categoryParent || ""}
-                          className="form-select focus-width"
-                          invalid={
-                            validation.touched.categoryParent && validation.errors.categoryParent ? true : false
-                            }
-                        >
-                          <option value="" selected disabled>Category</option>
-                          {allCategories.map(e => (
-                            <option value={e._id}>{e.name}</option>
-                          ))}
-                        </select>
-                    {validation.touched.categoryParent && validation.errors.categoryParent ? (
-                        <FormFeedback type="invalid">{validation.errors.categoryParent}</FormFeedback>
-                    ) : null}
+                  <Label htmlFor="categoryParent">Parent Category</Label>
+                  <select
+                    onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    id="categoryParent"
+                    name="categoryParent"
+                    value={validation.values.categoryParent || ""}
+                    className="form-select focus-width"
+                    invalid={
+                      validation.touched.categoryParent &&
+                      validation.errors.categoryParent
+                        ? true
+                        : false
+                    }
+                  >
+                    <option value="" selected disabled>
+                      Category
+                    </option>
+                    {allCategories.map((e) => (
+                      <option value={e._id}>{e.name}</option>
+                    ))}
+                  </select>
+                  {validation.touched.categoryParent &&
+                  validation.errors.categoryParent ? (
+                    <FormFeedback type="invalid">
+                      {validation.errors.categoryParent}
+                    </FormFeedback>
+                  ) : null}
                 </div>
                 <div className="form-group mb-3">
-                    <label className="col-form-label">Category Description</label>
-                    <Col lg={12}>
-                        <textarea
-                        id="categoryDescription"
-                        className="form-control"
-                        placeholder="Add category description for item"
-                        name="categoryDescription"
-                        onChange={validation.handleChange}
-                        onBlur={validation.handleBlur}
-                        value={validation.values.categoryDescription || ""}
-                        ></textarea>
-                        {validation.touched.categoryDescription &&
-                        validation.errors.categoryDescription ? (
-                        <FormFeedback type="invalid" className="d-block">
-                            {validation.errors.categoryDescription}
-                        </FormFeedback>
-                        ) : null}
-                    </Col>
-                 </div>
-                 <div className="mb-3 row mt-4">
-                    <div className="col-12 text-start">
-                        <button className="btn btn-primary w-md waves-effect waves-light" type="submit">Add Category</button>
-                    </div>
+                  <label className="col-form-label">Category Description</label>
+                  <Col lg={12}>
+                    <textarea
+                      id="categoryDescription"
+                      className="form-control"
+                      placeholder="Add category description for item"
+                      name="categoryDescription"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      rows={5}
+                      value={validation.values.categoryDescription || ""}
+                    ></textarea>
+                    {validation.touched.categoryDescription &&
+                    validation.errors.categoryDescription ? (
+                      <FormFeedback type="invalid" className="d-block">
+                        {validation.errors.categoryDescription}
+                      </FormFeedback>
+                    ) : null}
+                  </Col>
                 </div>
-            </Form>
+                <div className="mb-3 row mt-4">
+                  <div className="col-12 text-start">
+                    <button
+                      className="btn btn-primary w-md waves-effect waves-light"
+                      type="submit"
+                    >
+                      Add Category
+                    </button>
+                  </div>
+                </div>
+              </Form>
             </CardBody>
           </Card>
         </Col>
-        <Col xl={6}>
-        <Card>
-                <CardBody>
-                  {/*<CategoryList {...rowData:rowData}/>*/}
-                    <div
-                            className="ag-theme-quartz"
-                            style={{
-                                height: '500px',
-                                width: '100%'
-                            }}
-                        >
-                            <AgGridReact
-                              ref={gridRef}
-                              rowData={rowData}
-                              columnDefs={columnDefs}
-                              defaultColDef={defaultColDef}
-                              autoGroupColumnDef={autoGroupColumnDef}
-                              treeData={true}
-                              groupDefaultExpanded={-1}
-                              getDataPath={getDataPath}
-                              icons={icons}
-                            />
-                          </div>
+        <Col xl={7}>
+          <Card>
+            <CardBody>
+            <Table>
+              <thead>
+              <tr>
+                <th>
+                Category Name
+                </th>
+                <th>
+                Category Description
+                </th>
+              </tr>    
+              </thead>
+            </Table>
+
+              <div>
+                {allCategories.map((category) => (
+                  <div
+                    key={category._id}
+                   className="option"
+                  >
+                    <Row>
+                      <Col
+                        xs="1"
+                        onClick={() => handleCategoryClick(category._id)}
+                      >
+                        {category.children &&
+                        openCategories.includes(category._id) ? (
+                          <i className="mdi mdi-24px mdi-minus" />
+                        ) : category.children ? (
+                          <i className="mdi mdi-24px mdi-plus" />
+                        ) : null}
+                      </Col>
+                      <Col xs="5">
+                        <label className="h5 mt-2">{` ${category.name}`}</label>
+                      </Col>
+                      <Col xs="6">
+                        <label className="h5  mt-2">{` ${
+                          category?.description || ""
+                        }`}</label>
+                      </Col>
+                    </Row>
+
+                    {category.children &&
+                      openCategories.includes(category._id) && (
+                        <div  className="child-options opened mx-2">
+                          {category.children.map((child) => (
+                            <div key={child._id} className="child-option">
+                              <Row>
+                                <Col
+                                  onClick={(event) =>
+                                    handleChildClick(event, child._id)
+                                  }
+                                  xs="1"
+                                >
+                                  {child.children &&
+                                  openCategories.includes(child._id) ? (
+                                    <i className="mdi mdi-24px mdi-minus" />
+                                  ) : child.children ? (
+                                    <i className="mdi mdi-24px mdi-plus" />
+                                  ) : null}
+                                </Col>
+                                <Col xs="5">
+                                  <label className="h5 mt-2 ">{` ${child.name}`}</label>
+                                </Col>
+                                <Col xs="6">
+                                  <label className="h5 mt-2">{` ${
+                                    child?.description || ""
+                                  }`}</label>
+                                </Col>
+                              </Row>
+
+                              {child.children &&
+                                openCategories.includes(child._id) && (
+                                  <div className="grandchild-options mx-2">
+                                    {child.children.map((grandchild) => (
+                                      <div
+                                        key={grandchild._id}
+                                        className="grandchild-option"
+                                      >
+                                        <Row>
+                                          <Col xs="1"></Col>
+                                          <Col xs="5">
+                                            <label className="h5 mt-2">{` ${grandchild.name}`}</label>
+                                          </Col>
+                                          <Col xs="6">
+                                            <label className="h5 mt-2">{` ${
+                                              grandchild?.description || ""
+                                            }`}</label>
+                                          </Col>
+                                        </Row>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                ))}
+              </div>
             </CardBody>
-              </Card>
+          </Card>
         </Col>
-        </Row>
-        </React.Fragment>
-    );
-}
+      </Row>
+    </React.Fragment>
+  );
+};
 
 export default connect(null, { setBreadcrumbItems })(AddCategory);
