@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/bansi-terminal-frontend/static/css/main.40d5e8c0.css",
-    "main.js": "/bansi-terminal-frontend/static/js/main.b820f8c3.js",
+    "main.css": "/bansi-terminal-frontend/static/css/main.8a357070.css",
+    "main.js": "/bansi-terminal-frontend/static/js/main.91ec7122.js",
     "static/js/239.d93958df.chunk.js": "/bansi-terminal-frontend/static/js/239.d93958df.chunk.js",
     "static/js/213.db05f555.chunk.js": "/bansi-terminal-frontend/static/js/213.db05f555.chunk.js",
     "static/js/455.a24da58e.chunk.js": "/bansi-terminal-frontend/static/js/455.a24da58e.chunk.js",
@@ -43,23 +43,22 @@
     "static/media/fa-regular-400.ttf": "/bansi-terminal-frontend/static/media/fa-regular-400.1495f578452eb676f730.ttf",
     "static/media/dripicons-v2.woff": "/bansi-terminal-frontend/static/media/dripicons-v2.f19dcc0358afed69d277.woff",
     "static/media/fa-regular-400.woff": "/bansi-terminal-frontend/static/media/fa-regular-400.1069ea55beaa01060302.woff",
+    "static/media/Willsmeet-Logo.png": "/bansi-terminal-frontend/static/media/Willsmeet-Logo.a94427ee936205eba4ac.png",
     "static/media/fa-regular-400.woff2": "/bansi-terminal-frontend/static/media/fa-regular-400.1008b5226941c24f4468.woff2",
     "static/media/logo-dark.png": "/bansi-terminal-frontend/static/media/logo-dark.d5be005d7bda76119678.png",
     "static/media/logo-light.png": "/bansi-terminal-frontend/static/media/logo-light.d5be005d7bda76119678.png",
     "static/media/bg-1.png": "/bansi-terminal-frontend/static/media/bg-1.7694411d08a41ca3baef.png",
     "index.html": "/bansi-terminal-frontend/index.html",
-    "static/media/plus-solid.svg": "/bansi-terminal-frontend/static/media/plus-solid.8b3253883e22504e2bef.svg",
-    "static/media/minus-solid.svg": "/bansi-terminal-frontend/static/media/minus-solid.552354b56005563d4e6c.svg",
     "static/media/three-dots-vertical.svg": "/bansi-terminal-frontend/static/media/three-dots-vertical.3b9464fcdfd564bd9d841e79c9ec2f65.svg",
-    "main.40d5e8c0.css.map": "/bansi-terminal-frontend/static/css/main.40d5e8c0.css.map",
-    "main.b820f8c3.js.map": "/bansi-terminal-frontend/static/js/main.b820f8c3.js.map",
+    "main.8a357070.css.map": "/bansi-terminal-frontend/static/css/main.8a357070.css.map",
+    "main.91ec7122.js.map": "/bansi-terminal-frontend/static/js/main.91ec7122.js.map",
     "239.d93958df.chunk.js.map": "/bansi-terminal-frontend/static/js/239.d93958df.chunk.js.map",
     "213.db05f555.chunk.js.map": "/bansi-terminal-frontend/static/js/213.db05f555.chunk.js.map",
     "455.a24da58e.chunk.js.map": "/bansi-terminal-frontend/static/js/455.a24da58e.chunk.js.map",
     "488.9c06c1cd.chunk.js.map": "/bansi-terminal-frontend/static/js/488.9c06c1cd.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.40d5e8c0.css",
-    "static/js/main.b820f8c3.js"
+    "static/css/main.8a357070.css",
+    "static/js/main.91ec7122.js"
   ]
 }
