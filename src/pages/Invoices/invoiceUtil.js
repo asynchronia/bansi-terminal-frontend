@@ -56,3 +56,54 @@ if (!isNaN(dateObj)) {
 }
 console.error("Not a valid date object");
 }
+
+export const numberToIndianWords = (number) => {
+  const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+  const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const scales = ['', 'thousand', 'lakh', 'crore'];
+
+  if (number === 0) return 'zero';
+
+  // Split number into 2-digit chunks
+  const chunks = [];
+  while (number > 0) {
+      chunks.push(number % 100);
+      number = Math.floor(number / 100);
+  }
+
+  // Convert each chunk to words
+  const wordsChunks = chunks.map((chunk, index) => {
+      if (chunk === 0) return '';
+      let words = '';
+      const tensAndUnits = chunk % 100;
+      const hundreds = Math.floor(chunk / 100);
+      if (hundreds > 0) {
+          words += units[hundreds] + ' hundred';
+          if (tensAndUnits > 0) words += ' and ';
+      }
+      if (tensAndUnits < 10) {
+          words += units[tensAndUnits];
+      } else if (tensAndUnits < 20) {
+          words += teens[tensAndUnits - 10];
+      } else {
+          const tensDigit = Math.floor(tensAndUnits / 10);
+          const unitsDigit = tensAndUnits % 10;
+          words += tens[tensDigit];
+          if (unitsDigit > 0) words += '-' + units[unitsDigit];
+      }
+      if (index > 0) words += ' ' + scales[index];
+      return words;
+  });
+
+  // Join words chunks and trim any leading/trailing spaces
+  return wordsChunks.reverse().join(' ').trim();
+};
+
+export const formatNumberWithCommasAndDecimal = (number) => {
+  if (typeof number !== 'number' || isNaN(number)) {
+    return '';
+  }
+  const formattedNumber = number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  return formattedNumber;
+};

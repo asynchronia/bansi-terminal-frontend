@@ -21,10 +21,14 @@ const API_URL = {
     createBranch: '/api/branch/create',
     getWarehouseList :'/api/branch/warehouse-list',
     getUserList:'/api/users/get/users',
-    getUserRole: '/api/roles/list'
+    getUserRole: '/api/roles/list',
+    getItemData:"/api/items/get",
+    getInvoiceDetails:"/api/invoices/id/",
+    getPaymentDetails : "/api/payments/id"
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
+const getIdToken = () => localStorage.getItem("id_token");
 const getclientId = () => localStorage.getItem("client_id");
 const getsessionId = () => localStorage.getItem("sessionId");
 
@@ -69,7 +73,7 @@ export async function createClient(body) {
 export async function createAgreement(body) {
     return new Promise((resolve) => {
         axios
-            .post(`${baseUrl}${API_URL.createAgreement}`, body)
+            .post(`${baseUrl}${API_URL.createAgreement}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -145,6 +149,17 @@ export async function createBranch(body) {
     });
 }
 
+export async function getItemData(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getItemData}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
 export async function getInvoices(body) {
     return new Promise((resolve, reject) => {
         axios
@@ -156,6 +171,22 @@ export async function getInvoices(body) {
                 reject(error);
             });
     }).catch(error => {
+        console.log(error);
+        return error?.response;
+    });
+}
+
+export async function getPaymentDetails(id,body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(`${baseUrl}${API_URL.getPaymentDetails}/${id}`, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            }).catch(error => {
+                reject(error);
+            });
+    }).catch(error =>{
         console.log(error);
         return error?.response;
     });

@@ -188,8 +188,6 @@ const getListOfRowData =  useCallback(async (body) => {
     setAllCustomers([...custArr]);
     setRowData(response);
     setBodyObjectReq(body);
-    
-   
 });
 
 
@@ -231,7 +229,8 @@ useEffect(() => {
   props.setBreadcrumbItems('Invoices', breadcrumbItems);
   if(paginationPageSize && paginationPageSize !== undefined){
     let bodyObjectWithCategory = {...bodyObject};
-    bodyObjectWithCategory.limit=paginationPageSize;
+    // bodyObjectWithCategory.limit=
+    ;
     getListOfRowData(bodyObjectWithCategory);
   }
 },[paginationPageSize]);
