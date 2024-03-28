@@ -97,31 +97,59 @@ const AllOrders = (props) => {
   }
   ]
   const columnDefs = [
-    {headerName: "Order Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Order No.", field: "salesorder_id",suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Client", field: "customer_name",suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Total Amount", field: "total",suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "Action", field: "action", sortable: false,
-    cellClass:"actions-button-cell",
-    cellRenderer: DropdownMenuBtn,
-    cellRendererParams: {
-      handleResponse: handleDeleteResponse,
-      handleEditClick: handleEditClick
-    },suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}
-  }
+    {
+      headerName: "Order Date", field: "date", 
+      headerCheckboxSelection: true, checkboxSelection: true,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,headerTooltip: "Order Date",
+    },
+    {
+      headerName: "Order No.", field: "salesorder_id",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,headerTooltip: "Order No.",
+    },
+    {
+      headerName: "Client", field: "customer_name",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,
+      headerTooltip: "Client",
+    },
+    {
+      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,headerTooltip: "Order Status",
+    },
+    {
+      headerName: "Total Amount", field: "total",suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,headerTooltip: "Total Amount",
+    },
+    {
+      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,headerTooltip: "Invoice",
+    },
+    {
+      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,headerTooltip: "Payment",
+    },
+    {
+      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer,suppressMenu: true,
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,
+      headerTooltip: "Shipment",
+    },
+    {
+      headerName: "Action", field: "action", sortable: false,
+      cellClass:"actions-button-cell",
+      cellRenderer: DropdownMenuBtn,
+      cellRendererParams: {
+        handleResponse: handleDeleteResponse,
+        handleEditClick: handleEditClick
+      },suppressMenu: true,floatingFilterComponentParams: {suppressFilterButton:true},
+      tooltipValueGetter: (p) => p.value,headerTooltip: "Actions",
+    }
   ]
   const notify = (type, message) => {
     if (type === "Error") {
