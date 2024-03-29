@@ -215,7 +215,7 @@ const CreateItems = (props) => {
         values.images = [...selectedFiles];
         values.taxes = [...taxArr];
         values.category = categoryData.id;
-        // console.log(values);
+       
         handleItemCreation(values);
       }
     },
