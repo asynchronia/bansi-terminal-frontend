@@ -20,6 +20,7 @@
     .button-right-section{
         float: right;
         display: inline-flex;
+        gap:20px
     }
     .all-items-btn{
         margin-right: 10px;
@@ -36,4 +37,11 @@
         color: var(--bs-gray-600);
         line-height: 34px;
     }
+}
+.categoryDiv{
+    min-width: 300px;
+    z-index: 20;
+    position: absolute;
+    position: relative;
+    // border:1px solid red
 }
