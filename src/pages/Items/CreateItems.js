@@ -322,7 +322,7 @@ const CreateItems = (props) => {
                         validation.touched.title && validation.errors.title
                       }
                     />
-                    {validation.errors.title ? (
+                    {validation.errors.title && validation.touched.title ? (
                       <p style={{ color: "red" }}>{validation.errors.title}</p>
                     ) : null}
                   </div>
@@ -341,7 +341,7 @@ const CreateItems = (props) => {
                         validation.touched.hsnCode && validation.errors.hsnCode
                       }
                     />
-                    {validation.errors.hsnCode ? (
+                    {validation.errors.hsnCode && validation.touched.hsnCode ? (
                       <p style={{ color: "red" }}>
                         {validation.errors.hsnCode}
                       </p>
