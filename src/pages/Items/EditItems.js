@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import InputWithChips from "../../components/CustomComponents/InputWithChips";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
@@ -42,6 +42,7 @@ const EditItems = (props) => {
     id: null,
     show: false,
   });
+  const navigate = useNavigate();
 
   const [otherData, setOtherData] = useState({
     sku: "",
@@ -117,6 +118,9 @@ const EditItems = (props) => {
         theme: "colored",
       });
     }
+    setTimeout(()=>{
+      navigate('/items');
+    }, [5000])
   };
 
   const handleTaxes = (e) => {

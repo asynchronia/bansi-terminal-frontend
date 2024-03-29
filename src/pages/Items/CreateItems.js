@@ -24,6 +24,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const CreateItems = (props) => {
   const [selectedFiles, setselectedFiles] = useState([]);
@@ -37,6 +38,7 @@ const CreateItems = (props) => {
     id: null,
     show: false,
   });
+  const navigate = useNavigate();
 
   const [variantData, setVariantData] = useState([
     { id: uuidv4(), attributes: [] },
@@ -61,6 +63,9 @@ const CreateItems = (props) => {
         theme: "colored",
       });
     }
+    setTimeout(()=>{
+      navigate('/items');
+    }, [5000])
   };
 
   const handleTaxes = (e) => {
