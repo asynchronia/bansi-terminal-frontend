@@ -307,7 +307,7 @@ const EditItems = (props) => {
         values.taxes = [taxArr];
         values.category = categoryData.id;
         values.deletedVariants = [...deletedVariant];
-        console.log(values);
+        
         handleItemEdit(values)
       }
     },
@@ -318,7 +318,6 @@ const EditItems = (props) => {
     const data = values;
     try {
       const response = await axios.post(url, data);
-      console.log(response.data.success)
       if (response.data.success === true) {
         notify("Success", response.data.message);
       } else {
