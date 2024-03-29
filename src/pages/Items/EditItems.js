@@ -135,7 +135,7 @@ const EditItems = (props) => {
       let categoriesArr = data?.payload?.categories;
       const categoryName = findCategoryName(
         categoriesArr,
-        itemsData.payload?.item?.category
+        itemsData.payload?.item?.category?._id
       );
 
       setCategoryData({
@@ -219,6 +219,7 @@ const EditItems = (props) => {
     });
   };
 
+
   const handleItemCreation = async (values) => {
     try {
       const response = await createItemReq(values);
@@ -239,7 +240,7 @@ const EditItems = (props) => {
       _id:id,
       title: itemsData.payload?.item?.title,
       hsnCode: itemsData.payload?.item?.hsnCode,
-      category: itemsData.payload?.item?.category,
+      category: itemsData.payload?.item?.category?._id,
       description: itemsData.payload?.item?.description,
       itemType: itemsData.payload?.item?.itemType,
       itemUnit: itemsData.payload?.item?.itemUnit,
@@ -480,7 +481,7 @@ const EditItems = (props) => {
                           show: !categoryData.show,
                         });
                       }}
-                      className="form-control"
+                      className="form-select"
                     >
                       {categoryData.name !== ""
                         ? `Category: ${categoryData.name}`
