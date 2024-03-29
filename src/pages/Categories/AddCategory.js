@@ -1,9 +1,7 @@
 import React, {
   useEffect,
   useState,
-  useRef,
   useCallback,
-  useMemo,
 } from "react";
 import {
   Row,
@@ -15,28 +13,21 @@ import {
   Input,
   Label,
   FormFeedback,
-  Button,
-  CardHeader,
   Table,
 } from "reactstrap";
-// Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { connect } from "react-redux";
 import "./styles/AddCategory.scss";
 import { ToastContainer, toast } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import { AgGridReact } from "ag-grid-react";
 import {
   createCategoryReq,
   getCategoriesReq,
 } from "../../service/categoryService";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
+
 import "react-toastify/dist/ReactToastify.css";
-import plusIcon from "../../assets/images/small/plus-icon.png";
-import minusIcon from "../../assets/images/small/minus-icon.png";
-// import CategoryList from "./CategoryList";
+
 const AddCategory = (props) => {
   document.title = "Categories";
   const breadcrumbItems = [
@@ -49,7 +40,6 @@ const AddCategory = (props) => {
   const getCategories = useCallback(async () => {
     const response = await getCategoriesReq();
     let categories = response?.payload?.categories;
-    //  console.log(categories);
     setAllCategories(categories);
   });
   useEffect(() => {
@@ -58,7 +48,7 @@ const AddCategory = (props) => {
   }, []);
 
   const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
+   
     enableReinitialize: true,
 
     initialValues: {
@@ -131,10 +121,6 @@ const AddCategory = (props) => {
     });
   };
 
-  // const icons = {
-  //   groupExpanded: '<img src="'+ minusIcon+' "style="width: 15px;"/>',
-  //   groupContracted: '<img src="'+ plusIcon+' "style="width: 15px;"/>',
-  // };
   return (
     <React.Fragment>
       <ToastContainer position="top-center" theme="colored" />
