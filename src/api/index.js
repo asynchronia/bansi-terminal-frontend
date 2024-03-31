@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = process.env.API_BASE_URL || "http://localhost:3000";
+const baseUrl = "https://bansi-terminal-backend.vercel.app";
 
 const API_URL = {
     createItem: "/api/items/create",
