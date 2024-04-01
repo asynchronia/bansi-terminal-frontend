@@ -70,7 +70,7 @@ const CreateItems = (props) => {
 
   const handleTaxes = (e) => {
     const value = e.target.value;
-    setTaxArr([...taxArr, value]);
+    setTaxArr([value]);
   };
 
   const searchCategories = async () => {
