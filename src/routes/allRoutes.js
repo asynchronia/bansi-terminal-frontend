@@ -39,8 +39,7 @@ import Allorders from "../pages/Orders/Allorders";
 import Createorder from "../pages/Orders/Createorder";
 import ViewClient from "../pages/Client/ViewClient";
 import AllInvoices from "../pages/Invoices/AllInvoices";
-import AllPayments from "../pages/Invoices/AllPayments"
-import Login from "../pages/Authentication/Login"
+import AllPayments from "../pages/Invoices/AllPayments";
 import ViewItems from "../pages/Items/ViewItems"
 import PaymentDetails from "../pages/Invoices/PaymentDetails"
 import Login from "../pages/Authentication/Login";

@@ -15,21 +15,8 @@ const API_URL = {
     getOrderList: "/api/orders/list",
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
-<<<<<<< HEAD
-    signin:'/api/users/signup',
-    createAgreement: '/api/agreements/create',
-    getBranchList: '/api/branch/list',
-    createBranch: '/api/branch/create',
-    getWarehouseList :'/api/branch/warehouse-list',
-    getUserList:'/api/users/get/users',
-    getUserRole: '/api/roles/list',
-    getItemData:"/api/items/get",
-    getInvoiceDetails:"/api/invoices/id/",
-    getPaymentDetails : "/api/payments/id"
-=======
     createAgreement: '/api/agreements/create',
     getInvoice:'/api/invoices/id/'
->>>>>>> cb2bf0e (view invoice screen)
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -321,7 +308,7 @@ export async function getInvoice(body, id) {
 }
 
 export async function signin(body) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         axios
             .post(`${baseUrl}${API_URL.signin}`, body)
             .catch(error => {
