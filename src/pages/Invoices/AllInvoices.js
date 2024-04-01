@@ -24,16 +24,12 @@ const AllInvoices = (props) => {
   document.title = "Invoices";
   let navigate = useNavigate(); 
   const effectCalled = useRef(false);
-  const redirectToCreateItem = () =>{ 
-    let path = "/create-item"; 
-    navigate(path);
-  }
 
-  const redirectToEditPage = (id) =>{
-    let path = "/edit-item"; 
+  const redirectToViewPage = (id) =>{
+    let path = "/view-invoice/"+id; 
      setTimeout(() => {
       navigate(path, id);
-     }, 300); 
+     }, 400); 
       
   }
   const notify = (type, message) => {
@@ -65,10 +61,12 @@ const AllInvoices = (props) => {
     setmodal_standard(false);
     getListOfRowData();
   } 
-  const handleEditClick = (id) =>{
+ 
+  const onClickView = (id) =>{
     console.log("GRID OBJECT >>>"+id);
-    redirectToEditPage(id);
+    redirectToViewPage(id);
   }
+
 
 const columnDefs = [
     {headerName: "Invoice Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true,
@@ -113,6 +111,9 @@ const columnDefs = [
     {headerName: "", field: "action", sortable: false,
     cellClass:"actions-button-cell",
     cellRenderer: InvoiceActionBtn,
+    cellRendererParams:{
+      onClickView: onClickView
+    },
     suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true}
   } 

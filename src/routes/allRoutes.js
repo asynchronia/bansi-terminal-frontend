@@ -43,6 +43,8 @@ import AllPayments from "../pages/Invoices/AllPayments"
 import Login from "../pages/Authentication/Login"
 import ViewItems from "../pages/Items/ViewItems"
 import PaymentDetails from "../pages/Invoices/PaymentDetails"
+import Login from "../pages/Authentication/Login";
+import ViewInvoice from "../pages/Invoices/ViewInvoice";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -127,6 +129,7 @@ const userRoutes = [
   { path: "/invoices", component: <AllInvoices />},
   { path: "/payments", component: <AllPayments />},
   { path: "/payment/:id", component: <PaymentDetails/>},
+  { path: "/view-invoice/:id", component: <ViewInvoice />},
   // // this route should be at the end of all other routes
   {
     path: "/",

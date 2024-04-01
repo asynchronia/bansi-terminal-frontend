@@ -15,6 +15,7 @@ const API_URL = {
     getOrderList: "/api/orders/list",
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
+<<<<<<< HEAD
     signin:'/api/users/signup',
     createAgreement: '/api/agreements/create',
     getBranchList: '/api/branch/list',
@@ -25,6 +26,10 @@ const API_URL = {
     getItemData:"/api/items/get",
     getInvoiceDetails:"/api/invoices/id/",
     getPaymentDetails : "/api/payments/id"
+=======
+    createAgreement: '/api/agreements/create',
+    getInvoice:'/api/invoices/id/'
+>>>>>>> cb2bf0e (view invoice screen)
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -300,11 +305,10 @@ export async function login(body) {
     });
 }
 
-
-export async function signin(body) {
-    return new Promise((resolve) => {
+export async function getInvoice(body, id) {
+    return new Promise((resolve, reject) => {
         axios
-            .post(`${baseUrl}${API_URL.signin}`, body)
+            .get(`${baseUrl}${API_URL.getInvoice+id}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -316,3 +320,15 @@ export async function signin(body) {
     });
 }
 
+export async function signin(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.signin}`, body)
+            .catch(error => {
+                reject(error);
+            });
+    }).catch(error => {
+        console.log(error);
+        return error.response.data;
+    });
+}
