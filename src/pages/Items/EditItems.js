@@ -13,17 +13,18 @@ import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import InputWithChips from "../../components/CustomComponents/InputWithChips";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
-import axios from "axios";
+
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
+import { editItemReq, getCategoriesReq, getItemsReq, getTaxesReq } from "../../service/itemService";
 
 const EditItems = (props) => {
   const [itemsData, setItemsData] = useState({});
@@ -43,6 +44,7 @@ const EditItems = (props) => {
     show: false,
   });
   const navigate = useNavigate();
+  // console.log(variantOptions)
 
   const [otherData, setOtherData] = useState({
     sku: "",
@@ -56,24 +58,28 @@ const EditItems = (props) => {
   const { id } = useParams();
 
   const searchItemData = async (id) => {
-    const url = `http://localhost:3000/api/items/get`;
-    const data = { _id: id };
     try {
-      const res = await axios.post(url, data);
-      setItemsData(res.data);
-      setVariantData(res.data?.payload?.variants);
-      setTaxArr(res.data?.payload?.item?.taxes[0]._id);
-      setItemType( res.data?.payload?.item?.itemType,)
+      const data = { _id: id };
+      const res = await getItemsReq(data);
+      setItemsData(res);
+      setVariantData(res?.payload?.variants);
+      setTaxArr(res?.payload?.item?.taxes[0]._id);
+      setItemType(res?.payload?.item?.itemType);
       setOtherData({
-        sku: res.data.payload.variants[0]?.sku,
-        inventory: res.data.payload.variants[0]?.inventory,
-        costPrice: res.data.payload.variants[0]?.costPrice,
-        sellingPrice: res.data.payload.variants[0]?.sellingPrice,
+          sku: res?.payload.variants[0]?.sku,
+          inventory: res?.payload.variants[0]?.inventory,
+          costPrice: res?.payload.variants[0]?.costPrice,
+          sellingPrice: res?.payload.variants[0]?.sellingPrice,
       });
       setLoadedItems(true);
-    } catch (error) {
-      console.log(error);
-    }
+  } catch (error) {
+      if (error === 404) {
+          console.log("Item not found");
+      } else {
+          console.log("An error occurred while searching for item");
+      }
+  }
+    
   };
 
   useEffect(() => {
@@ -130,13 +136,9 @@ const EditItems = (props) => {
 
   const searchCategories = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/api/categories/list"
-      );
-      let data = await response.data;
-
-      setAllCategories(data?.payload?.categories);
-      let categoriesArr = data?.payload?.categories;
+      const response = await getCategoriesReq();
+      let categoriesArr = response?.payload?.categories;
+      setAllCategories(categoriesArr);
       const categoryName = findCategoryName(
         categoriesArr,
         itemsData.payload?.item?.category?._id
@@ -169,13 +171,14 @@ const EditItems = (props) => {
 
   const searchAllTaxes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/taxes/list");
-      let data = await response.data;
+      const response = await getTaxesReq();
+      let data = await response;
       setAllTaxes(data?.payload?.taxes);
     } catch (error) {
       console.log(error);
     }
   };
+
 
   useEffect(() => {
     searchCategories();
@@ -317,20 +320,23 @@ const EditItems = (props) => {
     },
   });
 
+
   const handleItemEdit = async (values) => {
-    const url = `http://localhost:3000/api/items/update`;
-    const data = values;
     try {
-      const response = await axios.post(url, data);
-      if (response.data.success === true) {
-        notify("Success", response.data.message);
-      } else {
-        notify("Error", response.data.message);
-      }
+        const response = await editItemReq(values);
+        if (response.success === true) {
+            notify("Success", response.message);
+        } else {
+            notify("Error", response.message);
+        }
     } catch (error) {
-      notify("Error", error.message);
+        if (error === 404) {
+            notify("Error", "Item not found");
+        } else {
+            notify("Error", "An error occurred while editing the item");
+        }
     }
-  };
+};
   
 
   const handleAddRow = () => {
@@ -353,7 +359,7 @@ const EditItems = (props) => {
       const updatedVariantData = variantData.map((el) => {
         if (el.attributes) {
           el.attributes = el.attributes.filter(
-            (attr) => !attr.hasOwnProperty(deletedAttributeName)
+            (attr) => attr.name !== deletedAttributeName
           );
         }
         return el;
@@ -364,6 +370,7 @@ const EditItems = (props) => {
   };
 
   const handleDeleteVariantData = (id) => {
+    
     const deletedRow = variantData.filter((row) => row._id === id);
     setDeletedVariant([...deletedVariant, deletedRow[0]._id]);
     const updatedRows = variantData.filter((row) => row._id !== id);
@@ -391,9 +398,6 @@ const EditItems = (props) => {
     setselectedFiles([...selectedFiles, updatedFiles[0]]);
   }
 
-  /**
-   * Formats the size
-   */
   function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -403,7 +407,6 @@ const EditItems = (props) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
-
   // if(!loadedItem){
   //   return (
   //     <div>
@@ -567,7 +570,7 @@ const EditItems = (props) => {
                       <select
                         id="taxes"
                         name="taxes"
-                        value={validation.values.taxes}
+                        value={validation.values.taxes._id}
                         onChange={handleTaxes}
                         onBlur={validation.handleBlur}
                         className="form-select focus-width"

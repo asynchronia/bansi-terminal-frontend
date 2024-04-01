@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { setBreadcrumbItems } from "../../store/actions";
 import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+
 import Img404 from "../../assets/images/Img404.png";
 import {
   Button,
@@ -12,13 +12,17 @@ import {
   Col,
   Modal,
   Row,
-  Table,
+
 } from "reactstrap";
 import { Avatar, CircularProgress } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
 import AgreementTable from "../../components/CustomComponents/AgreementTable";
 import { ToastContainer, toast } from "react-toastify";
-import { createAgreementReq } from "../../service/clientService";
+import {
+  createAgreementReq,
+  getAgreementReq,
+  getClientWithIdReq,
+} from "../../service/clientService";
 import AddBranch from "../../components/CustomComponents/AddBranch";
 import BranchData from "../../components/CustomComponents/BranchData";
 import UserData from "../../components/CustomComponents/UserData";
@@ -64,23 +68,17 @@ const ViewClient = (props) => {
     }, [5000]);
   };
 
-  console.log(agreementData)
+  // console.log(agreementData)
 
   const getAgreement = async (id) => {
-    const url = `http://localhost:3000/api/agreements/agreement`;
-    const data = { clientId: id };
     try {
-      const res = await axios.post(url, data);
-     console.log(res.data.payload.items)
-      
+      const data = { clientId: id };
+      const res = await getAgreementReq(data);
 
       let array = [];
-      let rowData=[...res?.data?.payload?.items];
 
-     
-
-      if (res?.data?.payload?.items) {
-        array = res?.data?.payload?.items?.flatMap((item) => {
+      if (res?.payload?.items) {
+        array = res?.payload?.items?.flatMap((item) => {
           return item.variants.map((variant) => {
             return {
               id: variant.variant._id,
@@ -93,22 +91,24 @@ const ViewClient = (props) => {
           });
         });
 
-        const items = res.data.payload.items;
+        const items = res.payload.items;
 
         // Iterate over items and their variants
         for (const item of items) {
-          const { item: { _id: itemId }, variants } = item;
-          
+          const {
+            item: { _id: itemId },
+            variants,
+          } = item;
+
           for (const variantItem of variants) {
-            const { variant: { _id: variantId, sellingPrice: price } } = variantItem;
-  
+            const {
+              variant: { _id: variantId, sellingPrice: price },
+            } = variantItem;
+
             // Wait for handleAddToAgreement to complete
             await handleAddToAgreement(itemId, variantId, price);
           }
         }
-
-        
-        
       }
 
       if (array.length > 0) {
@@ -118,12 +118,14 @@ const ViewClient = (props) => {
         setAgreementAvailable({ loading: false, value: false });
       }
     } catch (error) {
-      setAgreementAvailable({ loading: false, value: false });
-      console.log(error);
+      if (error === 404) {
+        setAgreementAvailable({ loading: false, value: false });;
+      } else {
+        setAgreementAvailable({ loading: false, value: false });
+      }
+      
     }
   };
-
-  
 
   const handleAddToAgreement = (itemId, variantId, price) => {
     const itemIndex = agreementData.findIndex((item) => item.item === itemId);
@@ -228,12 +230,12 @@ const ViewClient = (props) => {
   }, []);
 
   const searchClient = async (id) => {
-    const url = `http://localhost:3000/api/clients/get`;
-    const data = { _id: id };
+ 
     try {
-      const res = await axios.post(url, data);
+      const data = { _id: id };
+      const res = await getClientWithIdReq(data);
 
-      setClientData(res?.data?.payload?.client);
+      setClientData(res.payload?.client);
     } catch (error) {
       console.log(error);
     }

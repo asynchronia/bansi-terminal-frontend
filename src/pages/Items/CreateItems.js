@@ -18,8 +18,8 @@ import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
-import axios from "axios";
-import { createItemReq } from "../../service/itemService";
+
+import { createItemReq, getCategoriesReq, getTaxesReq } from "../../service/itemService";
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
@@ -75,11 +75,9 @@ const CreateItems = (props) => {
 
   const searchCategories = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/api/categories/list"
-      );
-      let data = await response.data;
-      setAllCategories(data?.payload?.categories);
+      const response = await getCategoriesReq();
+      let categories = response?.payload?.categories;
+      setAllCategories(categories);
     } catch (error) {
       console.log(error);
     }
@@ -87,8 +85,8 @@ const CreateItems = (props) => {
 
   const searchAllTaxes = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/taxes/list");
-      let data = await response.data;
+      const response = await getTaxesReq();
+      let data = await response;
       setAllTaxes(data?.payload?.taxes);
     } catch (error) {
       console.log(error);
