@@ -15,7 +15,16 @@ const API_URL = {
     getOrderList: "/api/orders/list",
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
+    signin:'/api/users/signup',
     createAgreement: '/api/agreements/create',
+    getBranchList: '/api/branch/list',
+    createBranch: '/api/branch/create',
+    getWarehouseList :'/api/branch/warehouse-list',
+    getUserList:'/api/users/get/users',
+    getUserRole: '/api/roles/list',
+    getItemData:"/api/items/get",
+    getInvoiceDetails:"/api/invoices/id/",
+    getPaymentDetails : "/api/payments/id",
     getInvoice:'/api/invoices/id/'
 };
 
