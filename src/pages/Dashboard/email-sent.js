@@ -62,20 +62,20 @@ class MonthlyEarnings extends Component {
             <React.Fragment>
                 <Card>
                     <CardBody>
-                        <h4 className="card-title mb-4">Email Sent</h4>
+                        <h4 className="card-title mb-4">Payments</h4>
 
                         <Row className="text-center mt-4">
                             <Col xs="4">
-                                <h5 className="font-size-20">$ 89425</h5>
-                                <p className="text-muted">Marketplace</p>
+                                <h5 className="font-size-20">₹ 50,000</h5>
+                                <p className="text-muted">Pending</p>
                             </Col>
                             <Col xs="4">
-                                <h5 className="font-size-20">$ 56210</h5>
-                                <p className="text-muted">Total Income</p>
+                                <h5 className="font-size-20">₹ 1,00,000</h5>
+                                <p className="text-muted">Received</p>
                             </Col>
                             <Col xs="4">
-                                <h5 className="font-size-20">$ 8974</h5>
-                                <p className="text-muted">Last Month</p>
+                                <h5 className="font-size-20">₹ 25,000</h5>
+                                <p className="text-muted">Overdue</p>
                             </Col>
                         </Row>
 

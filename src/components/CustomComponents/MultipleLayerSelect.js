@@ -26,7 +26,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
         <div
           style={{
             border: "1px solid #dee2e6",
-            padding: "2px 5px",
+            padding: "3px 8px",
             cursor: "pointer",
           }}
           key={category._id}
@@ -40,7 +40,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
                 <div
                   style={{
                     border: "1px solid #dee2e6",
-                    padding: "2px 5px",
+                    padding: "3px 8px",
                     cursor: "pointer",
                   }}
                   key={child._id}
@@ -54,7 +54,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
                     <div
                       style={{
                         border: "1px solid #dee2e6",
-                        padding: "2px 5px",
+                        padding: "2px 8px",
                         cursor: "pointer",
                       }}
                       className="grandchild-options"
@@ -71,7 +71,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
                             )
                           }
                         >
-                           {` ${grandchild.name}`}
+                           {`${grandchild.name}`}
                         </div>
                       ))}
                     </div>

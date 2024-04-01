@@ -13,14 +13,13 @@ import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import InputWithChips from "../../components/CustomComponents/InputWithChips";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
 import axios from "axios";
-import { createItemReq } from "../../service/itemService";
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
@@ -35,13 +34,15 @@ const EditItems = (props) => {
   const [variantData, setVariantData] = useState([]);
   const [taxArr, setTaxArr] = useState(null);
   const [variantOptions, setVariantOptions] = useState([]);
-  const[deletedVariant, setDeletedVariant]= useState([])
+  const [deletedVariant, setDeletedVariant] = useState([]);
+  const [itemType, setItemType]= useState('variable');
 
   const [categoryData, setCategoryData] = useState({
     name: "",
     id: null,
     show: false,
   });
+  const navigate = useNavigate();
 
   const [otherData, setOtherData] = useState({
     sku: "",
@@ -61,13 +62,13 @@ const EditItems = (props) => {
       const res = await axios.post(url, data);
       setItemsData(res.data);
       setVariantData(res.data?.payload?.variants);
-      setTaxArr(res.data?.payload?.item?.taxes);
-
+      setTaxArr(res.data?.payload?.item?.taxes[0]._id);
+      setItemType( res.data?.payload?.item?.itemType,)
       setOtherData({
-        sku: res.data.payload.variants[0]?.sku  , 
+        sku: res.data.payload.variants[0]?.sku,
         inventory: res.data.payload.variants[0]?.inventory,
-        costPrice:res.data.payload.variants[0]?.costPrice,
-        sellingPrice:res.data.payload.variants[0]?.sellingPrice
+        costPrice: res.data.payload.variants[0]?.costPrice,
+        sellingPrice: res.data.payload.variants[0]?.sellingPrice,
       });
       setLoadedItems(true);
     } catch (error) {
@@ -117,6 +118,9 @@ const EditItems = (props) => {
         theme: "colored",
       });
     }
+    setTimeout(()=>{
+      navigate('/items');
+    }, [5000])
   };
 
   const handleTaxes = (e) => {
@@ -130,17 +134,17 @@ const EditItems = (props) => {
         "http://localhost:3000/api/categories/list"
       );
       let data = await response.data;
-      
+
       setAllCategories(data?.payload?.categories);
       let categoriesArr = data?.payload?.categories;
       const categoryName = findCategoryName(
         categoriesArr,
-        itemsData.payload?.item?.category
+        itemsData.payload?.item?.category?._id
       );
 
       setCategoryData({
         name: categoryName,
-        id: itemsData.payload?.item?.category,
+        id: itemsData.payload?.item?.category?._id,
         show: false,
       });
     } catch (error) {
@@ -179,7 +183,6 @@ const EditItems = (props) => {
   }, [loadedItem]);
 
   const handleVariantChange = (id, name, value) => {
-  
     const updatedVariants = variantData.map((variant) => {
       if (variant._id === id) {
         if (name === "attributes") {
@@ -219,46 +222,33 @@ const EditItems = (props) => {
     });
   };
 
-  const handleItemCreation = async (values) => {
-    try {
-      const response = await createItemReq(values);
-      if (response.success === true) {
-        notify("Success", response.message);
-      } else {
-        notify("Error", response.message);
-      }
-    } catch (error) {
-      notify("Error", error.message);
-    }
-  };
+  
 
   const validation = useFormik({
     enableReinitialize: true,
 
     initialValues: {
-      _id:id,
+      _id: id,
       title: itemsData.payload?.item?.title,
       hsnCode: itemsData.payload?.item?.hsnCode,
-      category: itemsData.payload?.item?.category,
+      category: itemsData.payload?.item?.category?._id,
       description: itemsData.payload?.item?.description,
-      itemType: itemsData.payload?.item?.itemType,
       itemUnit: itemsData.payload?.item?.itemUnit,
       taxPreference: itemsData.payload?.item?.taxPreference,
       taxes: itemsData.payload?.item?.taxes[0],
       status: itemsData.payload?.item?.status,
       images: itemsData.payload?.item?.images,
       variants: itemsData.payload?.variants,
-      deletedVariant:[]
+      deletedVariants: [],
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Please Enter Item Name"),
       hsnCode: Yup.string().required("Please Enter HSN Code"),
       category: Yup.string().required("Please Select Category"),
-      itemType: Yup.string().required("Please Select Item Type"),
     }),
     onSubmit: (values) => {
       let unhandled = false;
-      if (values.itemType === "variable") {
+      if (itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
           if (
             variantData[i].attributes.length === 0 ||
@@ -273,7 +263,7 @@ const EditItems = (props) => {
             unhandled = true;
           }
         }
-      } else if (values.itemType === "service") {
+      } else if (itemType === "service") {
         if (
           otherData.sku === "" ||
           otherData.costPrice === "" ||
@@ -297,13 +287,20 @@ const EditItems = (props) => {
         notify("Error", "Please enter all the fields");
         return;
       } else {
-        if (values.itemType === "variable") {
-          const finalVariant = variantData.map((element) => {
-            const { id, ...rest } = element;
-            return rest;
-          });
-          values.variants = [...finalVariant];
-        } else if (values.itemType === "standard") {
+        if (itemType === "variable") {
+          const newData = variantData.map(
+            ({ _id, sku, attributes, costPrice, sellingPrice, inventory }) => ({
+              _id,
+              sku,
+              attributes,
+              costPrice,
+              sellingPrice,
+              inventory,
+            })
+          );
+
+          values.variants = [...newData];
+        } else if (itemType === "standard") {
           values.variants = [{ ...otherData }];
         } else {
           const { inventory, ...rest } = otherData;
@@ -311,26 +308,30 @@ const EditItems = (props) => {
         }
 
         values.images = [...selectedFiles];
-        values.taxes = [...taxArr];
+        values.taxes = [taxArr];
         values.category = categoryData.id;
-        values.deletedVariant=[...deletedVariant];
-        // console.log(values);
+        values.deletedVariants = [...deletedVariant];
+        
         handleItemEdit(values)
       }
     },
   });
 
-  const handleItemEdit=async(values)=>{
+  const handleItemEdit = async (values) => {
     const url = `http://localhost:3000/api/items/update`;
     const data = values;
     try {
-      const res = await axios.post(url, data);
-      console.log(res)
+      const response = await axios.post(url, data);
+      if (response.data.success === true) {
+        notify("Success", response.data.message);
+      } else {
+        notify("Error", response.data.message);
+      }
     } catch (error) {
-      console.log(error);
+      notify("Error", error.message);
     }
-
-  }
+  };
+  
 
   const handleAddRow = () => {
     const newRow = { id: uuidv4() };
@@ -363,7 +364,7 @@ const EditItems = (props) => {
   };
 
   const handleDeleteVariantData = (id) => {
-    const deletedRow= variantData.filter((row)=> row._id===id);
+    const deletedRow = variantData.filter((row) => row._id === id);
     setDeletedVariant([...deletedVariant, deletedRow[0]._id]);
     const updatedRows = variantData.filter((row) => row._id !== id);
     setVariantData(updatedRows);
@@ -470,7 +471,9 @@ const EditItems = (props) => {
                     ) : null}
                   </div>
                   <div className="mt-3 mb-0">
-                    <label className="form-label focus-width">Select Category</label>
+                    <label className="form-label focus-width">
+                      Select Category
+                    </label>
                     <label
                       name="category"
                       id="category"
@@ -480,7 +483,7 @@ const EditItems = (props) => {
                           show: !categoryData.show,
                         });
                       }}
-                      className="form-control"
+                      className="form-select"
                     >
                       {categoryData.name !== ""
                         ? `Category: ${categoryData.name}`
@@ -605,7 +608,11 @@ const EditItems = (props) => {
               <CardBody>
                 <CardTitle className="h4">Item Gallery</CardTitle>
                 <Form
-                  style={{ display: "flex", justifyContent: "center", gap:'20px' }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "20px",
+                  }}
                 >
                   <Dropzone
                     onDrop={(acceptedFiles) => {
@@ -627,10 +634,13 @@ const EditItems = (props) => {
                       </div>
                     )}
                   </Dropzone>
-                  <div style={{maxWidth:'50%'}} className="dropzone-previews mt-3" id="file-previews">
-                    <Box 
-                    sx={{display:'flex', flexWrap:'wrap', gap:'10px'}}
-                      
+                  <div
+                    style={{ maxWidth: "50%" }}
+                    className="dropzone-previews mt-3"
+                    id="file-previews"
+                  >
+                    <Box
+                      sx={{ display: "flex", flexWrap: "wrap", gap: "10px" }}
                       className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete"
                     >
                       {selectedFiles.map((f, i) => {
@@ -668,7 +678,7 @@ const EditItems = (props) => {
                     disabled="true"
                     name="itemType"
                     id="itemType"
-                    value={validation.values.itemType}
+                    value={itemType}
                     onBlur={validation.handleBlur}
                     onChange={validation.handleChange}
                     className="form-select focus-width"
@@ -684,7 +694,7 @@ const EditItems = (props) => {
         </Row>
         <Row>
           <Card>
-            {validation.values.itemType == "variable" ? (
+            {itemType === "variable" ? (
               <CardBody>
                 {variantOptions.map((row) => (
                   <AttributesRow
@@ -733,7 +743,7 @@ const EditItems = (props) => {
               <CardBody>
                 <Standard
                   data={otherData}
-                  type={validation.values.itemType}
+                  type={itemType}
                   onChange={handleOtherChange}
                 />
               </CardBody>
@@ -747,11 +757,10 @@ const EditItems = (props) => {
 
 const AttributesRow = (props) => {
   const { _id, onDelete, disabledDelete, setVariantOptions, data } = props;
-  const [displayValue, setDisplayValue]= useState(data.name || "")
+  const [displayValue, setDisplayValue] = useState(data.name || "");
   const nameRef = useRef(data.name || "");
   const [inputValue, setInputValue] = useState("");
   const [chips, setChips] = useState(data.chips || []);
-  
 
   useEffect(() => {
     setVariantOptions((prevOptions) =>
@@ -759,9 +768,7 @@ const AttributesRow = (props) => {
         if (e.id === _id) {
           return {
             ...e,
-            name: data.name
-              ? data.name
-              : displayValue,
+            name: data.name ? data.name : displayValue,
             chips: [...chips],
           };
         }
@@ -776,7 +783,7 @@ const AttributesRow = (props) => {
 
   const setNameRef = (event) => {
     nameRef.current = event.target.value;
-    setDisplayValue(nameRef.current)
+    setDisplayValue(nameRef.current);
   };
 
   //Handling Chips Creation on space or enter

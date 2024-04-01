@@ -6,7 +6,6 @@ import { Row, Col, Card, CardBody, CardTitle } from "reactstrap"
 
 import { connect } from "react-redux";
 
-//Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 
 import "../../pages/Tables/datatables.scss";
