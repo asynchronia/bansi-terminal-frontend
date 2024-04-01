@@ -27,7 +27,6 @@ const Dashboard = (props) => {
 
 
   const breadcrumbItems = [
-    { title: "Lexa", link: "#" },
     { title: "Dashboard", link: "#" }
   ]
 
@@ -36,10 +35,10 @@ const Dashboard = (props) => {
   },)
 
   const reports = [
-    { title: "Orders", iconClass: "cube-outline", total: "1,587", average: "+11%", badgecolor: "info" },
-    { title: "Revenue", iconClass: "buffer", total: "$46,782", average: "-29%", badgecolor: "danger" },
-    { title: "Average Price", iconClass: "tag-text-outline", total: "$15.9", average: "0%", badgecolor: "warning" },
-    { title: "Product Sold", iconClass: "briefcase-check", total: "1890", average: "+89%", badgecolor: "info" },
+    { title: "Ongoing Orders", iconClass: "cube-outline", total: "1,587", average: "+11%", badgecolor: "info" },
+    { title: "Delivered Orders", iconClass: "buffer", total: "1000", average: "-29%", badgecolor: "danger" },
+    { title: "Total Sales", iconClass: "tag-text-outline", total: "₹55,00,000", average: "0%", badgecolor: "warning" },
+    { title: "Pending Amount", iconClass: "briefcase-check", total: "₹5,00,000", average: "+89%", badgecolor: "info" },
   ]
 
   return (
@@ -58,42 +57,36 @@ const Dashboard = (props) => {
           <EmailSent />
         </Col>
 
-        <Col xl="3">
+        <Col xl="6">
           <MonthlyEarnings2 />
         </Col>
 
       </Row>
-      <Row>
+      {/* <Row>
 
         <Col xl="4" lg="6">
-          {/* inbox */}
           <Inbox />
         </Col>
         <Col xl="4" lg="6">
-          {/* recent activity */}
           <RecentActivity />
 
         </Col>
         <Col xl="4">
-          {/* widget user */}
           <WidgetUser />
 
-          {/* yearly sales */}
           <YearlySales />
         </Col>
       </Row>
 
       <Row>
         <Col xl="6">
-          {/* latest transactions */}
           <LatestTransactions />
         </Col>
 
         <Col xl="6">
-          {/* latest orders */}
           <LatestOrders />
         </Col>
-      </Row>
+      </Row> */}
 
     </React.Fragment>
   )
