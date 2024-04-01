@@ -11,7 +11,7 @@ import { setBreadcrumbItems } from "../../store/actions";
 import {useLocation} from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { getItemById } from "../../service/itemService";
+import { getItemByIdReq } from "../../service/itemService";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
@@ -55,7 +55,7 @@ const ViewItems = (props,{route,navigate}) => {
     }
 
     const getItemData = useCallback(async (body) => {
-      const response = await getItemById(bodyObject);
+      const response = await getItemByIdReq(bodyObject);
       
       if (response && response.payload && response.payload.item && response.payload.variants ) {
         const item = response.payload.item;
