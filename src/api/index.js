@@ -24,7 +24,8 @@ const API_URL = {
     getUserRole: '/api/roles/list',
     getItemData:"/api/items/get",
     getInvoiceDetails:"/api/invoices/id/",
-    getPaymentDetails : "/api/payments/id"
+    getPaymentDetails : "/api/payments/id",
+    getOrderDetails : "/api/orders/id"
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -180,6 +181,22 @@ export async function getPaymentDetails(id,body) {
     return new Promise((resolve, reject) => {
         axios
             .get(`${baseUrl}${API_URL.getPaymentDetails}/${id}`, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            }).catch(error => {
+                reject(error);
+            });
+    }).catch(error =>{
+        console.log(error);
+        return error?.response;
+    });
+}
+
+export async function getOrderDetails(id,body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(`${baseUrl}${API_URL.getOrderDetails}/${id}`, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

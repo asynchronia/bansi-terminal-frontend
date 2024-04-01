@@ -34,6 +34,19 @@ const AllOrders = (props) => {
     "limit": 200
   };
 
+  const redirectToViewPage = (id) =>{
+    // console.log("Order"+JSON.stringify(id));
+    let path = `/order/${id.salesorder_id}`; 
+     setTimeout(() => {
+      navigate(path,id);
+     }, 300); 
+  }
+
+  const handleViewClick = (id) =>{
+    console.log("GRID OBJECT >>>"+id);
+    redirectToViewPage(id);
+  }
+
   useEffect(() => {
     props.setBreadcrumbItems('All Orders', breadcrumbItems);
     if (!effectCalled.current) {
@@ -146,7 +159,8 @@ const AllOrders = (props) => {
       cellRenderer: DropdownMenuBtn,
       cellRendererParams: {
         handleResponse: handleDeleteResponse,
-        handleEditClick: handleEditClick
+        handleEditClick: handleEditClick,
+        handleViewClick: handleViewClick,
       },suppressMenu: true,floatingFilterComponentParams: {suppressFilterButton:true},
       tooltipValueGetter: (p) => p.value,headerTooltip: "Actions",
     }
