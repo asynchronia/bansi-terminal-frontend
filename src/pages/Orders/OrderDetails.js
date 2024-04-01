@@ -15,6 +15,7 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 import { getOrderDetailsReq } from "../../service/orderService";
+import OrderTrackingRenderer from "./OrderTrackingRenderer";
 
 const OrderDetails = (props) => {
   const { id } = useParams();
@@ -113,9 +114,36 @@ const OrderDetails = (props) => {
                 {/* <h3 className="secondary">Sales Order</h3>
                 <br/>
                 Sales Order #{orderData?.salesorder_number} */}
-                <h1 className="secondary">Sales Order</h1>
+                <h1 className="secondary">Sales Order 
+                   <button type="submit" className="btn btn-primary w-xl mr-3" style={{ margin: '0 10rem'}} >
+                    Draft
+                  </button>
+                </h1>
               <h6>Sales Order #{orderData?.salesorder_number}</h6>
-              <div>
+              <div style={{display: 'flex', margin: 'auto', width: '100vw'}}>
+                {/* Order Details. */}
+                
+                {/* First div */}
+                <OrderTrackingRenderer label={'Initiated'} date={'10-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
+                
+                {/* Dash line */}
+                <div style={{margin: '7px 0', marginLeft: '-31px', fontSize: '25px'}}>---</div>
+                
+                {/* Second div */}
+                <OrderTrackingRenderer label={'Approved'} date={'12-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
+                
+                {/* Dash line */}
+                <div style={{margin: '7px 0', marginLeft: '-31px', fontSize: '25px'}}>---</div>
+
+                {/* Third div */}
+                <OrderTrackingRenderer label={'Proceed'} date={'15-11-2023'} color={'transperent'} isCheck={false} />
+             
+                {/* Dash line */}
+                <div style={{margin: '7px 0', marginLeft: '-31px', fontSize: '25px'}}>---</div>
+                
+                {/* Fourth div */}
+                <OrderTrackingRenderer label={'Delivery'} date={'24-11-2023'} color={'transperent'} isCheck={false} />
+
               </div>
             </CardBody>
           </Card>
@@ -259,12 +287,17 @@ const OrderDetails = (props) => {
                               </AgGridReact>
                           </div>
                 </div>
-                <div className="content-above-table" style={{ textAlign: "right", marginRight: "10em" }}>
+                <div className="content-above-table" style={{ textAlign: "right", marginRight: "15.3em" }}>
                 <div className="details ">
-                <h4 className="secondary">Sub Total : 0.00</h4><br/>
-                <h4 className="secondary">CGST : 0.00</h4><br/>
-                <h4 className="secondary">SGST : 0.00</h4><br/>
-                <h4 className="secondary">Total : 0.00</h4><br/>
+                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px -12px'}}>Sub Total : <h4 style={{fontSize: '15px', margin: '-18px -95px'}}>0.00</h4></h4>
+                <p className="secondary" style={{margin: '-20px -32px'}}>Total Quantity 1</p>
+                <br/>
+                <h4 className="secondary" style={{fontSize: '15px', margin: '20px 18px'}}>CGST : <h4 style={{fontSize: '15px', margin: '-18px -125px'}}>0.00</h4></h4>
+                <br />
+                <h4 className="secondary" style={{fontSize: '15px', margin: '10px 21px'}}>SGST : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>0.00</h4></h4>
+                <br />
+                <hr style={{width: '117%'}} />
+                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px 21px'}}>Total : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>0.00</h4></h4>
                 </div>
                 </div>
               </CardBody>
