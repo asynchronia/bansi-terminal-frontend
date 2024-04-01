@@ -1,5 +1,6 @@
 import {
   createItem,
+  getItems,
   deleteItem,
   searchItem,
   getItemData,
@@ -12,15 +13,14 @@ export const createItemReq = async (body) => {
   const response = await createItem(body);
   return response;
 };
-export const getItemsReq = async (body) => {
+export const getItemByIdReq = async (body) => {
   const response = await getItemData(body);
-  return response
-  
+  return response;
 };
-export const getItemById = async (body = {}) => {
-  const response = await getItemData(body);
+export const getItemsReq = async (body = {}) => {
+  const response = await getItems(body);
   if (response.success && response.success === true) {
-    return response;
+    return response.payload.items;
   }
   return [];
 };
@@ -35,9 +35,9 @@ export const deletItemReq = async (body) => {
 };
 
 export const getTaxesReq = async () => {
-    const response = await getTaxes();
-    return response;
-  };
+  const response = await getTaxes();
+  return response;
+};
 
 export const searchItemReq = async (body) => {
   const response = await searchItem(body);

@@ -24,7 +24,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
-import { editItemReq, getCategoriesReq, getItemsReq, getTaxesReq } from "../../service/itemService";
+import { editItemReq, getCategoriesReq, getItemByIdReq, getTaxesReq } from "../../service/itemService";
 
 const EditItems = (props) => {
   const [itemsData, setItemsData] = useState({});
@@ -60,7 +60,7 @@ const EditItems = (props) => {
   const searchItemData = async (id) => {
     try {
       const data = { _id: id };
-      const res = await getItemsReq(data);
+      const res = await getItemByIdReq(data);
       setItemsData(res);
       setVariantData(res?.payload?.variants);
       setTaxArr(res?.payload?.item?.taxes[0]._id);
@@ -570,7 +570,7 @@ const EditItems = (props) => {
                       <select
                         id="taxes"
                         name="taxes"
-                        value={validation.values.taxes._id}
+                        value={validation.values?.taxes?._id}
                         onChange={handleTaxes}
                         onBlur={validation.handleBlur}
                         className="form-select focus-width"
