@@ -18,7 +18,7 @@ const OrderStatusRenderer = ({ value }) => {
       label = "Open";
       break;
     default:
-      color = "default";
+      return "";
   }
 
   return (
