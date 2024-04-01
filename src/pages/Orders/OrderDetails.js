@@ -17,17 +17,23 @@ import 'ag-grid-community/styles//ag-theme-quartz.css';
 import { getOrderDetailsReq } from "../../service/orderService";
 import OrderTrackingRenderer from "./OrderTrackingRenderer";
 
+
 const OrderDetails = (props) => {
   const { id } = useParams();
   const [orderData, setOrderData] = useState();
   const [lineItems ,setLineItems] = useState(0);
+  const [rowCount, setRowCount] = useState(0);
   const effectCalled = useRef(false);
   const gridRef = useRef();
+  const [totalItemTotal, setTotalItemTotal] = useState(0);
+  const [totalCGST, setTotalCGST] = useState(0);
+  const [totalSGST, setTotalSGST] = useState(0);
   const data = id ;
   //Handles BreadCrumbs
   const breadcrumbItems = [
       { title: "Dashboard", link: "#" },
       { title: "Sales Order", link: "#" },
+      // { title: "Order #"+orderData?.salesorder_number, link: "#" },
     ];
   
     const autoSizeStrategy = {
@@ -41,6 +47,16 @@ const OrderDetails = (props) => {
     const paginationPageSizeSelector = [5, 10, 25, 50];
     const [paginationPageSize, setPaginationPageSize ]= useState(5);
   
+    function OrderDetailsRenderer(params) {
+      const { data } = params;
+      const { quantity_shipped, quantity_packed, quantity_invoiced } = data;
+    
+      // Combine the quantities into a single string
+      const combinedQuantity = `Shipped ${quantity_shipped} \n Packed ${quantity_packed} \n Invoiced ${quantity_invoiced}`;
+    
+      // Return the combined quantity as the cell value
+      return combinedQuantity;
+    }
 
     const columnDefs = [
       {headerName: "Item & description", field: "description",suppressMenu: true,
@@ -50,7 +66,9 @@ const OrderDetails = (props) => {
       {headerName: "Warehouse Name", field: "warehouse_name",suppressMenu: true,
       floatingFilterComponentParams: {suppressFilterButton:true}},
       {headerName: "Status", field: "total",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true}},
+      floatingFilterComponentParams: {suppressFilterButton:true}
+      ,cellRenderer: OrderDetailsRenderer,
+      },
       {headerName: "Rate", field: "rate",suppressMenu: true,
       floatingFilterComponentParams: {suppressFilterButton:true}},
       {headerName: "Discount", field: "discount",suppressMenu: true,
@@ -65,16 +83,37 @@ const OrderDetails = (props) => {
      setPaginationPageSize(pageSize)
     }, []);
 
+    const processApiResponse = (response) => {
+      const lineItems = response.line_items || [];
+  
+    // Extract item_total, CGST, and SGST from each line_item
+    const itemTotals = lineItems.map(item => item.item_total);
+    const cgstTotals = lineItems.map(item => item.line_item_taxes.filter(tax => tax.tax_name.includes('CGST')).reduce((acc, tax) => acc + tax.tax_amount, 0));
+    const sgstTotals = lineItems.map(item => item.line_item_taxes.filter(tax => tax.tax_name.includes('SGST')).reduce((acc, tax) => acc + tax.tax_amount, 0));
+
+    // Calculate the total of all item_totals, CGST, and SGST
+    const totalItem = itemTotals.reduce((acc, curr) => acc + curr, 0);
+    const totalCGSTAmount = cgstTotals.reduce((acc, curr) => acc + curr, 0);
+    const totalSGSTAmount = sgstTotals.reduce((acc, curr) => acc + curr, 0);
+
+    // Set the totals to state
+    setTotalItemTotal(totalItem);
+    setTotalCGST(totalCGSTAmount);
+    setTotalSGST(totalSGSTAmount);
+    };
+
     const getOrderData =  useCallback(async (body) => {
       const response = await getOrderDetailsReq(body);
       setOrderData(response?.data);
-      setLineItems(response?.data?.line_items)
-      console.log("order details" + orderData);
-      props.setBreadcrumbItems(response?.data?.salesorder_number, breadcrumbItems);
+      setLineItems(response?.data?.line_items);
+      setRowCount(gridRef.current.api.getDisplayedRowCount());
+      processApiResponse(response?.data);
+      // console.log("order data"+ response?.data?.salesorder_number);
+      props.setBreadcrumbItems("Order #"+response?.data?.salesorder_number, breadcrumbItems);
   });
 
     useEffect(() => {
-      props.setBreadcrumbItems(orderData?.salesorder_number, breadcrumbItems);
+      props.setBreadcrumbItems("Order #"+orderData?.salesorder_number, breadcrumbItems);
       if (!effectCalled.current) {
         getOrderData(data);
         effectCalled.current=true;
@@ -82,11 +121,12 @@ const OrderDetails = (props) => {
     },[]); 
 
     useEffect(() => {
-      props.setBreadcrumbItems(orderData?.salesorder_number, breadcrumbItems);
+      // props.setBreadcrumbItems("Order #"+orderData?.salesorder_number, breadcrumbItems);
       if(paginationPageSize && paginationPageSize !== undefined){
         getOrderData(data);
       }
     },[paginationPageSize]);
+    
 
   return (
     <>
@@ -110,42 +150,24 @@ const OrderDetails = (props) => {
           </div>
         <Col>
           <Card>
-          <CardBody>
-                {/* <h3 className="secondary">Sales Order</h3>
-                <br/>
-                Sales Order #{orderData?.salesorder_number} */}
-                <h1 className="secondary">Sales Order 
-                   <button type="submit" className="btn btn-primary w-xl mr-3" style={{ margin: '0 10rem'}} >
-                    Draft
-                  </button>
-                </h1>
-              <h6>Sales Order #{orderData?.salesorder_number}</h6>
-              <div style={{display: 'flex', margin: 'auto', width: '100vw'}}>
-                {/* Order Details. */}
-                
-                {/* First div */}
-                <OrderTrackingRenderer label={'Initiated'} date={'10-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
-                
-                {/* Dash line */}
-                <div style={{margin: '7px 0', marginLeft: '-31px', fontSize: '25px'}}>---</div>
-                
-                {/* Second div */}
-                <OrderTrackingRenderer label={'Approved'} date={'12-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
-                
-                {/* Dash line */}
-                <div style={{margin: '7px 0', marginLeft: '-31px', fontSize: '25px'}}>---</div>
-
-                {/* Third div */}
-                <OrderTrackingRenderer label={'Proceed'} date={'15-11-2023'} color={'transperent'} isCheck={false} />
-             
-                {/* Dash line */}
-                <div style={{margin: '7px 0', marginLeft: '-31px', fontSize: '25px'}}>---</div>
-                
-                {/* Fourth div */}
-                <OrderTrackingRenderer label={'Delivery'} date={'24-11-2023'} color={'transperent'} isCheck={false} />
-
-              </div>
-            </CardBody>
+          <CardBody style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h1 className="secondary">Sales Order</h1>
+            <h6>Sales Order #{orderData?.salesorder_number}</h6>
+          </div>
+          <button type="submit" className="btn btn-primary w-md mr-3">
+            Draft
+          </button>
+        </CardBody>
+        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-evenly', margin: '5px 40px 30px 30px' }}>
+          <OrderTrackingRenderer label={'Initiated'} date={'10-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
+          <div style={{margin: '7px', marginLeft: '-15px', fontSize: '25px'}}>---</div>
+          <OrderTrackingRenderer label={'Approved'} date={'12-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
+          <div style={{margin: '7px', marginLeft: '-15px', fontSize: '25px'}}>---</div>
+          <OrderTrackingRenderer label={'Proceed'} date={'15-11-2023'} color={'#D3D3D3'} isCheck={false} />
+          <div style={{margin: '7px', marginLeft: '-15px', fontSize: '25px'}}>---</div>
+          <OrderTrackingRenderer label={'Delivery'} date={'24-11-2023'} color={'#D3D3D3'} isCheck={false} />
+        </div>
           </Card>
           <Row className="d-flex align-items-stretch">
                 {/* First Card */}
@@ -289,15 +311,15 @@ const OrderDetails = (props) => {
                 </div>
                 <div className="content-above-table" style={{ textAlign: "right", marginRight: "15.3em" }}>
                 <div className="details ">
-                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px -12px'}}>Sub Total : <h4 style={{fontSize: '15px', margin: '-18px -95px'}}>0.00</h4></h4>
-                <p className="secondary" style={{margin: '-20px -32px'}}>Total Quantity 1</p>
+                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px -12px'}}>Sub Total : <h4 style={{fontSize: '15px', margin: '-18px -95px'}}>₹ {totalItemTotal}</h4></h4>
+                <p className="secondary" style={{margin: '-20px -32px'}}>Total Quantity {rowCount}</p>
                 <br/>
-                <h4 className="secondary" style={{fontSize: '15px', margin: '20px 18px'}}>CGST : <h4 style={{fontSize: '15px', margin: '-18px -125px'}}>0.00</h4></h4>
+                <h4 className="secondary" style={{fontSize: '15px', margin: '20px 18px'}}>CGST : <h4 style={{fontSize: '15px', margin: '-18px -125px'}}>₹ {totalCGST}</h4></h4>
                 <br />
-                <h4 className="secondary" style={{fontSize: '15px', margin: '10px 21px'}}>SGST : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>0.00</h4></h4>
+                <h4 className="secondary" style={{fontSize: '15px', margin: '10px 21px'}}>SGST : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>₹ {totalSGST}</h4></h4>
                 <br />
                 <hr style={{width: '117%'}} />
-                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px 21px'}}>Total : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>0.00</h4></h4>
+                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px 21px'}}>Total : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>₹ {Math.round((totalItemTotal+totalCGST+totalSGST) * 100) / 100}</h4></h4>
                 </div>
                 </div>
               </CardBody>

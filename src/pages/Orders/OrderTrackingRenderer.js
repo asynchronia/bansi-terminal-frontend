@@ -8,7 +8,7 @@ const OrderTrackingRenderer = ({label, date, color, isCheck}) => {
         height: '50px',
         padding: '10px',
         margin: 0,
-        backgroundColor: {color},
+        backgroundColor: color,
         borderRadius: '10px', 
         marginRight: '30px'
         }}>
