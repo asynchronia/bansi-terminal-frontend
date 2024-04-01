@@ -1,4 +1,5 @@
 import axios from "axios";
+import { reject } from "lodash";
 
 const baseUrl = "https://bansi-terminal-backend.vercel.app";
 
@@ -24,7 +25,12 @@ const API_URL = {
     getUserRole: '/api/roles/list',
     getItemData:"/api/items/get",
     getInvoiceDetails:"/api/invoices/id/",
-    getPaymentDetails : "/api/payments/id"
+    getPaymentDetails : "/api/payments/id",
+    getOrderDetails : "/api/orders/id",
+    getAgreement: "/api/agreements/agreement",
+    editItem:"/api/items/update",
+    getTaxes:"/api/taxes/list",
+    getClientWithId:"/api/clients/get",
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -77,7 +83,7 @@ export async function createAgreement(body) {
             .then((res) => {
                 resolve(res.data);
                 return res.data;
-            });
+            })
     });
 }
 
@@ -88,6 +94,56 @@ export async function getItems(body) {
             .then((res) => {
                 resolve(res.data);
                 return res.data;
+            });
+    });
+}
+
+export async function getClientWithId(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getClientWithId}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+
+export async function getAgreement(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.getAgreement}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+            }).catch(error => {
+                reject(error.response.status);
+            });
+    });
+}
+
+export async function getTaxes() {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(`${baseUrl}${API_URL.getTaxes}`, { headers: getHeaders() })
+            .then((res) => {
+                
+                resolve(res.data);
+               
+            }).catch(error => {
+                reject(error.response.status);
+            });
+    });
+}
+
+export async function editItem(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.editItem}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+            }).catch(error => {
+                reject(error.response.status);
             });
     });
 }
@@ -180,6 +236,22 @@ export async function getPaymentDetails(id,body) {
     return new Promise((resolve, reject) => {
         axios
             .get(`${baseUrl}${API_URL.getPaymentDetails}/${id}`, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            }).catch(error => {
+                reject(error);
+            });
+    }).catch(error =>{
+        console.log(error);
+        return error?.response;
+    });
+}
+
+export async function getOrderDetails(id,body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(`${baseUrl}${API_URL.getOrderDetails}/${id}`, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

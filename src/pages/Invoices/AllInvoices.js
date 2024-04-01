@@ -110,7 +110,7 @@ const columnDefs = [
     floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Amount Due", field: "balance",suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true}},
-    {headerName: "", field: "action", sortable: false,
+    {headerName: "Action", field: "action", sortable: false,
     cellClass:"actions-button-cell",
     cellRenderer: InvoiceActionBtn,
     suppressMenu: true,
