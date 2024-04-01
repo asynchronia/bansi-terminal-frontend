@@ -86,12 +86,12 @@ class MonthlyEarnings extends Component {
 
                         <Row className="text-center mt-4">
                             <Col xs="6">
-                                <h5 className="font-size-20">$ 2548</h5>
-                                <p className="text-muted">Marketplace</p>
+                                <h5 className="font-size-20">₹ 10,00,000</h5>
+                                <p className="text-muted">Sales</p>
                             </Col>
                             <Col xs="6">
-                                <h5 className="font-size-20">$ 6985</h5>
-                                <p className="text-muted">Total Income</p>
+                                <h5 className="font-size-20">₹ 8,00,000</h5>
+                                <p className="text-muted">Purchases</p>
                             </Col>
                         </Row>
 
