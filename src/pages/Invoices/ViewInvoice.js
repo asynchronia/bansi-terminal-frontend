@@ -9,6 +9,7 @@ import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { getInvoiceReq } from "../../service/invoiceService";
 import { ToastContainer } from "react-toastify";
 import {indianNumberWords,formatNumberWithCommasAndDecimal} from "./invoiceUtil";
+import GenericPdfDownloader from "../../utility/GenericPdfDownloader";
 import "./styles/datatables.scss";
 import "./styles/ViewInvoice.scss";
 const ViewInvoice = (props) => {
@@ -215,8 +216,7 @@ const getTermsSection = () =>{
 
   return (
     <React.Fragment>
-      <div className="view-invoice">
-      <ToastContainer position="top-center" theme="colored" />
+      <div className="view-invoice" id="view-invoice">
       <div
           style={{
             position: "absolute",
@@ -225,9 +225,10 @@ const getTermsSection = () =>{
             display: "flex",
           }}
         >
-          <button type="submit" className="btn btn-outline-primary w-xl mx-3">
-            Download PDF
-          </button>
+         { responseObj && <GenericPdfDownloader 
+          downloadFileName={"view-invoice-"+responseObj.invoice_number} 
+          rootElementId="view-invoice" 
+        />}
           <button type="submit" className="btn btn-primary w-xl mx-3">
             Send on Mail
           </button>
