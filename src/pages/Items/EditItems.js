@@ -113,7 +113,7 @@ const EditItems = (props) => {
       });
     });
   
-    console.log(options);
+   
     setVariantOptions(options);
     setVariantDataChanged(false); // Reset variantDataChanged flag
   }, [variantData, variantDataChanged]); 
@@ -193,7 +193,9 @@ const EditItems = (props) => {
     searchAllTaxes();
   }, [loadedItem]);
 
+
   const handleVariantChange = (id, name, value) => {
+    
     const updatedVariants = variantData.map((variant) => {
       if (variant._id === id) {
         if (name === "attributes") {
@@ -201,7 +203,6 @@ const EditItems = (props) => {
             (attr) => attr.name === value.name
           );
           if (attributeIndex !== -1) {
-            
             const updatedAttributes = [...variant.attributes];
             updatedAttributes[attributeIndex] = value;
             return {
@@ -222,8 +223,17 @@ const EditItems = (props) => {
         };
       }
       return variant;
+    }).map((variant) => {
+      if (variant._id === id) {
+        // Remove _id from the updated variant
+        const { _id, ...rest } = variant;
+        return rest;
+      }
+      return variant;
     });
+    
     setVariantData(updatedVariants);
+    
   };
 
   const handleOtherChange = (name, value) => {
@@ -353,7 +363,7 @@ const EditItems = (props) => {
   };
 
   const handleAddVariantData = () => {
-    const newRow = { id: uuidv4(), attributes: [] };
+    const newRow = { _id: uuidv4(), attributes: [] };
     setVariantData([...variantData, newRow]);
   };
 
@@ -731,8 +741,8 @@ const EditItems = (props) => {
                 {variantData.map((row) => (
                   <AllVariantRows
                     data={row}
-                    key={row.id}
-                    _id={row.id}
+                    key={row._id}
+                    _id={row._id}
                     variantOptions={variantOptions}
                     disabledDelete={variantData.length === 1}
                     onChange={handleVariantChange}

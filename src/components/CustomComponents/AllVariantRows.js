@@ -4,7 +4,7 @@ import { Row, Col } from "reactstrap";
 
 const AllVariantRows = (props) => {
   const { _id, onDelete, variantOptions, disabledDelete, onChange, data } = props;
-  const reqId= data?._id? data?._id : _id;
+  
   
   const handleInputChange = (e) => {
     const {name, value } = e.target;
@@ -14,10 +14,9 @@ const AllVariantRows = (props) => {
         var obj={};
         obj.name=arr[1];
         obj.value=value;
-       
-        onChange(reqId, "attributes", obj );
+        onChange(_id, "attributes", obj );
     }else{
-        onChange(reqId, name, value);
+        onChange(_id, name, value);
     }
  
   };
@@ -114,7 +113,7 @@ const AllVariantRows = (props) => {
         <button
           type="button"
           className="btn btn-primary waves-effect waves-light mt-5"
-          onClick={() => onDelete(reqId)}
+          onClick={() => onDelete(_id)}
           disabled={disabledDelete}
         >
           <i className="mdi mdi-18px mdi-delete"></i>
