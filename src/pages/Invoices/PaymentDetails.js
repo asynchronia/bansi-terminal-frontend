@@ -10,13 +10,47 @@ import "react-toastify/dist/ReactToastify.css";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
 import { ToastContainer } from "react-toastify";
-
+import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 import './styles/PaymentDetailsCard.scss' 
 import { getPaymentDetailsReq } from "../../service/invoiceService";
-import {indianNumberWords,formatNumberWithCommasAndDecimal} from "./invoiceUtil";
+const options: Options = {
+  filename: "payment.pdf",
+  method: "save",
+  // default is Resolution.MEDIUM = 3, which should be enough, higher values
+  // increases the image quality but also the size of the PDF, so be careful
+  // using values higher than 10 when having multiple pages generated, it
+  // might cause the page to crash or hang.
+  resolution: Resolution.MEDIUM,
+  page: {
+    // margin is in MM, default is Margin.NONE = 0
+    margin: Margin.MEDIUM,
+    // default is 'A4'
+    format: "A4",
+    // default is 'portrait'
+    orientation: "portrait"
+  },
+  canvas: {
+    // default is 'image/jpeg' for better size performance
+    mimeType: "image/jpeg",
+    qualityRatio: 1
+  },
+  // Customize any value passed to the jsPDF instance and html2canvas
+  // function. You probably will not need this and things can break,
+  // so use with caution.
+  overrides: {
+    // see https://artskydj.github.io/jsPDF/docs/jsPDF.html for more options
+    pdf: {
+      compress: true
+    },
+    // see https://html2canvas.hertzen.com/configuration for more options
+    canvas: {
+      useCORS: true
+    }
+  }
+};
 const PaymentDetails = (props) => {
   const { id } = useParams();
   const [paymentData, setPaymentData] = useState();
@@ -85,13 +119,10 @@ const PaymentDetails = (props) => {
       }
     },[]); 
 
-    useEffect(() => {
-      props.setBreadcrumbItems(paymentData?.payment_number, breadcrumbItems);
-      if(paginationPageSize && paginationPageSize !== undefined){
-        getPaymentData(data);
-      }
-    },[paginationPageSize]);
 
+  const getTargetElement = () => document.getElementById("payment-container");
+
+  const downloadPDF = () => generatePDF(getTargetElement, options);
   return (
     <>
       <div style={{ position: "relative" }}>
@@ -104,14 +135,14 @@ const PaymentDetails = (props) => {
             display: "flex",
           }}
         >
-          <button type="submit" className="btn btn-outline-primary w-xl mx-3">
+          <button type="submit" className="btn btn-outline-primary w-xl mx-3" onClick={downloadPDF}>
             Download PDF
           </button>
           <button type="submit" className="btn btn-primary w-xl mx-3">
             Send on Mail
           </button>
           </div>
-        <Col>
+        <Col id="payment-container">
           <Card>
             <CardBody>
               <div class="card-content">
