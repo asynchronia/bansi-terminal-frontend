@@ -45,6 +45,7 @@ import PaymentDetails from "../pages/Invoices/PaymentDetails"
 import Login from "../pages/Authentication/Login";
 import ViewInvoice from "../pages/Invoices/ViewInvoice";
 import OrderDetails from "../pages/Orders/OrderDetails";
+import Users from "../pages/Users/Users"
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -131,6 +132,7 @@ const userRoutes = [
   { path: "/payment/:id", component: <PaymentDetails/>},
   { path: "/view-invoice/:id", component: <ViewInvoice />},
   { path: "/order/:id", component: <OrderDetails/>},
+  { path: "/users", component: <Users/>},
   // // this route should be at the end of all other routes
   {
     path: "/",
