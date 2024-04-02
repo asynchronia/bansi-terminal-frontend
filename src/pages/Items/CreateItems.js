@@ -62,10 +62,11 @@ const CreateItems = (props) => {
         position: "top-center",
         theme: "colored",
       });
+      setTimeout(()=>{
+        navigate('/items');
+      }, [5000])
     }
-    setTimeout(()=>{
-      navigate('/items');
-    }, [5000])
+    
   };
 
   const handleTaxes = (e) => {
