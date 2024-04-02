@@ -26,6 +26,7 @@ const API_URL = {
     getItemData:"/api/items/get",
     getInvoiceDetails:"/api/invoices/id/",
     getPaymentDetails : "/api/payments/id",
+    getInvoice:'/api/invoices/id/',
     getOrderDetails : "/api/orders/id",
     getAgreement: "/api/agreements/agreement",
     editItem:"/api/items/update",
@@ -372,11 +373,10 @@ export async function login(body) {
     });
 }
 
-
-export async function signin(body) {
-    return new Promise((resolve) => {
+export async function getInvoice(body, id) {
+    return new Promise((resolve, reject) => {
         axios
-            .post(`${baseUrl}${API_URL.signin}`, body)
+            .get(`${baseUrl}${API_URL.getInvoice+id}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -388,3 +388,15 @@ export async function signin(body) {
     });
 }
 
+export async function signin(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.signin}`, body)
+            .catch(error => {
+                reject(error);
+            });
+    }).catch(error => {
+        console.log(error);
+        return error.response.data;
+    });
+}
