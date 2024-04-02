@@ -35,6 +35,7 @@ const Users = (props) => {
   const navigate = useNavigate();
   const effectCalled = useRef(false);
   const [usersData,setUsersData] = useState([]);
+  const [chips, setChips] = useState([]);
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -81,6 +82,17 @@ const Users = (props) => {
       <UserCardDetails key={index} usersData={user} />
     ));
   };
+
+  const handleInputChange = (e) =>{
+        if(e.key === 'Enter') {
+          e.preventDefault();
+        const inputText = e.target.value.trim();
+        if(inputText) {
+          setChips([...chips, inputText]);
+          e.target.value = '';
+        }
+  }
+  }
   
 
   return (
@@ -173,7 +185,7 @@ const Users = (props) => {
                   name="contact"
                   className="form-control"
                   type="text"
-                  placeholder="Enter Email id"
+                  placeholder="Enter Contact Number"
                   onChange={null}
                   onBlur={null}
                   value={null}
@@ -189,7 +201,43 @@ const Users = (props) => {
                   name="gender"
                   className="form-control"
                   type="text"
-                  placeholder="Set Password"
+                  placeholder="Enter Gender"
+                  onChange={null}
+                  onBlur={null}
+                  value={null}
+                  invalid={null}
+                />
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs="12">
+              <div className="mt-3 mb-0">
+                <label className="contact">Branch Access</label>
+                <input
+                  id="contact"
+                  name="contact"
+                  className="form-control"
+                  type="text"
+                  placeholder="Enter Branch Access"
+                  onKeyDown={handleInputChange}
+                  value={chips.join(',')}
+                  onBlur={null}
+                  invalid={null}
+                />
+              </div>
+            </Col>
+            </Row>
+            <Row>
+            <Col xs="12">
+              <div className="mt-3 mb-0">
+                <label className="Gender">User Role</label>
+                <input
+                  id="gender"
+                  name="gender"
+                  className="form-control"
+                  type="text"
+                  placeholder="Enter User Role"
                   onChange={null}
                   onBlur={null}
                   value={null}
@@ -211,7 +259,6 @@ const Users = (props) => {
       {renderUserCards()}
     </Col>
     </Row>
-X``
       </Form>
     </div>
   );
