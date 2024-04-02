@@ -48,13 +48,6 @@ const ViewInvoice = (props) => {
   const autoSizeStrategy = {
     type: 'fitGridWidth'
   };
-  // enables pagination in the grid
-  const pagination = true;
-
-  // sets 10 rows per page (default is 100)
-  // allows the user to select the page size from a predefined list of page sizes
-  // const paginationPageSizeSelector = [5, 10, 20, 50, 100];
-  const paginationPageSizeSelector = [25,50,100];
 
  
   const [rowData, setRowData] = useState([]);
