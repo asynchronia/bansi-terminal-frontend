@@ -37,6 +37,7 @@ const EditItems = (props) => {
   const [variantOptions, setVariantOptions] = useState([]);
   const [deletedVariant, setDeletedVariant] = useState([]);
   const [itemType, setItemType]= useState('variable');
+  const [variantDataChanged, setVariantDataChanged] = useState(false);
 
   const [categoryData, setCategoryData] = useState({
     name: "",
@@ -87,30 +88,36 @@ const EditItems = (props) => {
   }, [loadedItem]);
 
   useEffect(() => {
-    let options = [];
+    let options = [...variantOptions]; // Make a copy of the current variantOptions
     let products = variantData;
+  
     products.forEach((product) => {
       product.attributes.forEach((attribute) => {
-        const existingOption = options.find(
+        const existingOptionIndex = options.findIndex(
           (option) => option.name === attribute.name
         );
-
-        if (!existingOption) {
+  
+        if (existingOptionIndex === -1) {
+          // Option doesn't exist, add it with the new value
           options.push({
             id: uuidv4(),
             name: attribute.name,
             chips: [attribute.value],
           });
         } else {
-          if (!existingOption.chips.includes(attribute.value)) {
-            existingOption.chips.push(attribute.value);
+          // Option exists, update chips if value is not already present
+          if (!options[existingOptionIndex].chips.includes(attribute.value)) {
+            options[existingOptionIndex].chips.push(attribute.value);
           }
         }
       });
     });
-
+  
+   
     setVariantOptions(options);
-  }, [variantData]);
+    setVariantDataChanged(false); // Reset variantDataChanged flag
+  }, [variantData, variantDataChanged]); 
+  
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -119,14 +126,10 @@ const EditItems = (props) => {
         theme: "colored",
       });
     } else {
-      toast.success(message, {
-        position: "top-center",
-        theme: "colored",
-      });
+      let path = `/view-item/${id}`
+      navigate(path);
     }
-    setTimeout(()=>{
-      navigate('/items');
-    }, [5000])
+    
   };
 
   const handleTaxes = (e) => {
@@ -185,7 +188,9 @@ const EditItems = (props) => {
     searchAllTaxes();
   }, [loadedItem]);
 
+
   const handleVariantChange = (id, name, value) => {
+    
     const updatedVariants = variantData.map((variant) => {
       if (variant._id === id) {
         if (name === "attributes") {
@@ -193,7 +198,6 @@ const EditItems = (props) => {
             (attr) => attr.name === value.name
           );
           if (attributeIndex !== -1) {
-            // Update the value if the attribute name already exists
             const updatedAttributes = [...variant.attributes];
             updatedAttributes[attributeIndex] = value;
             return {
@@ -214,8 +218,17 @@ const EditItems = (props) => {
         };
       }
       return variant;
+    }).map((variant) => {
+      if (variant._id === id) {
+        // Remove _id from the updated variant
+        const { _id, ...rest } = variant;
+        return rest;
+      }
+      return variant;
     });
+    
     setVariantData(updatedVariants);
+    
   };
 
   const handleOtherChange = (name, value) => {
@@ -345,7 +358,7 @@ const EditItems = (props) => {
   };
 
   const handleAddVariantData = () => {
-    const newRow = { id: uuidv4(), attributes: [] };
+    const newRow = { _id: uuidv4(), attributes: [] };
     setVariantData([...variantData, newRow]);
   };
 
@@ -723,8 +736,8 @@ const EditItems = (props) => {
                 {variantData.map((row) => (
                   <AllVariantRows
                     data={row}
-                    key={row.id}
-                    _id={row.id}
+                    key={row._id}
+                    _id={row._id}
                     variantOptions={variantOptions}
                     disabledDelete={variantData.length === 1}
                     onChange={handleVariantChange}
