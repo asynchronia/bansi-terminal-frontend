@@ -51,20 +51,15 @@ const CreateItems = (props) => {
     sellingPrice: "",
   });
 
-  const notify = (type, message) => {
+  const notify = (type, message, id) => {
     if (type === "Error") {
       toast.error(message, {
         position: "top-center",
         theme: "colored",
       });
     } else {
-      toast.success(message, {
-        position: "top-center",
-        theme: "colored",
-      });
-      setTimeout(()=>{
-        navigate('/items');
-      }, [5000])
+      let path = `/view-item/${id}`
+      navigate(path);
     }
     
   };
@@ -129,7 +124,7 @@ const CreateItems = (props) => {
     try {
       const response = await createItemReq(values);
       if (response.success === true) {
-        notify("Success", response.message);
+        notify("Success", response.message, response.payload.itemId);
       } else {
         notify("Error", response.message);
       }

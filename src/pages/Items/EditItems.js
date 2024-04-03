@@ -126,13 +126,8 @@ const EditItems = (props) => {
         theme: "colored",
       });
     } else {
-      toast.success(message, {
-        position: "top-center",
-        theme: "colored",
-      });
-      setTimeout(()=>{
-        navigate('/items');
-      }, [5000])
+      let path = `/view-item/${id}`
+      navigate(path);
     }
     
   };
