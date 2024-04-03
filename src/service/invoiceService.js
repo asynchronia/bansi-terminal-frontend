@@ -1,4 +1,5 @@
-import { getInvoices,getPaymentList,getPaymentDetails} from "../api";
+
+import { getInvoices,getPaymentList,getPaymentDetails, getInvoice} from "../api";
 
 export const getInvoicesReq = async (body = {}) => {
     const response = await getInvoices(body);
@@ -24,3 +25,10 @@ export const getPaymentReq = async (body = {}) => {
     return [];
 };
 
+export const getInvoiceReq = async (body = {}, id) => {
+    const response = await getInvoice(body, id);
+    if(response.success && response.success === true){
+        return response.payload.data;
+    }
+    return [];
+};
