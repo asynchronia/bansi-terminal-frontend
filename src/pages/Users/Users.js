@@ -28,7 +28,35 @@ import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getUserListReq } from "../../service/usersService";
 import UserCardDetails from "./UserCardDetails";
+import Select from '@mui/material/Select';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Chip from '@mui/material/Chip';
+import MenuItem from '@mui/material/MenuItem';
+import {InputLabel} from "@mui/material";
+import { useTheme } from '@mui/material/styles';
+import FormControl from '@mui/material/FormControl';
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
+import { getUserWarehouseListReq } from "../../service/usersService";
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {  
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(name, personName, theme) {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
 
 const Users = (props) => {
   
@@ -36,6 +64,10 @@ const Users = (props) => {
   const effectCalled = useRef(false);
   const [usersData,setUsersData] = useState([]);
   const [chips, setChips] = useState([]);
+  const [warehouseList, setWarehouseList] = useState([]);
+  const theme = useTheme();
+  const [createmenu, setCreateMenu] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('User role');
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -54,6 +86,19 @@ const Users = (props) => {
     }, [5000])
   };
 
+  const names = [
+    'Oliver Hansen',
+    'Van Henry',
+    'April Tucker',
+    'Ralph Hubbard',
+    'Omar Alexander',
+    'Carlos Abbott',
+    'Miriam Wagner',
+    'Bradley Wilkerson',
+    'Virginia Andrews',
+    'Kelly Snyder',
+  ];
+
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
@@ -66,6 +111,19 @@ const Users = (props) => {
       setUsersData(response?.payload);
     } 
   });  
+
+
+    const warehouseData = useCallback(async (body) => {
+        const response = await getUserWarehouseListReq(usersData.role);
+        if (response && response.payload) {
+          // console.log(response);
+            // setWarehouseList(response?.payload?.warehouses.map((item, i)=>(
+            //   <div key={i}>{item?.name}</div>
+            //   )));
+          } 
+    }); 
+    warehouseData();
+
 
   useEffect(() => {
     props.setBreadcrumbItems("Users", breadcrumbItems);
@@ -92,8 +150,21 @@ const Users = (props) => {
           e.target.value = '';
         }
   }
+  };
+
+  const handleWarehouseChange = (event) =>{
+    const {
+      target: { value },
+    } = event;
+    setWarehouseList(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
+  const handleRoleChange = (event) =>{
+    setSelectedRole(event.target.value);
   }
-  
 
   return (
     <div style={{ position: "relative" }}>
@@ -213,37 +284,67 @@ const Users = (props) => {
           <Row>
             <Col xs="12">
               <div className="mt-3 mb-0">
-                <label className="contact">Branch Access</label>
-                <input
-                  id="contact"
-                  name="contact"
-                  className="form-control"
-                  type="text"
-                  placeholder="Enter Branch Access"
-                  onKeyDown={handleInputChange}
-                  value={chips.join(',')}
-                  onBlur={null}
-                  invalid={null}
-                />
+                <label className="contact">Warehouse Access</label>
+                
+                <Row>
+                <FormControl sx={{ m: 1, width: 300 }} >
+                  <InputLabel id="demo-multiple-chip-label">Warehouse</InputLabel>
+                  <Select
+                    labelId="demo-multiple-chip-label"
+                    id="demo-multiple-chip"
+                    multiple
+                    value={warehouseList}
+                    onChange={handleWarehouseChange}
+                    input={<OutlinedInput id="select-multiple-chip" label="Warehouse" />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} />
+                          ))}
+                      </Box>
+                        )}
+                        MenuProps={MenuProps}
+                      >
+                        {names.map((name) => (
+                          <MenuItem
+                            key={name}
+                            value={name}
+                            style={getStyles(name, warehouseList, theme)}
+                            >
+                            {name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                </Row>
+
               </div>
             </Col>
             </Row>
             <Row>
             <Col xs="12">
-              <div className="mt-3 mb-0">
-                <label className="Gender">User Role</label>
-                <input
-                  id="gender"
-                  name="gender"
-                  className="form-control"
-                  type="text"
-                  placeholder="Enter User Role"
-                  onChange={null}
-                  onBlur={null}
-                  value={null}
-                  invalid={null}
-                />
-              </div>
+                <div className="dropdown dropdown-topbar pt-3 mt-1 d-inline-block" >
+                    <label className="contact">User Role</label>
+                  <Row>
+                  <FormControl sx={{ m: 1, minWidth: 283 }}>
+                        <InputLabel id="demo-simple-select-helper-label" >User Role</InputLabel>
+                        <Select
+                          labelId="demo-simple-select-helper-label"
+                          id="demo-simple-select-helper"
+                          value={selectedRole}
+                          label="User Role"
+                          onChange={handleRoleChange}
+                        >
+                          <MenuItem value="">
+                            <em>None</em>
+                          </MenuItem>
+                          <MenuItem value="Admin" >Admin</MenuItem>
+                          <MenuItem value="superAdmin">superAdmin</MenuItem>
+                          <MenuItem value="clientAdmin">clientAdmin</MenuItem>
+                        </Select>
+                      </FormControl>
+                      </Row>
+                </div>
             </Col>
           </Row>
           <div className="mt-3 mb-0">
