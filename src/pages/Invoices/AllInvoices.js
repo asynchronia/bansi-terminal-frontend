@@ -29,9 +29,16 @@ const AllInvoices = (props) => {
     let path = "/view-invoice/"+id; 
      setTimeout(() => {
       navigate(path, id);
-     }, 400); 
-      
+     }, 400);     
   }
+  
+  const redirectToEditPage = (id) =>{
+    // let path = "/Edit-invoice/"+id; 
+    //  setTimeout(() => {
+    //   navigate(path, id);
+    //  }, 400);     
+  }
+
   const notify = (type, message) => {
     if (type === "Error") {
       toast.error(message, {
