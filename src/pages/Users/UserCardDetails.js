@@ -2,22 +2,21 @@ import React, { useState } from 'react';
 import { useCallback } from 'react';
 import { Card, CardBody, Row, Col, Button } from 'reactstrap';
 import Chip from '@mui/material/Chip';
-import { getUserRoleListReq, getUserWarehouseListReq } from '../../service/usersService';
-
+import { getUserRoleListReq } from '../../service/usersService';
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg"
+import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.svg"
 
 const UserCardDetails = (user) => {
 
     const [userRole, setUserRole] = useState('');
 
-    // console.log("user"+JSON.stringify(user));
+    
     const color = user?.usersData?.status==="active" ? '#2ecc71' : "red";
-    // console.log(user?.usersData?.associatedBranch?.isPrimary);
+    
     
     const roleData = useCallback(async (body) => {
       const response = await getUserRoleListReq(user.usersData.role);
       if (response && response.payload) {
-          // console.log(user.usersData.role);
-          // console.log(response?.payload.roles.filter(role=>role._id===user.usersData.role)[0].title);
           setUserRole(response?.payload.roles.filter(role=>role._id===user.usersData.role)[0].title);
       } 
     });  
@@ -37,12 +36,8 @@ const UserCardDetails = (user) => {
             <h3 className="card-title">{user?.usersData?.firstName} {user?.usersData?.lastName}</h3>
           </Col>
           <Col xs="auto" className="ml-auto">
-            <Button color="secondary">
-              <i className="mdi mdi-account-edit"></i>
-            </Button>
-            <Button color="danger">
-              <i className="mdi mdi-close-circle"></i>
-            </Button>
+            <Edit style={{cursor:'pointer', marginRight:'0.4rem'}} />
+            <Delete style={{cursor:'pointer'}}/>
           </Col>
         </Row>
         <Row className="mt-3">

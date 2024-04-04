@@ -35,20 +35,20 @@ const Login = props => {
     }),
     onSubmit: async (values) => {
       // dispatch(loginUser(values, props.router.navigate));
-      console.log(values);
+      
       const response = await loginReq(values);
-      console.log(response);
+      
       try {
         if (response.success) {
-          console.log(response);
+          
           localStorage.setItem("accessToken", response.payload.accessToken);
           props.router.navigate("/dashboard");
         } else {
-          console.log('component try else', response);
+          
           setError(response.message);
         }
       } catch (error) {
-        console.log('component catch error', error);
+        // console.log('component catch error', error);
         setError(error.message);
       }
     }

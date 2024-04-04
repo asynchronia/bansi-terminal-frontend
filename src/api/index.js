@@ -181,10 +181,10 @@ export async function getBranchList(body) {
     });
 }
 
-export async function getWarehouseList() {
+export async function getWarehouseList(body) {
     return new Promise((resolve) => {
         axios
-            .get(`${baseUrl}${API_URL.getWarehouseList}`, { headers: getHeaders() })
+            .get(`${baseUrl}${API_URL.getWarehouseList}`,body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

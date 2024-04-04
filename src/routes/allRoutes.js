@@ -118,7 +118,7 @@ const userRoutes = [
   { path: "/edit-item/:id", component: <EditItems /> },
   { path: "/client/add", component: <CreateClient /> },
   { path: "/items", component: <AllItems /> },
-  { path: "/view-item", component: <ViewItems />},
+  { path: "/view-item/:id", component: <ViewItems />},
   { path: "/clients", component: <AllClients /> },
   { path: "/categories", component: <AddCategory /> },
   { path: "/dashboard", component: <Dashboard /> },

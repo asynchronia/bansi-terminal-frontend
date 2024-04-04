@@ -1,6 +1,6 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Card, CardBody, CardTitle, Button, Input, Modal } from "reactstrap"
+import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap"
 
 import { connect } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
@@ -66,14 +66,12 @@ const AllInvoices = (props) => {
     getListOfRowData();
   } 
   const handleEditClick = (id) =>{
-    console.log("GRID OBJECT >>>"+id);
     redirectToEditPage(id);
   }
 
 const columnDefs = [
     {headerName: "Invoice Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true,
      cellRenderer: (props)=>{
-        console.log("created on props"+props.data);
         let date= new Date(props.value);
         return <>{date.toDateString()}</>
       },suppressMenu: true,
@@ -86,7 +84,6 @@ const columnDefs = [
     floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Status", field: "status", width:200,
      cellRenderer: (props)=>{
-        console.log("created on props"+props.data);
         let due_date= new Date(props.data.due_date);
         
         let curr_date = new Date();
@@ -98,9 +95,9 @@ const columnDefs = [
           statusClass = statusClass + "red";
         }else{
           let days= getDifferenceInDays(curr_date, due_date);
-          console.log("Pending days"+days);
+          
           days>0 ? status_msg = "Pending in "+days+" day(s)" : status_msg="";
-          console.log("Pending days status"+status_msg);
+          
           statusClass = statusClass + "green";
         }
         return <><p className="status-field">{getDateInFormat(due_date)}</p><p className={statusClass}>{status_msg}</p> </>
@@ -131,7 +128,7 @@ const [allCustomers, setAllCustomers] = useState([]);
 const [customer, setCustomer] = useState("");
 const [rowData, setRowData] = useState([]);
 const [searchValue, setSearchValue] = useState("");
-const [gridApi, setGridApi] = useState(null);
+
 const [paginationPageSize, setPaginationPageSize ]= useState(25);
 const [currRowItem, setCurrRowItem] = useState(null);
 const [modal_standard, setmodal_standard] = useState(false)
@@ -150,10 +147,8 @@ function removeBodyCss() {
   document.body.classList.add("no_padding")
 }
 const onPaginationChanged = useCallback((event) => {
-  console.log('onPaginationPageLoaded', event);
   // Workaround for bug in events order
  let pageSize=  gridRef.current.api.paginationGetPageSize();
- console.log("PAGE SIZE"+pageSize);
  setPaginationPageSize(pageSize);
   
 }, []);
@@ -173,15 +168,13 @@ const onPaginationChanged = useCallback((event) => {
 * */
 const getListOfRowData =  useCallback(async (body) => {
     const response = await getInvoicesReq(body);
-    console.log(response);
+    
     let custList = new Set();
      response.map((val,id)=>{
-      console.log("CUSTOMER "+val.customer_name);
       custList.add(val.customer_name);
     });
     let custArr = [];
     {custList?.forEach((val,key,set) => {
-      console.log("CUSTOMER "+val);
        custArr.push(val);
      })}
 
@@ -236,11 +229,9 @@ useEffect(() => {
 },[paginationPageSize]);
 
 const handleChange = (e) =>{
- console.log("handle change category"+e.target.value);
  setCustomer(e.target.value);
 }
 const handleInputChange = (e) =>{
-  console.log("handle search"+e.target.value);
   setSearchValue(e.target.value);
  }
 

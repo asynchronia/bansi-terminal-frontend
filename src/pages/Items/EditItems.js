@@ -44,7 +44,7 @@ const EditItems = (props) => {
     show: false,
   });
   const navigate = useNavigate();
-  // console.log(variantOptions)
+
 
   const [otherData, setOtherData] = useState({
     sku: "",

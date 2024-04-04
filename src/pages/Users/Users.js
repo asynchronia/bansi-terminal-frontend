@@ -4,26 +4,12 @@ import {
   Col,
   Card,
   CardBody,
-  Label,
-  Input,
-  CardTitle,
   Form,
-  Button,
 } from "reactstrap";
 import "react-toastify/dist/ReactToastify.css";
-import Dropzone from "react-dropzone";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import InputWithChips from "../../components/CustomComponents/InputWithChips";
-import { v4 as uuidv4 } from "uuid";
-import * as Yup from "yup";
-import { useFormik } from "formik";
-import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
-import axios from "axios";
-import { createItemReq } from "../../service/itemService";
 import { ToastContainer, toast } from "react-toastify";
-import Standard from "../../components/CustomComponents/Standard";
-import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getUserListReq } from "../../service/usersService";
@@ -35,8 +21,7 @@ import MenuItem from '@mui/material/MenuItem';
 import {InputLabel} from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import FormControl from '@mui/material/FormControl';
-import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from "reactstrap";
-import { getUserWarehouseListReq } from "../../service/usersService";
+import { getUserWarehouseListReq, getUserRoleListReq } from "../../service/usersService";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -65,9 +50,10 @@ const Users = (props) => {
   const [usersData,setUsersData] = useState([]);
   const [chips, setChips] = useState([]);
   const [warehouseList, setWarehouseList] = useState([]);
+  const [warehouseListData, setWarehouseListData] = useState([]);
   const theme = useTheme();
-  const [createmenu, setCreateMenu] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('User role');
+  const [selectRole, setSelectRole] = useState();
+  const [selectedRole, setSelectedRole] = useState([]);
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -116,26 +102,41 @@ const Users = (props) => {
     const warehouseData = useCallback(async (body) => {
         const response = await getUserWarehouseListReq(usersData.role);
         if (response && response.payload) {
-          // console.log(response);
-            // setWarehouseList(response?.payload?.warehouses.map((item, i)=>(
-            //   <div key={i}>{item?.name}</div>
-            //   )));
+          
+            setWarehouseListData(response?.payload?.warehouses.map((item, i)=>(
+              <div key={i}>{item?.name}</div>
+              )));
           } 
     }); 
-    warehouseData();
+   
+    const rolesData = useCallback(async (body) => {
+        const response = await getUserRoleListReq(usersData.role);
+        if (response && response.payload) {
+          
+            setSelectedRole(response?.payload?.roles.map((item, i)=>(
+              <div key={i}>{item?.title}</div>
+              )));
+          } 
+    }); 
+
+    // const handleDelete = (chipToDelete) => () =>{
+    //   setWarehouseList((warehouseList)=>warehouseList.filter((chips)=>chips!==chipToDelete));
+    // }
 
 
   useEffect(() => {
     props.setBreadcrumbItems("Users", breadcrumbItems);
     if (!effectCalled.current) {
       getUsersData();
+      warehouseData();
+      rolesData();
       // getCategories();
       effectCalled.current=true;
     }
   },[]); 
 
   const renderUserCards = () => {
-    console.log(usersData);
+    
     return usersData?.map((user, index) => (
       <UserCardDetails key={index} usersData={user} />
     ));
@@ -163,7 +164,7 @@ const Users = (props) => {
   };
 
   const handleRoleChange = (event) =>{
-    setSelectedRole(event.target.value);
+    setSelectRole(event.target.value);
   }
 
   return (
@@ -305,11 +306,11 @@ const Users = (props) => {
                         )}
                         MenuProps={MenuProps}
                       >
-                        {names.map((name) => (
+                        {warehouseListData.map((name) => (
                           <MenuItem
                             key={name}
                             value={name}
-                            style={getStyles(name, warehouseList, theme)}
+                            style={getStyles(name, warehouseListData, theme)}
                             >
                             {name}
                           </MenuItem>
@@ -331,16 +332,22 @@ const Users = (props) => {
                         <Select
                           labelId="demo-simple-select-helper-label"
                           id="demo-simple-select-helper"
-                          value={selectedRole}
+                          value={selectRole}
                           label="User Role"
                           onChange={handleRoleChange}
                         >
                           <MenuItem value="">
                             <em>None</em>
                           </MenuItem>
-                          <MenuItem value="Admin" >Admin</MenuItem>
-                          <MenuItem value="superAdmin">superAdmin</MenuItem>
-                          <MenuItem value="clientAdmin">clientAdmin</MenuItem>
+                          {selectedRole.map((name) => (
+                          <MenuItem
+                            key={name}
+                            value={name}
+                            style={getStyles(name, selectedRole, theme)}
+                            >
+                            {name}
+                          </MenuItem>
+                        ))}
                         </Select>
                       </FormControl>
                       </Row>

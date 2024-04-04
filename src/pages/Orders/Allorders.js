@@ -35,7 +35,6 @@ const AllOrders = (props) => {
   };
 
   const redirectToViewPage = (id) =>{
-    // console.log("Order"+JSON.stringify(id));
     let path = `/order/${id.salesorder_id}`; 
      setTimeout(() => {
       navigate(path,id);
@@ -43,7 +42,6 @@ const AllOrders = (props) => {
   }
 
   const handleViewClick = (id) =>{
-    console.log("GRID OBJECT >>>"+id);
     redirectToViewPage(id);
   }
 

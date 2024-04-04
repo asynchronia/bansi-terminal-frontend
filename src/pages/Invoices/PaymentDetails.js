@@ -65,7 +65,6 @@ const PaymentDetails = (props) => {
       setPaymentData(response);
       props.setBreadcrumbItems(response?.payment_number, breadcrumbItems);
       if (response) {
-        console.log("Payment Data"+ paymentData?.invoices);
         let totalInvoicesAmount = 0;
         let totalBalanceAmount = 0;
         for (const invoice of response.invoices) {
