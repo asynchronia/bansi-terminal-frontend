@@ -105,21 +105,20 @@ const PaymentDetails = (props) => {
     setPaginationPageSize(pageSize)
   }, []);
 
-  const getPaymentData = useCallback(async (body) => {
-    const response = await getPaymentDetailsReq(body);
-    setPaymentData(response);
-    props.setBreadcrumbItems(response?.payment_number, breadcrumbItems);
-    if (response) {
-      console.log("Payment Data" + paymentData?.invoices);
-      let totalInvoicesAmount = 0;
-      let totalBalanceAmount = 0;
-      for (const invoice of response.invoices) {
-        totalInvoicesAmount += invoice?.total || 0;
-        totalBalanceAmount += invoice?.balance || 0;
+    const getPaymentData =  useCallback(async (body) => {
+      const response = await getPaymentDetailsReq(body);
+      setPaymentData(response);
+      props.setBreadcrumbItems(response?.payment_number, breadcrumbItems);
+      if (response) {
+        let totalInvoicesAmount = 0;
+        let totalBalanceAmount = 0;
+        for (const invoice of response.invoices) {
+            totalInvoicesAmount += invoice?.total || 0;
+            totalBalanceAmount += invoice?.balance || 0;
+        }
+        const amountReceived = totalInvoicesAmount - totalBalanceAmount;
+        setAmountReceived(amountReceived);
       }
-      const amountReceived = totalInvoicesAmount - totalBalanceAmount;
-      setAmountReceived(amountReceived);
-    }
   });
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 .table-action-btn{
     display:inline-block;
 }
-.drop-down-item{
+.order-drop-down-item{
     .btn{
         width: 30px;
         padding-right: 6px;
@@ -24,11 +24,6 @@
     &.show { 
         // override for the checkbox/radio buttons
         color: black !important;
-        background-color: white !important;
-        border-color: #D3D3D3 !important;
-        width: 30px;
-        padding-right: 6px;
-        padding-left: 6px;
       }
 
 }

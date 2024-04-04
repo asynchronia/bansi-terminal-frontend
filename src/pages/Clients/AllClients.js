@@ -10,8 +10,6 @@ import { getClientsReq } from "../../service/clientService";
 import "./styles/datatables.scss";
 import "./styles/AllClients.scss";
 
-import plusIcon from "../../assets/images/small/plus-icon.png";
-import minusIcon from "../../assets/images/small/minus-icon.png";
 import ClientActionField from "./ClientActionField";
 import { changePreloader } from "../../store/actions";
 
@@ -75,7 +73,7 @@ const AllClients = (props) => {
   const [status, setStatus] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState(null);
-  const [gridApi, setGridApi] = useState(null);
+  
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [sortData, setSortData] = useState(null);
   const [page, setPage] = useState(1);

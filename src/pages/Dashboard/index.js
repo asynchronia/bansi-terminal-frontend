@@ -11,12 +11,6 @@ import Miniwidget from "./Miniwidget"
 //import MonthlyEarnings from "./montly-earnings";
 import EmailSent from "./email-sent";
 import MonthlyEarnings2 from "./montly-earnings2";
-import Inbox from "./inbox";
-import RecentActivity from "./recent-activity";
-import WidgetUser from "./widget-user";
-import YearlySales from "./yearly-sales";
-import LatestTransactions from "./latest-transactions";
-import LatestOrders from "./latest-orders";
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/actions";
