@@ -87,7 +87,7 @@ const Users = (props) => {
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Users", link: "#" },
   ];  
 

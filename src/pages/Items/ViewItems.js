@@ -31,8 +31,8 @@ const ViewItems = (props,{route,navigate}) => {
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
-      { title: "Dashboard", link: "#" },
-      { title: "Items", link: "#" },
+      { title: "Dashboard", link: "/dashboard" },
+      { title: "Items", link: "/items" },
       { title: itemsData?.title, link: "#" },
     ];
   

@@ -26,7 +26,7 @@ const PaymentDetails = (props) => {
   const data = id ;
   //Handles BreadCrumbs
   const breadcrumbItems = [
-      { title: "Dashboard", link: "#" },
+      { title: "Dashboard", link: "/dashboard" },
       { title: "Payment", link: "#" },
       { title: "View Payment", link: "#" },
     ];

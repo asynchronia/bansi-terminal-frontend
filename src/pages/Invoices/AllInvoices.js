@@ -51,7 +51,7 @@ const AllInvoices = (props) => {
   }
   const breadcrumbItems = [
     
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Invoices", link: "#" },
     
   ];

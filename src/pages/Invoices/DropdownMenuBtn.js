@@ -1,11 +1,5 @@
 import React,{useState} from "react";
-import {ReactComponent as ThreeDots} from '../../assets/images/small/three-dots-vertical.svg';
-import {
-    Dropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-  } from 'reactstrap';
+import CustomDropdown from "../../components/CustomComponents/CustomDropdown"; 
 import "./styles/DropdownMenuBtn.scss";
 
 const DropdownMenuBtn = (props) =>{
@@ -16,14 +10,14 @@ const DropdownMenuBtn = (props) =>{
       handleViewClick(data);
     }
     return (
-        <div className="invoice-drop-down-item">
-          <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
-            <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={onViewClick}>View Item</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        </div>
+      <CustomDropdown 
+          isOpen={menu}
+          direction={'bottom'}
+          toggle={() => setMenu(!menu)}
+          items={[
+            { label: 'View Item', onClick: onViewClick }
+          ]}
+      />
       );
 }
 export default DropdownMenuBtn;

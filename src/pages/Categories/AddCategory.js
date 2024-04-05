@@ -31,8 +31,8 @@ import "react-toastify/dist/ReactToastify.css";
 const AddCategory = (props) => {
   document.title = "Categories";
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
-    { title: "Items", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
+    { title: "Items", link: "/items" },
     { title: "Category", link: "#" },
   ];
   const [allCategories, setAllCategories] = useState([]);
