@@ -13,8 +13,8 @@ const Quotations = (props) => {
 
   const breadcrumbItems = [
     
-    { title: "Dashboard", link: "#" },
-    { title: "Sales Order", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
+    { title: "Sales Order", link: "/orders" },
     { title: "Quotations", link: "#" },
     
   ];

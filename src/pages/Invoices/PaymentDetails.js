@@ -63,14 +63,14 @@ const PaymentDetails = (props) => {
   const data = id;
   //Handles BreadCrumbs
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
-    { title: "Payment", link: "#" },
-    { title: "View Payment", link: "#" },
-  ];
-
-  const autoSizeStrategy = {
-    type: 'fitGridWidth'
-  };
+      { title: "Dashboard", link: "/dashboard" },
+      { title: "Payment", link: "#" },
+      { title: "View Payment", link: "#" },
+    ];
+  
+    const autoSizeStrategy = {
+      type: 'fitGridWidth'
+    };
 
   const pagination = false;
 

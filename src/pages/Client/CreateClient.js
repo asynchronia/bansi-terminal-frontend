@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 const CreateClient = props => {
   const navigate = useNavigate();
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Client", link: "/client" },
     { title: "Add new Client", link: "/client/add" },
   ]
