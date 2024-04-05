@@ -1,9 +1,10 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap"
+import { changePreloader } from "../../store/actions";
 
 import DropdownMenuBtn from "./DropdownMenuBtn";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
@@ -19,6 +20,7 @@ import "./styles/AllInvoices.scss";
 const AllPayments = (props) => {
   document.title = "Payments";
   let navigate = useNavigate(); 
+  let dispatch= useDispatch();
   const effectCalled = useRef(false);
 
   const redirectToViewPage = (id) =>{
@@ -120,6 +122,7 @@ const onPaginationChanged = useCallback((event) => {
 }, []);
 
 const getListOfRowData =  useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getPaymentReq(body);
     let custList = new Set();
      response.map((val,id)=>{
@@ -132,6 +135,7 @@ const getListOfRowData =  useCallback(async (body) => {
     setAllCustomers([...custArr]);
     setRowData(response);
     setBodyObjectReq(body);
+    dispatch(changePreloader(false));
 });
 
 
