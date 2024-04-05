@@ -100,7 +100,8 @@ const SidebarContent = props => {
   };
 
   const activeMenu = useCallback(() => {
-    const pathName = APP_ENV.PUBLIC_URL + props.router.location.pathname;
+
+    const pathName = process.env.PUBLIC_URL + props.router.location.pathname;
     let matchingMenuItem = null;
     const ul = document.getElementById("side-menu");
     const items = ul.getElementsByTagName("a");
@@ -116,6 +117,7 @@ const SidebarContent = props => {
       activateParentDropdown(matchingMenuItem);
     }
   }, [props.router.location.pathname, activateParentDropdown]);
+
 
   useEffect(() => {
     ref.current.recalculate();
