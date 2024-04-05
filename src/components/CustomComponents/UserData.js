@@ -45,7 +45,6 @@ const UserData = (props) => {
    }
 
   }
-// console.log(associatedBranch)
   const getUserData = async () => {
     try {
       const response = await getUserListReq({

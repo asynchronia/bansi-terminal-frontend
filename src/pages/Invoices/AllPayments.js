@@ -55,7 +55,6 @@ const AllPayments = (props) => {
 const columnDefs = [
     {headerName: "Invoice Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true,
      cellRenderer: (props)=>{
-        console.log("created on props"+props.data);
         let date= new Date(props.value);
         return <>{date.toDateString()}</>
      },suppressMenu: true,
@@ -122,10 +121,8 @@ const onPaginationChanged = useCallback((event) => {
 
 const getListOfRowData =  useCallback(async (body) => {
     const response = await getPaymentReq(body);
-    console.log(response);
     let custList = new Set();
      response.map((val,id)=>{
-      console.log("CUSTOMER "+val.customer_name);
       custList.add(val.customer_name);
     });
     let custArr = [];

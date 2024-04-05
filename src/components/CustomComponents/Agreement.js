@@ -97,7 +97,6 @@ const Agreement = (props) => {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     const fileUrl = URL.createObjectURL(file);
-    console.log(file)
     setFileData({
       name:file.name,
       url:fileUrl
