@@ -19,12 +19,17 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
 
-import { createItemReq, getCategoriesReq, getTaxesReq } from "../../service/itemService";
+import {
+  createItemReq,
+  getCategoriesReq,
+  getTaxesReq,
+} from "../../service/itemService";
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import StyledButton from "../../components/Common/StyledButton";
 
 const CreateItems = (props) => {
   const [selectedFiles, setselectedFiles] = useState([]);
@@ -38,6 +43,7 @@ const CreateItems = (props) => {
     id: null,
     show: false,
   });
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const navigate = useNavigate();
 
   const [variantData, setVariantData] = useState([
@@ -58,10 +64,9 @@ const CreateItems = (props) => {
         theme: "colored",
       });
     } else {
-      let path = `/view-item/${id}`
+      let path = `/view-item/${id}`;
       navigate(path);
     }
-    
   };
 
   const handleTaxes = (e) => {
@@ -128,8 +133,10 @@ const CreateItems = (props) => {
       } else {
         notify("Error", response.message);
       }
+      setIsButtonLoading(false);
     } catch (error) {
       notify("Error", error.message);
+      setIsButtonLoading(false);
     }
   };
 
@@ -158,6 +165,7 @@ const CreateItems = (props) => {
       itemType: Yup.string().required("Please Select Item Type"),
     }),
     onSubmit: (values) => {
+      setIsButtonLoading(true);
       let unhandled = false;
       if (values.itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
@@ -196,6 +204,7 @@ const CreateItems = (props) => {
       if (unhandled) {
         setFieldInvalid(false);
         notify("Error", "Please enter all the fields");
+        setIsButtonLoading(false);
         return;
       } else {
         if (values.itemType === "variable") {
@@ -214,7 +223,7 @@ const CreateItems = (props) => {
         values.images = [...selectedFiles];
         values.taxes = [...taxArr];
         values.category = categoryData.id;
-       
+
         handleItemCreation(values);
       }
     },
@@ -261,7 +270,7 @@ const CreateItems = (props) => {
   ];
 
   useEffect(() => {
-    props.setBreadcrumbItems("CreateItems", breadcrumbItems);
+    props.setBreadcrumbItems("Create Items", breadcrumbItems);
   });
 
   //Handle File Upload
@@ -274,6 +283,12 @@ const CreateItems = (props) => {
     );
     setselectedFiles([...selectedFiles, updatedFiles[0]]);
   }
+
+  const onCreateItemClick = (e) => {
+    e.preventDefault();
+    validation.handleSubmit();
+    return false;
+  };
 
   /**
    * Formats the size
@@ -291,14 +306,7 @@ const CreateItems = (props) => {
   return (
     <div style={{ position: "relative" }}>
       <ToastContainer position="top-center" theme="colored" />
-      <Form
-        className="form-horizontal mt-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          validation.handleSubmit();
-          return false;
-        }}
-      >
+      <Form className="form-horizontal mt-4">
         <Row>
           <Col xl="4">
             <Card>
@@ -370,8 +378,6 @@ const CreateItems = (props) => {
                         setCategoryData={setCategoryData}
                       />
                     ) : null}
-
-                   
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
@@ -412,9 +418,14 @@ const CreateItems = (props) => {
                 <option value="published">Published</option>
                 <option value="draft">Draft</option>
               </select>
-              <button type="submit" className="btn btn-primary w-xl mx-3">
+              <StyledButton
+                color={"primary"}
+                className={"w-md mx-2"}
+                onClick={onCreateItemClick}
+                isLoading={isButtonLoading}
+              >
                 Submit
-              </button>
+              </StyledButton>
             </div>
             <Card>
               <CardBody>
@@ -485,7 +496,11 @@ const CreateItems = (props) => {
               <CardBody>
                 <CardTitle className="h4">Item Gallery</CardTitle>
                 <Form
-                  style={{ display: "flex", justifyContent: "center", gap:'20px' }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "20px",
+                  }}
                 >
                   <Dropzone
                     onDrop={(acceptedFiles) => {
@@ -507,10 +522,13 @@ const CreateItems = (props) => {
                       </div>
                     )}
                   </Dropzone>
-                  <div style={{maxWidth:'50%'}} className="dropzone-previews mt-3" id="file-previews">
-                    <Box 
-                    sx={{display:'flex', flexWrap:'wrap', gap:'10px'}}
-                      
+                  <div
+                    style={{ maxWidth: "50%" }}
+                    className="dropzone-previews mt-3"
+                    id="file-previews"
+                  >
+                    <Box
+                      sx={{ display: "flex", flexWrap: "wrap", gap: "10px" }}
                       className="mt-1 mb-0 shadow-none border dz-processing dz-image-preview dz-success dz-complete"
                     >
                       {selectedFiles.map((f, i) => {
