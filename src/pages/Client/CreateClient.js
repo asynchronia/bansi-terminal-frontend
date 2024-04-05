@@ -21,29 +21,24 @@ const CreateClient = props => {
 
   const [selectedFiles, setselectedFiles] = useState([])
 
-  const notify = (type, message) => {
+  const notify = (type, message, id) => {
     if (type === "Error") {
       toast.error(message, {
         position: "top-center",
         theme: "colored",
       })
     } else {
-      toast.success(message, {
-        position: "top-center",
-        theme: "colored",
-      })
+      let path = `/client/${id}`
+      navigate(path);
     }
 
-    setTimeout(()=>{
-      navigate('/clients');
-    }, [5000])
   }
 
   const handleCreateClient = async (values) => {
     try {
       const response = await createClientReq(values)
       if (response.success === true) {
-        notify("Success", response.message)
+        notify("Success", response.message, response.payload?.client._id)
       } else {
         notify("Error", response.message)
       }

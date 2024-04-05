@@ -100,6 +100,7 @@ const SidebarContent = props => {
   };
 
   const activeMenu = useCallback(() => {
+
     const pathName = process.env.PUBLIC_URL + props.router.location.pathname;
     let matchingMenuItem = null;
     const ul = document.getElementById("side-menu");
@@ -156,7 +157,7 @@ const SidebarContent = props => {
 
             <li>
               <Link to="/clients" className=" waves-effect">
-                <i className="mdi mdi-calendar-check"></i>
+                <i className="mdi mdi-account-multiple-outline"></i>
                 <span>Clients</span>
               </Link>
             </li>
@@ -209,7 +210,12 @@ const SidebarContent = props => {
                 </li>
               </ul>
             </li>
-            
+            <li>
+              <Link to="/users" className=" waves-effect">
+                <i className="mdi mdi-account-multiple"></i>
+                <span>Users</span>
+              </Link>
+            </li>
           </ul>
         </div>
       </SimpleBar>

@@ -15,14 +15,13 @@ const DropdownMenuBtn = (props) =>{
       deleteItem(data);
     }
     const onEditClick = () =>{
-      console.log("id passed for " + data.title + " with id "+data._id);
       handleEditClick(data._id);
     }
     const onViewClick = () =>{
-      handleViewClick(data);
+      handleViewClick(data._id);
     }
     return (
-        <div className="drop-down-item">
+        <div className="items-drop-down-item">
           <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
             <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
             <DropdownMenu>

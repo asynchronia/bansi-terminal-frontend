@@ -8,7 +8,7 @@ import {
 import "react-toastify/dist/ReactToastify.css";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import {useLocation} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { getItemByIdReq } from "../../service/itemService";
@@ -19,20 +19,21 @@ import { attributesCellRenderer} from './ItemsUtils';
  
 
 const ViewItems = (props,{route,navigate}) => {
-  const location = useLocation();
   let navigateTo = useNavigate(); 
   const [itemsData, setItemsData] = useState();
   const [variantData, setVariantData] = useState([]);
   const [taxData, setTaxData] = useState();
-  const data = location.state.data;  
+  const {id} = useParams();  
   const effectCalled = useRef(false);
   const gridRef = useRef();
+
+  
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
       { title: "Dashboard", link: "#" },
       { title: "Items", link: "#" },
-      { title: data.title, link: "#" },
+      { title: itemsData?.title, link: "#" },
     ];
   
     const autoSizeStrategy = {
@@ -40,7 +41,7 @@ const ViewItems = (props,{route,navigate}) => {
     };
 
     let bodyObject = {
-        "_id": data._id
+        "_id": id
     };
 
     const redirectToEditPage = (id) =>{
@@ -55,7 +56,7 @@ const ViewItems = (props,{route,navigate}) => {
     }
 
     const getItemData = useCallback(async (body) => {
-      const response = await getItemByIdReq(bodyObject);
+      const response = await getItemByIdReq(body);
       
       if (response && response.payload && response.payload.item && response.payload.variants ) {
         const item = response.payload.item;
@@ -109,7 +110,7 @@ const ViewItems = (props,{route,navigate}) => {
     },[]); 
 
     useEffect(() => {
-      props.setBreadcrumbItems(data.title, breadcrumbItems);
+      props.setBreadcrumbItems(itemsData?.title, breadcrumbItems);
       if(paginationPageSize && paginationPageSize !== undefined){
         getItemData(bodyObject);
         // getCategories();
@@ -132,7 +133,7 @@ const ViewItems = (props,{route,navigate}) => {
             <option value="active">Published</option>
             <option value="draft">Draft</option>
           </select>
-          <button type="submit" onClick={() => handleEditClick(data?._id)} className="btn btn-primary w-xl mx-3">
+          <button type="submit" onClick={() => handleEditClick(itemsData?._id)} className="btn btn-primary w-xl mx-3">
             Edit
           </button>
           </div>
@@ -140,7 +141,7 @@ const ViewItems = (props,{route,navigate}) => {
           <Card>
             <CardBody>
               <h6 className="secondary">Product Name</h6>
-              <h className="card-title">{data.title}</h>
+              <h className="card-title">{itemsData?.title}</h>
               <hr></hr>
               <h6 className="secondary">Description</h6>
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
@@ -236,7 +237,7 @@ const ViewItems = (props,{route,navigate}) => {
           </Row>
           <Card>
             <CardBody>
-              <h4 className="card-title">{data.title}</h4>
+              <h4 className="card-title">{itemsData?.title}</h4>
               <hr></hr>
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
               <div
