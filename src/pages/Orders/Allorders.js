@@ -95,7 +95,7 @@ const AllOrders = (props) => {
   const gridRef = useRef();
   
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Sales Order", link: "#" },
   ];
 

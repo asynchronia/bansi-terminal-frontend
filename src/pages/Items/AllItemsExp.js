@@ -16,7 +16,7 @@ const[checked, setChecked] = useState([]);
 const [data, setData] = useState({columns:[], rows:[]});
   const breadcrumbItems = [
     
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Purchase Order", link: "#" },
     
   ]

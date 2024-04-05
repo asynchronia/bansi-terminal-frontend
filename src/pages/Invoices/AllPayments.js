@@ -45,7 +45,7 @@ const AllPayments = (props) => {
   }
   const breadcrumbItems = [
     
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Payments", link: "#" },
     
   ];

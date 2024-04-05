@@ -15,7 +15,7 @@ import StyledButton from "../../components/Common/StyledButton";
 const CreateClient = (props) => {
   const navigate = useNavigate();
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Client", link: "/client" },
     { title: "Add new Client", link: "/client/add" },
   ];
