@@ -283,6 +283,7 @@ const AllItems = (props) => {
     });
     setRowData(response);
     setBodyObjectReq(body);
+    dispatch(changePreloader(false));
   });
 
   const getCategories = useCallback(async () => {
@@ -300,9 +301,7 @@ const AllItems = (props) => {
     }
   }, []);
 
-  setTimeout(() => {
-    dispatch(changePreloader(false));
-  }, 2000);
+ 
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
