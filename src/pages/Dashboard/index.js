@@ -17,7 +17,7 @@ import { setBreadcrumbItems } from "../../store/actions";
 
 const Dashboard = (props) => {
 
-  document.title = "Dashboard | Lexa - Responsive Bootstrap 5 Admin Dashboard";
+  document.title = "Bansi Terminal";
 
 
   const breadcrumbItems = [

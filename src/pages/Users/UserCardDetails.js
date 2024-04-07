@@ -43,9 +43,9 @@ const UserCardDetails = (user) => {
         <Row className="mt-3">
           <Col>
             <div className="d-flex flex-wrap">
-              {user?.usersData?.associatedBranch?.name ?
-               <Chip label={user?.usersData?.associatedBranch?.name} className="mr-2"/>
-                : null }
+              {user?.usersData?.associatedWarehouses.map((warehouse, index) => (
+                <Chip key={index} label={warehouse.code} className="mr-2"/>
+              ))}
             </div>
           </Col>
         </Row>
