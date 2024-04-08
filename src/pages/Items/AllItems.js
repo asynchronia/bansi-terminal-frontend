@@ -2,11 +2,12 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Button, Input, Modal } from "reactstrap";
 
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 // import {AgGridReact} from 'ag-grid-react';
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
+import { changePreloader } from "../../store/actions";
 
 /*.dropdown-toggle::after {
   display: none !important; 
@@ -43,10 +44,10 @@ const AllItems = (props) => {
       navigate(path, id);
     }, 300);
   };
-  const redirectToViewPage = (data) => {
-    let path = "/view-item";
+  const redirectToViewPage = (id) => {
+    let path = `/view-item/${id}`;
     setTimeout(() => {
-      navigate(path, { state: { data: data } });
+      navigate(path, id);
     }, 300);
   };
   const notify = (type, message) => {
@@ -63,7 +64,7 @@ const AllItems = (props) => {
     }
   };
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "All Items Order", link: "#" },
   ];
   const gridRef = useRef();
@@ -80,7 +81,6 @@ const AllItems = (props) => {
     redirectToViewPage(data);
   };
   const handleEditClick = (id) => {
-    // console.log("GRID OBJECT >>>" + id);
     redirectToEditPage(id);
   };
   const deleteItem = async (data) => {
@@ -234,10 +234,10 @@ const AllItems = (props) => {
   const [category, setCategory] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
-  const [gridApi, setGridApi] = useState(null);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
+  const dispatch = useDispatch();
 
   let bodyObject = {
     page: 1,
@@ -253,10 +253,10 @@ const AllItems = (props) => {
     document.body.classList.add("no_padding");
   }
   const onPaginationChanged = useCallback((event) => {
-    // console.log("onPaginationPageLoaded", event);
+    
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
-    // console.log("PAGE SIZE" + pageSize);
+    
     setPaginationPageSize(pageSize);
   }, []);
   /*
@@ -274,6 +274,7 @@ const AllItems = (props) => {
 }
 * */
   const getListOfRowData = useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getItemsReq(body);
 
     response.map((val, id) => {
@@ -282,6 +283,7 @@ const AllItems = (props) => {
     });
     setRowData(response);
     setBodyObjectReq(body);
+    dispatch(changePreloader(false));
   });
 
   const getCategories = useCallback(async () => {
@@ -298,6 +300,8 @@ const AllItems = (props) => {
       effectCalled.current = true;
     }
   }, []);
+
+ 
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
@@ -334,11 +338,11 @@ const AllItems = (props) => {
   }, [paginationPageSize]);
 
   const handleChange = (e) => {
-    // console.log("handle change category" + e.target.value);
+    
     setCategory(e.target.value);
   };
   const handleInputChange = (e) => {
-    // console.log("handle search" + e.target.value);
+    
     setSearchValue(e.target.value);
   };
 

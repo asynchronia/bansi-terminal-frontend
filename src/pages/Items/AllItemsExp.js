@@ -16,7 +16,7 @@ const[checked, setChecked] = useState([]);
 const [data, setData] = useState({columns:[], rows:[]});
   const breadcrumbItems = [
     
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Purchase Order", link: "#" },
     
   ]
@@ -50,11 +50,11 @@ const [data, setData] = useState({columns:[], rows:[]});
       );*/
     },
     onRowsClick: (rowData, rowMeta) => {
-      console.log("rowData", rowData);
+      
       //this.handleClick(this.state.data[rowMeta.dataIndex]);
     },
     onRowsExpand: (curExpanded, allExpanded) => {
-      console.log("rowExpand", curExpanded, allExpanded[0]);
+      
       //this.handleClick(this.state.data[allExpanded[0].dataIndex]);
     }
   };
@@ -156,7 +156,7 @@ const [data, setData] = useState({columns:[], rows:[]});
         checked.push(cbVal);
         ele.check = <MDBCheckbox label=' ' type='checkbox' id={cbVal} onClick={toggleCheck} checked={isChecked(cbVal)}/>;
     });*/
-    console.log("Data Value >> "+data);
+    
     setChecked(checked);
     setData(initData);
   },[]);

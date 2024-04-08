@@ -32,7 +32,6 @@ export const ifOverDue = (currDate, dueDate) => {
     } else if (date1 > date2) {
       return true;
     } else {
-      console.log(`Both dates are equal`);
         return false;
     }
   }
@@ -50,7 +49,6 @@ if (!isNaN(dateObj)) {
   const year = dateObj.getFullYear();
 
   const resultDate = `${day}/${month}/${year}`;
-  console.log(resultDate);  // 15/05/2019
 
   return resultDate;
 }

@@ -31,7 +31,7 @@ const OrderDetails = (props) => {
   const data = id ;
   //Handles BreadCrumbs
   const breadcrumbItems = [
-      { title: "Dashboard", link: "#" },
+      { title: "Dashboard", link: "/dashboard" },
       { title: "Sales Order", link: "#" },
       // { title: "Order #"+orderData?.salesorder_number, link: "#" },
     ];
@@ -108,7 +108,6 @@ const OrderDetails = (props) => {
       setLineItems(response?.data?.line_items);
       setRowCount(gridRef.current.api.getDisplayedRowCount());
       processApiResponse(response?.data);
-      // console.log("order data"+ response?.data?.salesorder_number);
       props.setBreadcrumbItems("Order #"+response?.data?.salesorder_number, breadcrumbItems);
   });
 

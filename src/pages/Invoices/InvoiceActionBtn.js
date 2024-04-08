@@ -1,5 +1,4 @@
 import React,{useState} from "react";
-import { useNavigate } from "react-router-dom";
 import {ReactComponent as ThreeDots} from '../../assets/images/small/three-dots-vertical.svg';
 import {
     Dropdown,
@@ -17,7 +16,7 @@ const InvoiceActionBtn = (props) =>{
       onClickView(data.invoice_id);
   }
     return (
-        <div className="drop-down-item">
+        <div className="invoice-drop-down-item">
           <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
             <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
             <DropdownMenu>

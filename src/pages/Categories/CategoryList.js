@@ -2,9 +2,9 @@ import React from "react";
 import "./styles/CategoryList.scss";
 
 const CategoryList = (props) =>{
-    console.log("PROPS   >>  "+props);
+    
     const openCaret = (evt) =>{
-        console.log("Target element  "+evt.currentTarget);
+        
         let domEle = evt.currentTarget;
         domEle.parentElement.querySelector(".nested").classList.toggle("active");
          domEle.classList.toggle("caret-down");
@@ -34,7 +34,7 @@ const CategoryList = (props) =>{
         <>
             <ul id="myUL">
                 { props?.rowData &&  props.rowData.map((itr,idx) => {
-                    console.log("categories "+itr.name);
+                    
                     return ( itr?.children && itr.children.length > 0 ? 
                         <li>
                             <span class="caret" onClick={openCaret}><span className="category-block">{itr.name}</span><span>{itr.description}</span></span>

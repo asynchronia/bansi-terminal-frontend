@@ -27,15 +27,17 @@ import {
 } from "../../service/categoryService";
 
 import "react-toastify/dist/ReactToastify.css";
+import StyledButton from "../../components/Common/StyledButton";
 
 const AddCategory = (props) => {
   document.title = "Categories";
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
-    { title: "Items", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
+    { title: "Items", link: "/items" },
     { title: "Category", link: "#" },
   ];
   const [allCategories, setAllCategories] = useState([]);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const getCategories = useCallback(async () => {
     const response = await getCategoriesReq();
@@ -61,6 +63,7 @@ const AddCategory = (props) => {
       categoryParent: Yup.string().required("Please Enter Parent Category"),
     }),
     onSubmit: (values, { resetForm }) => {
+      setIsButtonLoading(true);
       let body = {
         name: values.categoryName,
         description: values.categoryDescription,
@@ -78,8 +81,10 @@ const AddCategory = (props) => {
       } else {
         notify("Error", response.payload[0].message);
       }
+      setIsButtonLoading(false);
     } catch (error) {
       notify("Error", error.message);
+      setIsButtonLoading(false);
     }
     resetForm();
     getCategories();
@@ -121,6 +126,12 @@ const AddCategory = (props) => {
     });
   };
 
+  const onCreateCategoryClick=(e)=>{
+    e.preventDefault();
+    validation.handleSubmit();
+    return false;
+  }
+
   return (
     <React.Fragment>
       <ToastContainer position="top-center" theme="colored" />
@@ -132,11 +143,7 @@ const AddCategory = (props) => {
               <hr />
               <Form
                 className="form-horizontal mt-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  validation.handleSubmit();
-                  return false;
-                }}
+                
               >
                 <div className="mb-3">
                   <Label>Category Name</Label>
@@ -216,12 +223,14 @@ const AddCategory = (props) => {
                 </div>
                 <div className="mb-3 row mt-4">
                   <div className="col-12 text-start">
-                    <button
-                      className="btn btn-primary w-md waves-effect waves-light"
-                      type="submit"
-                    >
-                      Add Category
-                    </button>
+                  <StyledButton
+                color={"primary"}
+                className={"w-md"}
+                onClick={onCreateCategoryClick}
+                isLoading={isButtonLoading}
+              >
+                Submit
+              </StyledButton>
                   </div>
                 </div>
               </Form>

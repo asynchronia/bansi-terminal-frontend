@@ -21,10 +21,6 @@ import SimpleBar from "simplebar-react"
 import { Link } from "react-router-dom"
 
 import "../../components/CommonForBoth/rightbar.scss"
-//Import images
-import layout1 from "../../assets/images/layouts/layout-1.jpg"
-import layout2 from "../../assets/images/layouts/layout-2.jpg"
-import layout3 from "../../assets/images/layouts/layout-3.jpg"
 
 const RightSidebar = props => {
   return (
@@ -359,40 +355,9 @@ const RightSidebar = props => {
                 </div>
               </FormGroup> */}
 
-              <h6 className="text-center">Choose Layouts</h6>
+             
 
-              <div className="mb-2">
-                <Link
-                  to="#"
-                  target="_blank"
-                >
-                  <img
-                    src={layout1}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </Link>
-              </div>
-
-              <div className="mb-2">
-                <Link to="#" target="_blank">
-                  <img
-                    src={layout2}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </Link>
-              </div>
-
-              <div className="mb-2">
-                <Link to="#" target="_blank">
-                  <img
-                    src={layout3}
-                    className="img-fluid img-thumbnail"
-                    alt=""
-                  />
-                </Link>
-              </div>
+             
 
               <Link
                 to="#"

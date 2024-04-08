@@ -5,15 +5,17 @@ import { Row, Col, Card, CardBody } from "reactstrap"
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { getOrdersReq } from "../../service/orderService";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import CircleRenderer from "./CircleRenderer";
+import { changePreloader } from "../../store/actions";
 
 const AllOrders = (props) => {
   document.title = "All Orders";
+  let dispatch = useDispatch();
   let navigate = useNavigate(); 
   const effectCalled = useRef(false);
   
@@ -35,7 +37,6 @@ const AllOrders = (props) => {
   };
 
   const redirectToViewPage = (id) =>{
-    // console.log("Order"+JSON.stringify(id));
     let path = `/order/${id.salesorder_id}`; 
      setTimeout(() => {
       navigate(path,id);
@@ -43,7 +44,6 @@ const AllOrders = (props) => {
   }
 
   const handleViewClick = (id) =>{
-    console.log("GRID OBJECT >>>"+id);
     redirectToViewPage(id);
   }
 
@@ -63,8 +63,10 @@ const AllOrders = (props) => {
   },[paginationPageSize]);
 
   const getListOfRowData =  useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getOrdersReq(body);
     setRowData(response);
+    dispatch(changePreloader(false));
   });
   const redirectToEditPage = (id) =>{
     let path = "/edit-item"; 
@@ -93,7 +95,7 @@ const AllOrders = (props) => {
   const gridRef = useRef();
   
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Sales Order", link: "#" },
   ];
 

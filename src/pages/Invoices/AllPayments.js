@@ -1,9 +1,10 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap"
+import { changePreloader } from "../../store/actions";
 
 import DropdownMenuBtn from "./DropdownMenuBtn";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
@@ -19,6 +20,7 @@ import "./styles/AllInvoices.scss";
 const AllPayments = (props) => {
   document.title = "Payments";
   let navigate = useNavigate(); 
+  let dispatch= useDispatch();
   const effectCalled = useRef(false);
 
   const redirectToViewPage = (id) =>{
@@ -43,7 +45,7 @@ const AllPayments = (props) => {
   }
   const breadcrumbItems = [
     
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Payments", link: "#" },
     
   ];
@@ -55,7 +57,6 @@ const AllPayments = (props) => {
 const columnDefs = [
     {headerName: "Invoice Date", field: "date", headerCheckboxSelection: true, checkboxSelection: true,
      cellRenderer: (props)=>{
-        console.log("created on props"+props.data);
         let date= new Date(props.value);
         return <>{date.toDateString()}</>
      },suppressMenu: true,
@@ -121,11 +122,10 @@ const onPaginationChanged = useCallback((event) => {
 }, []);
 
 const getListOfRowData =  useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getPaymentReq(body);
-    console.log(response);
     let custList = new Set();
      response.map((val,id)=>{
-      console.log("CUSTOMER "+val.customer_name);
       custList.add(val.customer_name);
     });
     let custArr = [];
@@ -135,6 +135,7 @@ const getListOfRowData =  useCallback(async (body) => {
     setAllCustomers([...custArr]);
     setRowData(response);
     setBodyObjectReq(body);
+    dispatch(changePreloader(false));
 });
 
 

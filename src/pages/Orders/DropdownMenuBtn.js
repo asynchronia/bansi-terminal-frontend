@@ -1,11 +1,5 @@
 import React,{useState} from "react";
-import {ReactComponent as ThreeDots} from '../../assets/images/small/three-dots-vertical.svg';
-import {
-    Dropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-  } from 'reactstrap';
+import CustomDropdown from "../../components/CustomComponents/CustomDropdown";
 import "./styles/DropdownMenuBtn.scss";
 const DropdownMenuBtn = (props) =>{
 
@@ -21,17 +15,17 @@ const DropdownMenuBtn = (props) =>{
       handleViewClick(data);
     }
     return (
-        <div className="drop-down-item">
-          <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
-            <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
-            <DropdownMenu>
-              <DropdownItem onClick={onEditOrder}>Edit Item</DropdownItem>
-              <DropdownItem onClick={onViewClick}>View Item</DropdownItem>
-              <DropdownItem>Change Status</DropdownItem>
-              <DropdownItem onClick={onDeleteOrder}>Delete Order</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        </div>
+        <CustomDropdown  
+          isOpen={menu}
+          direction={'bottom'}
+          toggle={() => setMenu(!menu)}
+          items={[
+            { label: 'Edit Item', onClick: onEditOrder },
+            { label: 'View Item', onClick: onViewClick },
+            { label: 'Change Status' },
+            { label: 'Delete Order', onClick: onDeleteOrder }  
+          ]}
+        />
       );
 }
 export default DropdownMenuBtn;

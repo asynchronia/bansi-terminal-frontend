@@ -25,6 +25,7 @@ import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
 import { editItemReq, getCategoriesReq, getItemByIdReq, getTaxesReq } from "../../service/itemService";
+import StyledButton from "../../components/Common/StyledButton";
 
 const EditItems = (props) => {
   const [itemsData, setItemsData] = useState({});
@@ -37,6 +38,8 @@ const EditItems = (props) => {
   const [variantOptions, setVariantOptions] = useState([]);
   const [deletedVariant, setDeletedVariant] = useState([]);
   const [itemType, setItemType]= useState('variable');
+  const [variantDataChanged, setVariantDataChanged] = useState(false);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const [categoryData, setCategoryData] = useState({
     name: "",
@@ -44,7 +47,7 @@ const EditItems = (props) => {
     show: false,
   });
   const navigate = useNavigate();
-  // console.log(variantOptions)
+
 
   const [otherData, setOtherData] = useState({
     sku: "",
@@ -87,30 +90,36 @@ const EditItems = (props) => {
   }, [loadedItem]);
 
   useEffect(() => {
-    let options = [];
+    let options = [...variantOptions]; // Make a copy of the current variantOptions
     let products = variantData;
+  
     products.forEach((product) => {
       product.attributes.forEach((attribute) => {
-        const existingOption = options.find(
+        const existingOptionIndex = options.findIndex(
           (option) => option.name === attribute.name
         );
-
-        if (!existingOption) {
+  
+        if (existingOptionIndex === -1) {
+          // Option doesn't exist, add it with the new value
           options.push({
             id: uuidv4(),
             name: attribute.name,
             chips: [attribute.value],
           });
         } else {
-          if (!existingOption.chips.includes(attribute.value)) {
-            existingOption.chips.push(attribute.value);
+          // Option exists, update chips if value is not already present
+          if (!options[existingOptionIndex].chips.includes(attribute.value)) {
+            options[existingOptionIndex].chips.push(attribute.value);
           }
         }
       });
     });
-
+  
+   
     setVariantOptions(options);
-  }, [variantData]);
+    setVariantDataChanged(false); // Reset variantDataChanged flag
+  }, [variantData, variantDataChanged]); 
+  
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -119,14 +128,10 @@ const EditItems = (props) => {
         theme: "colored",
       });
     } else {
-      toast.success(message, {
-        position: "top-center",
-        theme: "colored",
-      });
+      let path = `/view-item/${id}`
+      navigate(path);
     }
-    setTimeout(()=>{
-      navigate('/items');
-    }, [5000])
+    
   };
 
   const handleTaxes = (e) => {
@@ -185,7 +190,9 @@ const EditItems = (props) => {
     searchAllTaxes();
   }, [loadedItem]);
 
+
   const handleVariantChange = (id, name, value) => {
+    
     const updatedVariants = variantData.map((variant) => {
       if (variant._id === id) {
         if (name === "attributes") {
@@ -193,7 +200,6 @@ const EditItems = (props) => {
             (attr) => attr.name === value.name
           );
           if (attributeIndex !== -1) {
-            // Update the value if the attribute name already exists
             const updatedAttributes = [...variant.attributes];
             updatedAttributes[attributeIndex] = value;
             return {
@@ -214,8 +220,17 @@ const EditItems = (props) => {
         };
       }
       return variant;
+    }).map((variant) => {
+      if (variant._id === id) {
+        // Remove _id from the updated variant
+        const { _id, ...rest } = variant;
+        return rest;
+      }
+      return variant;
     });
+    
     setVariantData(updatedVariants);
+    
   };
 
   const handleOtherChange = (name, value) => {
@@ -250,6 +265,7 @@ const EditItems = (props) => {
       category: Yup.string().required("Please Select Category"),
     }),
     onSubmit: (values) => {
+      setIsButtonLoading(true);
       let unhandled = false;
       if (itemType === "variable") {
         for (let i = 0; i < variantData.length; i++) {
@@ -288,6 +304,7 @@ const EditItems = (props) => {
       if (unhandled) {
         setFieldInvalid(false);
         notify("Error", "Please enter all the fields");
+        setIsButtonLoading(false);
         return;
       } else {
         if (itemType === "variable") {
@@ -329,12 +346,14 @@ const EditItems = (props) => {
         } else {
             notify("Error", response.message);
         }
+        setIsButtonLoading(false);
     } catch (error) {
         if (error === 404) {
             notify("Error", "Item not found");
         } else {
             notify("Error", "An error occurred while editing the item");
         }
+        setIsButtonLoading(false);
     }
 };
   
@@ -345,7 +364,7 @@ const EditItems = (props) => {
   };
 
   const handleAddVariantData = () => {
-    const newRow = { id: uuidv4(), attributes: [] };
+    const newRow = { _id: uuidv4(), attributes: [] };
     setVariantData([...variantData, newRow]);
   };
 
@@ -379,12 +398,12 @@ const EditItems = (props) => {
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
-    { title: "All Items", link: "#" },
+    { title: "All Items", link: "/items" },
     { title: "Edit Items", link: `/edit-item/:${id}` },
   ];
 
   useEffect(() => {
-    props.setBreadcrumbItems("CreateItems", breadcrumbItems);
+    props.setBreadcrumbItems("Edit Items", breadcrumbItems);
   });
 
   //Handle File Upload
@@ -415,16 +434,17 @@ const EditItems = (props) => {
   //   )
   // }
 
+  const onEditItemClick = (e) => {
+    e.preventDefault();
+    validation.handleSubmit();
+    return false;
+  };
+
   return (
     <div style={{ position: "relative" }}>
       <ToastContainer position="top-center" theme="colored" />
       <Form
         className="form-horizontal mt-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          validation.handleSubmit();
-          return false;
-        }}
       >
         <Row>
           <Col xl="4">
@@ -538,9 +558,14 @@ const EditItems = (props) => {
                 <option value="published">Published</option>
                 <option value="draft">Draft</option>
               </select>
-              <button type="submit" className="btn btn-primary w-xl mx-3">
-                Submit
-              </button>
+              <StyledButton
+                color={"primary"}
+                className={"w-md mx-2"}
+                onClick={onEditItemClick}
+                isLoading={isButtonLoading}
+              >
+                Edit
+              </StyledButton>
             </div>
             <Card>
               <CardBody>
@@ -723,8 +748,8 @@ const EditItems = (props) => {
                 {variantData.map((row) => (
                   <AllVariantRows
                     data={row}
-                    key={row.id}
-                    _id={row.id}
+                    key={row._id}
+                    _id={row._id}
                     variantOptions={variantOptions}
                     disabledDelete={variantData.length === 1}
                     onChange={handleVariantChange}

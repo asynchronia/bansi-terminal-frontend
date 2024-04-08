@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, CardBody, Label, Form, Alert, Input, FormFeedback } from 'reactstrap';
+import { Container, Row, Col, Card, CardBody, Label, Form, Alert, Input, FormFeedback, Button } from 'reactstrap';
 import logoDark from "../../assets/images/logo-dark.png";
 import logoLight from "../../assets/images/logo-dark.png";
 import { useSelector, useDispatch } from "react-redux";
@@ -14,12 +14,16 @@ import withRouter from '../../components/Common/withRouter';
 // actions
 import { loginUser, socialLogin } from "../../store/actions";
 import { loginReq } from '../../service/authService';
+import StyledButton from '../../components/Common/StyledButton';
+import useAuth from '../../hooks/useAuth';
 
 const Login = props => {
   document.title = "Login | WILLSMEET";
 
+  const { setAuth } = useAuth();
   const dispatch = useDispatch();
   const [error, setError] = React.useState(null);
+  const [isButtonLoading, setIsButtonLoading] = React.useState(false);
 
   const validation = useFormik({
     // enableReinitialize : use this  flag when initial values needs to be changed
@@ -35,24 +39,29 @@ const Login = props => {
     }),
     onSubmit: async (values) => {
       // dispatch(loginUser(values, props.router.navigate));
-      console.log(values);
+      setIsButtonLoading(true);
       const response = await loginReq(values);
-      console.log(response);
       try {
         if (response.success) {
-          console.log(response);
           localStorage.setItem("accessToken", response.payload.accessToken);
+          localStorage.setItem("user", JSON.stringify(response.payload.user));
+          setAuth(response.payload.user);
           props.router.navigate("/dashboard");
         } else {
-          console.log('component try else', response);
           setError(response.message);
         }
       } catch (error) {
-        console.log('component catch error', error);
         setError(error.message);
       }
+      setIsButtonLoading(false);
     }
   });
+
+  const onloginClick = (e) => {
+    e.preventDefault();
+    validation.handleSubmit();
+    return false;
+  }
 
 
   /* const selectLoginState = (state) => state.Login;
@@ -90,11 +99,11 @@ const Login = props => {
                     <p className="text-muted text-center">Login to continue to WILLSMEET</p>
                     <Form
                       className="form-horizontal mt-4"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        validation.handleSubmit();
-                        return false;
-                      }}
+                      // onSubmit={(e) => {
+                      //   e.preventDefault();
+                      //   validation.handleSubmit();
+                      //   return false;
+                      // }}
                     >
                       {error ? <Alert color="danger">{error}</Alert> : null}
                       <div className="mb-3">
@@ -141,7 +150,15 @@ const Login = props => {
                           </div>
                         </div>
                         <div className="col-6 text-end">
-                          <button className="btn btn-primary w-md waves-effect waves-light" type="submit">Log In</button>
+                          <StyledButton
+                            color={"primary"}
+                            className={"w-md"}
+                            onClick={onloginClick}
+                            isLoading={isButtonLoading}
+                          >
+                            Login
+                          </StyledButton>
+                          {/* <button className="btn btn-primary w-md waves-effect waves-light" type="submit">Log In</button> */}
                         </div>
                       </Row>
                       <Row className="form-group mb-0">

@@ -68,7 +68,7 @@ const ViewClient = (props) => {
     }, [5000]);
   };
 
-  // console.log(agreementData)
+
 
   const getAgreement = async (id) => {
     try {
@@ -164,7 +164,7 @@ const ViewClient = (props) => {
   };
 
   const breadcrumbItems = [
-    { title: "Dashboard", link: "#" },
+    { title: "Dashboard", link: "/dashboard" },
     { title: "Client", link: "/client" },
     { title: "View", link: "/client/:id" },
   ];
@@ -202,7 +202,6 @@ const ViewClient = (props) => {
   const handleSubmitUser = async (data) => {
     try {
       const response = await signinReq(data);
-      console.log(response);
       if (response.success === true) {
         notify("Success", response.message);
       } else {
