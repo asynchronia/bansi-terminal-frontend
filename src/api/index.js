@@ -376,7 +376,7 @@ export async function login(body) {
 export async function getInvoice(body, id) {
     return new Promise((resolve, reject) => {
         axios
-            .get(`${baseUrl}${API_URL.getInvoice + id}`, body, { headers: getHeaders() })
+            .get(`${baseUrl}${API_URL.getInvoice + id}`, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
