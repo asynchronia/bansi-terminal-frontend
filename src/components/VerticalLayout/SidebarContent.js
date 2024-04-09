@@ -13,6 +13,8 @@ import { Link } from "react-router-dom"
 //import { withTranslation } from "react-i18next"
 
 import APP_ENV from "../../utility/env";
+import RequirePermission from "../../routes/middleware/requirePermission"
+import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants"
 
 
 const SidebarContent = props => {
@@ -154,40 +156,48 @@ const SidebarContent = props => {
                 <span>Dashboard</span>
               </Link>
             </li>
-
-            <li>
-              <Link to="/clients" className=" waves-effect">
-                <i className="mdi mdi-account-multiple-outline"></i>
-                <span>Clients</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/#" className="has-arrow waves-effect">
-                <i className="mdi mdi-email-outline"></i>
-                <span>Items</span>
-              </Link>
-              <ul className="sub-menu" >
-                <li>
-                  <Link to="/items">All Items</Link>
-                </li>
-                <li>
-                  <Link to="/create-item">Create Item</Link>
-                </li>
-                <li>
-                  <Link to="/categories">Categories</Link>
-                </li>
-              </ul>
-            </li>
+            <RequirePermission module={MODULES_ENUM.CLIENTS}>
+              <li>
+                <Link to="/clients" className=" waves-effect">
+                  <i className="mdi mdi-account-multiple-outline"></i>
+                  <span>Clients</span>
+                </Link>
+              </li>
+            </RequirePermission>
+            <RequirePermission module={MODULES_ENUM.ITEMS}>
+              <li>
+                <Link to="/#" className="has-arrow waves-effect">
+                  <i className="mdi mdi-email-outline"></i>
+                  <span>Items</span>
+                </Link>
+                <ul className="sub-menu" >
+                  <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.READ}>
+                    <li>
+                      <Link to="/items">All Items</Link>
+                    </li>
+                  </RequirePermission>
+                  <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.CREATE}>
+                    <li>
+                      <Link to="/create-item">Create Item</Link>
+                    </li>
+                  </RequirePermission>
+                  <RequirePermission module={MODULES_ENUM.CATEGORIES}>
+                    <li>
+                      <Link to="/categories">Categories</Link>
+                    </li>
+                  </RequirePermission>
+                </ul>
+              </li>
+            </RequirePermission>
             <li>
               <Link to="/#" className="has-arrow waves-effect">
                 <i className="mdi mdi-cart-outline"></i>
                 <span>Sales Order</span>
               </Link>
               <ul className="sub-menu" >
-                <li>
+                {/* <li>
                   <Link to="/create-order">Create Order</Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/orders">All Orders</Link>
                 </li>
@@ -210,12 +220,14 @@ const SidebarContent = props => {
                 </li>
               </ul>
             </li>
-            <li>
-              <Link to="/users" className=" waves-effect">
-                <i className="mdi mdi-account-multiple"></i>
-                <span>Users</span>
-              </Link>
-            </li>
+            <RequirePermission module={MODULES_ENUM.USERS}>
+              <li>
+                <Link to="/users" className=" waves-effect">
+                  <i className="mdi mdi-account-multiple"></i>
+                  <span>Users</span>
+                </Link>
+              </li>
+            </RequirePermission>
           </ul>
         </div>
       </SimpleBar>

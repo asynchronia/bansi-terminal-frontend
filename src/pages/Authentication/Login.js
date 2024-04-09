@@ -15,10 +15,12 @@ import withRouter from '../../components/Common/withRouter';
 import { loginUser, socialLogin } from "../../store/actions";
 import { loginReq } from '../../service/authService';
 import StyledButton from '../../components/Common/StyledButton';
+import useAuth from '../../hooks/useAuth';
 
 const Login = props => {
   document.title = "Login | WILLSMEET";
 
+  const { setAuth } = useAuth();
   const dispatch = useDispatch();
   const [error, setError] = React.useState(null);
   const [isButtonLoading, setIsButtonLoading] = React.useState(false);
@@ -42,6 +44,8 @@ const Login = props => {
       try {
         if (response.success) {
           localStorage.setItem("accessToken", response.payload.accessToken);
+          localStorage.setItem("user", JSON.stringify(response.payload.user));
+          setAuth(response.payload.user);
           props.router.navigate("/dashboard");
         } else {
           setError(response.message);
