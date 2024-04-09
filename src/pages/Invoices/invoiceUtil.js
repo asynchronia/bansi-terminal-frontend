@@ -19,7 +19,7 @@ let difference_in_days =
     Math.round
         (difference_in_time / (1000 * 3600 * 24));
 
-return difference_in_days;
+return Math.abs(difference_in_days);
 
 }
 
@@ -83,7 +83,7 @@ export const indianNumberWords = (num) => {
         });
     }
 
-    return result;
+    return result.charAt(0).toUpperCase() + result.slice(1);
 };
 
 export const formatNumberWithCommasAndDecimal = (number) => {
@@ -91,5 +91,5 @@ export const formatNumberWithCommasAndDecimal = (number) => {
     return ''; 
   }
   const formattedNumber = number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-  return formattedNumber;
+  return "₹" + formattedNumber;
 };

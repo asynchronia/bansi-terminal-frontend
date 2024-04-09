@@ -16,7 +16,7 @@ import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 import { attributesCellRenderer} from './ItemsUtils';
-
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
  
 
 const ViewItems = (props,{route,navigate}) => {
@@ -83,9 +83,11 @@ const ViewItems = (props,{route,navigate}) => {
       {headerName: "Stock Quantity",sortable:false, field: "inventory",suppressMenu: true,
       floatingFilterComponentParams: {suppressFilterButton:true}},
       {headerName: "Cost Price",sortable:false, field: "costPrice",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true}},
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)},
       {headerName: "Selling Price",sortable:false, field: "sellingPrice",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true}},
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)},
       {headerName: "Variant Info", field: "attributes",sortable:false,suppressMenu: true,
       floatingFilterComponentParams: {suppressFilterButton:true},cellRenderer: attributesCellRenderer}
     ]

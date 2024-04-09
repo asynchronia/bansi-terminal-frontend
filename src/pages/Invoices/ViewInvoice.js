@@ -34,17 +34,21 @@ const ViewInvoice = (props) => {
     { headerName: "Qty", field: "quantity" ,suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true}},
     { headerName: "Rate", field: "rate", sortable: false,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true} },
+    floatingFilterComponentParams: {suppressFilterButton:true},
+    valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) },
     { headerName: "CGST%", field: "cgst", sortable: false,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
+    floatingFilterComponentParams: {suppressFilterButton:true} },
     { headerName: "Tax Amt", field: "cgst_tax", sortable: false,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true} } ,
+    floatingFilterComponentParams: {suppressFilterButton:true},
+    valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) } ,
     { headerName: "SGST%", field: "sgst", sortable: false,suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true} },
     { headerName: "Tax Amt", field: "sgst_tax", sortable: false,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true} },
+    floatingFilterComponentParams: {suppressFilterButton:true},
+    valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) },
     { headerName: "Amount", field: "item_total", sortable: false,suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true} }
+    floatingFilterComponentParams: {suppressFilterButton:true},
+    valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) }
   ]
   const autoSizeStrategy = {
     type: 'fitGridWidth'
@@ -158,10 +162,10 @@ const getInvoiceFinalDetails = () =>{
         <>
         <table className="invoice-table">
             <tr >
-                <td className="label-col td-style">{"Sub Total"}</td><td className="td-style">{responseObj.sub_total}</td>
+                <td className="label-col td-style">{"Sub Total"}</td><td className="td-style">{formatNumberWithCommasAndDecimal(responseObj.sub_total)}</td>
             </tr>
             <tr>
-                <td className="label-col td-style">{"Taxable Amount"}</td><td className="td-style">{responseObj.tax_total}</td>
+                <td className="label-col td-style">{"Taxable Amount"}</td><td className="td-style">{formatNumberWithCommasAndDecimal(responseObj.tax_total)}</td>
             </tr>
             <tr>
                 <td className="label-col td-style">{"CGST"}</td><td className="td-style">{cgst}</td>

@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
 import { changePreloader } from "../../store/actions";
-
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 /*.dropdown-toggle::after {
   display: none !important; 
 }*/
@@ -134,6 +134,7 @@ const AllItems = (props) => {
         sortable: false,
         suppressMenu: true,
         floatingFilterComponentParams: { suppressFilterButton: true },
+        valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
       },
       {
         headerName: "Created On",

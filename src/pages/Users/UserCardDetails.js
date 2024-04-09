@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useCallback } from 'react';
-import { Card, CardBody, Row, Col, Button } from 'reactstrap';
+import React, { useEffect, useRef, useState,useCallback } from "react";
+// import React, { useState } from 'react';
+// import { useCallback } from 'react';
+import { Card, CardBody, Row, Col } from 'reactstrap';
 import Chip from '@mui/material/Chip';
 import { getUserRoleListReq } from '../../service/usersService';
 import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg"
@@ -9,20 +10,22 @@ import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.
 const UserCardDetails = (user) => {
 
     const [userRole, setUserRole] = useState('');
-
-    
+    const effectCalled = useRef(false); 
     const color = user?.usersData?.status==="active" ? '#2ecc71' : "red";
-    
-    
     const roleData = useCallback(async (body) => {
       const response = await getUserRoleListReq(user.usersData.role);
       if (response && response.payload) {
           setUserRole(response?.payload.roles.filter(role=>role._id===user.usersData.role)[0].title);
       } 
     });  
-     
 
-    roleData();
+    
+    useEffect(() => {
+      if (!effectCalled.current) {
+        roleData();
+        effectCalled.current=true;
+      }
+    },[]); 
     // warehouseData();
 
     return (
