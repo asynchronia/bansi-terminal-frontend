@@ -2,6 +2,7 @@ import React,{useState} from "react";
 import CustomDropdown from "../../components/CustomComponents/CustomDropdown";
  
 import "./styles/DropdownMenuBtn.scss";
+import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 const DropdownMenuBtn = (props) =>{
     const {deleteItem, handleEditClick, data, handleViewClick} = props;
     const [menu, setMenu] = useState(false);
@@ -20,10 +21,10 @@ const DropdownMenuBtn = (props) =>{
           direction={'bottom'}
           toggle={() => setMenu(!menu)}
           items={[
-            { label: 'Edit Item', onClick: onEditClick },
+            { label: 'Edit Item', onClick: onEditClick, module: MODULES_ENUM.ITEMS, permission: PERMISSIONS_ENUM.UPDATE },
             { label: 'View Item', onClick: onViewClick },
-            { label: 'Change Status' },
-            { label: 'Delete Item', onClick: onDeleteItem }
+            { label: 'Change Status', module: MODULES_ENUM.ITEMS, permission: PERMISSIONS_ENUM.UPDATE },
+            { label: 'Delete Item', onClick: onDeleteItem, module: MODULES_ENUM.ITEMS, permission: PERMISSIONS_ENUM.DELETE }
           ]}
        />
       );

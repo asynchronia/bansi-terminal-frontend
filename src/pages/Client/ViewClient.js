@@ -256,7 +256,7 @@ const ViewClient = (props) => {
   };
 
   useEffect(() => {
-    props.setBreadcrumbItems("EditClient", breadcrumbItems);
+    props.setBreadcrumbItems("Client", breadcrumbItems);
   });
 
   return (
