@@ -12,7 +12,6 @@ import {
   Col,
   Modal,
   Row,
-
 } from "reactstrap";
 import { Avatar, CircularProgress } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
@@ -30,6 +29,7 @@ import { createBranchReq } from "../../service/branchService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { signinReq } from "../../service/authService";
+import { getTaxesReq } from "../../service/itemService";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -39,6 +39,7 @@ const ViewClient = (props) => {
     loading: true,
     value: false,
   });
+  const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
     agreement: false,
     branch: false,
@@ -68,25 +69,51 @@ const ViewClient = (props) => {
     }, [5000]);
   };
 
-
+  const searchAllTaxes = async (part) => {
+    try {
+      const response = await getTaxesReq();
+      let data = await response;
+     setAllTaxes (data?.payload?.taxes);
+     if(part==='agreement'){
+      return data?.payload?.taxes
+     }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getAgreement = async (id) => {
     try {
       const data = { clientId: id };
       const res = await getAgreementReq(data);
+      let taxes= await searchAllTaxes('agreement');
+      // console.log(res.payload.items);
+     
 
       let array = [];
+
 
       if (res?.payload?.items) {
         array = res?.payload?.items?.flatMap((item) => {
           return item.variants.map((variant) => {
+            const attributes = variant.variant.attributes;
+            let taxName;
+            for(let i=0; i<taxes.length; i++){
+              if(taxes[i]._id===item.item.taxes[0]){
+                taxName= taxes[i].name;
+              }
+            }
+            
             return {
               id: variant.variant._id,
               itemId: variant.variant.itemId,
               title: item.item.title,
               sku: variant.variant.sku,
-              costPrice: variant.variant.costPrice,
-              sellingPrice: variant.variant.sellingPrice,
+              sellingPrice: variant.price,
+              attributes:attributes,
+              tax:taxName,
+              unit:item.item.itemUnit,
+              type:item.item.itemType
             };
           });
         });
@@ -119,11 +146,10 @@ const ViewClient = (props) => {
       }
     } catch (error) {
       if (error === 404) {
-        setAgreementAvailable({ loading: false, value: false });;
+        setAgreementAvailable({ loading: false, value: false });
       } else {
         setAgreementAvailable({ loading: false, value: false });
       }
-      
     }
   };
 
@@ -226,10 +252,11 @@ const ViewClient = (props) => {
   useEffect(() => {
     searchClient(id);
     getAgreement(id);
+    searchAllTaxes()
+    
   }, []);
 
   const searchClient = async (id) => {
- 
     try {
       const data = { _id: id };
       const res = await getClientWithIdReq(data);
@@ -270,6 +297,7 @@ const ViewClient = (props) => {
         }}
       >
         <Agreement
+        allTaxes={allTaxes}
           handleSubmitAgreement={handleSubmitAgreement}
           displayTableData={displayTableData}
           setDisplayTableData={setDisplayTableData}
@@ -377,6 +405,7 @@ const ViewClient = (props) => {
                     setAgreementData={setAgreementData}
                     displayTableData={displayTableData}
                     setDisplayTableData={setDisplayTableData}
+                    
                   />
                 </div>
               )}
