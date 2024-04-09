@@ -15,7 +15,7 @@ const DropdownMenuBtn = (props) =>{
           direction={'bottom'}
           toggle={() => setMenu(!menu)}
           items={[
-            { label: 'View Item', onClick: onViewClick }
+            { label: 'View Payments', onClick: onViewClick }
           ]}
       />
       );

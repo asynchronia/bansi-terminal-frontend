@@ -8,7 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
 import { changePreloader } from "../../store/actions";
-
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 /*.dropdown-toggle::after {
   display: none !important; 
 }*/
@@ -22,6 +22,8 @@ import "./styles/AllItems.scss";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { AgGridReact } from "ag-grid-react";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
+import RequirePermission from "../../routes/middleware/requirePermission";
+import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 
 const AllItems = (props) => {
   document.title = "All Items";
@@ -102,72 +104,73 @@ const AllItems = (props) => {
   };
 
   const columnDefs = [
-      {
-        headerName: "Item Name",
-        field: "title",
-        headerCheckboxSelection: true,
-        checkboxSelection: true,
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
+    {
+      headerName: "Item Name",
+      field: "title",
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Type",
+      field: "itemType",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "HSN Code",
+      field: "hsnCode",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Sale Price",
+      field: "salePrice",
+      sortable: false,
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+    },
+    {
+      headerName: "Created On",
+      field: "createdAt",
+      cellRenderer: (props) => {
+
+        let date = new Date(props.value);
+        return <>{date.toDateString()}</>;
       },
-      {
-        headerName: "Type",
-        field: "itemType",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Category",
+      field: "category",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Action",
+      field: "action",
+      sortable: false,
+      cellClass: "actions-button-cell",
+      cellRenderer: DropdownMenuBtn,
+      cellRendererParams: {
+        deleteItem: onDeleteItem,
+        handleResponse: handleDeleteResponse,
+        handleEditClick: handleEditClick,
+        handleViewClick: handleViewClick,
       },
-      {
-        headerName: "HSN Code",
-        field: "hsnCode",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Status",
-        field: "status",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Sale Price",
-        field: "salePrice",
-        sortable: false,
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Created On",
-        field: "createdAt",
-        cellRenderer: (props) => {
-         
-          let date = new Date(props.value);
-          return <>{date.toDateString()}</>;
-        },
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Category",
-        field: "category",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Action",
-        field: "action",
-        sortable: false,
-        cellClass: "actions-button-cell",
-        cellRenderer: DropdownMenuBtn,
-        cellRendererParams: {
-          deleteItem: onDeleteItem,
-          handleResponse: handleDeleteResponse,
-          handleEditClick: handleEditClick,
-          handleViewClick: handleViewClick,
-        },
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-    ],
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+  ],
     agRowData = [
       {
         itemName: "Byju's",
@@ -253,10 +256,10 @@ const AllItems = (props) => {
     document.body.classList.add("no_padding");
   }
   const onPaginationChanged = useCallback((event) => {
-    
+
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
-    
+
     setPaginationPageSize(pageSize);
   }, []);
   /*
@@ -301,7 +304,7 @@ const AllItems = (props) => {
     }
   }, []);
 
- 
+
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
@@ -338,11 +341,11 @@ const AllItems = (props) => {
   }, [paginationPageSize]);
 
   const handleChange = (e) => {
-    
+
     setCategory(e.target.value);
   };
   const handleInputChange = (e) => {
-    
+
     setSearchValue(e.target.value);
   };
 
@@ -422,20 +425,22 @@ const onGridReady = useCallback((params) => {
             <Card>
               <CardBody>
                 <div className="button-section">
-                  <Button
-                    className="all-items-btn"
-                    color="primary"
-                    onClick={redirectToCreateItem}
-                  >
-                    <i className=" mdi mdi-20px mdi-plus mx-1"></i>Create Item
-                  </Button>
-                  <Button color="secondary">Import Items</Button>
+                  <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.CREATE}>
+                    <Button
+                      className="all-items-btn"
+                      color="primary"
+                      onClick={redirectToCreateItem}
+                    >
+                      <i className=" mdi mdi-20px mdi-plus mx-1"></i>Create Item
+                    </Button>
+                    <Button color="secondary">Import Items</Button>
+                  </RequirePermission>
                   <div className="button-right-section">
                     <div className="categoryDiv">
                       <label
                         name="category"
                         id="category"
-                      
+
                         onClick={() => {
                           setCategoryData({
                             ...categoryData,
@@ -450,7 +455,7 @@ const onGridReady = useCallback((params) => {
                           : `Select Category`}
                       </label>
                       {categoryData.show ? (
-                        <div style={{position:'absolute', background:'white', minWidth:'300px'}}>
+                        <div style={{ position: 'absolute', background: 'white', minWidth: '300px' }}>
                           <MultipleLayerSelect
                             categories={allCategories}
                             setCategoryData={setCategoryData}

@@ -16,7 +16,7 @@ import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 import { getOrderDetailsReq } from "../../service/orderService";
 import OrderTrackingRenderer from "./OrderTrackingRenderer";
-
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 
 const OrderDetails = (props) => {
   const { id } = useParams();
@@ -70,11 +70,15 @@ const OrderDetails = (props) => {
       ,cellRenderer: OrderDetailsRenderer,
       },
       {headerName: "Rate", field: "rate",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true}},
+      floatingFilterComponentParams: {suppressFilterButton:true},},
       {headerName: "Discount", field: "discount",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true}},
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+    },
       {headerName: "Amount", field: "item_total",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true}},
+      floatingFilterComponentParams: {suppressFilterButton:true},
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+    },
     ]
     
     const onPaginationChanged = useCallback((event) => {
@@ -159,13 +163,13 @@ const OrderDetails = (props) => {
           </button>
         </CardBody>
         <div style={{ display: 'flex', width: '100%', justifyContent: 'space-evenly', margin: '5px 40px 30px 30px' }}>
-          <OrderTrackingRenderer label={'Initiated'} date={'10-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
+          <OrderTrackingRenderer label={'Initiated'} date={orderData?.date} color={orderData?.date ? 'rgb(209 247 209)' : '#D3D3D3'}  isCheck={orderData?.date ? true : false}  />
           <div style={{margin: '7px', marginLeft: '-15px', fontSize: '25px'}}>---</div>
-          <OrderTrackingRenderer label={'Approved'} date={'12-11-2023'} color={'rgb(209 247 209)'} isCheck={true} />
+          <OrderTrackingRenderer label={'Approved'} date={'12-11-2023'} color={orderData?.date ? 'rgb(209 247 209)' : '#D3D3D3'}  isCheck={orderData?.date ? true : false}  />
           <div style={{margin: '7px', marginLeft: '-15px', fontSize: '25px'}}>---</div>
-          <OrderTrackingRenderer label={'Proceed'} date={'15-11-2023'} color={'#D3D3D3'} isCheck={false} />
+          <OrderTrackingRenderer label={'Proceed'} date={'15-11-2023'} color={orderData?.date ? 'rgb(209 247 209)' : '#D3D3D3'}  isCheck={orderData?.date ? true : false}  />
           <div style={{margin: '7px', marginLeft: '-15px', fontSize: '25px'}}>---</div>
-          <OrderTrackingRenderer label={'Delivery'} date={'24-11-2023'} color={'#D3D3D3'} isCheck={false} />
+          <OrderTrackingRenderer label={'Delivery'} date={'24-11-2023'} color={orderData?.packages?.shipment_order?.delivery_date  ? 'rgb(209 247 209)' : '#D3D3D3'}  isCheck={orderData?.packages?.shipment_order?.delivery_date ? true : false}  />
         </div>
           </Card>
           <Row className="d-flex align-items-stretch">
@@ -310,12 +314,12 @@ const OrderDetails = (props) => {
                 </div>
                 <div className="content-above-table" style={{ textAlign: "right", marginRight: "15.3em" }}>
                 <div className="details ">
-                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px -12px'}}>Sub Total : <h4 style={{fontSize: '15px', margin: '-18px -95px'}}>₹ {totalItemTotal}</h4></h4>
+                <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px -12px'}}>Sub Total : <h4 style={{fontSize: '15px', margin: '-18px -95px'}}>{formatNumberWithCommasAndDecimal(totalItemTotal)}</h4></h4>
                 <p className="secondary" style={{margin: '-20px -32px'}}>Total Quantity {rowCount}</p>
                 <br/>
-                <h4 className="secondary" style={{fontSize: '15px', margin: '20px 18px'}}>CGST : <h4 style={{fontSize: '15px', margin: '-18px -125px'}}>₹ {totalCGST}</h4></h4>
+                <h4 className="secondary" style={{fontSize: '15px', margin: '20px 18px'}}>CGST : <h4 style={{fontSize: '15px', margin: '-18px -125px'}}>{formatNumberWithCommasAndDecimal(totalCGST)}</h4></h4>
                 <br />
-                <h4 className="secondary" style={{fontSize: '15px', margin: '10px 21px'}}>SGST : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>₹ {totalSGST}</h4></h4>
+                <h4 className="secondary" style={{fontSize: '15px', margin: '10px 21px'}}>SGST : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>{formatNumberWithCommasAndDecimal(totalSGST)}</h4></h4>
                 <br />
                 <hr style={{width: '117%'}} />
                 <h4 className="secondary" style={{fontSize: '15px', fontWeight: 'bold', margin: '20px 21px'}}>Total : <h4 style={{fontSize: '15px', margin: '-18px -128px'}}>₹ {Math.round((totalItemTotal+totalCGST+totalSGST) * 100) / 100}</h4></h4>

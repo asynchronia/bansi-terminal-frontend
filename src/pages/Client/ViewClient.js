@@ -165,7 +165,7 @@ const ViewClient = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Client", link: "/client" },
+    { title: "Client", link: "/clients" },
     { title: "View", link: "/client/:id" },
   ];
 
@@ -256,7 +256,7 @@ const ViewClient = (props) => {
   };
 
   useEffect(() => {
-    props.setBreadcrumbItems("EditClient", breadcrumbItems);
+    props.setBreadcrumbItems("Client", breadcrumbItems);
   });
 
   return (

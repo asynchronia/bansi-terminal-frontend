@@ -16,7 +16,7 @@ const CreateClient = (props) => {
   const navigate = useNavigate();
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Client", link: "/client" },
+    { title: "Client", link: "/clients" },
     { title: "Add new Client", link: "/client/add" },
   ];
 

@@ -8,6 +8,7 @@ import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
 import { changePreloader } from "../../store/actions";
+import { formatNumberWithCommasAndDecimal } from "./invoiceUtil";
 
 /*.dropdown-toggle::after {
   display: none !important; 
@@ -148,12 +149,14 @@ const AllInvoices = (props) => {
       sortable: false,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
     },
     {
       headerName: "Amount Due",
       field: "balance",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
     },
     {
       headerName: "Action",
@@ -162,7 +165,7 @@ const AllInvoices = (props) => {
       cellClass: "actions-button-cell",
       cellRenderer: InvoiceActionBtn,
       cellRendererParams: {
-        onClickView: onClickView,
+      onClickView: onClickView,
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },

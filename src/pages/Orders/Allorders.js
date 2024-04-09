@@ -12,6 +12,7 @@ import { getOrdersReq } from "../../service/orderService";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import CircleRenderer from "./CircleRenderer";
 import { changePreloader } from "../../store/actions";
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -138,6 +139,7 @@ const AllOrders = (props) => {
       headerName: "Total Amount", field: "total",suppressMenu: true,
       floatingFilterComponentParams: {suppressFilterButton:true},
       tooltipValueGetter: (p) => p.value,headerTooltip: "Total Amount",
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
     },
     {
       headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,suppressMenu: true,
