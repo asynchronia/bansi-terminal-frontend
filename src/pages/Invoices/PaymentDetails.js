@@ -91,11 +91,13 @@ const PaymentDetails = (props) => {
     },
     {
       headerName: "Invoice Amount", field: "total", suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true }
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
     },
     {
       headerName: "Payment Amount", field: "total", suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true }
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
     }
   ]
 
@@ -244,7 +246,7 @@ const PaymentDetails = (props) => {
                     </Row>
                     <Row>
                       <Col xs="12">
-                        <p className="text-white" style={{ fontSize: "28px" }}>₹{formatNumberWithCommasAndDecimal(amountReceived)}</p>
+                        <p className="text-white" style={{ fontSize: "28px" }}>{formatNumberWithCommasAndDecimal(amountReceived)}</p>
                       </Col>
                     </Row>
                   </div>

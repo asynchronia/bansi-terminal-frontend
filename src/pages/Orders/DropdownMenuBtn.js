@@ -20,8 +20,8 @@ const DropdownMenuBtn = (props) =>{
           direction={'bottom'}
           toggle={() => setMenu(!menu)}
           items={[
-            { label: 'Edit Item', onClick: onEditOrder },
-            { label: 'View Item', onClick: onViewClick },
+            { label: 'Update Order', onClick: onEditOrder },
+            { label: 'View Order', onClick: onViewClick },
             { label: 'Change Status' },
             { label: 'Delete Order', onClick: onDeleteOrder }  
           ]}

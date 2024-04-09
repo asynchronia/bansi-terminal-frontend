@@ -9,7 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
-
+import { formatNumberWithCommasAndDecimal } from "./invoiceUtil";
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -72,7 +72,8 @@ const columnDefs = [
     {headerName: "Payment Mode", field: "payment_mode",suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Amount Paid", field: "amount",suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
+    floatingFilterComponentParams: {suppressFilterButton:true},
+    valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)},
     {headerName: "Action", field: "action",sortable:false,
     suppressMenu: true, floatingFilterComponentParams: {suppressFilterButton:true},
     cellClass:"actions-button-cell",
