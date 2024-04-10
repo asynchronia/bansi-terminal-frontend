@@ -3,6 +3,7 @@ import { Button, Card, CardBody, Col, Row, Table } from "reactstrap";
 import { searchItemReq } from "../../service/itemService";
 import { v4 as uuidv4 } from "uuid";
 import AgreementTable from "./AgreementTable";
+import { Chip } from "@mui/material";
 
 const Agreement = (props) => {
   const {
@@ -45,7 +46,7 @@ const Agreement = (props) => {
       unit: item.itemUnit,
       type: item.itemType,
     };
-    console.log(obj);
+    // console.log(obj);
     setDisplayTableData([...displayTableData, obj]);
     handleShowData(false);
   };
@@ -101,7 +102,7 @@ const Agreement = (props) => {
 
   const getListOfRowData = async (data) => {
     const response = await searchItemReq(data);
-    console.log(response.payload.items);
+    // console.log(response.payload.items);
     setRowData(response?.payload?.items);
   };
 
@@ -226,7 +227,17 @@ const Agreement = (props) => {
                       }}
                       key={variant._id}
                     >
-                      <Col>{item.title}</Col>
+                      <Col>
+                        <p>{item.title}</p>
+                        <div sx={{display:'flex', gap:'3px'}}>
+                          {variant.attributes
+                            ? variant?.attributes?.map((attribute) => (
+                                <Chip size="small" key={attribute._id} label= {`${attribute.name}-${attribute.value}`}/>
+                               
+                              ))
+                            : null}
+                        </div>
+                      </Col>
                       <Col>{variant.sku}</Col>
                       <Col>{variant.costPrice}</Col>
                       <Col>{variant.sellingPrice}</Col>
