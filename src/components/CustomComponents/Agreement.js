@@ -196,6 +196,7 @@ const Agreement = (props) => {
                 position: "absolute",
                 zIndex: 2,
                 width: "750px",
+                height:'500px', overflowY:'scroll'
               }}
             >
               {rowData.length === 0 ? (
@@ -205,7 +206,7 @@ const Agreement = (props) => {
               ) : (
                 rowData?.map((item) =>
                   item?.variant?.map((variant) => (
-                    <Row
+                    <Row 
                       onClick={() => {
                         handleAddToAgreement(
                           item._id,
