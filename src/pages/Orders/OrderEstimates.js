@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback} from "react";
 import { Row, Col, Card, CardBody, CardTitle, Button, Input, Modal } from "reactstrap"
 import { connect, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +17,16 @@ import { getEstimatesReq } from "../../service/orderService";
 const OrderEstimates = (props) => {
     document.title = "Estimates";
     let dispatch = useDispatch();
+    let navigate = useNavigate();
     const effectCalled = useRef(false);
+
+
+    const redirectToViewPage = (id) => {
+        let path = "/view-estimate/" + id;
+        setTimeout(() => {
+          navigate(path, id);
+        }, 400);
+      };
 
   const breadcrumbItems = [
 
@@ -75,17 +84,13 @@ const OrderEstimates = (props) => {
     type: 'fitGridWidth'
   };
 
-// const paginationPageSizeSelector = [5, 10, 20, 50, 100];
   const paginationPageSizeSelector = [25,50,100];
 
-  // TODO check from where status will come.
-  const [allStatuses, setAllStatuses] = useState(['Active', 'Inactive']);
-  const [status, setStatus] = useState("");
+
+ 
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState(null);
-  
+
   const [paginationPageSize, setPaginationPageSize] = useState(25);
-  const [sortData, setSortData] = useState(null);
   const [page, setPage] = useState(1);
 
   const onPaginationChanged = useCallback((event) => {
@@ -102,26 +107,11 @@ const OrderEstimates = (props) => {
     }
   }, []);
 
-
-  useEffect(() => {
-    props.setBreadcrumbItems('Estimates', breadcrumbItems);
-    if (searchValue || searchValue === "") {
-      getListOfRowData('search');
-    }
-  }, [searchValue]);
-
-  useEffect(() => {
-    if (sortData?.key && sortData?.order) {
-      getListOfRowData('sort');
-    }
-  }, [sortData]);
-
   
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
     const response = await getEstimatesReq(body);
-
-    setRowData(response);
+    setRowData(response.data);
     dispatch(changePreloader(false));
   });
 
@@ -133,7 +123,11 @@ const OrderEstimates = (props) => {
     }
   }, []);
 
- 
+ const onRowClicked = (event) =>{
+    console.log(event.data);
+    //estimate_id
+    redirectToViewPage(event.data?.estimate_id);
+ }
 
   return (
     <React.Fragment>
@@ -161,6 +155,8 @@ const OrderEstimates = (props) => {
                     rowData={rowData}
                     onPaginationChanged={onPaginationChanged}
                     sortingOrder={["desc", "asc"]}
+                    autoSizeStrategy={autoSizeStrategy}
+                    onRowClicked={onRowClicked}
                   >
                   </AgGridReact>
                 </div>

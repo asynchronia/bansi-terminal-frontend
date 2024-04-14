@@ -69,22 +69,18 @@ const Expenses = (props) => {
     
   ];
   
-  //TODO to check for autoSizeStrategy
+
   const autoSizeStrategy = {
     type: 'fitGridWidth'
   };
 
-// const paginationPageSizeSelector = [5, 10, 20, 50, 100];
   const paginationPageSizeSelector = [25,50,100];
 
-  // TODO check from where status will come.
-  const [allStatuses, setAllStatuses] = useState(['Active', 'Inactive']);
-  const [status, setStatus] = useState("");
+ 
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState(null);
   
   const [paginationPageSize, setPaginationPageSize] = useState(25);
-  const [sortData, setSortData] = useState(null);
+
   const [page, setPage] = useState(1);
 
   const onPaginationChanged = useCallback((event) => {
@@ -106,7 +102,7 @@ const Expenses = (props) => {
     dispatch(changePreloader(true));
     const response = await getExpensesReq(body);
 
-    setRowData(response);
+    setRowData(response.data);
     dispatch(changePreloader(false));
   });
 
@@ -146,6 +142,7 @@ const Expenses = (props) => {
                     rowData={rowData}
                     onPaginationChanged={onPaginationChanged}
                     sortingOrder={["desc", "asc"]}
+                    autoSizeStrategy={autoSizeStrategy}
                   >
                   </AgGridReact>
                 </div>
