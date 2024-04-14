@@ -32,6 +32,8 @@ const API_URL = {
     editItem: "/api/items/update",
     getTaxes: "/api/taxes/list",
     getClientWithId: "/api/clients/get",
+    getEstimates: "/api/estimates/list",
+    getExpenses:"/api/expenses/list"
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -221,6 +223,38 @@ export async function getInvoices(body) {
     return new Promise((resolve, reject) => {
         axios
             .post(`${baseUrl}${API_URL.getInvoices}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            }).catch(error => {
+                reject(error);
+            });
+    }).catch(error => {
+        console.log(error);
+        return error?.response;
+    });
+}
+
+export async function getEstimates(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.getEstimates}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            }).catch(error => {
+                reject(error);
+            });
+    }).catch(error => {
+        console.log(error);
+        return error?.response;
+    });
+}
+
+export async function getExpenses(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.getExpenses}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

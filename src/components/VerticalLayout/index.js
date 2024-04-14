@@ -153,7 +153,7 @@ const Layout = (props) => {
       <div id="layout-wrapper">
         <Header toggleMenuCallback={toggleMenuCallback} />
         <Sidebar
-          theme={props.leftSideBarTheme}
+          theme={"dark"}
           type={props.leftSideBarType}
           isMobile={props.isMobile}
         />

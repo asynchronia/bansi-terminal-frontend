@@ -242,9 +242,9 @@ body[data-topbar="dark"] {
 }
 
 body[data-sidebar="dark"] {
-  .navbar-brand-box {
+ /* .navbar-brand-box {
     background: var(--#{$prefix}sidebar-dark-bg);
-  }
+  }*/
 
   .logo-dark {
     display: none;

@@ -1,4 +1,4 @@
-import { getOrderList,getOrderDetails } from "../api";
+import { getOrderList,getOrderDetails, getEstimates } from "../api";
 
 export const getOrdersReq = async (body = {}) => {
     const response = await getOrderList(body);
@@ -8,5 +8,10 @@ export const getOrdersReq = async (body = {}) => {
 
 export const getOrderDetailsReq = async(body={})=>{
     const response =await getOrderDetails(body);
+    return response.payload;
+}
+
+export const getEstimatesReq = async(body={})=>{
+    const response =await getEstimates(body);
     return response.payload;
 }
