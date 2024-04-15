@@ -1,3 +1,4 @@
+import { Chip } from "@mui/material";
 import React, { useRef } from "react";
 import { CardHeader, Table } from "reactstrap";
 
@@ -64,24 +65,33 @@ const AgreementTable = (props) => {
     setAgreementData(updatedAgreementData);
   };
 
+
   return (
     <Table className="mt-3">
       <thead>
         <tr>
           <th>Product Name</th>
           <th>SKU</th>
-          <th>Cost Price</th>
-          <th> Selling Price</th>
-          <th></th>
+          <th>Cost</th>
+          <th>Tax Bracket</th>
         </tr>
       </thead>
       <tbody id="agreementBody">
         {displayTableData?.length > 0
           ? displayTableData.map((data) => (
               <tr key={data.id}>
-                <td className="pt-4">{data.title}</td>
+                <td className="pt-4" style={{ display: "flex", flexDirection: "column" }}>
+                  <p>{data.title}</p>
+                  <div style={{display:'flex', gap:'3px'}}>
+                  {data.type==='variable'? 
+                  data.attributes.map((attribute, index) => (
+                    <Chip size="small" key={index} label={`${attribute.name}: ${attribute.value}`} />
+                  )):null
+                  }
+                  </div>
+                </td>
                 <td className="pt-4">{data.sku}</td>
-                <td className="pt-4">{data.costPrice}</td>
+
                 {editable ? (
                   <td>
                     <input
@@ -94,8 +104,9 @@ const AgreementTable = (props) => {
                     />
                   </td>
                 ) : (
-                  <td className="pt-4">{data?.sellingPrice || ""}</td>
+                  <td className="pt-4">₹{`${data?.sellingPrice}/per ${data.unit}` || ""}</td>
                 )}
+                <td className="pt-4">{data?.tax}</td>
                 {editable ? (
                   <td>
                     <button

@@ -50,7 +50,7 @@ const UserData = (props) => {
         clientId: clientId,
       });
       let array = response?.payload;
-      console.log(array)
+      
 
       const newArray = array.map((item) => ({
         UserName: item.firstName+" "+item.lastName,

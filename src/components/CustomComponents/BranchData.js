@@ -37,7 +37,7 @@ const BranchData = (props) => {
       const newArray = array.map((item) => ({
         Name: item.name,
         isPrimary: item.isPrimary,
-        AssociatedWarehouse: item.associatedWarehouse,
+        AssociatedWarehouse: item.associatedWarehouse.code,
         Contact: item.contact,
       }));
 
