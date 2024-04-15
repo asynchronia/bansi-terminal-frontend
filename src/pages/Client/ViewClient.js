@@ -29,6 +29,7 @@ import { createBranchReq } from "../../service/branchService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { signinReq } from "../../service/authService";
+import { getTaxesReq } from "../../service/itemService";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -38,6 +39,7 @@ const ViewClient = (props) => {
     loading: true,
     value: false,
   });
+  const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
     agreement: false,
     branch: false,
@@ -71,19 +73,32 @@ const ViewClient = (props) => {
     try {
       const data = { clientId: id };
       const res = await getAgreementReq(data);
+      let taxes = await searchAllTaxes("agreement");
+      // console.log(res.payload.items);
 
       let array = [];
 
       if (res?.payload?.items) {
         array = res?.payload?.items?.flatMap((item) => {
           return item.variants.map((variant) => {
+            const attributes = variant.variant.attributes;
+            let taxName;
+            for (let i = 0; i < taxes.length; i++) {
+              if (taxes[i]._id === item.item.taxes[0]) {
+                taxName = taxes[i].name;
+              }
+            }
+
             return {
               id: variant.variant._id,
               itemId: variant.variant.itemId,
               title: item.item.title,
               sku: variant.variant.sku,
-              costPrice: variant.variant.costPrice,
-              sellingPrice: variant.variant.sellingPrice,
+              sellingPrice: variant.price,
+              attributes: attributes,
+              tax: taxName,
+              unit: item.item.itemUnit,
+              type: item.item.itemType,
             };
           });
         });
@@ -222,6 +237,7 @@ const ViewClient = (props) => {
   useEffect(() => {
     searchClient(id);
     getAgreement(id);
+    searchAllTaxes();
   }, []);
 
   const searchClient = async (id) => {
@@ -251,7 +267,7 @@ const ViewClient = (props) => {
   };
 
   useEffect(() => {
-    props.setBreadcrumbItems("EditClient", breadcrumbItems);
+    props.setBreadcrumbItems("Client", breadcrumbItems);
   });
 
   return (
@@ -265,6 +281,7 @@ const ViewClient = (props) => {
         }}
       >
         <Agreement
+          allTaxes={allTaxes}
           handleSubmitAgreement={handleSubmitAgreement}
           displayTableData={displayTableData}
           setDisplayTableData={setDisplayTableData}

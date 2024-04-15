@@ -123,6 +123,7 @@ const SidebarContent = props => {
 
   useEffect(() => {
     ref.current.recalculate();
+    document.body.setAttribute("data-sidebar","dark");
   }, []);
 
   useEffect(() => {
@@ -146,8 +147,8 @@ const SidebarContent = props => {
   return (
     <React.Fragment>
       <SimpleBar style={{ maxHeight: "100%" }} ref={ref}>
-        <div id="sidebar-menu">
-          <ul className="metismenu list-unstyled" id="side-menu">
+        <div id="sidebar-menu" data-sidebar="dark">
+          <ul className="metismenu list-unstyled mm-show mm-active" id="side-menu">
             {/* <li className="menu-title">{("Main")} </li> */}
             <li>
               <Link to="/dashboard" className="waves-effect">
@@ -202,8 +203,11 @@ const SidebarContent = props => {
                   <Link to="/orders">All Orders</Link>
                 </li>
                 <li>
-                  <Link to="/quotations">Quotations</Link>
+                  <Link to="/estimates">Estimates</Link>
                 </li>
+                {/* <li>
+                  <Link to="/quotations">Quotations</Link>
+                </li> */}
               </ul>
             </li>
             <li>
@@ -219,6 +223,12 @@ const SidebarContent = props => {
                   <Link to="/payments">Payments</Link>
                 </li>
               </ul>
+            </li>
+            <li>
+              <Link to="/expenses" className="waves-effect">
+                <i className="mdi mdi-truck-delivery"></i>
+                <span>Expenses</span>
+              </Link>
             </li>
             <RequirePermission module={MODULES_ENUM.USERS}>
               <li>

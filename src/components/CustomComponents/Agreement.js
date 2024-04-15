@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useState , useRef} from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { Button, Card, CardBody, Col, Row, Table } from "reactstrap";
 import { searchItemReq } from "../../service/itemService";
 import { v4 as uuidv4 } from "uuid";
 import AgreementTable from "./AgreementTable";
+import { Chip } from "@mui/material";
 
 const Agreement = (props) => {
   const {
+    allTaxes,
     handleSubmitAgreement,
     agreementData,
     setAgreementData,
@@ -17,23 +19,34 @@ const Agreement = (props) => {
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
   const [fileData, setFileData] = useState({
-    name:null,
-    url:null
-  })
+    name: null,
+    url: null,
+  });
 
   const handleShowData = (value) => {
     setShowRowData(value);
   };
 
-  const handleDisplayData = (itemId, id, variant, title) => {
+  const handleDisplayData = (item, itemId, id, variant, title) => {
+    let taxes = allTaxes;
+    let taxName;
+    for (let i = 0; i < taxes.length; i++) {
+      if (taxes[i]._id === item.taxes[0]) {
+        taxName = taxes[i].name;
+      }
+    }
     let obj = {
-      id: id,
-      itemId: itemId,
-      title: title,
+      id: variant._id,
+      itemId: variant.itemId,
+      title: item.title,
       sku: variant.sku,
-      costPrice: variant.costPrice,
       sellingPrice: variant.sellingPrice,
+      attributes: variant.attributes,
+      tax: taxName,
+      unit: item.itemUnit,
+      type: item.itemType,
     };
+    // console.log(obj);
     setDisplayTableData([...displayTableData, obj]);
     handleShowData(false);
   };
@@ -56,7 +69,6 @@ const Agreement = (props) => {
         },
       ]);
     } else {
-      
       const variantIndex = agreementData[itemIndex].variants.findIndex(
         (variant) => variant.variant === variantId
       );
@@ -90,20 +102,18 @@ const Agreement = (props) => {
 
   const getListOfRowData = async (data) => {
     const response = await searchItemReq(data);
+    // console.log(response.payload.items);
     setRowData(response?.payload?.items);
   };
-
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     const fileUrl = URL.createObjectURL(file);
     setFileData({
-      name:file.name,
-      url:fileUrl
+      name: file.name,
+      url: fileUrl,
     });
-
   };
-
 
   const fileInputRef = useRef(null);
 
@@ -166,10 +176,14 @@ const Agreement = (props) => {
                 onChange={handleFileUpload}
               />
               <Button className="btn-primary" onClick={handleButtonClick}>
-                {fileData.name?<div>{fileData.name}</div>:<div>
-                  <i className="ion ion-md-cloud-download mx-2"></i>
-                  Upload PDF
-                </div>}
+                {fileData.name ? (
+                  <div>{fileData.name}</div>
+                ) : (
+                  <div>
+                    <i className="ion ion-md-cloud-download mx-2"></i>
+                    Upload PDF
+                  </div>
+                )}
               </Button>
             </Col>
           </Row>
@@ -182,6 +196,7 @@ const Agreement = (props) => {
                 position: "absolute",
                 zIndex: 2,
                 width: "750px",
+                height:'500px', overflowY:'scroll'
               }}
             >
               {rowData.length === 0 ? (
@@ -191,7 +206,7 @@ const Agreement = (props) => {
               ) : (
                 rowData?.map((item) =>
                   item?.variant?.map((variant) => (
-                    <Row
+                    <Row 
                       onClick={() => {
                         handleAddToAgreement(
                           item._id,
@@ -199,6 +214,7 @@ const Agreement = (props) => {
                           variant.sellingPrice
                         );
                         handleDisplayData(
+                          item,
                           item._id,
                           variant._id,
                           variant,
@@ -212,7 +228,17 @@ const Agreement = (props) => {
                       }}
                       key={variant._id}
                     >
-                      <Col>{item.title}</Col>
+                      <Col>
+                        <p>{item.title}</p>
+                        <div sx={{display:'flex', gap:'3px'}}>
+                          {variant.attributes
+                            ? variant?.attributes?.map((attribute) => (
+                                <Chip size="small" key={attribute._id} label= {`${attribute.name}-${attribute.value}`}/>
+                               
+                              ))
+                            : null}
+                        </div>
+                      </Col>
                       <Col>{variant.sku}</Col>
                       <Col>{variant.costPrice}</Col>
                       <Col>{variant.sellingPrice}</Col>
