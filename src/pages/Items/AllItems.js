@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Button, Input, Modal } from "reactstrap";
 
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 // import {AgGridReact} from 'ag-grid-react';
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
-
+import { changePreloader } from "../../store/actions";
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 /*.dropdown-toggle::after {
   display: none !important; 
 }*/
@@ -133,6 +134,7 @@ const AllItems = (props) => {
         sortable: false,
         suppressMenu: true,
         floatingFilterComponentParams: { suppressFilterButton: true },
+        valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
       },
       {
         headerName: "Created On",
@@ -236,6 +238,7 @@ const AllItems = (props) => {
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
+  const dispatch = useDispatch();
 
   let bodyObject = {
     page: 1,
@@ -272,6 +275,7 @@ const AllItems = (props) => {
 }
 * */
   const getListOfRowData = useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getItemsReq(body);
 
     response.map((val, id) => {
@@ -280,6 +284,7 @@ const AllItems = (props) => {
     });
     setRowData(response);
     setBodyObjectReq(body);
+    dispatch(changePreloader(false));
   });
 
   const getCategories = useCallback(async () => {
@@ -296,6 +301,8 @@ const AllItems = (props) => {
       effectCalled.current = true;
     }
   }, []);
+
+ 
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);

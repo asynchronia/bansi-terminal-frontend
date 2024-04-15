@@ -16,21 +16,22 @@ const API_URL = {
     getOrderList: "/api/orders/list",
     getPaymentList: "/api/payments/list",
     login: "/api/users/login",
-    signin:'/api/users/signup',
+    signin: '/api/users/signup',
     createAgreement: '/api/agreements/create',
     getBranchList: '/api/branch/list',
     createBranch: '/api/branch/create',
-    getWarehouseList :'/api/branch/warehouse-list',
-    getUserList:'/api/users/get/users',
+    getWarehouseList: '/api/branch/warehouse-list',
+    getUserList: '/api/users/get/users',
     getUserRole: '/api/roles/list',
-    getItemData:"/api/items/get",
-    getInvoiceDetails:"/api/invoices/id/",
-    getPaymentDetails : "/api/payments/id",
-    getOrderDetails : "/api/orders/id",
+    getItemData: "/api/items/get",
+    getInvoiceDetails: "/api/invoices/id/",
+    getPaymentDetails: "/api/payments/id",
+    getInvoice: '/api/invoices/id/',
+    getOrderDetails: "/api/orders/id",
     getAgreement: "/api/agreements/agreement",
-    editItem:"/api/items/update",
-    getTaxes:"/api/taxes/list",
-    getClientWithId:"/api/clients/get",
+    editItem: "/api/items/update",
+    getTaxes: "/api/taxes/list",
+    getClientWithId: "/api/clients/get",
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -127,9 +128,9 @@ export async function getTaxes() {
         axios
             .get(`${baseUrl}${API_URL.getTaxes}`, { headers: getHeaders() })
             .then((res) => {
-                
+
                 resolve(res.data);
-               
+
             }).catch(error => {
                 reject(error.response.status);
             });
@@ -184,7 +185,7 @@ export async function getBranchList(body) {
 export async function getWarehouseList(body) {
     return new Promise((resolve) => {
         axios
-            .get(`${baseUrl}${API_URL.getWarehouseList}`,body, { headers: getHeaders() })
+            .get(`${baseUrl}${API_URL.getWarehouseList}`, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -232,7 +233,7 @@ export async function getInvoices(body) {
     });
 }
 
-export async function getPaymentDetails(id,body) {
+export async function getPaymentDetails(id, body) {
     return new Promise((resolve, reject) => {
         axios
             .get(`${baseUrl}${API_URL.getPaymentDetails}/${id}`, { headers: getHeaders() })
@@ -242,13 +243,13 @@ export async function getPaymentDetails(id,body) {
             }).catch(error => {
                 reject(error);
             });
-    }).catch(error =>{
+    }).catch(error => {
         console.log(error);
         return error?.response;
     });
 }
 
-export async function getOrderDetails(id,body) {
+export async function getOrderDetails(id, body) {
     return new Promise((resolve, reject) => {
         axios
             .get(`${baseUrl}${API_URL.getOrderDetails}/${id}`, { headers: getHeaders() })
@@ -258,7 +259,7 @@ export async function getOrderDetails(id,body) {
             }).catch(error => {
                 reject(error);
             });
-    }).catch(error =>{
+    }).catch(error => {
         console.log(error);
         return error?.response;
     });
@@ -372,11 +373,10 @@ export async function login(body) {
     });
 }
 
-
-export async function signin(body) {
-    return new Promise((resolve) => {
+export async function getInvoice(body, id) {
+    return new Promise((resolve, reject) => {
         axios
-            .post(`${baseUrl}${API_URL.signin}`, body)
+            .get(`${baseUrl}${API_URL.getInvoice + id}`, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -388,3 +388,15 @@ export async function signin(body) {
     });
 }
 
+export async function signin(body) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post(`${baseUrl}${API_URL.signin}`, body)
+            .catch(error => {
+                reject(error);
+            });
+    }).catch(error => {
+        console.log(error);
+        return error.response.data;
+    });
+}

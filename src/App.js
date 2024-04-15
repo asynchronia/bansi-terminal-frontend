@@ -1,12 +1,21 @@
+import PropTypes from 'prop-types'
+import React from "react"
+
 import { Route, Routes } from "react-router-dom"
-import React from 'react';
+import { connect } from "react-redux"
 import { userRoutes, authRoutes } from "./routes/allRoutes"
 import Authmiddleware from "./routes/middleware/Authmiddleware"
 import "./assets/scss/theme.scss"
 
 import VerticalLayout from "./components/VerticalLayout/"
 
-function App() {
+const App = props => {
+  function getLayout() {
+    let layoutCls = VerticalLayout
+    
+    return layoutCls
+  }
+  const Layout = getLayout();
   return (
     <React.Fragment>
       <Routes>
@@ -26,7 +35,7 @@ function App() {
             path={route.path}
             element={
               <Authmiddleware>
-                <VerticalLayout>{route.component}</VerticalLayout>
+                <Layout>{route.component}</Layout>
               </Authmiddleware>
             }
           />
@@ -36,4 +45,14 @@ function App() {
   );
 }
 
-export default App;
+App.propTypes = {
+  layout: PropTypes.any
+}
+
+const mapStateToProps = state => {
+  return {
+    layout: state.Layout,
+  }
+}
+
+export default connect(mapStateToProps, null)(App)

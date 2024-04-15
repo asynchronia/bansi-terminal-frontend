@@ -9,14 +9,18 @@ import {
  
 import "./styles/InvoiceActionBtn.scss";
 const InvoiceActionBtn = (props) =>{
-   const [menu, setMenu] = useState(false);
-  
+
+  const {onClickView, data} = props;
+  const [menu, setMenu] = useState(false);
+  const onClickViewInvoice = () =>{
+      onClickView(data.invoice_id);
+  }
     return (
         <div className="invoice-drop-down-item">
           <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
             <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
             <DropdownMenu>
-              <DropdownItem>View Invoice</DropdownItem>
+              <DropdownItem onClick={onClickViewInvoice}>View Invoice</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </div>

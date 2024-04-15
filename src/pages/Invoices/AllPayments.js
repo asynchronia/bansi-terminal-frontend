@@ -1,14 +1,15 @@
 import React,{useEffect, useState, useRef,useCallback} from "react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap"
+import { changePreloader } from "../../store/actions";
 
 import DropdownMenuBtn from "./DropdownMenuBtn";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
-
+import { formatNumberWithCommasAndDecimal } from "./invoiceUtil";
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -19,6 +20,7 @@ import "./styles/AllInvoices.scss";
 const AllPayments = (props) => {
   document.title = "Payments";
   let navigate = useNavigate(); 
+  let dispatch= useDispatch();
   const effectCalled = useRef(false);
 
   const redirectToViewPage = (id) =>{
@@ -70,7 +72,8 @@ const columnDefs = [
     {headerName: "Payment Mode", field: "payment_mode",suppressMenu: true,
     floatingFilterComponentParams: {suppressFilterButton:true}},
     {headerName: "Amount Paid", field: "amount",suppressMenu: true,
-    floatingFilterComponentParams: {suppressFilterButton:true}},
+    floatingFilterComponentParams: {suppressFilterButton:true},
+    valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)},
     {headerName: "Action", field: "action",sortable:false,
     suppressMenu: true, floatingFilterComponentParams: {suppressFilterButton:true},
     cellClass:"actions-button-cell",
@@ -120,6 +123,7 @@ const onPaginationChanged = useCallback((event) => {
 }, []);
 
 const getListOfRowData =  useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getPaymentReq(body);
     let custList = new Set();
      response.map((val,id)=>{
@@ -132,6 +136,7 @@ const getListOfRowData =  useCallback(async (body) => {
     setAllCustomers([...custArr]);
     setRowData(response);
     setBodyObjectReq(body);
+    dispatch(changePreloader(false));
 });
 
 

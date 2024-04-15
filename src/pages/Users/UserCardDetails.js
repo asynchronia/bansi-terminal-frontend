@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useCallback } from 'react';
-import { Card, CardBody, Row, Col, Button } from 'reactstrap';
+import React, { useEffect, useRef, useState,useCallback } from "react";
+// import React, { useState } from 'react';
+// import { useCallback } from 'react';
+import { Card, CardBody, Row, Col } from 'reactstrap';
 import Chip from '@mui/material/Chip';
 import { getUserRoleListReq } from '../../service/usersService';
 import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg"
@@ -9,20 +10,22 @@ import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.
 const UserCardDetails = (user) => {
 
     const [userRole, setUserRole] = useState('');
-
-    
+    const effectCalled = useRef(false); 
     const color = user?.usersData?.status==="active" ? '#2ecc71' : "red";
-    
-    
     const roleData = useCallback(async (body) => {
       const response = await getUserRoleListReq(user.usersData.role);
       if (response && response.payload) {
           setUserRole(response?.payload.roles.filter(role=>role._id===user.usersData.role)[0].title);
       } 
     });  
-     
 
-    roleData();
+    
+    useEffect(() => {
+      if (!effectCalled.current) {
+        roleData();
+        effectCalled.current=true;
+      }
+    },[]); 
     // warehouseData();
 
     return (
@@ -43,9 +46,9 @@ const UserCardDetails = (user) => {
         <Row className="mt-3">
           <Col>
             <div className="d-flex flex-wrap">
-              {user?.usersData?.associatedBranch?.name ?
-               <Chip label={user?.usersData?.associatedBranch?.name} className="mr-2"/>
-                : null }
+              {user?.usersData?.associatedWarehouses.map((warehouse, index) => (
+                <Chip key={index} label={warehouse.code} className="mr-2"/>
+              ))}
             </div>
           </Col>
         </Row>

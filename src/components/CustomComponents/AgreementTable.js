@@ -40,7 +40,6 @@ const AgreementTable = (props) => {
     setAgreementData(updatedAgreementData);
   };
 
-
   const handleDeleteAgreement = (variantId) => {
     const newArr = displayTableData.filter((e) => {
       return e.id !== variantId;
@@ -66,7 +65,7 @@ const AgreementTable = (props) => {
   };
 
   return (
-    <Table>
+    <Table className="mt-3">
       <thead>
         <tr>
           <th>Product Name</th>
@@ -83,29 +82,33 @@ const AgreementTable = (props) => {
                 <td className="pt-4">{data.title}</td>
                 <td className="pt-4">{data.sku}</td>
                 <td className="pt-4">{data.costPrice}</td>
-                <td>
-                  {editable?<input
-                    type="text"
-                    value={data?.sellingPrice || ""}
-                    className="form-control"
-                    onChange={(event) => {
-                      handleSellingPrice(event, data.id, data.itemId);
-                    }}
-                  />
-                  :
-                  data?.sellingPrice || ""}
-                </td>
-                {editable?<td>
-                  <button
-                    type="button"
-                    className="btn btn-primary waves-effect waves-light"
-                    onClick={() => {
-                      handleDeleteAgreement(data.id);
-                    }}
-                  >
-                    <i className="mdi mdi-18px mdi-delete"></i>
-                  </button>
-                </td>:null}
+                {editable ? (
+                  <td>
+                    <input
+                      type="text"
+                      value={data?.sellingPrice || ""}
+                      className="form-control"
+                      onChange={(event) => {
+                        handleSellingPrice(event, data.id, data.itemId);
+                      }}
+                    />
+                  </td>
+                ) : (
+                  <td className="pt-4">{data?.sellingPrice || ""}</td>
+                )}
+                {editable ? (
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-primary waves-effect waves-light"
+                      onClick={() => {
+                        handleDeleteAgreement(data.id);
+                      }}
+                    >
+                      <i className="mdi mdi-18px mdi-delete"></i>
+                    </button>
+                  </td>
+                ) : null}
               </tr>
             ))
           : null}

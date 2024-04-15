@@ -161,7 +161,7 @@ const ViewClient = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Clients", link: "/clients" },
+    { title: "Client", link: "/clients" },
     { title: "View", link: "/client/:id" },
   ];
 
