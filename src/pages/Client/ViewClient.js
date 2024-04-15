@@ -12,7 +12,6 @@ import {
   Col,
   Modal,
   Row,
-
 } from "reactstrap";
 import { Avatar, CircularProgress } from "@mui/material";
 import Agreement from "../../components/CustomComponents/Agreement";
@@ -68,8 +67,6 @@ const ViewClient = (props) => {
     }, [5000]);
   };
 
-
-
   const getAgreement = async (id) => {
     try {
       const data = { clientId: id };
@@ -119,11 +116,10 @@ const ViewClient = (props) => {
       }
     } catch (error) {
       if (error === 404) {
-        setAgreementAvailable({ loading: false, value: false });;
+        setAgreementAvailable({ loading: false, value: false });
       } else {
         setAgreementAvailable({ loading: false, value: false });
       }
-      
     }
   };
 
@@ -165,7 +161,7 @@ const ViewClient = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Client", link: "/client" },
+    { title: "Clients", link: "/clients" },
     { title: "View", link: "/client/:id" },
   ];
 
@@ -229,7 +225,6 @@ const ViewClient = (props) => {
   }, []);
 
   const searchClient = async (id) => {
- 
     try {
       const data = { _id: id };
       const res = await getClientWithIdReq(data);
