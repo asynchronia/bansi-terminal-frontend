@@ -115,7 +115,7 @@ const UserData = (props) => {
         return e._id
       })
       
-      const newUser = { ...values.primaryUser, clientId: clientId.toString(), associatedBranch:branchArray };
+      const newUser = { ...values.primaryUser, clientId: clientId.toString(), associatedBranches:branchArray };
       handleSubmit(newUser);
     },
   });
