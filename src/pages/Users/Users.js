@@ -50,6 +50,15 @@ const Users = (props) => {
   const theme = useTheme();
   const [selectRole, setSelectRole] = useState();
   const [selectedRole, setSelectedRole] = useState([]);
+  const [gender, setGender] = useState("");
+
+  // Form field usestates
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  const [errors, setErrors] = useState({});
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -162,10 +171,54 @@ const Users = (props) => {
     setSelectRole(event.target.value);
   };
 
+  const handleGenderChange = (e) => {
+    setGender(e.target.value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Validate form fields
+    const errors = {};
+    if (!firstName) {
+      errors.firstName = "First name is required";
+    } else if (!/^[a-zA-Z]+$/.test(firstName)) {
+      errors.firstName = "First name should contain only alphabets";
+    }
+    if (!lastName) {
+      errors.lastName = "Last name is required";
+    } else if (!/^[a-zA-Z]+$/.test(lastName)) {
+      errors.lastName = "Last name should contain only alphabets";
+    }
+    if (!email) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      errors.email = "Email is invalid";
+    }
+    if (!password) {
+      errors.password = "Password is required";
+    } else if (password.length < 8) {
+      errors.password = "Password must be at least 8 characters long";
+    } else if (!/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/.test(password)) {
+      errors.password =
+        "Password must contain at least one digit, one lowercase, one uppercase letter and one special character";
+    }
+    if (!contactNumber) {
+      errors.contactNumber = "Contact number is required";
+    } else if (!/^\d{10}$/.test(contactNumber)) {
+      errors.contactNumber = "Contact number must be 10 digits";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setErrors(errors);
+    } else {
+      console.log("Form submitted");
+    }
+  };
+
   return (
     <div style={{ position: "relative" }}>
       <ToastContainer position="top-center" theme="colored" />
-      <Form className="form-horizontal mt-4" onSubmit={(e) => {}}>
+      <Form className="form-horizontal mt-4" onSubmit={handleSubmit}>
         <Row>
           <Col xl="4">
             <Card>
@@ -182,11 +235,14 @@ const Users = (props) => {
                         className="form-control"
                         type="text"
                         placeholder="Enter First Name"
-                        onChange={null}
+                        onChange={(e) => setFirstName(e.target.value)}
                         onBlur={null}
-                        value={null}
+                        value={firstName}
                         invalid={null}
                       />
+                      {errors.firstName && (
+                        <span style={{ color: "red" }}>{errors.firstName}</span>
+                      )}
                     </div>
                   </Col>
                   <Col xs="6">
@@ -198,11 +254,14 @@ const Users = (props) => {
                         className="form-control"
                         type="text"
                         placeholder="Enter Last Name"
-                        onChange={null}
+                        onChange={(e) => setLastName(e.target.value)}
                         onBlur={null}
-                        value={null}
+                        value={lastName}
                         invalid={null}
                       />
+                      {errors.lastName && (
+                        <span style={{ color: "red" }}>{errors.lastName}</span>
+                      )}
                     </div>
                   </Col>
                 </Row>
@@ -216,11 +275,14 @@ const Users = (props) => {
                         className="form-control"
                         type="text"
                         placeholder="Enter Email id"
-                        onChange={null}
+                        onChange={(e) => setEmail(e.target.value)}
                         onBlur={null}
-                        value={null}
+                        value={email}
                         invalid={null}
                       />
+                      {errors.email && (
+                        <span style={{ color: "red" }}>{errors.email}</span>
+                      )}
                     </div>
                   </Col>
                   <Col xs="6">
@@ -230,13 +292,16 @@ const Users = (props) => {
                         id="password"
                         name="password"
                         className="form-control"
-                        type="text"
+                        type="password"
                         placeholder="Set Password"
-                        onChange={null}
+                        onChange={(e) => setPassword(e.target.value)}
                         onBlur={null}
-                        value={null}
+                        value={password}
                         invalid={null}
                       />
+                      {errors.password && (
+                        <span style={{ color: "red" }}>{errors.password}</span>
+                      )}
                     </div>
                   </Col>
                 </Row>
@@ -250,27 +315,34 @@ const Users = (props) => {
                         className="form-control"
                         type="text"
                         placeholder="Enter Contact Number"
-                        onChange={null}
+                        onChange={(e) => setContactNumber(e.target.value)}
                         onBlur={null}
-                        value={null}
+                        value={contactNumber}
                         invalid={null}
                       />
+                      {errors.contactNumber && (
+                        <span style={{ color: "red" }}>
+                          {errors.contactNumber}
+                        </span>
+                      )}
                     </div>
                   </Col>
                   <Col xs="6">
                     <div className="mt-3 mb-0">
-                      <label className="Gender">Gender</label>
-                      <input
+                      <label className="gender">Gender</label>
+                      <select
+                        onChange={handleGenderChange}
                         id="gender"
                         name="gender"
+                        value={gender}
                         className="form-control"
-                        type="text"
-                        placeholder="Enter Gender"
-                        onChange={null}
-                        onBlur={null}
-                        value={null}
-                        invalid={null}
-                      />
+                      >
+                        <option value="" selected>
+                          {"Gender"}
+                        </option>
+                        <option value={"male"}>Male</option>
+                        <option value={"female"}>Female</option>
+                      </select>
                     </div>
                   </Col>
                 </Row>
