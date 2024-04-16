@@ -11,14 +11,14 @@ import {
   Row,
   Table,
 } from "reactstrap";
-import { getUserListReq } from "../../service/usersService";
+import { getUserListReq} from "../../service/usersService";
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import * as Yup from "yup";
 import AddUser from "./AddUser";
-import { getUserRoleReq } from "../../service/branchService";
+// import { getBranchListReq, getUserRoleReq } from "../../service/branchService";
 
 const UserData = (props) => {
   const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
@@ -27,6 +27,9 @@ const UserData = (props) => {
   const gridRef = useRef();
   const [userData, setUserData] = useState([]);
   const [page, setPage] = useState(1);
+  const [selectedItems, setSelectedItems] = useState([]);
+  
+
 
   const getRoleName=(roleId)=>{
    if(roleId==="65b4e43b671d73cc3c1bbf8c"){
@@ -59,8 +62,11 @@ const UserData = (props) => {
       }));
 
       setUserData(newArray);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   };
+  
 
   const onGridReady = useCallback((params) => {
     getUserData();
@@ -75,7 +81,7 @@ const UserData = (props) => {
     { field: "UserName", minWidth: 220 },
     { field: "UserRole", minWidth: 220 },
     { field: "Contact", minWidth: 220 },
-    // { field: "Action", minWidth:150},
+    { field: "Associated Branch", minWidth:220},
   ]);
 
   //For creating new User need Formik for validation schema
@@ -91,6 +97,7 @@ const UserData = (props) => {
             gender:null,
             role:"65b4e43b671d73cc3c1bbf90",
             clientId:clientId,
+            associatedBranch:[]
           }
     },
     validationSchema: Yup.object({
@@ -104,7 +111,11 @@ const UserData = (props) => {
           })
     }),
     onSubmit: (values) => {
-      const newUser = { ...values.primaryUser, clientId: clientId.toString() };
+      const branchArray = selectedItems.map((e)=>{
+        return e._id
+      })
+      
+      const newUser = { ...values.primaryUser, clientId: clientId.toString(), associatedBranch:branchArray };
       handleSubmit(newUser);
     },
   });
@@ -164,7 +175,7 @@ const UserData = (props) => {
                 </Col>
               </Row>
             </div>
-            <AddUser validation={validation} />
+            <AddUser selectedItems={selectedItems} setSelectedItems={setSelectedItems} clientId={clientId}  modal={openModal.user} validation={validation} />
           </Form>
         </div>
       </Modal>
