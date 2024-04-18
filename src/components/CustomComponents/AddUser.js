@@ -35,7 +35,6 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
       }));
 
       setBranchList(newArray);
-      console.log(newArray);
     } catch (error) {
       console.log(error);
     }

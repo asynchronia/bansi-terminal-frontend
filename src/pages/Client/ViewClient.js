@@ -239,6 +239,7 @@ const ViewClient = (props) => {
       }
     } catch (error) {
       notify("Error", error.message);
+      
     }
   };
 
