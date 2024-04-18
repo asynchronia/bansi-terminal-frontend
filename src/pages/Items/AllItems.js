@@ -24,6 +24,8 @@ import { AgGridReact } from "ag-grid-react";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import RequirePermission from "../../routes/middleware/requirePermission";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
+import { ReactComponent as Import } from "../../assets/images/svg/import-button.svg";
+import { ReactComponent as Add } from "../../assets/images/svg/add-button.svg";
 
 const AllItems = (props) => {
   document.title = "All Items";
@@ -104,73 +106,73 @@ const AllItems = (props) => {
   };
 
   const columnDefs = [
-    {
-      headerName: "Item Name",
-      field: "title",
-      headerCheckboxSelection: true,
-      checkboxSelection: true,
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-    },
-    {
-      headerName: "Type",
-      field: "itemType",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-    },
-    {
-      headerName: "HSN Code",
-      field: "hsnCode",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-    },
-    {
-      headerName: "Status",
-      field: "status",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-    },
-    {
-      headerName: "Sale Price",
-      field: "salePrice",
-      sortable: false,
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
-    },
-    {
-      headerName: "Created On",
-      field: "createdAt",
-      cellRenderer: (props) => {
-
-        let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
+      {
+        headerName: "Item Name",
+        field: "title",
+        headerCheckboxSelection: true,
+        checkboxSelection: true,
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
       },
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-    },
-    {
-      headerName: "Category",
-      field: "category",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-    },
-    {
-      headerName: "Action",
-      field: "action",
-      sortable: false,
-      cellClass: "actions-button-cell",
-      cellRenderer: DropdownMenuBtn,
-      cellRendererParams: {
-        deleteItem: onDeleteItem,
-        handleResponse: handleDeleteResponse,
-        handleEditClick: handleEditClick,
-        handleViewClick: handleViewClick,
+      {
+        headerName: "Type",
+        field: "itemType",
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
       },
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-    },
-  ],
+      {
+        headerName: "HSN Code",
+        field: "hsnCode",
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
+      },
+      {
+        headerName: "Status",
+        field: "status",
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
+      },
+      {
+        headerName: "Sale Price",
+        field: "salePrice",
+        sortable: false,
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
+        valueFormatter: (params) =>
+          formatNumberWithCommasAndDecimal(params.value),
+      },
+      {
+        headerName: "Created On",
+        field: "createdAt",
+        cellRenderer: (props) => {
+          let date = new Date(props.value);
+          return <>{date.toDateString()}</>;
+        },
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
+      },
+      {
+        headerName: "Category",
+        field: "category",
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
+      },
+      {
+        headerName: "Action",
+        field: "action",
+        sortable: false,
+        cellClass: "actions-button-cell",
+        cellRenderer: DropdownMenuBtn,
+        cellRendererParams: {
+          deleteItem: onDeleteItem,
+          handleResponse: handleDeleteResponse,
+          handleEditClick: handleEditClick,
+          handleViewClick: handleViewClick,
+        },
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
+      },
+    ],
     agRowData = [
       {
         itemName: "Byju's",
@@ -240,7 +242,9 @@ const AllItems = (props) => {
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
+  const [delaySearch, setDelaySearch] = useState("");
   const dispatch = useDispatch();
+  const dropdownRef = useRef(null);
 
   let bodyObject = {
     page: 1,
@@ -256,7 +260,6 @@ const AllItems = (props) => {
     document.body.classList.add("no_padding");
   }
   const onPaginationChanged = useCallback((event) => {
-
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
 
@@ -304,11 +307,13 @@ const AllItems = (props) => {
     }
   }, []);
 
-
-
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
-    if (categoryData.id && categoryData.id !== undefined && categoryData.id !== null) {
+    if (
+      categoryData.id &&
+      categoryData.id !== undefined &&
+      categoryData.id !== null
+    ) {
       let bodyObjectWithCategory = { ...bodyObject };
       bodyObjectWithCategory.filter = {};
       bodyObjectWithCategory.filter.category = categoryData.id;
@@ -322,14 +327,14 @@ const AllItems = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
-    if (searchValue && searchValue !== undefined && searchValue !== "") {
+    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
       let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.search = searchValue;
+      bodyObjectWithCategory.search = delaySearch;
       getListOfRowData(bodyObjectWithCategory);
     } else {
       getListOfRowData(bodyObject);
     }
-  }, [searchValue]);
+  }, [delaySearch]);
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
@@ -341,13 +346,33 @@ const AllItems = (props) => {
   }, [paginationPageSize]);
 
   const handleChange = (e) => {
-
     setCategory(e.target.value);
   };
   const handleInputChange = (e) => {
-
     setSearchValue(e.target.value);
+
+    const delay = 2000;
+
+    const timerId = setTimeout(() => {
+      console.log("Executing code after delay");
+      setDelaySearch(e.target.value);
+    }, delay);
+
+    return () => clearTimeout(timerId);
   };
+
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //       setCategoryData({ ...categoryData, show: false });
+  //     }
+  //   };
+
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [categoryData]);
 
   /*
 const onGridReady = useCallback((params) => {
@@ -425,22 +450,34 @@ const onGridReady = useCallback((params) => {
             <Card>
               <CardBody>
                 <div className="button-section">
-                  <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.CREATE}>
+                  <RequirePermission
+                    module={MODULES_ENUM.ITEMS}
+                    permission={PERMISSIONS_ENUM.CREATE}
+                  >
                     <Button
                       className="all-items-btn"
                       color="primary"
                       onClick={redirectToCreateItem}
                     >
-                      <i className=" mdi mdi-20px mdi-plus mx-1"></i>Create Item
+                      <Add style={{ marginRight: "5px" }} />
+                      Create Item
                     </Button>
-                    <Button color="secondary">Import Items</Button>
+                    <Button
+                      style={{
+                        color: "black",
+                        backgroundColor: "#bfd8f7",
+                        border: "none",
+                      }}
+                    >
+                      <Import style={{ marginRight: "5px" }} />
+                      Import Items
+                    </Button>
                   </RequirePermission>
                   <div className="button-right-section">
-                    <div className="categoryDiv">
+                    <div className="categoryDiv" ref={dropdownRef}>
                       <label
                         name="category"
                         id="category"
-
                         onClick={() => {
                           setCategoryData({
                             ...categoryData,
@@ -455,7 +492,13 @@ const onGridReady = useCallback((params) => {
                           : `Select Category`}
                       </label>
                       {categoryData.show ? (
-                        <div style={{ position: 'absolute', background: 'white', minWidth: '300px' }}>
+                        <div
+                          style={{
+                            position: "absolute",
+                            background: "white",
+                            minWidth: "300px",
+                          }}
+                        >
                           <MultipleLayerSelect
                             categories={allCategories}
                             setCategoryData={setCategoryData}

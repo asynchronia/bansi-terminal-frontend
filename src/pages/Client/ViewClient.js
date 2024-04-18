@@ -69,51 +69,36 @@ const ViewClient = (props) => {
     }, [5000]);
   };
 
-  const searchAllTaxes = async (part) => {
-    try {
-      const response = await getTaxesReq();
-      let data = await response;
-     setAllTaxes (data?.payload?.taxes);
-     if(part==='agreement'){
-      return data?.payload?.taxes
-     }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const getAgreement = async (id) => {
     try {
       const data = { clientId: id };
       const res = await getAgreementReq(data);
-      let taxes= await searchAllTaxes('agreement');
+      let taxes = await searchAllTaxes("agreement");
       // console.log(res.payload.items);
-     
 
       let array = [];
-
 
       if (res?.payload?.items) {
         array = res?.payload?.items?.flatMap((item) => {
           return item.variants.map((variant) => {
             const attributes = variant.variant.attributes;
             let taxName;
-            for(let i=0; i<taxes.length; i++){
-              if(taxes[i]._id===item.item.taxes[0]){
-                taxName= taxes[i].name;
+            for (let i = 0; i < taxes.length; i++) {
+              if (taxes[i]._id === item.item.taxes[0]) {
+                taxName = taxes[i].name;
               }
             }
-            
+
             return {
               id: variant.variant._id,
               itemId: variant.variant.itemId,
               title: item.item.title,
               sku: variant.variant.sku,
               sellingPrice: variant.price,
-              attributes:attributes,
-              tax:taxName,
-              unit:item.item.itemUnit,
-              type:item.item.itemType
+              attributes: attributes,
+              tax: taxName,
+              unit: item.item.itemUnit,
+              type: item.item.itemType,
             };
           });
         });
@@ -252,8 +237,7 @@ const ViewClient = (props) => {
   useEffect(() => {
     searchClient(id);
     getAgreement(id);
-    searchAllTaxes()
-    
+    searchAllTaxes();
   }, []);
 
   const searchClient = async (id) => {
@@ -297,7 +281,7 @@ const ViewClient = (props) => {
         }}
       >
         <Agreement
-        allTaxes={allTaxes}
+          allTaxes={allTaxes}
           handleSubmitAgreement={handleSubmitAgreement}
           displayTableData={displayTableData}
           setDisplayTableData={setDisplayTableData}
@@ -405,7 +389,6 @@ const ViewClient = (props) => {
                     setAgreementData={setAgreementData}
                     displayTableData={displayTableData}
                     setDisplayTableData={setDisplayTableData}
-                    
                   />
                 </div>
               )}

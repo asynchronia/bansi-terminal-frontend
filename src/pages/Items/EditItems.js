@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import {  useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InputWithChips from "../../components/CustomComponents/InputWithChips";
 import { v4 as uuidv4 } from "uuid";
 import * as Yup from "yup";
@@ -24,7 +24,12 @@ import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
-import { editItemReq, getCategoriesReq, getItemByIdReq, getTaxesReq } from "../../service/itemService";
+import {
+  editItemReq,
+  getCategoriesReq,
+  getItemByIdReq,
+  getTaxesReq,
+} from "../../service/itemService";
 import StyledButton from "../../components/Common/StyledButton";
 
 const EditItems = (props) => {
@@ -37,17 +42,17 @@ const EditItems = (props) => {
   const [taxArr, setTaxArr] = useState(null);
   const [variantOptions, setVariantOptions] = useState([]);
   const [deletedVariant, setDeletedVariant] = useState([]);
-  const [itemType, setItemType]= useState('variable');
+  const [itemType, setItemType] = useState("variable");
+  const [typeValue, setTypeValue] = useState("variable");
+  console.log(typeValue);
   const [variantDataChanged, setVariantDataChanged] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-
   const [categoryData, setCategoryData] = useState({
     name: "",
     id: null,
     show: false,
   });
   const navigate = useNavigate();
-
 
   const [otherData, setOtherData] = useState({
     sku: "",
@@ -69,20 +74,19 @@ const EditItems = (props) => {
       setTaxArr(res?.payload?.item?.taxes[0]._id);
       setItemType(res?.payload?.item?.itemType);
       setOtherData({
-          sku: res?.payload.variants[0]?.sku,
-          inventory: res?.payload.variants[0]?.inventory,
-          costPrice: res?.payload.variants[0]?.costPrice,
-          sellingPrice: res?.payload.variants[0]?.sellingPrice,
+        sku: res?.payload.variants[0]?.sku,
+        inventory: res?.payload.variants[0]?.inventory,
+        costPrice: res?.payload.variants[0]?.costPrice,
+        sellingPrice: res?.payload.variants[0]?.sellingPrice,
       });
       setLoadedItems(true);
-  } catch (error) {
+    } catch (error) {
       if (error === 404) {
-          console.log("Item not found");
+        console.log("Item not found");
       } else {
-          console.log("An error occurred while searching for item");
+        console.log("An error occurred while searching for item");
       }
-  }
-    
+    }
   };
 
   useEffect(() => {
@@ -92,13 +96,13 @@ const EditItems = (props) => {
   useEffect(() => {
     let options = [...variantOptions]; // Make a copy of the current variantOptions
     let products = variantData;
-  
+
     products.forEach((product) => {
       product.attributes.forEach((attribute) => {
         const existingOptionIndex = options.findIndex(
           (option) => option.name === attribute.name
         );
-  
+
         if (existingOptionIndex === -1) {
           // Option doesn't exist, add it with the new value
           options.push({
@@ -114,12 +118,10 @@ const EditItems = (props) => {
         }
       });
     });
-  
-   
+
     setVariantOptions(options);
     setVariantDataChanged(false); // Reset variantDataChanged flag
-  }, [variantData, variantDataChanged]); 
-  
+  }, [variantData, variantDataChanged]);
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -128,10 +130,9 @@ const EditItems = (props) => {
         theme: "colored",
       });
     } else {
-      let path = `/view-item/${id}`
+      let path = `/view-item/${id}`;
       navigate(path);
     }
-    
   };
 
   const handleTaxes = (e) => {
@@ -184,53 +185,51 @@ const EditItems = (props) => {
     }
   };
 
-
   useEffect(() => {
     searchCategories();
     searchAllTaxes();
   }, [loadedItem]);
 
-
   const handleVariantChange = (id, name, value) => {
-    
-    const updatedVariants = variantData.map((variant) => {
-      if (variant._id === id) {
-        if (name === "attributes") {
-          const attributeIndex = variant.attributes.findIndex(
-            (attr) => attr.name === value.name
-          );
-          if (attributeIndex !== -1) {
-            const updatedAttributes = [...variant.attributes];
-            updatedAttributes[attributeIndex] = value;
-            return {
-              ...variant,
-              attributes: updatedAttributes,
-            };
-          } else {
-            // Add the new attribute if it doesn't exist
-            return {
-              ...variant,
-              attributes: [...variant.attributes, value],
-            };
+    const updatedVariants = variantData
+      .map((variant) => {
+        if (variant._id === id) {
+          if (name === "attributes") {
+            const attributeIndex = variant.attributes.findIndex(
+              (attr) => attr.name === value.name
+            );
+            if (attributeIndex !== -1) {
+              const updatedAttributes = [...variant.attributes];
+              updatedAttributes[attributeIndex] = value;
+              return {
+                ...variant,
+                attributes: updatedAttributes,
+              };
+            } else {
+              // Add the new attribute if it doesn't exist
+              return {
+                ...variant,
+                attributes: [...variant.attributes, value],
+              };
+            }
           }
+          return {
+            ...variant,
+            [name]: value,
+          };
         }
-        return {
-          ...variant,
-          [name]: value,
-        };
-      }
-      return variant;
-    }).map((variant) => {
-      if (variant._id === id) {
-        // Remove _id from the updated variant
-        const { _id, ...rest } = variant;
-        return rest;
-      }
-      return variant;
-    });
-    
+        return variant;
+      })
+      .map((variant) => {
+        if (variant._id === id) {
+          // Remove _id from the updated variant
+          const { _id, ...rest } = variant;
+          return rest;
+        }
+        return variant;
+      });
+
     setVariantData(updatedVariants);
-    
   };
 
   const handleOtherChange = (name, value) => {
@@ -239,8 +238,6 @@ const EditItems = (props) => {
       [name]: value,
     });
   };
-
-  
 
   const validation = useFormik({
     enableReinitialize: true,
@@ -331,32 +328,30 @@ const EditItems = (props) => {
         values.taxes = [taxArr];
         values.category = categoryData.id;
         values.deletedVariants = [...deletedVariant];
-        
-        handleItemEdit(values)
+
+        handleItemEdit(values);
       }
     },
   });
 
-
   const handleItemEdit = async (values) => {
     try {
-        const response = await editItemReq(values);
-        if (response.success === true) {
-            notify("Success", response.message);
-        } else {
-            notify("Error", response.message);
-        }
-        setIsButtonLoading(false);
+      const response = await editItemReq(values);
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+      setIsButtonLoading(false);
     } catch (error) {
-        if (error === 404) {
-            notify("Error", "Item not found");
-        } else {
-            notify("Error", "An error occurred while editing the item");
-        }
-        setIsButtonLoading(false);
+      if (error === 404) {
+        notify("Error", "Item not found");
+      } else {
+        notify("Error", "An error occurred while editing the item");
+      }
+      setIsButtonLoading(false);
     }
-};
-  
+  };
 
   const handleAddRow = () => {
     const newRow = { id: uuidv4() };
@@ -389,7 +384,6 @@ const EditItems = (props) => {
   };
 
   const handleDeleteVariantData = (id) => {
-    
     const deletedRow = variantData.filter((row) => row._id === id);
     setDeletedVariant([...deletedVariant, deletedRow[0]._id]);
     const updatedRows = variantData.filter((row) => row._id !== id);
@@ -440,12 +434,14 @@ const EditItems = (props) => {
     return false;
   };
 
+  const handleTypeChange = (e) => {
+    setTypeValue(e.target.value);
+  };
+
   return (
     <div style={{ position: "relative" }}>
       <ToastContainer position="top-center" theme="colored" />
-      <Form
-        className="form-horizontal mt-4"
-      >
+      <Form className="form-horizontal mt-4">
         <Row>
           <Col xl="4">
             <Card>
@@ -703,12 +699,11 @@ const EditItems = (props) => {
                 <h4 className="card-title">Type</h4>
                 <div className="mb-1">
                   <select
-                    disabled="true"
                     name="itemType"
                     id="itemType"
-                    value={itemType}
+                    value={typeValue}
                     onBlur={validation.handleBlur}
-                    onChange={validation.handleChange}
+                    onChange={handleTypeChange}
                     className="form-select focus-width"
                   >
                     <option value="variable">Variable Item</option>
