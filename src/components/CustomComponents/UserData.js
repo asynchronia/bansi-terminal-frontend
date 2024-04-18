@@ -115,12 +115,10 @@ const UserData = (props) => {
         clientId: clientId.toString(),
         associatedBranches: branchArray,
       };
+
       handleSubmit(newUser);
-      // console.log(newUser);
     },
   });
-
-
 
   return (
     <div>
