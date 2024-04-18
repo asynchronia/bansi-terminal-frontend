@@ -442,6 +442,10 @@ export async function signin(body) {
     return new Promise((resolve, reject) => {
         axios
             .post(`${baseUrl}${API_URL.signin}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            })
             .catch(error => {
                 reject(error);
             });
