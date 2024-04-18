@@ -122,7 +122,7 @@ const AllInvoices = (props) => {
         let statusClass = "status-msg ";
         if (ifOverDue(curr_date, due_date)) {
           let days = getDifferenceInDays(curr_date, due_date);
-          status_msg = "Overdue by " + days + " day(s)";
+          status_msg = days > 0 ? "Overdue by " + days + " day(s)" : "";
           statusClass = statusClass + "red";
         } else {
           let days = getDifferenceInDays(curr_date, due_date);

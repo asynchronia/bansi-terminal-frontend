@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Row, Col, Card, CardBody } from "reactstrap";
 import { useParams } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
 import { ToastContainer } from "react-toastify";
 import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
@@ -15,6 +15,8 @@ import {
   indianNumberWords,
   formatNumberWithCommasAndDecimal,
 } from "./invoiceUtil";
+
+import { changePreloader } from "../../store/actions";
 
 const options: Options = {
   filename: "payment.pdf",
@@ -58,6 +60,7 @@ const PaymentDetails = (props) => {
   const [amountReceived, setAmountReceived] = useState(0);
   const effectCalled = useRef(false);
   const gridRef = useRef();
+  let dispatch = useDispatch();
   const data = id;
   //Handles BreadCrumbs
   const breadcrumbItems = [
@@ -115,6 +118,7 @@ const PaymentDetails = (props) => {
   }, []);
 
   const getPaymentData = useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getPaymentDetailsReq(body);
     setPaymentData(response);
     props.setBreadcrumbItems(response?.payment_number, breadcrumbItems);
@@ -128,6 +132,7 @@ const PaymentDetails = (props) => {
       const amountReceived = totalInvoicesAmount - totalBalanceAmount;
       setAmountReceived(amountReceived);
     }
+    dispatch(changePreloader(false));
   });
 
   useEffect(() => {
