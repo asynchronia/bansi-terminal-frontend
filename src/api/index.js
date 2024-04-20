@@ -35,6 +35,7 @@ const API_URL = {
     getEstimateList: "/api/estimates/list",
     getExpenses:"/api/expenses/list",
     getEstimate: '/api/estimates/id/',
+    getAgreementItems: '/api/items/agreement-item-list',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -452,5 +453,16 @@ export async function signin(body) {
     }).catch(error => {
         console.log(error);
         return error.response.data;
+    });
+}
+
+export async function getAgreementItems(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getAgreementItems}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
     });
 }

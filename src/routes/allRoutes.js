@@ -49,6 +49,8 @@ import Users from "../pages/Users/Users"
 import OrderEstimates from "../pages/Orders/OrderEstimates"
 import Expenses from "../pages/Expenses/Expenses"
 import ViewEstimate from "../pages/Orders/ViewEstimate"
+import AgreementItemsListing from "../pages/Items/AgreementItemsListing"
+import AgreementItemView from "../pages/Items/AgreementItemView"
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -139,6 +141,8 @@ const userRoutes = [
   { path: "/estimates", component: <OrderEstimates/>},
   { path: "/expenses", component: <Expenses/>},
   { path: "/view-estimate/:id", component: <ViewEstimate />},
+  { path: "/agreement-items", component: <AgreementItemsListing /> },
+  { path: "/view-agreement-item/:id", component: <AgreementItemView />},
   // // this route should be at the end of all other routes
   {
     path: "/",

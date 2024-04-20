@@ -18,7 +18,7 @@ const DropdownMenuBtn = (props) =>{
     return (
        <CustomDropdown 
           isOpen={menu}
-          direction={'bottom'}
+          direction={'down'}
           toggle={() => setMenu(!menu)}
           items={[
             { label: 'Edit Item', onClick: onEditClick, module: MODULES_ENUM.ITEMS, permission: PERMISSIONS_ENUM.UPDATE },
