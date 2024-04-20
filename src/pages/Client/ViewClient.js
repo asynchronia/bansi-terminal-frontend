@@ -39,6 +39,7 @@ const ViewClient = (props) => {
     loading: true,
     value: false,
   });
+  
   const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
     agreement: false,
@@ -68,6 +69,9 @@ const ViewClient = (props) => {
       window.location.reload();
     }, [5000]);
   };
+
+
+  
 
   const searchAllTaxes = async (part) => {
     try {
@@ -235,6 +239,7 @@ const ViewClient = (props) => {
       }
     } catch (error) {
       notify("Error", error.message);
+      
     }
   };
 
@@ -460,6 +465,7 @@ const ViewClient = (props) => {
                 />
               ) : (
                 <UserData
+                  
                   handleSubmit={handleSubmitUser}
                   clientId={id}
                   openModal={openModal}
