@@ -36,6 +36,7 @@ const API_URL = {
     getExpenses:"/api/expenses/list",
     getEstimate: '/api/estimates/id/',
     getAgreementItems: '/api/items/agreement-item-list',
+    getClientUsers: '/api/users/get/client-users',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -157,6 +158,17 @@ export async function getUserList(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.getUserList}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getClientUsers(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getClientUsers}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

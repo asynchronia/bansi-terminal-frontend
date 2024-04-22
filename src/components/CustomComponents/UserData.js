@@ -11,7 +11,7 @@ import {
   Row,
   Table,
 } from "reactstrap";
-import { getUserListReq } from "../../service/usersService";
+import { getClientUsersReq } from "../../service/usersService";
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -46,7 +46,7 @@ const UserData = (props) => {
   };
   const getUserData = async () => {
     try {
-      const response = await getUserListReq({
+      const response = await getClientUsersReq({
         clientId: clientId,
       });
       let array = response?.payload;
@@ -76,7 +76,7 @@ const UserData = (props) => {
     { field: "UserName", minWidth: 220 },
     { field: "UserRole", minWidth: 220 },
     { field: "Contact", minWidth: 220 },
-    { field: "Associated Branch", minWidth: 220 },
+    { field: "Associated Branches", minWidth: 220 },
   ]);
 
   //For creating new User need Formik for validation schema
