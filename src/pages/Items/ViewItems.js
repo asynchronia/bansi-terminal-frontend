@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Row, Col, Card, CardBody } from "reactstrap";
 import "react-toastify/dist/ReactToastify.css";
-import { connect } from "react-redux";
+import { connect, useDispatch } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -14,8 +14,10 @@ import { attributesCellRenderer } from "./ItemsUtils";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import RequirePermission from "../../routes/middleware/requirePermission";
+import { changePreloader } from "../../store/actions";
 
 const ViewItems = (props, { route, navigate }) => {
+  let dispatch = useDispatch();
   let navigateTo = useNavigate();
   const [itemsData, setItemsData] = useState();
   const [variantData, setVariantData] = useState([]);
@@ -51,6 +53,7 @@ const ViewItems = (props, { route, navigate }) => {
   };
 
   const getItemData = useCallback(async (body) => {
+    dispatch(changePreloader(true));
     const response = await getItemByIdReq(body);
 
     if (
@@ -67,6 +70,7 @@ const ViewItems = (props, { route, navigate }) => {
         setTaxData(item?.taxes);
       }
     }
+    dispatch(changePreloader(false));
   });
   const pagination = false;
 
@@ -133,7 +137,6 @@ const ViewItems = (props, { route, navigate }) => {
     props.setBreadcrumbItems(itemsData?.title, breadcrumbItems);
     if (!effectCalled.current) {
       getItemData(bodyObject);
-      // getCategories();
       effectCalled.current = true;
     }
   }, [bodyObject]);
@@ -142,7 +145,6 @@ const ViewItems = (props, { route, navigate }) => {
     props.setBreadcrumbItems(itemsData?.title, breadcrumbItems);
     if (paginationPageSize && paginationPageSize !== undefined) {
       getItemData(bodyObject);
-      // getCategories();
     }
   }, [paginationPageSize]);
 

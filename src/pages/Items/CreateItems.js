@@ -310,7 +310,7 @@ const CreateItems = (props) => {
         <Row>
           <Col xl="4">
             <Card>
-              <CardBody>
+              <CardBody style={{ height: "41rem" }}>
                 <h4 className="card-title">Item Primary</h4>
 
                 <div>
