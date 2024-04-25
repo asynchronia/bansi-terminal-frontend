@@ -7,6 +7,7 @@ import {
   getCategories,
   editItem,
   getTaxes,
+  getAgreementItems,
 } from "../api";
 
 export const createItemReq = async (body) => {
@@ -47,4 +48,12 @@ export const searchItemReq = async (body) => {
 export const editItemReq = async (body) => {
   const response = await editItem(body);
   return response;
+};
+
+export const getAgreementItemsReq = async (body) => {
+  const response = await getAgreementItems(body);
+  if (response.success && response.success === true) {
+    return response.payload.items;
+  }
+  return [];
 };

@@ -14,7 +14,8 @@ import { Link } from "react-router-dom"
 
 import APP_ENV from "../../utility/env";
 import RequirePermission from "../../routes/middleware/requirePermission"
-import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants"
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants"
+import RequireUserType from "../../routes/middleware/requireUserType"
 
 
 const SidebarContent = props => {
@@ -123,7 +124,7 @@ const SidebarContent = props => {
 
   useEffect(() => {
     ref.current.recalculate();
-    document.body.setAttribute("data-sidebar","dark");
+    document.body.setAttribute("data-sidebar", "dark");
   }, []);
 
   useEffect(() => {
@@ -165,31 +166,41 @@ const SidebarContent = props => {
                 </Link>
               </li>
             </RequirePermission>
-            <RequirePermission module={MODULES_ENUM.ITEMS}>
+            <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+              <RequirePermission module={MODULES_ENUM.ITEMS}>
+                <li>
+                  <Link to="/#" className="has-arrow waves-effect">
+                    <i className="mdi mdi-email-outline"></i>
+                    <span>Items</span>
+                  </Link>
+                  <ul className="sub-menu" >
+                    <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.READ}>
+                      <li>
+                        <Link to="/items">All Items</Link>
+                      </li>
+                    </RequirePermission>
+                    <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.CREATE}>
+                      <li>
+                        <Link to="/create-item">Create Item</Link>
+                      </li>
+                    </RequirePermission>
+                    <RequirePermission module={MODULES_ENUM.CATEGORIES}>
+                      <li>
+                        <Link to="/categories">Categories</Link>
+                      </li>
+                    </RequirePermission>
+                  </ul>
+                </li>
+              </RequirePermission>
+            </RequireUserType>
+            <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
               <li>
-                <Link to="/#" className="has-arrow waves-effect">
-                  <i className="mdi mdi-email-outline"></i>
-                  <span>Items</span>
+                <Link to="/agreement-items" className=" waves-effect">
+                  <i className="mdi mdi-account-multiple-outline"></i>
+                  <span>Agreement Items</span>
                 </Link>
-                <ul className="sub-menu" >
-                  <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.READ}>
-                    <li>
-                      <Link to="/items">All Items</Link>
-                    </li>
-                  </RequirePermission>
-                  <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.CREATE}>
-                    <li>
-                      <Link to="/create-item">Create Item</Link>
-                    </li>
-                  </RequirePermission>
-                  <RequirePermission module={MODULES_ENUM.CATEGORIES}>
-                    <li>
-                      <Link to="/categories">Categories</Link>
-                    </li>
-                  </RequirePermission>
-                </ul>
               </li>
-            </RequirePermission>
+            </RequireUserType>
             <li>
               <Link to="/#" className="has-arrow waves-effect">
                 <i className="mdi mdi-cart-outline"></i>

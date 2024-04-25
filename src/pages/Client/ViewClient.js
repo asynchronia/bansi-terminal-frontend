@@ -39,6 +39,7 @@ const ViewClient = (props) => {
     loading: true,
     value: false,
   });
+  
   const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
     agreement: false,
@@ -67,6 +68,22 @@ const ViewClient = (props) => {
     setTimeout(() => {
       window.location.reload();
     }, [5000]);
+  };
+
+
+  
+
+  const searchAllTaxes = async (part) => {
+    try {
+      const response = await getTaxesReq();
+      let data = await response;
+     setAllTaxes (data?.payload?.taxes);
+     if(part==='agreement'){
+      return data?.payload?.taxes
+     }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const getAgreement = async (id) => {
@@ -220,6 +237,7 @@ const ViewClient = (props) => {
       }
     } catch (error) {
       notify("Error", error.message);
+      
     }
   };
 
@@ -443,6 +461,7 @@ const ViewClient = (props) => {
                 />
               ) : (
                 <UserData
+                  
                   handleSubmit={handleSubmitUser}
                   clientId={id}
                   openModal={openModal}
