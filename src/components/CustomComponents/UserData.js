@@ -47,7 +47,7 @@ const UserData = (props) => {
   const getUserData = async () => {
     try {
       const response = await getClientUsersReq({
-        clientId: clientId,
+        _id: clientId,
       });
       let array = response?.payload;
 
