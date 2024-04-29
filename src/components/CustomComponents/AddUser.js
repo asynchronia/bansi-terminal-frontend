@@ -238,7 +238,7 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
                 renderValue={(selected) => (
                   <div>
                     {selected.map((value) => (
-                      <Chip size="small" key={value._id} label={value.address} />
+                      <Chip className="mx-2" size="small" key={value._id} label={value.address} />
                     ))}
                   </div>
                 )}
