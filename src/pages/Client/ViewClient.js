@@ -64,10 +64,10 @@ const ViewClient = (props) => {
         position: "top-center",
         theme: "colored",
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, [5000]);
     }
-    setTimeout(() => {
-      window.location.reload();
-    }, [5000]);
   };
 
 
