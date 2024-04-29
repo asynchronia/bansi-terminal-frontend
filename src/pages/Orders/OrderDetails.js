@@ -13,6 +13,7 @@ import { getOrderDetailsReq } from "../../service/orderService";
 import OrderTrackingRenderer from "./OrderTrackingRenderer";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import { changePreloader } from "../../store/actions";
+import {ReactComponent as Edit} from "../../assets/images/svg/edit-button.svg";
 
 const OrderDetails = (props) => {
   let dispatch = useDispatch();
@@ -29,8 +30,8 @@ const OrderDetails = (props) => {
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Sales Order", link: "#" },
-    // { title: "Order #" + orderData?.salesorder_number, link: "#" },
+    { title: "All Orders", link: "#" },
+    { title: "Order #" + orderData?.salesorder_number, link: "#" },
   ];
 
   const autoSizeStrategy = {
@@ -86,6 +87,8 @@ const OrderDetails = (props) => {
       field: "rate",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: (params) =>
+      formatNumberWithCommasAndDecimal(params.value),
     },
     {
       headerName: "Discount",
@@ -169,7 +172,7 @@ const OrderDetails = (props) => {
       getOrderData(data);
       effectCalled.current = true;
     }
-  }, []);
+  }, [breadcrumbItems]);
 
   useEffect(() => {
     // props.setBreadcrumbItems("Order #"+orderData?.salesorder_number, breadcrumbItems);
@@ -195,6 +198,7 @@ const OrderDetails = (props) => {
             <option value="draft">Draft</option>
           </select>
           <button type="submit" className="btn btn-primary w-xl mx-3">
+          <Edit style={{ marginRight: "5px", fill: "white" }} />
             Edit
           </button>
         </div>
@@ -277,7 +281,7 @@ const OrderDetails = (props) => {
             <Col xs="6" className="d-flex">
               <Card className="w-100">
                 <CardBody>
-                  <div className="mt-3">
+                  {orderData?.date && <div className="mt-3">
                     <Row>
                       <Col xs="6">
                         <p>Order Date</p>
@@ -285,9 +289,10 @@ const OrderDetails = (props) => {
                       <Col xs="6">
                         <p>{orderData?.date}</p>
                       </Col>
+                    <hr/>
                     </Row>
-                  </div>
-                  <div>
+                  </div>}
+                  {orderData?.payment_terms && <div>
                     <Row>
                       <Col xs="6">
                         {" "}
@@ -296,9 +301,10 @@ const OrderDetails = (props) => {
                       <Col xs="6">
                         <p>{orderData?.payment_terms}</p>
                       </Col>
+                    <hr/>
                     </Row>
-                  </div>
-                  <div>
+                  </div>}
+                  {orderData?.delivery_method && <div>
                     <Row>
                       <Col xs="6">
                         {" "}
@@ -308,9 +314,10 @@ const OrderDetails = (props) => {
                         {" "}
                         <p>{orderData?.delivery_method}</p>
                       </Col>
+                    <hr/>
                     </Row>
-                  </div>
-                  <div>
+                  </div>}
+                  {orderData?.sales_channel_formatted && <div>
                     <Row>
                       <Col xs="6">
                         {" "}
@@ -322,9 +329,10 @@ const OrderDetails = (props) => {
                         {" "}
                         <p>{orderData?.sales_channel_formatted}</p>
                       </Col>
+                    <hr/>
                     </Row>
-                  </div>
-                  <div>
+                  </div>}
+                  {orderData?.created_by_name && <div>
                     <Row>
                       <Col xs="6">
                         {" "}
@@ -336,9 +344,10 @@ const OrderDetails = (props) => {
                         {" "}
                         <p>{orderData?.created_by_name}</p>
                       </Col>
+                    <hr/>
                     </Row>
-                  </div>
-                  <div>
+                  </div>}
+                  {orderData?.custom_field_hash?.cf_acknowledgement_uploaded && <div>
                     <Row>
                       <Col xs="6">
                         {" "}
@@ -355,8 +364,9 @@ const OrderDetails = (props) => {
                           }
                         </p>
                       </Col>
+                    <hr/>
                     </Row>
-                  </div>
+                  </div>}
                 </CardBody>
               </Card>
             </Col>
@@ -536,10 +546,9 @@ const OrderDetails = (props) => {
                   >
                     Total :{" "}
                     <h4 style={{ fontSize: "15px", margin: "-18px -128px" }}>
-                      ₹{" "}
-                      {Math.round(
+                      {formatNumberWithCommasAndDecimal(Math.round(
                         (totalItemTotal + totalCGST + totalSGST) * 100
-                      ) / 100}
+                      ) / 100)}
                     </h4>
                   </h4>
                 </div>

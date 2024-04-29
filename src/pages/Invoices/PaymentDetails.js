@@ -66,7 +66,9 @@ const PaymentDetails = (props) => {
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Payment", link: "/payments" },
-    { title: "View Payment", link: "#" },
+    // { title: "View Payment", link: "#" },
+    { title: "Payment #" + paymentData?.payment_number, link: "#" },
+
   ];
 
   const autoSizeStrategy = {
@@ -141,7 +143,7 @@ const PaymentDetails = (props) => {
       getPaymentData(data);
       effectCalled.current = true;
     }
-  }, []);
+  }, [breadcrumbItems]);
 
   useEffect(() => {
     props.setBreadcrumbItems(paymentData?.payment_number, breadcrumbItems);

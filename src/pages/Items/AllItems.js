@@ -69,7 +69,7 @@ const AllItems = (props) => {
   };
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "All Items Order", link: "#" },
+    { title: "All Items", link: "#" },
   ];
   const gridRef = useRef();
   const handleDeleteResponse = (response) => {

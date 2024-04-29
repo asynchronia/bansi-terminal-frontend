@@ -11,6 +11,7 @@ import {
 } from "reactstrap";
 import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
 import { useNavigate, useParams } from "react-router-dom";
@@ -556,6 +557,7 @@ const EditItems = (props) => {
                 onClick={onEditItemClick}
                 isLoading={isButtonLoading}
               >
+              <Edit style={{ marginRight: "5px", fill: "white" }} />
                 Edit
               </StyledButton>
             </div>

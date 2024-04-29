@@ -134,44 +134,53 @@ const AllOrders = (props) => {
       headerCheckboxSelection: true, checkboxSelection: true, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
+      width : 150,sortable:false
     },
     {
       headerName: "Order No.", field: "salesorder_id", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
+      width: 200,sortable:false
     },
     {
       headerName: "Client", field: "customer_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
+      width : 200,sortable:false
     },
     {
       headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
+      width : 110,sortable:false
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
-      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
+      width : 130,sortable:false
     },
     {
       headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Invoice",
+      width : 80,sortable:false
     },
     {
       headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Payment",
+      width : 100,sortable:false
     },
     {
       headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Shipment",
+      width : 100,sortable:false
+
     },
     {
       headerName: "Action", field: "action", sortable: false,
@@ -183,6 +192,7 @@ const AllOrders = (props) => {
         handleViewClick: handleViewClick,
       }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
+      width : 80
     }
   ]
   const notify = (type, message) => {
