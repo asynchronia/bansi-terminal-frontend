@@ -18,6 +18,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import * as Yup from "yup";
 import AddUser from "./AddUser";
+import { Chip } from "@mui/material";
 // import { getBranchListReq, getUserRoleReq } from "../../service/branchService";
 
 const UserData = (props) => {
@@ -47,7 +48,7 @@ const UserData = (props) => {
   const getUserData = async () => {
     try {
       const response = await getClientUsersReq({
-        _id: clientId,
+        clientId: clientId,
       });
       let array = response?.payload;
       // console.log(response)
@@ -56,6 +57,7 @@ const UserData = (props) => {
         UserName: item.firstName + " " + item.lastName,
         UserRole: getRoleName(item.role),
         Contact: item.contact,
+        associatedBranches: item.associatedBranches,
       }));
 
       setUserData(newArray);
@@ -64,7 +66,7 @@ const UserData = (props) => {
     }
   };
 
-  const onGridReady = useCallback((params) => {
+  useEffect(() => {
     getUserData();
   }, []);
 
@@ -194,6 +196,7 @@ const UserData = (props) => {
               <th>Name</th>
               <th>Role</th>
               <th>Contact</th>
+              <th>Associated Branches</th>
             </tr>
           </thead>
           <tbody>
@@ -203,12 +206,23 @@ const UserData = (props) => {
                   <td>{user.UserName}</td>
                   <td>{user.UserRole}</td>
                   <td>{user.Contact}</td>
+                  <td style={{ width: 'min-content' }}>
+                    {
+                      <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap'}}>
+                        {
+                          user.associatedBranches.map((branch, index) => (
+                            <Chip size="small" key={index} label={`${branch.name}`} />
+                          ))
+                        }
+                      </div>
+                    }
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td></td>
-                <td style={{textAlign:'center'}}>No Rows to Show</td>
+                <td style={{ textAlign: 'center' }}>No Rows to Show</td>
                 <td></td>
               </tr>
             )}
