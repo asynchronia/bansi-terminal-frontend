@@ -482,7 +482,7 @@ const getInvoiceTable = () =>{
                       <div
                         className="ag-theme-quartz"
                         style={{
-                          height: "300px",
+                          height: "320px",
                           width: "100%",
                         }}
                       >
