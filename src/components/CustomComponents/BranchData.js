@@ -9,6 +9,7 @@ import {
   Form,
   Modal,
   Row,
+  TabContent,
   Table,
 } from "reactstrap";
 import { getBranchListReq } from "../../service/branchService";
@@ -17,12 +18,12 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import AddBranch from "./AddBranch";
 import * as Yup from "yup";
+import { TableHead } from "@mui/material";
 
 const BranchData = (props) => {
   const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
     props;
 
-  const gridRef = useRef();
   const [branchData, setBranchData] = useState([]);
   const [page, setPage] = useState(1);
 
@@ -45,21 +46,9 @@ const BranchData = (props) => {
     } catch (error) {}
   };
 
-  const onGridReady = useCallback((params) => {
+  useEffect(() => {
     getBranchData();
   }, []);
-
-  const onPaginationChanged = useCallback((event) => {
-    const page = gridRef.current.api.paginationGetCurrentPage() + 1;
-    setPage(page);
-  }, []);
-
-  const [colDefs, setColDefs] = useState([
-    { field: "Name", minWidth: 220 },
-    { field: "AssociatedWarehouse", minWidth: 220 },
-    { field: "Contact", minWidth: 220 },
-    // { field: "Action", minWidth:150},
-  ]);
 
   //For creating new Branch need Formik for validation schema
   const validation = useFormik({
@@ -84,7 +73,6 @@ const BranchData = (props) => {
       handleSubmit(newBranch);
     },
   });
-
   return (
     <div>
       <Modal
@@ -144,17 +132,33 @@ const BranchData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div className="ag-theme-quartz" style={{ height: 309 }}>
-        <AgGridReact
-          ref={gridRef}
-          rowData={branchData}
-          columnDefs={colDefs}
-          onPaginationChanged={onPaginationChanged}
-          pagination={true}
-          paginationAutoPageSize={true}
-          suppressAggFuncInHeader={true}
-          onGridReady={onGridReady}
-        />
+      <div style={{ maxHeight: 309, width: "100%" }}>
+        <Table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Associated Warehouse</th>
+              <th>Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            {branchData.length > 0 ? (
+              branchData.map((branch) => (
+                <tr>
+                  <td>{branch.Name}</td>
+                  <td>{branch.AssociatedWarehouse}</td>
+                  <td>{branch.Contact}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td></td>
+                <td style={{ textAlign: "center" }}>No Rows to Show</td>
+                <td></td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
       </div>
       <div className="text-center">
         <Button

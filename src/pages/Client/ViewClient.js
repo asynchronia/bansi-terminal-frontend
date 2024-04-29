@@ -39,7 +39,7 @@ const ViewClient = (props) => {
     loading: true,
     value: false,
   });
-  
+
   const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
     agreement: false,
@@ -64,23 +64,20 @@ const ViewClient = (props) => {
         position: "top-center",
         theme: "colored",
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, [5000]);
     }
-    setTimeout(() => {
-      window.location.reload();
-    }, [5000]);
   };
-
-
-  
 
   const searchAllTaxes = async (part) => {
     try {
       const response = await getTaxesReq();
       let data = await response;
-     setAllTaxes (data?.payload?.taxes);
-     if(part==='agreement'){
-      return data?.payload?.taxes
-     }
+      setAllTaxes(data?.payload?.taxes);
+      if (part === "agreement") {
+        return data?.payload?.taxes;
+      }
     } catch (error) {
       console.log(error);
     }
@@ -191,11 +188,11 @@ const ViewClient = (props) => {
     }
   };
 
-  const breadcrumbItems = [
+  const [breadcrumbItems, setBreadCrubmsItems] = useState([
     { title: "Dashboard", link: "/dashboard" },
     { title: "Client", link: "/clients" },
     { title: "View", link: "/client/:id" },
-  ];
+  ]);
 
   const handleSubmitAgreement = async () => {
     try {
@@ -237,7 +234,6 @@ const ViewClient = (props) => {
       }
     } catch (error) {
       notify("Error", error.message);
-      
     }
   };
 
@@ -264,6 +260,11 @@ const ViewClient = (props) => {
       const res = await getClientWithIdReq(data);
 
       setClientData(res.payload?.client);
+      setBreadCrubmsItems([
+        { title: "Dashboard", link: "/dashboard" },
+        { title: "Clients", link: "/clients" },
+        { title: res.payload?.client.name, link: "/client/:id" },
+      ]);
     } catch (error) {
       console.log(error);
     }
@@ -286,7 +287,7 @@ const ViewClient = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
-  });
+  }, [breadcrumbItems]);
 
   return (
     <div style={{ position: "relative" }}>
@@ -400,7 +401,7 @@ const ViewClient = (props) => {
                   </div>
                 </div>
               ) : (
-                <div>
+                <div style={{ height: "450px", overflowY: "scroll" }}>
                   <AgreementTable
                     editable={false}
                     agreementData={agreementData}
@@ -461,7 +462,6 @@ const ViewClient = (props) => {
                 />
               ) : (
                 <UserData
-                  
                   handleSubmit={handleSubmitUser}
                   clientId={id}
                   openModal={openModal}
@@ -539,24 +539,7 @@ const ViewClient = (props) => {
                     <p>Account Number:</p>
                   </Col>
                   <Col xs="8">
-                    <p>
-                      **********
-                      {clientData?.bankAccountNumber
-                        ? clientData?.bankAccountNumber[
-                            clientData?.bankAccountNumber.length - 3
-                          ]
-                        : null}
-                      {clientData?.bankAccountNumber
-                        ? clientData?.bankAccountNumber[
-                            clientData?.bankAccountNumber.length - 2
-                          ]
-                        : null}
-                      {clientData?.bankAccountNumber
-                        ? clientData?.bankAccountNumber[
-                            clientData?.bankAccountNumber?.length - 1
-                          ]
-                        : null}
-                    </p>
+                    <p>{clientData?.bankAccountNumber}</p>
                   </Col>
                 </Row>
               </div>

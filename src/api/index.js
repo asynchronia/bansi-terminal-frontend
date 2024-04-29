@@ -36,7 +36,7 @@ const API_URL = {
     getExpenses:"/api/expenses/list",
     getEstimate: '/api/estimates/id/',
     getAgreementItems: '/api/items/agreement-item-list',
-    getClientUsers: '/api/users/get/client-users',
+    getClientUsers: '/api/clients/get',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");

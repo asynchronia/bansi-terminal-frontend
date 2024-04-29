@@ -49,6 +49,8 @@ const CreateClient = (props) => {
     }
   };
 
+  
+
   const validation = useFormik({
     enableReinitialize: true,
 
@@ -137,6 +139,7 @@ const CreateClient = (props) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
+  console.log(validation.errors)
 
   useEffect(() => {
     props.setBreadcrumbItems("CreateItems", breadcrumbItems);
@@ -228,7 +231,7 @@ const CreateClient = (props) => {
                         type="text"
                         placeholder="Enter Item Name"
                       />
-                      {validation.errors.name ? (
+                      { validation.touched.name && validation.errors.name ? (
                         <p style={{ color: "red" }}>{validation.errors.name}</p>
                       ) : null}
                     </div>
@@ -252,7 +255,8 @@ const CreateClient = (props) => {
                         }
                         placeholder="Enter Item Name"
                       />
-                      {validation.errors.contact ? (
+                      { validation.touched.contact &&
+                          validation.errors.contact ? (
                         <p style={{ color: "red" }}>
                           {validation.errors.contact}
                         </p>
@@ -275,7 +279,7 @@ const CreateClient = (props) => {
                         }
                         placeholder="Enter Item Name"
                       />
-                      {validation.errors.email ? (
+                      {validation.touched.email && validation.errors.email? (
                         <p style={{ color: "red" }}>
                           {validation.errors.email}
                         </p>
@@ -302,7 +306,8 @@ const CreateClient = (props) => {
                       <option value="business">Business</option>
                       <option value="individual">Individual</option>
                     </select>
-                    {validation.errors.clientType ? (
+                    {validation.touched.clientType &&
+                        validation.errors.clientType? (
                       <p style={{ color: "red" }}>
                         {validation.errors.clientType}
                       </p>
@@ -333,7 +338,8 @@ const CreateClient = (props) => {
                     }
                     placeholder="Enter Account Number"
                   />
-                  {validation.errors.bankAccountNumber ? (
+                  { validation.touched.bankAccountNumber &&
+                      validation.errors.bankAccountNumber ? (
                     <p style={{ color: "red" }}>
                       {validation.errors.bankAccountNumber}
                     </p>
@@ -355,7 +361,8 @@ const CreateClient = (props) => {
                       validation.errors.bankAccountName
                     }
                   />
-                  {validation.errors.bankAccountName ? (
+                  { validation.touched.bankAccountName &&
+                      validation.errors.bankAccountName ? (
                     <p style={{ color: "red" }}>
                       {validation.errors.bankAccountName}
                     </p>
@@ -376,7 +383,7 @@ const CreateClient = (props) => {
                       validation.touched.ifscCode && validation.errors.ifscCode
                     }
                   />
-                  {validation.errors.ifscCode ? (
+                  { validation.touched.ifscCode && validation.errors.ifscCode ? (
                     <p style={{ color: "red" }}>{validation.errors.ifscCode}</p>
                   ) : null}
                 </div>
@@ -393,7 +400,7 @@ const CreateClient = (props) => {
                     value={validation.values.pan}
                     invalid={validation.touched.pan && validation.errors.pan}
                   />
-                  {validation.errors.pan ? (
+                  {validation.touched.pan && validation.errors.pan ? (
                     <p style={{ color: "red" }}>{validation.errors.pan}</p>
                   ) : null}
                 </div>
@@ -412,7 +419,7 @@ const CreateClient = (props) => {
                       validation.touched.gstin && validation.errors.gstin
                     }
                   />
-                  {validation.errors.gstin ? (
+                  { validation.touched.gstin && validation.errors.gstin? (
                     <p style={{ color: "red" }}>{validation.errors.gstin}</p>
                   ) : null}
                 </div>

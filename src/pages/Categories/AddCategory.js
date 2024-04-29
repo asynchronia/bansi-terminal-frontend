@@ -274,10 +274,10 @@ const AddCategory = (props) => {
                         ) : null}
                       </Col>
                       <Col xs="5">
-                        <label className="h5 mt-2">{` ${category.name}`}</label>
+                        <label className="h6 mt-2">{` ${category.name}`}</label>
                       </Col>
                       <Col xs="6">
-                        <label className="h5  mt-2">{` ${
+                        <label className="h6  mt-2">{` ${
                           category?.description || ""
                         }`}</label>
                       </Col>
@@ -303,10 +303,10 @@ const AddCategory = (props) => {
                                   ) : null}
                                 </Col>
                                 <Col xs="5">
-                                  <label className="h5 mt-2 ">{` ${child.name}`}</label>
+                                  <label className="h6 mt-2 ">{` ${child.name}`}</label>
                                 </Col>
                                 <Col xs="6">
-                                  <label className="h5 mt-2">{` ${
+                                  <label className="h6 mt-2">{` ${
                                     child?.description || ""
                                   }`}</label>
                                 </Col>
