@@ -50,6 +50,7 @@ const UserData = (props) => {
         _id: clientId,
       });
       let array = response?.payload;
+      // console.log(response)
 
       const newArray = array.map((item) => ({
         UserName: item.firstName + " " + item.lastName,
@@ -67,16 +68,17 @@ const UserData = (props) => {
     getUserData();
   }, []);
 
+
   const onPaginationChanged = useCallback((event) => {
     const page = gridRef.current.api.paginationGetCurrentPage() + 1;
     setPage(page);
   }, []);
 
   const [colDefs, setColDefs] = useState([
-    { field: "UserName", minWidth: 220 },
-    { field: "UserRole", minWidth: 220 },
-    { field: "Contact", minWidth: 220 },
-    { field: "Associated Branches", minWidth: 220 },
+    { field: "UserName" },
+    { field: "UserRole" },
+    { field: "Contact" },
+    { field: "Associated Branches" },
   ]);
 
   //For creating new User need Formik for validation schema
@@ -185,18 +187,43 @@ const UserData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div className="ag-theme-quartz" style={{ height: 309 }}>
+      <div style={{ maxHeight: 309, width: "100%" }}>
+        <Table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Contact</th>
+            </tr>
+          </thead>
+          <tbody>
+            {userData.length > 0 ? (
+              userData.map((user) => (
+                <tr>
+                  <td>{user.UserName}</td>
+                  <td>{user.UserRole}</td>
+                  <td>{user.Contact}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td></td>
+                <td style={{textAlign:'center'}}>No Rows to Show</td>
+                <td></td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      </div>
+      {/* <div className="ag-theme-quartz" style={{ height: 309 }}>
         <AgGridReact
           ref={gridRef}
           rowData={userData}
           columnDefs={colDefs}
-          onPaginationChanged={onPaginationChanged}
-          pagination={true}
-          paginationAutoPageSize={true}
           suppressAggFuncInHeader={true}
           onGridReady={onGridReady}
         />
-      </div>
+      </div> */}
       <div className="text-center">
         <Button
           onClick={() => {

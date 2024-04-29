@@ -42,7 +42,10 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
 
   useEffect(() => {
     searchAllRole();
-    getBranchList();
+    if(modal){
+      getBranchList();
+    }
+    
   }, []);
 
   if (modal) {
@@ -240,11 +243,11 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
                   </div>
                 )}
               >
-                {branchList.map((option) => (
+                {branchList.length>0? branchList.map((option) => (
                   <MenuItem key={option._id} value={option}>
                     {option.address}
                   </MenuItem>
-                ))}
+                )):null}
               </Select>
             </FormControl>
           </Row>

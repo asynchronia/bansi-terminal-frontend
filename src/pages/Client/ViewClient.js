@@ -540,22 +540,7 @@ const ViewClient = (props) => {
                   </Col>
                   <Col xs="8">
                     <p>
-                      **********
-                      {clientData?.bankAccountNumber
-                        ? clientData?.bankAccountNumber[
-                            clientData?.bankAccountNumber.length - 3
-                          ]
-                        : null}
-                      {clientData?.bankAccountNumber
-                        ? clientData?.bankAccountNumber[
-                            clientData?.bankAccountNumber.length - 2
-                          ]
-                        : null}
-                      {clientData?.bankAccountNumber
-                        ? clientData?.bankAccountNumber[
-                            clientData?.bankAccountNumber?.length - 1
-                          ]
-                        : null}
+                    {clientData?.bankAccountNumber}
                     </p>
                   </Col>
                 </Row>
