@@ -122,7 +122,7 @@ const AllInvoices = (props) => {
         let statusClass = "status-msg ";
         if (ifOverDue(curr_date, due_date)) {
           let days = getDifferenceInDays(curr_date, due_date);
-          status_msg = "Overdue by " + days + " day(s)";
+          status_msg = days > 0 ? "Overdue by " + days + " day(s)" : "";
           statusClass = statusClass + "red";
         } else {
           let days = getDifferenceInDays(curr_date, due_date);
@@ -149,14 +149,16 @@ const AllInvoices = (props) => {
       sortable: false,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+      valueFormatter: (params) =>
+        formatNumberWithCommasAndDecimal(params.value),
     },
     {
       headerName: "Amount Due",
       field: "balance",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+      valueFormatter: (params) =>
+        formatNumberWithCommasAndDecimal(params.value),
     },
     {
       headerName: "Action",
@@ -165,7 +167,7 @@ const AllInvoices = (props) => {
       cellClass: "actions-button-cell",
       cellRenderer: InvoiceActionBtn,
       cellRendererParams: {
-      onClickView: onClickView,
+        onClickView: onClickView,
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
@@ -189,6 +191,7 @@ const AllInvoices = (props) => {
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
+  const [delaySearch, setDelaySearch] = useState("");
 
   let bodyObject = {
     page: 1,
@@ -266,14 +269,14 @@ const AllInvoices = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Invoices", breadcrumbItems);
-    if (searchValue && searchValue !== undefined && searchValue !== "") {
+    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
       let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.search = searchValue;
+      bodyObjectWithCategory.search = delaySearch;
       getListOfRowData(bodyObjectWithCategory);
     } else {
       getListOfRowData(bodyObject);
     }
-  }, [searchValue]);
+  }, [delaySearch]);
 
   useEffect(() => {
     props.setBreadcrumbItems("Invoices", breadcrumbItems);
@@ -289,6 +292,15 @@ const AllInvoices = (props) => {
   };
   const handleInputChange = (e) => {
     setSearchValue(e.target.value);
+
+    const delay = 2000;
+
+    const timerId = setTimeout(() => {
+      console.log("Executing code after delay");
+      setDelaySearch(e.target.value);
+    }, delay);
+
+    return () => clearTimeout(timerId);
   };
 
   /*

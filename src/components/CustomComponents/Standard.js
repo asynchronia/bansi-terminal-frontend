@@ -4,7 +4,7 @@ import { Col, Row } from 'reactstrap'
 
 const Standard = (props) => {
 
-    const {data, type, onChange}=props
+    const {editPage, data, type, onChange}=props
     const handleInputChange = (e) => {
         const {name, value } = e.target;
         onChange(name, value);
@@ -23,6 +23,7 @@ const Standard = (props) => {
           placeholder="Enter SKU"
           onChange={handleInputChange}
           value={data?.sku ||""}
+          disabled={editPage}
         />
       </Col>
      { type === "standard" ? <Col>

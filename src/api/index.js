@@ -35,6 +35,8 @@ const API_URL = {
     getEstimateList: "/api/estimates/list",
     getExpenses:"/api/expenses/list",
     getEstimate: '/api/estimates/id/',
+    getAgreementItems: '/api/items/agreement-item-list',
+    getClientUsers: '/api/users/get/client-users',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -156,6 +158,17 @@ export async function getUserList(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.getUserList}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getClientUsers(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getClientUsers}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -396,7 +409,7 @@ export async function getOrderList(body) {
 export async function login(body) {
     return new Promise((resolve) => {
         axios
-            .post(`${baseUrl}${API_URL.login}`, body)
+            .post(`${baseUrl}${API_URL.login}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;
@@ -441,12 +454,27 @@ export async function getEstimate(body, id) {
 export async function signin(body) {
     return new Promise((resolve, reject) => {
         axios
-            .post(`${baseUrl}${API_URL.signin}`, body)
+            .post(`${baseUrl}${API_URL.signin}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            })
             .catch(error => {
                 reject(error);
             });
     }).catch(error => {
         console.log(error);
         return error.response.data;
+    });
+}
+
+export async function getAgreementItems(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getAgreementItems}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
     });
 }

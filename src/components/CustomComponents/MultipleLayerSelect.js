@@ -21,7 +21,7 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
   };
 
   return (
-    <div style={{ maxHeight: "200px", overflowY: "scroll" }}>
+    <div style={{ maxHeight: "200px", overflowY: "scroll"}}>
       {categories.map((category) => (
         <div
           style={{

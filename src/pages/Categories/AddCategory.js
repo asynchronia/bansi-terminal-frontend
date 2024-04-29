@@ -59,16 +59,18 @@ const AddCategory = (props) => {
       categoryDescription: "",
     },
     validationSchema: Yup.object({
-      categoryName: Yup.string().required("Please Enter Category Name"),
-      categoryParent: Yup.string().required("Please Enter Parent Category"),
+      categoryName: Yup.string().required("Please Enter Category Name")
+      //categoryParent: Yup.string().required("Please Enter Parent Category"),
     }),
     onSubmit: (values, { resetForm }) => {
       setIsButtonLoading(true);
       let body = {
         name: values.categoryName,
         description: values.categoryDescription,
-        parentCategoryId: values.categoryParent,
       };
+      if(values.categoryParent && values.categoryParent !== ""){
+       body. parentCategoryId = values.categoryParent
+      }
       handleSubmit(body, resetForm);
     },
   });
@@ -272,10 +274,10 @@ const AddCategory = (props) => {
                         ) : null}
                       </Col>
                       <Col xs="5">
-                        <label className="h5 mt-2">{` ${category.name}`}</label>
+                        <label className="h6 mt-2">{` ${category.name}`}</label>
                       </Col>
                       <Col xs="6">
-                        <label className="h5  mt-2">{` ${
+                        <label className="h6  mt-2">{` ${
                           category?.description || ""
                         }`}</label>
                       </Col>
@@ -301,10 +303,10 @@ const AddCategory = (props) => {
                                   ) : null}
                                 </Col>
                                 <Col xs="5">
-                                  <label className="h5 mt-2 ">{` ${child.name}`}</label>
+                                  <label className="h6 mt-2 ">{` ${child.name}`}</label>
                                 </Col>
                                 <Col xs="6">
-                                  <label className="h5 mt-2">{` ${
+                                  <label className="h6 mt-2">{` ${
                                     child?.description || ""
                                   }`}</label>
                                 </Col>

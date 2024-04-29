@@ -1,35 +1,44 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap";
-import { changePreloader } from "../../store/actions";
+import { Row, Col, Card, CardBody } from "reactstrap";
 
-import DropdownMenuBtn from "./DropdownMenuBtn";
 import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
-import { AgGridReact } from "ag-grid-react";
+// import {AgGridReact} from 'ag-grid-react';
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
-import { formatNumberWithCommasAndDecimal } from "./invoiceUtil";
+import { changePreloader } from "../../store/actions";
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
+/*.dropdown-toggle::after {
+  display: none !important; 
+}*/
 
 //Import Action to copy breadcrumb items from local state to redux state
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import { getPaymentReq } from "../../service/invoiceService";
+import { getAgreementItemsReq } from "../../service/itemService";
+import { getCategoriesReq } from "../../service/categoryService";
 import "./styles/datatables.scss";
-import "./styles/AllInvoices.scss";
+import "./styles/AllItems.scss";
+import DropdownMenuBtn from "./DropdownMenuBtn";
+import { AgGridReact } from "ag-grid-react";
 
-const AllPayments = (props) => {
-  document.title = "Payments";
+const AgreementItemsListing = (props) => {
+  document.title = "All Items";
   let navigate = useNavigate();
-  let dispatch = useDispatch();
   const effectCalled = useRef(false);
 
+  const [categoryData, setCategoryData] = useState({
+    name: "",
+    id: null,
+    show: false,
+  });
+
   const redirectToViewPage = (id) => {
-    let path = `/payment/${id.payment_id}`;
+    let path = `/view-agreement-item/${id}`;
     setTimeout(() => {
       navigate(path, id);
     }, 300);
   };
-
   const notify = (type, message) => {
     if (type === "Error") {
       toast.error(message, {
@@ -45,88 +54,63 @@ const AllPayments = (props) => {
   };
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Payments", link: "#" },
+    { title: "Agreement Items", link: "#" },
   ];
   const gridRef = useRef();
+  
   const handleViewClick = (data) => {
     redirectToViewPage(data);
   };
 
   const columnDefs = [
     {
-      headerName: "Invoice Date",
-      field: "date",
+      headerName: "Item Name",
+      field: "title",
       headerCheckboxSelection: true,
       checkboxSelection: true,
-      cellRenderer: (props) => {
-        let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
-      },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 160,sortable:false
-
-    },
-    {
-      headerName: "Payment#",
-      field: "payment_number",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 120,sortable:false
     },
     {
       headerName: "Type",
-      field: "payment_type",
+      field: "itemType",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 140,sortable:false
     },
     {
-      headerName: "Client",
-      field: "customer_name",
+      headerName: "HSN Code",
+      field: "hsnCode",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 220,sortable:false
     },
     {
-      headerName: "Invoice#",
-      field: "invoice_numbers",
+      headerName: "Price",
+      field: "price",
+      sortable: false,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 180,sortable:false
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
     },
     {
-      headerName: "Payment Mode",
-      field: "payment_mode",
+      headerName: "Category",
+      field: "category",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 130,sortable:false
-    },
-    {
-      headerName: "Amount Paid",
-      field: "amount",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      valueFormatter: (params) =>
-        formatNumberWithCommasAndDecimal(params.value),
-      width : 120,sortable:false
-
     },
     {
       headerName: "Action",
       field: "action",
       sortable: false,
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
       cellClass: "actions-button-cell",
       cellRenderer: DropdownMenuBtn,
       cellRendererParams: {
         handleViewClick: handleViewClick,
       },
-      width : 90
-
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
     },
   ];
+
   const autoSizeStrategy = {
     type: "fitGridWidth",
   };
@@ -137,14 +121,14 @@ const AllPayments = (props) => {
   // allows the user to select the page size from a predefined list of page sizes
   const paginationPageSizeSelector = [25, 50, 100];
 
-  const [allCustomers, setAllCustomers] = useState([]);
-  const [customer, setCustomer] = useState("");
+  const [allCategories, setAllCategories] = useState([]);
+  const [category, setCategory] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
-  const [delaySearch, setDelaySearch] = useState("");
+  const dispatch = useDispatch();
 
   let bodyObject = {
     page: 1,
@@ -160,142 +144,147 @@ const AllPayments = (props) => {
     document.body.classList.add("no_padding");
   }
   const onPaginationChanged = useCallback((event) => {
+
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
+
     setPaginationPageSize(pageSize);
   }, []);
-
+  /*
+{
+    "page": 1,
+    "limit": 10,
+    "search": "p",
+    "sort": {
+        "key": "createdAt",
+        "order": "asc"
+    },
+    "filter": {
+        "category": "65bab211ce0f79d56447c537"
+    }
+}
+* */
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-    const response = await getPaymentReq(body);
-    let custList = new Set();
+    const response = await getAgreementItemsReq(body);
+    console.log(response, "response")
     response.map((val, id) => {
-      custList.add(val.customer_name);
+      val.category = val.category.name;
+      val.price = val.variants[0].price;
     });
-    let custArr = [];
-    custList?.forEach((val, key, set) => {
-      custArr.push(val);
-    });
-    setAllCustomers([...custArr]);
     setRowData(response);
     setBodyObjectReq(body);
     dispatch(changePreloader(false));
   });
 
+  const getCategories = useCallback(async () => {
+    const response = await getCategoriesReq();
+
+    setAllCategories(response?.payload?.categories);
+  });
+
   useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
+    props.setBreadcrumbItems("All Items", breadcrumbItems);
     if (!effectCalled.current) {
       getListOfRowData(bodyObject);
+      getCategories();
       effectCalled.current = true;
     }
   }, []);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (customer && customer !== undefined && customer !== "") {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      bodyObjectWithFilter.filter = {};
-      bodyObjectWithFilter.filter.customer_name = customer;
-      getListOfRowData(bodyObjectWithFilter);
-    } else {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      delete bodyObjectWithFilter["filter"];
-      getListOfRowData(bodyObjectWithFilter);
-    }
-  }, [customer]);
+
 
   useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithSearch = { ...bodyObject };
-      bodyObjectWithSearch.search = delaySearch;
-      getListOfRowData(bodyObjectWithSearch);
+    props.setBreadcrumbItems("All Items", breadcrumbItems);
+    if (categoryData.id && categoryData.id !== undefined && categoryData.id !== null) {
+      let bodyObjectWithCategory = { ...bodyObject };
+      bodyObjectWithCategory.filter = {};
+      bodyObjectWithCategory.filter.category = categoryData.id;
+      getListOfRowData(bodyObjectWithCategory);
+    } else {
+      let bodyObjectWithCategory = { ...bodyObjectReq };
+      delete bodyObjectWithCategory["filter"];
+      getListOfRowData(bodyObjectWithCategory);
+    }
+  }, [categoryData]);
+
+  useEffect(() => {
+    props.setBreadcrumbItems("All Items", breadcrumbItems);
+    if (searchValue && searchValue !== undefined && searchValue !== "") {
+      let bodyObjectWithCategory = { ...bodyObject };
+      bodyObjectWithCategory.search = searchValue;
+      getListOfRowData(bodyObjectWithCategory);
     } else {
       getListOfRowData(bodyObject);
     }
-  }, [delaySearch]);
+  }, [searchValue]);
 
   useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
+    props.setBreadcrumbItems("All Items", breadcrumbItems);
     if (paginationPageSize && paginationPageSize !== undefined) {
-      getListOfRowData(bodyObject);
+      let bodyObjectWithCategory = { ...bodyObject };
+      bodyObjectWithCategory.limit = paginationPageSize;
+      getListOfRowData(bodyObjectWithCategory);
     }
   }, [paginationPageSize]);
 
   const handleChange = (e) => {
-    setCustomer(e.target.value);
+
+    setCategory(e.target.value);
   };
   const handleInputChange = (e) => {
+
     setSearchValue(e.target.value);
-
-    const delay = 2000;
-
-    const timerId = setTimeout(() => {
-      console.log("Executing code after delay");
-      setDelaySearch(e.target.value);
-    }, delay);
-
-    return () => clearTimeout(timerId);
   };
 
   return (
     <React.Fragment>
       <ToastContainer position="top-center" theme="colored" />
-      <Modal
-        isOpen={modal_standard}
-        toggle={() => {
-          tog_standard();
-        }}
-      >
-        <div className="modal-header">
-          <h5 className="modal-title mt-0" id="myModalLabel">
-            Confirm
-          </h5>
-          <button
-            type="button"
-            onClick={() => {
-              setmodal_standard(false);
-            }}
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div className="modal-body">
-          <h5>Are you sure you want to delete {currRowItem?.title} ? </h5>
-        </div>
-        <div className="modal-footer">
-          <button
-            type="button"
-            onClick={() => {
-              setmodal_standard(false);
-            }}
-            className="btn btn-secondary waves-effect"
-            data-dismiss="modal"
-          >
-            Close
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary waves-effect waves-light"
-            onClick={() => {
-              // deleteItem(currRowItem)
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      </Modal>
-      <div className="all-invoices">
+      <div className="all-items">
         <Row>
           <Col className="col-12">
             <Card>
               <CardBody>
-                <div className="button-section">
+                {/* <div className="button-section">
+                  <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.CREATE}>
+                    <Button
+                      className="all-items-btn"
+                      color="primary"
+                      onClick={redirectToCreateItem}
+                    >
+                      <i className=" mdi mdi-20px mdi-plus mx-1"></i>Create Item
+                    </Button>
+                    <Button color="secondary">Import Items</Button>
+                  </RequirePermission>
                   <div className="button-right-section">
-                    <div className="invoice-search-box">
+                    <div className="categoryDiv">
+                      <label
+                        name="category"
+                        id="category"
+
+                        onClick={() => {
+                          setCategoryData({
+                            ...categoryData,
+                            show: !categoryData.show,
+                          });
+                          setCategory(categoryData.id);
+                        }}
+                        className="form-select focus-width"
+                      >
+                        {categoryData.name !== ""
+                          ? `Category: ${categoryData.name}`
+                          : `Select Category`}
+                      </label>
+                      {categoryData.show ? (
+                        <div style={{ position: 'absolute', background: 'white', minWidth: '300px' }}>
+                          <MultipleLayerSelect
+                            categories={allCategories}
+                            setCategoryData={setCategoryData}
+                          />
+                        </div>
+                      ) : null}
+                    </div>
+                    <div class="input-group">
                       <div className="search-box position-relative">
                         <Input
                           type="text"
@@ -307,22 +296,8 @@ const AllPayments = (props) => {
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
                     </div>
-                    <select
-                      onChange={handleChange}
-                      id="customer"
-                      name="customer"
-                      value={customer}
-                      className="form-select focus-width"
-                    >
-                      <option value="" selected>
-                        Select Client
-                      </option>
-                      {allCustomers.map((e) => (
-                        <option value={e}>{e}</option>
-                      ))}
-                    </select>
                   </div>
-                </div>
+                </div> */}
                 <div
                   className="ag-theme-quartz"
                   style={{
@@ -332,7 +307,7 @@ const AllPayments = (props) => {
                 >
                   <AgGridReact
                     ref={gridRef}
-                    rowHeight={60}
+                    floatingFilter={true}
                     suppressRowClickSelection={true}
                     columnDefs={columnDefs}
                     pagination={pagination}
@@ -354,4 +329,4 @@ const AllPayments = (props) => {
   );
 };
 
-export default connect(null, { setBreadcrumbItems })(AllPayments);
+export default connect(null, { setBreadcrumbItems })(AgreementItemsListing);

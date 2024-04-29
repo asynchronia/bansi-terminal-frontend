@@ -266,7 +266,7 @@ const CreateItems = (props) => {
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "All Items", link: "/items" },
-    { title: "Create Items", link: "/create-items" },
+    { title: "Create Item", link: "/create-items" },
   ];
 
   useEffect(() => {
@@ -310,7 +310,7 @@ const CreateItems = (props) => {
         <Row>
           <Col xl="4">
             <Card>
-              <CardBody>
+              <CardBody style={{ height: "41rem" }}>
                 <h4 className="card-title">Item Primary</h4>
 
                 <div>
@@ -373,10 +373,12 @@ const CreateItems = (props) => {
                         : `Select Category`}
                     </label>
                     {categoryData.show ? (
-                      <MultipleLayerSelect
-                        categories={allCategories}
-                        setCategoryData={setCategoryData}
-                      />
+                      <div style={{position:'absolute', width:'90%', zIndex:2, background:'#FFFFFF'}}>
+                        <MultipleLayerSelect
+                          categories={allCategories}
+                          setCategoryData={setCategoryData}
+                        />
+                      </div>
                     ) : null}
                   </div>
                   <div className="mt-3">

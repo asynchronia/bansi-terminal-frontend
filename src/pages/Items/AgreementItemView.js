@@ -1,24 +1,27 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Row, Col, Card, CardBody } from "reactstrap";
+import {
+  Row,
+  Col,
+  Card,
+  CardBody,
+} from "reactstrap";
 import "react-toastify/dist/ReactToastify.css";
-import { connect, useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { getItemByIdReq } from "../../service/itemService";
-import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles//ag-grid.css";
-import "ag-grid-community/styles//ag-theme-quartz.css";
-import { attributesCellRenderer } from "./ItemsUtils";
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles//ag-grid.css';
+import 'ag-grid-community/styles//ag-theme-quartz.css';
+import { attributesCellRenderer } from './ItemsUtils';
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import RequirePermission from "../../routes/middleware/requirePermission";
-import { changePreloader } from "../../store/actions";
-import {ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
+
 
 const ViewItems = (props, { route, navigate }) => {
-  let dispatch = useDispatch();
   let navigateTo = useNavigate();
   const [itemsData, setItemsData] = useState();
   const [variantData, setVariantData] = useState([]);
@@ -26,6 +29,8 @@ const ViewItems = (props, { route, navigate }) => {
   const { id } = useParams();
   const effectCalled = useRef(false);
   const gridRef = useRef();
+
+
 
   //Handles BreadCrumbs
   const breadcrumbItems = [
@@ -35,11 +40,11 @@ const ViewItems = (props, { route, navigate }) => {
   ];
 
   const autoSizeStrategy = {
-    type: "fitGridWidth",
+    type: 'fitGridWidth'
   };
 
   let bodyObject = {
-    _id: id,
+    "_id": id
   };
 
   const redirectToEditPage = (id) => {
@@ -47,31 +52,24 @@ const ViewItems = (props, { route, navigate }) => {
     setTimeout(() => {
       navigateTo(path, id);
     }, 300);
-  };
+  }
 
   const handleEditClick = (id) => {
     redirectToEditPage(id);
-  };
+  }
 
   const getItemData = useCallback(async (body) => {
-    dispatch(changePreloader(true));
     const response = await getItemByIdReq(body);
-
-    if (
-      response &&
-      response.payload &&
-      response.payload.item &&
-      response.payload.variants
-    ) {
+    
+    if (response && response.payload && response.payload.item && response.payload.item.variants) {
       const item = response.payload.item;
       setItemsData(item);
-      const variants = Object.values(response.payload.variants);
+      const variants = Object.values(response.payload.item.variants);
       setVariantData(variants);
       if (item.taxes) {
         setTaxData(item?.taxes);
       }
     }
-    dispatch(changePreloader(false));
   });
   const pagination = false;
 
@@ -80,53 +78,27 @@ const ViewItems = (props, { route, navigate }) => {
   const paginationPageSizeSelector = [5, 10, 25, 50];
   const [paginationPageSize, setPaginationPageSize] = useState(5);
 
+
   const columnDefs = [
     {
-      headerName: "SKU",
-      field: "sku",
-      sortable: false,
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
+      headerName: "SKU", field: "sku", sortable: false, suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true }
     },
     {
-      headerName: "Stock Quantity",
-      sortable: false,
-      field: "inventory",
-      suppressMenu: true,
+      headerName: "Price", sortable: false, field: "price", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
     },
     {
-      headerName: "Cost Price",
-      sortable: false,
-      field: "costPrice",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      valueFormatter: (params) =>
-        formatNumberWithCommasAndDecimal(params.value),
-    },
-    {
-      headerName: "Selling Price",
-      sortable: false,
-      field: "sellingPrice",
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      valueFormatter: (params) =>
-        formatNumberWithCommasAndDecimal(params.value),
-    },
-    {
-      headerName: "Variant Info",
-      field: "attributes",
-      sortable: false,
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      cellRenderer: attributesCellRenderer,
-    },
-  ];
+      headerName: "Variant Info", field: "attributes", sortable: false, suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true }, cellRenderer: attributesCellRenderer
+    }
+  ]
 
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
-    setPaginationPageSize(pageSize);
+    setPaginationPageSize(pageSize)
   }, []);
 
   // const getCategories = useCallback(async () => {
@@ -135,17 +107,19 @@ const ViewItems = (props, { route, navigate }) => {
   // });
 
   useEffect(() => {
-    props.setBreadcrumbItems(itemsData?.title, breadcrumbItems);
+    props.setBreadcrumbItems("View Item Details", breadcrumbItems);
     if (!effectCalled.current) {
       getItemData(bodyObject);
+      // getCategories();
       effectCalled.current = true;
     }
-  }, [bodyObject]);
+  }, []);
 
   useEffect(() => {
     props.setBreadcrumbItems(itemsData?.title, breadcrumbItems);
     if (paginationPageSize && paginationPageSize !== undefined) {
       getItemData(bodyObject);
+      // getCategories();
     }
   }, [paginationPageSize]);
 
@@ -153,10 +127,7 @@ const ViewItems = (props, { route, navigate }) => {
     <>
       <div style={{ position: "relative" }}>
         <ToastContainer position="top-center" theme="colored" />
-        <RequirePermission
-          module={MODULES_ENUM.ITEMS}
-          permission={PERMISSIONS_ENUM.UPDATE}
-        >
+        <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.UPDATE}>
           <div
             style={{
               position: "absolute",
@@ -169,12 +140,7 @@ const ViewItems = (props, { route, navigate }) => {
               <option value="active">Published</option>
               <option value="draft">Draft</option>
             </select>
-            <button
-              type="submit"
-              onClick={() => handleEditClick(itemsData?._id)}
-              className="btn btn-primary w-xl mx-3"
-            >
-              <Edit style={{ marginRight: "5px", fill: "white" }} />
+            <button type="submit" onClick={() => handleEditClick(itemsData?._id)} className="btn btn-primary w-xl mx-3">
               Edit
             </button>
           </div>
@@ -204,7 +170,7 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.hsnCode}</p>
-                      </Col><hr/>
+                      </Col>
                     </Row>
                   </div>
                   <div>
@@ -215,7 +181,7 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.category?.name}</p>
-                      </Col><hr/>
+                      </Col>
                     </Row>
                   </div>
                   <div>
@@ -227,7 +193,7 @@ const ViewItems = (props, { route, navigate }) => {
                       <Col xs="8">
                         {" "}
                         <p>{itemsData?.itemType}</p>
-                      </Col><hr/>
+                      </Col>
                     </Row>
                   </div>
                 </CardBody>
@@ -245,7 +211,7 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.taxPreference}</p>
-                      </Col><hr/>
+                      </Col>
                     </Row>
                   </div>
                   <div>
@@ -255,10 +221,10 @@ const ViewItems = (props, { route, navigate }) => {
                         <p>Tax Bracket:</p>
                       </Col>
                       <Col xs="8">
-                        <p>
-                          {taxData && taxData[0] && <p>{taxData[0].name}</p>}
-                        </p>
-                      </Col><hr/>
+                        <p>{taxData && taxData[0] && (
+                          <p>{taxData[0].name}</p>
+                        )}</p>
+                      </Col>
                     </Row>
                   </div>
                   <div>
@@ -270,7 +236,7 @@ const ViewItems = (props, { route, navigate }) => {
                       <Col xs="8">
                         {" "}
                         <p>{itemsData?.itemType}</p>
-                      </Col><hr/>
+                      </Col>
                     </Row>
                   </div>
                 </CardBody>
@@ -285,8 +251,8 @@ const ViewItems = (props, { route, navigate }) => {
                 <div
                   className="ag-theme-quartz"
                   style={{
-                    height: "250px",
-                    width: "100%",
+                    height: '250px',
+                    width: '100%'
                   }}
                 >
                   <AgGridReact
@@ -300,8 +266,8 @@ const ViewItems = (props, { route, navigate }) => {
                     reactiveCustomComponents
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={variantData}
-                    onPaginationChanged={onPaginationChanged}
-                  ></AgGridReact>
+                    onPaginationChanged={onPaginationChanged}>
+                  </AgGridReact>
                 </div>
               </div>
             </CardBody>
@@ -311,5 +277,7 @@ const ViewItems = (props, { route, navigate }) => {
     </>
   );
 };
+
+
 
 export default connect(null, { setBreadcrumbItems })(ViewItems);

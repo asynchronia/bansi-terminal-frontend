@@ -11,14 +11,15 @@ import {
   Row,
   Table,
 } from "reactstrap";
-import { getUserListReq } from "../../service/usersService";
+import { getClientUsersReq } from "../../service/usersService";
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import * as Yup from "yup";
 import AddUser from "./AddUser";
-import { getUserRoleReq } from "../../service/branchService";
+import { Chip } from "@mui/material";
+// import { getBranchListReq, getUserRoleReq } from "../../service/branchService";
 
 const UserData = (props) => {
   const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
@@ -27,44 +28,48 @@ const UserData = (props) => {
   const gridRef = useRef();
   const [userData, setUserData] = useState([]);
   const [page, setPage] = useState(1);
+  const [selectedItems, setSelectedItems] = useState([]);
 
-  const getRoleName=(roleId)=>{
-   if(roleId==="65b4e43b671d73cc3c1bbf8c"){
-    return "Super Admin";
-   }else if(roleId==="65b4e43b671d73cc3c1bbf8d"){
-    return "Admin"
-   }else if(roleId==="65b4e43b671d73cc3c1bbf8e"){
-    return "Client Admin"
-   }else if(roleId==="65b4e43b671d73cc3c1bbf8f"){
-    return "Client Manager"
-   }else if( roleId ==="65b4e43b671d73cc3c1bbf90"){
-    return "Client User"
-   }else{
-    return "User"
-   }
-
-  }
+  const getRoleName = (roleId) => {
+    if (roleId === "65b4e43b671d73cc3c1bbf8c") {
+      return "Super Admin";
+    } else if (roleId === "65b4e43b671d73cc3c1bbf8d") {
+      return "Admin";
+    } else if (roleId === "65b4e43b671d73cc3c1bbf8e") {
+      return "Client Admin";
+    } else if (roleId === "65b4e43b671d73cc3c1bbf8f") {
+      return "Client Manager";
+    } else if (roleId === "65b4e43b671d73cc3c1bbf90") {
+      return "Client User";
+    } else {
+      return "User";
+    }
+  };
   const getUserData = async () => {
     try {
-      const response = await getUserListReq({
+      const response = await getClientUsersReq({
         clientId: clientId,
       });
       let array = response?.payload;
-      
+      // console.log(response)
 
       const newArray = array.map((item) => ({
-        UserName: item.firstName+" "+item.lastName,
-        UserRole:  getRoleName(item.role),
-        Contact: item.contact,  
+        UserName: item.firstName + " " + item.lastName,
+        UserRole: getRoleName(item.role),
+        Contact: item.contact,
+        associatedBranches: item.associatedBranches,
       }));
 
       setUserData(newArray);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const onGridReady = useCallback((params) => {
+  useEffect(() => {
     getUserData();
   }, []);
+
 
   const onPaginationChanged = useCallback((event) => {
     const page = gridRef.current.api.paginationGetCurrentPage() + 1;
@@ -72,39 +77,49 @@ const UserData = (props) => {
   }, []);
 
   const [colDefs, setColDefs] = useState([
-    { field: "UserName", minWidth: 220 },
-    { field: "UserRole", minWidth: 220 },
-    { field: "Contact", minWidth: 220 },
-    // { field: "Action", minWidth:150},
+    { field: "UserName" },
+    { field: "UserRole" },
+    { field: "Contact" },
+    { field: "Associated Branches" },
   ]);
 
   //For creating new User need Formik for validation schema
   const validation = useFormik({
     enableReinitialize: true,
     initialValues: {
-        primaryUser:{
-            firstName:null,
-            lastName:null,
-            email:null,
-            password:null,
-            contact:null,
-            gender:null,
-            role:"65b4e43b671d73cc3c1bbf90",
-            clientId:clientId,
-          }
+      primaryUser: {
+        firstName: null,
+        lastName: null,
+        email: null,
+        password: null,
+        contact: null,
+        gender: null,
+        role: "65b4e43b671d73cc3c1bbf90",
+        clientId: clientId,
+        associatedBranches: [],
+      },
     },
     validationSchema: Yup.object({
-        primaryUser: Yup.object().shape({
-            firstName:Yup.string().required("Please Enter First Name"),
-            lastName:Yup.string().required("Please Enter Last Name"),
-            email:Yup.string().required("Please Enter Email Id"),
-            password:Yup.string().required("Please Enter Password"),
-            contact:Yup.string().required("Please Enter Valid Contact Number"),
-            gender:Yup.string().required("Please Enter Gender"),
-          })
+      primaryUser: Yup.object().shape({
+        firstName: Yup.string().required("Please Enter First Name"),
+        lastName: Yup.string().required("Please Enter Last Name"),
+        email: Yup.string().required("Please Enter Email Id"),
+        password: Yup.string().required("Please Enter Password"),
+        contact: Yup.string().required("Please Enter Valid Contact Number"),
+        gender: Yup.string().required("Please Enter Gender"),
+      }),
     }),
     onSubmit: (values) => {
-      const newUser = { ...values.primaryUser, clientId: clientId.toString() };
+      const branchArray = selectedItems.map((e) => {
+        return e._id;
+      });
+
+      const newUser = {
+        ...values.primaryUser,
+        clientId: clientId.toString(),
+        associatedBranches: branchArray,
+      };
+
       handleSubmit(newUser);
     },
   });
@@ -164,22 +179,65 @@ const UserData = (props) => {
                 </Col>
               </Row>
             </div>
-            <AddUser validation={validation} />
+            <AddUser
+              selectedItems={selectedItems}
+              setSelectedItems={setSelectedItems}
+              clientId={clientId}
+              modal={openModal.user}
+              validation={validation}
+            />
           </Form>
         </div>
       </Modal>
-      <div className="ag-theme-quartz" style={{ height: 309 }}>
+      <div style={{ maxHeight: 309, width: "100%" }}>
+        <Table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Contact</th>
+              <th>Associated Branches</th>
+            </tr>
+          </thead>
+          <tbody>
+            {userData.length > 0 ? (
+              userData.map((user) => (
+                <tr>
+                  <td>{user.UserName}</td>
+                  <td>{user.UserRole}</td>
+                  <td>{user.Contact}</td>
+                  <td style={{ width: 'min-content' }}>
+                    {
+                      <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap'}}>
+                        {
+                          user.associatedBranches.map((branch, index) => (
+                            <Chip size="small" key={index} label={`${branch.name}`} />
+                          ))
+                        }
+                      </div>
+                    }
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td></td>
+                <td style={{ textAlign: 'center' }}>No Rows to Show</td>
+                <td></td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      </div>
+      {/* <div className="ag-theme-quartz" style={{ height: 309 }}>
         <AgGridReact
           ref={gridRef}
           rowData={userData}
           columnDefs={colDefs}
-          onPaginationChanged={onPaginationChanged}
-          pagination={true}
-          paginationAutoPageSize={true}
           suppressAggFuncInHeader={true}
           onGridReady={onGridReady}
         />
-      </div>
+      </div> */}
       <div className="text-center">
         <Button
           onClick={() => {

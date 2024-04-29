@@ -20,3 +20,8 @@ export const PERMISSIONS_ENUM = {
   UPDATE: 'update',
   DELETE: 'delete',
 };
+
+export const USER_TYPES_ENUM = {
+  CLIENT: 'client',
+  ADMIN: 'admin',
+};
