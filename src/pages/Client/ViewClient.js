@@ -400,7 +400,7 @@ const ViewClient = (props) => {
                   </div>
                 </div>
               ) : (
-                <div style={{height:'400px', overflowY:'scroll'}}>
+                <div style={{height:'450px', overflowY:'scroll'}}>
                   <AgreementTable
                     editable={false}
                     agreementData={agreementData}

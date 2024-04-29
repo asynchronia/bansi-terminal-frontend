@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Col, Row, Table } from "reactstrap";
 import { searchItemReq } from "../../service/itemService";
 import { v4 as uuidv4 } from "uuid";
 import AgreementTable from "./AgreementTable";
-import { Chip } from "@mui/material";
+import { Chip, TableHead } from "@mui/material";
 
 const Agreement = (props) => {
   const {
@@ -200,6 +200,13 @@ const Agreement = (props) => {
                 overflowY: "scroll",
               }}
             >
+              <Row className="mt-3" style={{ width: "750px", fontWeight:'bold' }}>
+                    <Col>Title</Col>
+                    <Col>SKU</Col>
+                    <Col>Cost Price</Col>
+                    <Col>Selling Price</Col>
+              </Row>
+              <hr />
               {rowData.length === 0 ? (
                 <Row>
                   <p className="form-text-lg text-center">No Data Found</p>{" "}
