@@ -93,3 +93,11 @@ export const formatNumberWithCommasAndDecimal = (number) => {
   const formattedNumber = number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
   return "₹" + formattedNumber;
 };
+
+
+export const  formatCamelCase = (str) => {
+  // Using replace method with regEx
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+      return index == 0 ? word.toLowerCase() : word.toUpperCase();
+  }).replace(/\s+/g, ' ');
+}
