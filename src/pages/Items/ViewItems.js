@@ -15,6 +15,7 @@ import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import RequirePermission from "../../routes/middleware/requirePermission";
 import { changePreloader } from "../../store/actions";
+import {ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 
 const ViewItems = (props, { route, navigate }) => {
   let dispatch = useDispatch();
@@ -173,6 +174,7 @@ const ViewItems = (props, { route, navigate }) => {
               onClick={() => handleEditClick(itemsData?._id)}
               className="btn btn-primary w-xl mx-3"
             >
+              <Edit style={{ marginRight: "5px", fill: "white" }} />
               Edit
             </button>
           </div>
@@ -202,7 +204,7 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.hsnCode}</p>
-                      </Col>
+                      </Col><hr/>
                     </Row>
                   </div>
                   <div>
@@ -213,7 +215,7 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.category?.name}</p>
-                      </Col>
+                      </Col><hr/>
                     </Row>
                   </div>
                   <div>
@@ -225,7 +227,7 @@ const ViewItems = (props, { route, navigate }) => {
                       <Col xs="8">
                         {" "}
                         <p>{itemsData?.itemType}</p>
-                      </Col>
+                      </Col><hr/>
                     </Row>
                   </div>
                 </CardBody>
@@ -243,7 +245,7 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.taxPreference}</p>
-                      </Col>
+                      </Col><hr/>
                     </Row>
                   </div>
                   <div>
@@ -256,7 +258,7 @@ const ViewItems = (props, { route, navigate }) => {
                         <p>
                           {taxData && taxData[0] && <p>{taxData[0].name}</p>}
                         </p>
-                      </Col>
+                      </Col><hr/>
                     </Row>
                   </div>
                   <div>
@@ -268,7 +270,7 @@ const ViewItems = (props, { route, navigate }) => {
                       <Col xs="8">
                         {" "}
                         <p>{itemsData?.itemType}</p>
-                      </Col>
+                      </Col><hr/>
                     </Row>
                   </div>
                 </CardBody>

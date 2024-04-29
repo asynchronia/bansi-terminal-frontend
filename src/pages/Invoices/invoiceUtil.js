@@ -60,36 +60,40 @@ const teens = ['', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixte
 const tens = ['', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
 export const indianNumberWords = (num) => {
-    if (num === 0) return 'zero';
+  if (num === 0) return 'Zero';
 
-    const numberToWords = (num) => {
-        if (num < 10) return ones[num];
-        if (num < 20) return teens[num - 10];
-        if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? ' ' + ones[num % 10] : '');
-        if (num < 1000) return ones[Math.floor(num / 100)] + ' hundred' + (num % 100 !== 0 ? ' ' + numberToWords(num % 100) : '');
-        if (num < 100000) return numberToWords(Math.floor(num / 1000)) + ' thousand' + (num % 1000 !== 0 ? ' ' + numberToWords(num % 1000) : '');
-        if (num < 10000000) return numberToWords(Math.floor(num / 100000)) + ' lakh' + (num % 100000 !== 0 ? ' ' + numberToWords(num % 100000) : '');
-        return numberToWords(Math.floor(num / 10000000)) + ' crore' + (num % 10000000 !== 0 ? ' ' + numberToWords(num % 10000000) : '');
-    };
+  const numberToWords = (num) => {
+      if (num < 10) return ones[num];
+      if (num < 20) return teens[num - 10];
+      if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? ' ' + ones[num % 10] : '');
+      if (num < 1000) return ones[Math.floor(num / 100)] + ' hundred' + (num % 100 !== 0 ? ' ' + numberToWords(num % 100) : '');
+      if (num < 100000) return numberToWords(Math.floor(num / 1000)) + ' thousand' + (num % 1000 !== 0 ? ', ' + numberToWords(num % 1000) : '');
+      if (num < 10000000) return numberToWords(Math.floor(num / 100000)) + ' lakh' + (num % 100000 !== 0 ? ', ' + numberToWords(num % 100000) : '');
+      return numberToWords(Math.floor(num / 10000000)) + ' crore' + (num % 10000000 !== 0 ? ', ' + numberToWords(num % 10000000) : '');
+  };
 
-    const [integerPart, decimalPart] = String(num).split('.').map(Number);
+  const [integerPart, decimalPart] = String(num).split('.').map(Number);
 
-    let result = numberToWords(integerPart);
+  let result = numberToWords(integerPart);
 
-    if (decimalPart) {
-        result += ' point';
-        decimalPart.toString().slice(0, 2).split('').forEach(digit => {
-            result += ' ' + ones[parseInt(digit)];
-        });
-    }
-
-    return result.charAt(0).toUpperCase() + result.slice(1);
+  if (decimalPart) {
+      result += ' point';
+      decimalPart.toString().slice(0, 2).split('').forEach(digit => {
+          result += ' ' + ones[parseInt(digit)];
+      });
+  }
+  return result.charAt(0).toUpperCase() + result.slice(1);
 };
+
 
 export const formatNumberWithCommasAndDecimal = (number) => {
   if (typeof number !== 'number' || isNaN(number)) {
     return ''; 
   }
-  const formattedNumber = number.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-  return "₹" + formattedNumber;
+  if(number===0){
+    return "-";
+  }
+
+  const formattedNumber = number.toLocaleString('en-IN');
+  return "₹ " + formattedNumber;
 };

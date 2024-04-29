@@ -94,6 +94,7 @@ const Users = (props) => {
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Users", link: "#" },
+    { title: "Add User", link: "#" },
   ];
 
   const getUsersData = useCallback(async (body) => {
@@ -342,6 +343,7 @@ const Users = (props) => {
                         </option>
                         <option value={"male"}>Male</option>
                         <option value={"female"}>Female</option>
+                        <option value={"others"}>Others</option>
                       </select>
                     </div>
                   </Col>
@@ -353,10 +355,10 @@ const Users = (props) => {
 
                       <Row>
                         <FormControl
-                          sx={{ m: 1, width: 300, mr: 1.5, ml: "auto" }}
+                          // sx={{ m: 1, width: 300, mr: 1.5, ml: "auto" }}
                         >
                           <InputLabel
-                            sx={{ mt: -1.2 }}
+                            // sx={{ mt: -1.2 }}
                             id="demo-multiple-chip-label"
                           >
                             Warehouse
@@ -371,7 +373,7 @@ const Users = (props) => {
                               <OutlinedInput
                                 id="select-multiple-chip"
                                 label="Warehouse"
-                                sx={{ height: 35 }}
+                                // sx={{ height: 35 }}
                               />
                             }
                             renderValue={(selected) => (
