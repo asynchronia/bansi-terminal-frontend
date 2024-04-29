@@ -17,7 +17,7 @@ const InvoiceActionBtn = (props) =>{
   }
     return (
         <div className="invoice-drop-down-item">
-          <Dropdown isOpen={menu} direction={'bottom'} toggle={() => setMenu(!menu)} className="table-action-btn">
+          <Dropdown isOpen={menu} direction={'down'} toggle={() => setMenu(!menu)} className="table-action-btn">
             <DropdownToggle> <ThreeDots className='logo' /></DropdownToggle>
             <DropdownMenu>
               <DropdownItem onClick={onClickViewInvoice}>View Invoice</DropdownItem>

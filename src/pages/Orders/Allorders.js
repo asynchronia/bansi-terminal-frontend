@@ -1,8 +1,8 @@
-import React,{useEffect,useState,useRef,useCallback} from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer,toast} from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { Row, Col, Card, CardBody } from "reactstrap"
-import {AgGridReact} from 'ag-grid-react';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
 import { connect, useDispatch } from "react-redux";
@@ -17,9 +17,9 @@ import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 const AllOrders = (props) => {
   document.title = "All Orders";
   let dispatch = useDispatch();
-  let navigate = useNavigate(); 
+  let navigate = useNavigate();
   const effectCalled = useRef(false);
-  
+
   const autoSizeStrategy = {
     type: 'fitGridWidth'
   };
@@ -31,70 +31,86 @@ const AllOrders = (props) => {
   const paginationPageSizeSelector = [25, 50, 100];
 
   const [rowData, setRowData] = useState([]);
-  const [paginationPageSize, setPaginationPageSize ]= useState(25);
-  let bodyObject = {
-    "page": 1,
-    "limit": 200
-  };
+  const [paginationPageSize, setPaginationPageSize] = useState(25);
+  const [page, setPage] = useState(1);
 
-  const redirectToViewPage = (id) =>{
-    let path = `/order/${id.salesorder_id}`; 
-     setTimeout(() => {
-      navigate(path,id);
-     }, 300); 
+  const redirectToViewPage = (id) => {
+    let path = `/order/${id.salesorder_id}`;
+    setTimeout(() => {
+      navigate(path, id);
+    }, 300);
   }
 
-  const handleViewClick = (id) =>{
+  const handleViewClick = (id) => {
     redirectToViewPage(id);
   }
 
   useEffect(() => {
     props.setBreadcrumbItems('All Orders', breadcrumbItems);
-    if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
-      effectCalled.current=true;
-    }
-  },[]);
+    getListOfRowData('page');
+  }, [page, paginationPageSize]);
 
-  useEffect(() => {
-    props.setBreadcrumbItems('All Orders', breadcrumbItems);
-    if(paginationPageSize && paginationPageSize !== undefined){
-      getListOfRowData(bodyObject);
+  const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
     }
-  },[paginationPageSize]);
-
-  const getListOfRowData =  useCallback(async (body) => {
     dispatch(changePreloader(true));
-    const response = await getOrdersReq(body);
-    setRowData(response);
+    const response = await getOrdersReq({
+      page: page,
+      limit: paginationPageSize,
+    });
+
+    const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+    let filledRows;
+
+    if (response.length < paginationPageSize) {
+      filledRows = [...response];
+    } else {
+      filledRows = [...response, ...emptyObjects];
+    }
+
+    const newData = [...rowData];
+    newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+    setRowData(newData);
+
     dispatch(changePreloader(false));
-  });
-  const redirectToEditPage = (id) =>{
-    let path = "/edit-item"; 
-     setTimeout(() => {
+  }, [page, paginationPageSize]);
+
+  const redirectToEditPage = (id) => {
+    let path = "/edit-item";
+    setTimeout(() => {
       navigate(path, id);
-     }, 300); 
-      
+    }, 300);
+
   }
-  const handleDeleteResponse = (response) =>{
+  const handleDeleteResponse = (response) => {
     if (response.success === true) {
       notify("Success", response.message);
     } else {
       notify("Error", response.message);
     }
     getListOfRowData();
-  } 
-  const handleEditClick = (id) =>{
+  }
+  const handleEditClick = (id) => {
     redirectToEditPage(id);
   }
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
-   let pageSize=  gridRef.current.api.paginationGetPageSize();
-   setPaginationPageSize(pageSize)
+    let pageSize = gridRef.current.api.paginationGetPageSize();
+    setPaginationPageSize(pageSize);
+
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
+    }
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
+
+    if (page !== newPage) {
+      setPage(newPage);
+    }
   }, []);
-  
+
   const gridRef = useRef();
-  
+
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Sales Order", link: "#" },
@@ -110,57 +126,57 @@ const AllOrders = (props) => {
       invoiced_status: "invoiced",
       paid_status: "unpaid",
       status: "invoiced",
-  }
+    }
   ]
   const columnDefs = [
     {
-      headerName: "Order Date", field: "date", 
-      headerCheckboxSelection: true, checkboxSelection: true,suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
-      tooltipValueGetter: (p) => p.value,headerTooltip: "Order Date",
+      headerName: "Order Date", field: "date",
+      headerCheckboxSelection: true, checkboxSelection: true, suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
       width : 150,sortable:false
     },
     {
-      headerName: "Order No.", field: "salesorder_id",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
-      tooltipValueGetter: (p) => p.value,headerTooltip: "Order No.",
+      headerName: "Order No.", field: "salesorder_id", suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
       width: 200,sortable:false
     },
     {
-      headerName: "Client", field: "customer_name",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
+      headerName: "Client", field: "customer_name", suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
       width : 200,sortable:false
     },
     {
-      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer,suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
-      tooltipValueGetter: (p) => p.value,headerTooltip: "Order Status",
+      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
       width : 110,sortable:false
     },
     {
-      headerName: "Total Amount", field: "total",suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
-      tooltipValueGetter: (p) => p.value,headerTooltip: "Total Amount",
+      headerName: "Total Amount", field: "total", suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
       width : 130,sortable:false
     },
     {
-      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
-      tooltipValueGetter: (p) => p.value,headerTooltip: "Invoice",
+      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Invoice",
       width : 80,sortable:false
     },
     {
-      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer,suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
-      tooltipValueGetter: (p) => p.value,headerTooltip: "Payment",
+      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Payment",
       width : 100,sortable:false
     },
     {
-      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer,suppressMenu: true,
-      floatingFilterComponentParams: {suppressFilterButton:true},
+      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Shipment",
       width : 100,sortable:false
@@ -168,14 +184,14 @@ const AllOrders = (props) => {
     },
     {
       headerName: "Action", field: "action", sortable: false,
-      cellClass:"actions-button-cell",
+      cellClass: "actions-button-cell",
       cellRenderer: DropdownMenuBtn,
       cellRendererParams: {
         handleResponse: handleDeleteResponse,
         handleEditClick: handleEditClick,
         handleViewClick: handleViewClick,
-      },suppressMenu: true,floatingFilterComponentParams: {suppressFilterButton:true},
-      tooltipValueGetter: (p) => p.value,headerTooltip: "Actions",
+      }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
       width : 80
     }
   ]
@@ -193,44 +209,40 @@ const AllOrders = (props) => {
     }
   }
 
-  useEffect(() => {
-    props.setBreadcrumbItems('All Orders', breadcrumbItems);
-  },[]);
-
   return (
     <>
-       <ToastContainer position="top-center" theme="colored" />
-        <div className="all-items">
-          <Row>
-            <Col className="col-12">
-              <Card>
-                <CardBody>
-                    <div
-                            className="ag-theme-quartz"
-                            style={{
-                                height: '500px',
-                                width: '100%'
-                            }}
-                        >
-                            <AgGridReact
-                                ref={gridRef}
-                                suppressRowClickSelection={true}
-                                columnDefs={columnDefs}
-                                pagination={pagination}
-                                paginationPageSize={paginationPageSize}
-                                paginationPageSizeSelector={paginationPageSizeSelector}
-                                rowSelection="multiple"
-                                reactiveCustomComponents
-                                autoSizeStrategy={autoSizeStrategy}
-                                rowData={rowData}
-                                onPaginationChanged={onPaginationChanged}>
-                            </AgGridReact>
-                        </div>
-            </CardBody>
-              </Card>
-            </Col>
-          </Row>
-          </div>
+      <ToastContainer position="top-center" theme="colored" />
+      <div className="all-items">
+        <Row>
+          <Col className="col-12">
+            <Card>
+              <CardBody>
+                <div
+                  className="ag-theme-quartz"
+                  style={{
+                    height: '500px',
+                    width: '100%'
+                  }}
+                >
+                  <AgGridReact
+                    ref={gridRef}
+                    suppressRowClickSelection={true}
+                    columnDefs={columnDefs}
+                    pagination={pagination}
+                    paginationPageSize={paginationPageSize}
+                    paginationPageSizeSelector={paginationPageSizeSelector}
+                    rowSelection="multiple"
+                    reactiveCustomComponents
+                    autoSizeStrategy={autoSizeStrategy}
+                    rowData={rowData}
+                    onPaginationChanged={onPaginationChanged}>
+                  </AgGridReact>
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </div>
     </>
   )
 }
