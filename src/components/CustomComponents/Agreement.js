@@ -196,7 +196,8 @@ const Agreement = (props) => {
                 position: "absolute",
                 zIndex: 2,
                 width: "750px",
-                height:'500px', overflowY:'scroll'
+                height: "500px",
+                overflowY: "scroll",
               }}
             >
               {rowData.length === 0 ? (
@@ -206,7 +207,7 @@ const Agreement = (props) => {
               ) : (
                 rowData?.map((item) =>
                   item?.variant?.map((variant) => (
-                    <Row 
+                    <Row
                       onClick={() => {
                         handleAddToAgreement(
                           item._id,
@@ -230,11 +231,14 @@ const Agreement = (props) => {
                     >
                       <Col>
                         <p>{item.title}</p>
-                        <div sx={{display:'flex', gap:'3px'}}>
+                        <div sx={{ display: "flex", gap: "3px" }}>
                           {variant.attributes
                             ? variant?.attributes?.map((attribute) => (
-                                <Chip size="small" key={attribute._id} label= {`${attribute.name}-${attribute.value}`}/>
-                               
+                                <Chip
+                                  size="small"
+                                  key={attribute._id}
+                                  label={`${attribute.name}-${attribute.value}`}
+                                />
                               ))
                             : null}
                         </div>
@@ -249,14 +253,15 @@ const Agreement = (props) => {
             </div>
           ) : null}
         </div>
-
-        <AgreementTable
-          editable={true}
-          agreementData={agreementData}
-          displayTableData={displayTableData}
-          setAgreementData={setAgreementData}
-          setDisplayTableData={setDisplayTableData}
-        />
+        <div style={{ height: "400px", overflowY: "scroll" }}>
+          <AgreementTable
+            editable={true}
+            agreementData={agreementData}
+            displayTableData={displayTableData}
+            setAgreementData={setAgreementData}
+            setDisplayTableData={setDisplayTableData}
+          />
+        </div>
       </CardBody>
     </Card>
   );
