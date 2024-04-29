@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Col, Row, Table } from "reactstrap";
 import { searchItemReq } from "../../service/itemService";
 import { v4 as uuidv4 } from "uuid";
 import AgreementTable from "./AgreementTable";
-import { Chip } from "@mui/material";
+import { Chip, CircularProgress, TableHead } from "@mui/material";
 
 const Agreement = (props) => {
   const {
@@ -18,6 +18,7 @@ const Agreement = (props) => {
   } = props;
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
+  const [loadedData, setLoadedData] = useState(false);
   const [fileData, setFileData] = useState({
     name: null,
     url: null,
@@ -25,6 +26,7 @@ const Agreement = (props) => {
 
   const handleShowData = (value) => {
     setShowRowData(value);
+    setLoadedData(false);
   };
 
   const handleDisplayData = (item, itemId, id, variant, title) => {
@@ -96,6 +98,7 @@ const Agreement = (props) => {
         limit: 10,
       };
       setShowRowData(true);
+      setLoadedData(true);
       getListOfRowData(data);
     }
   };
@@ -196,67 +199,93 @@ const Agreement = (props) => {
                 position: "absolute",
                 zIndex: 2,
                 width: "750px",
-                height:'500px', overflowY:'scroll'
+                height: "500px",
+                overflowY: "scroll",
               }}
             >
-              {rowData.length === 0 ? (
-                <Row>
-                  <p className="form-text-lg text-center">No Data Found</p>{" "}
-                </Row>
-              ) : (
-                rowData?.map((item) =>
-                  item?.variant?.map((variant) => (
-                    <Row 
-                      onClick={() => {
-                        handleAddToAgreement(
-                          item._id,
-                          variant._id,
-                          variant.sellingPrice
-                        );
-                        handleDisplayData(
-                          item,
-                          item._id,
-                          variant._id,
-                          variant,
-                          item.title
-                        );
-                      }}
-                      className="py-3"
-                      style={{
-                        borderBottom: "1px solid #f4f4f4",
-                        cursor: "pointer",
-                      }}
-                      key={variant._id}
-                    >
-                      <Col>
-                        <p>{item.title}</p>
-                        <div sx={{display:'flex', gap:'3px'}}>
-                          {variant.attributes
-                            ? variant?.attributes?.map((attribute) => (
-                                <Chip size="small" key={attribute._id} label= {`${attribute.name}-${attribute.value}`}/>
-                               
-                              ))
-                            : null}
-                        </div>
-                      </Col>
-                      <Col>{variant.sku}</Col>
-                      <Col>{variant.costPrice}</Col>
-                      <Col>{variant.sellingPrice}</Col>
-                    </Row>
-                  ))
+              <Row
+                className="mt-3"
+                style={{ width: "750px", fontWeight: "bold" }}
+              >
+                <Col>Title</Col>
+                <Col>SKU</Col>
+                <Col>Cost Price</Col>
+                <Col>Selling Price</Col>
+              </Row>
+              <hr />
+              {loadedData ? (
+                rowData.length === 0 ? (
+                  <Row>
+                    <p className="form-text-lg text-center">No Data Found</p>{" "}
+                  </Row>
+                ) : (
+                  rowData?.map((item) =>
+                    item?.variant?.map((variant) => (
+                      <Row
+                        onClick={() => {
+                          handleAddToAgreement(
+                            item._id,
+                            variant._id,
+                            variant.sellingPrice
+                          );
+                          handleDisplayData(
+                            item,
+                            item._id,
+                            variant._id,
+                            variant,
+                            item.title
+                          );
+                        }}
+                        className="py-3"
+                        style={{
+                          borderBottom: "1px solid #f4f4f4",
+                          cursor: "pointer",
+                        }}
+                        key={variant._id}
+                      >
+                        <Col>
+                          <p>{item.title}</p>
+                          <div sx={{ display: "flex", gap: "3px" }}>
+                            {variant.attributes
+                              ? variant?.attributes?.map((attribute) => (
+                                  <Chip
+                                    size="small"
+                                    key={attribute._id}
+                                    label={`${attribute.name}-${attribute.value}`}
+                                  />
+                                ))
+                              : null}
+                          </div>
+                        </Col>
+                        <Col>{variant.sku}</Col>
+                        <Col>{variant.costPrice}</Col>
+                        <Col>{variant.sellingPrice}</Col>
+                      </Row>
+                    ))
+                  )
                 )
+              ) : (
+                <Row>
+                  <Col></Col>
+                  <Col></Col>
+                  <Col>
+                    <CircularProgress />
+                  </Col>
+                  <Col></Col>
+                </Row>
               )}
             </div>
           ) : null}
         </div>
-
-        <AgreementTable
-          editable={true}
-          agreementData={agreementData}
-          displayTableData={displayTableData}
-          setAgreementData={setAgreementData}
-          setDisplayTableData={setDisplayTableData}
-        />
+        <div style={{ height: "400px", overflowY: "scroll" }}>
+          <AgreementTable
+            editable={true}
+            agreementData={agreementData}
+            displayTableData={displayTableData}
+            setAgreementData={setAgreementData}
+            setDisplayTableData={setDisplayTableData}
+          />
+        </div>
       </CardBody>
     </Card>
   );

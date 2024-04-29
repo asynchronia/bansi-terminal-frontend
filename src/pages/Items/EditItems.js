@@ -45,7 +45,6 @@ const EditItems = (props) => {
   const [deletedVariant, setDeletedVariant] = useState([]);
   const [itemType, setItemType] = useState("variable");
   const [typeValue, setTypeValue] = useState("variable");
-  console.log(typeValue);
   const [variantDataChanged, setVariantDataChanged] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [categoryData, setCategoryData] = useState({
@@ -401,6 +400,8 @@ const EditItems = (props) => {
     props.setBreadcrumbItems("Edit Items", breadcrumbItems);
   });
 
+  const editPage = true;
+
   //Handle File Upload
   function handleAcceptedFiles(files) {
     const updatedFiles = files.map((file) =>
@@ -492,7 +493,7 @@ const EditItems = (props) => {
                   </div>
                   <div className="mt-3 mb-0">
                     <label className="form-label focus-width">
-                      Select Category
+                      Category
                     </label>
                     <label
                       name="category"
@@ -503,18 +504,13 @@ const EditItems = (props) => {
                           show: !categoryData.show,
                         });
                       }}
-                      className="form-select"
+                      className="form-control"
                     >
-                      {categoryData.name !== ""
-                        ? `Category: ${categoryData.name}`
-                        : `Select Category`}
+                     
+                        {categoryData.name}
+                       
                     </label>
-                    {categoryData.show ? (
-                      <MultipleLayerSelect
-                        categories={allCategories}
-                        setCategoryData={setCategoryData}
-                      />
-                    ) : null}
+                   
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
@@ -733,17 +729,20 @@ const EditItems = (props) => {
                   />
                 ))}
                 <div className="mt-3">
-                  <button
-                    type="button"
-                    className="btn btn-primary waves-effect waves-light "
-                    onClick={handleAddRow}
-                  >
-                    <label className="card-title mx-1">Add</label>
-                    <i className=" mdi mdi-18px mdi-plus"></i>
-                  </button>
+                  {!editPage ? (
+                    <button
+                      type="button"
+                      className="btn btn-primary waves-effect waves-light "
+                      onClick={handleAddRow}
+                    >
+                      <label className="card-title mx-1">Add</label>
+                      <i className=" mdi mdi-18px mdi-plus"></i>
+                    </button>
+                  ) : null}
                 </div>
                 {variantData.map((row) => (
                   <AllVariantRows
+                  editPage={editPage}
                     data={row}
                     key={row._id}
                     _id={row._id}
@@ -767,6 +766,7 @@ const EditItems = (props) => {
             ) : (
               <CardBody>
                 <Standard
+                  editPage={editPage}
                   data={otherData}
                   type={itemType}
                   onChange={handleOtherChange}
@@ -827,6 +827,8 @@ const AttributesRow = (props) => {
     setChips(chips.filter((_, index) => index !== chipIndex));
   };
 
+  const editPage = true;
+
   return (
     <div>
       <Row>
@@ -840,6 +842,7 @@ const AttributesRow = (props) => {
             onChange={setNameRef}
             value={displayValue}
             ref={nameRef}
+            disabled={true}
           />
         </Col>
         <Col xs="8">
@@ -853,14 +856,16 @@ const AttributesRow = (props) => {
         </Col>
 
         <Col xs="1">
-          <button
-            type="button"
-            className="btn btn-primary waves-effect waves-light mt-5"
-            disabled={disabledDelete}
-            onClick={() => onDelete(_id)}
-          >
-            <i className="mdi mdi-18px mdi-delete"></i>
-          </button>
+          {!editPage ? (
+            <button
+              type="button"
+              className="btn btn-primary waves-effect waves-light mt-5"
+              disabled={disabledDelete}
+              onClick={() => onDelete(_id)}
+            >
+              <i className="mdi mdi-18px mdi-delete"></i>
+            </button>
+          ) : null}
         </Col>
       </Row>
     </div>

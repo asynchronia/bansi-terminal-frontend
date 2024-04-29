@@ -3,7 +3,7 @@ import React from "react";
 import { Row, Col } from "reactstrap";
 
 const AllVariantRows = (props) => {
-  const { _id, onDelete, variantOptions, disabledDelete, onChange, data } = props;
+  const {editPage, _id, onDelete, variantOptions, disabledDelete, onChange, data } = props;
   
   
   const handleInputChange = (e) => {
@@ -37,6 +37,7 @@ const AllVariantRows = (props) => {
           type="text"
           placeholder="Enter SKU"
           onChange={handleInputChange}
+          disabled={editPage}
         />
       </Col>
       <Col>

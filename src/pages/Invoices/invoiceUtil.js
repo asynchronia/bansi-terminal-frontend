@@ -90,10 +90,14 @@ export const formatNumberWithCommasAndDecimal = (number) => {
   if (typeof number !== 'number' || isNaN(number)) {
     return ''; 
   }
-  if(number===0){
-    return "-";
-  }
-
   const formattedNumber = number.toLocaleString('en-IN');
-  return "₹ " + formattedNumber;
+  return "₹" + formattedNumber;
 };
+
+
+export const  formatCamelCase = (str) => {
+  // Using replace method with regEx
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+      return index == 0 ? word.toLowerCase() : word.toUpperCase();
+  }).replace(/\s+/g, ' ');
+}

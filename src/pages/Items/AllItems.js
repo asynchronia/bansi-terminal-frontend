@@ -299,6 +299,7 @@ const AllItems = (props) => {
   });
 
   useEffect(() => {
+    getCategories();
     props.setBreadcrumbItems("All Items", breadcrumbItems);
     if (!effectCalled.current) {
       getListOfRowData(bodyObject);
@@ -323,7 +324,7 @@ const AllItems = (props) => {
       delete bodyObjectWithCategory["filter"];
       getListOfRowData(bodyObjectWithCategory);
     }
-  }, [categoryData]);
+  }, [categoryData.id]);
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
