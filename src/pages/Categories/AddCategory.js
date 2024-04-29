@@ -59,16 +59,18 @@ const AddCategory = (props) => {
       categoryDescription: "",
     },
     validationSchema: Yup.object({
-      categoryName: Yup.string().required("Please Enter Category Name"),
-      categoryParent: Yup.string().required("Please Enter Parent Category"),
+      categoryName: Yup.string().required("Please Enter Category Name")
+      //categoryParent: Yup.string().required("Please Enter Parent Category"),
     }),
     onSubmit: (values, { resetForm }) => {
       setIsButtonLoading(true);
       let body = {
         name: values.categoryName,
         description: values.categoryDescription,
-        parentCategoryId: values.categoryParent,
       };
+      if(values.categoryParent && values.categoryParent !== ""){
+       body. parentCategoryId = values.categoryParent
+      }
       handleSubmit(body, resetForm);
     },
   });

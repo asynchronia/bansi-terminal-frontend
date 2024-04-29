@@ -11,7 +11,6 @@ import {
 } from "reactstrap";
 import { connect, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -20,18 +19,54 @@ import { ToastContainer } from "react-toastify";
 import {
   indianNumberWords,
   formatNumberWithCommasAndDecimal,
+  formatCamelCase
 } from "./invoiceUtil";
-import GenericPdfDownloader from "../../utility/GenericPdfDownloader";
+import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 import "./styles/datatables.scss";
 import "./styles/ViewInvoice.scss";
 
 import { changePreloader } from "../../store/actions";
 
+const options: Options = {
+  filename: "invoice.pdf",
+  method: "save",
+  // default is Resolution.MEDIUM = 3, which should be enough, higher values
+  // increases the image quality but also the size of the PDF, so be careful
+  // using values higher than 10 when having multiple pages generated, it
+  // might cause the page to crash or hang.
+  resolution: Resolution.MEDIUM,
+  page: {
+    // margin is in MM, default is Margin.NONE = 0
+    margin: Margin.MEDIUM,
+    // default is 'A4'
+    format: "A4",
+    // default is 'portrait'
+    orientation: "portrait",
+  },
+  canvas: {
+    // default is 'image/jpeg' for better size performance
+    mimeType: "image/jpeg",
+    qualityRatio: 1,
+  },
+  // Customize any value passed to the jsPDF instance and html2canvas
+  // function. You probably will not need this and things can break,
+  // so use with caution.
+  overrides: {
+    // see https://artskydj.github.io/jsPDF/docs/jsPDF.html for more options
+    pdf: {
+      compress: true,
+    },
+    // see https://html2canvas.hertzen.com/configuration for more options
+    canvas: {
+      useCORS: true,
+    },
+  },
+};
 const ViewInvoice = (props) => {
   document.title = "Invoice Details";
   const breadcrumbItems = [
     { title: "Dashboard", link: "#" },
-    { title: "Invoice", link: "#" },
+    { title: "Invoices", link: "/invoices" },
   ];
   const gridRef = useRef();
   const effectCalled = useRef(false);
@@ -128,10 +163,10 @@ const ViewInvoice = (props) => {
     page: 1,
     limit: 200,
   };
-
+const getTargetElement = () => document.getElementById("invoice-container");
+const downloadPDF = () => generatePDF(getTargetElement, options);
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-    console.log("WHY is invoice id undefined" + invoiceId.id);
     const responseObj = await getInvoiceReq(body, invoiceId.id);
     console.log(responseObj);
     let rowData = [];
@@ -285,7 +320,7 @@ const ViewInvoice = (props) => {
 
   const getTermsSection = () => {
     var textArr = responseObj.terms.split(/\r?\n/);
-    var amountText = indianNumberWords(responseObj.sub_total);
+    var amountText = formatCamelCase(indianNumberWords(responseObj.sub_total));
 
     return (
       <>
@@ -333,7 +368,57 @@ const ViewInvoice = (props) => {
       }
   }
   * */
-
+const getBaseDetails = () =>{
+  return(
+        <div id="invoice-details" class="invoice-details">
+          <div className="invoice-details-lhs">
+              <h3>
+                <br />
+                <span>Bansi Office Solutions Private Limited</span>
+              </h3>
+              <span className="invoice-addr">{"#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India"}</span>
+              <br />
+              GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
+              <br />
+              MSME No : UDYAM-KR-03-0065095
+              <br />
+              Web: www.willsmeet.com, Email:sales@willsmeet.com
+              <br />
+        </div>
+        <div className="invoice-details-rhs">
+          {"TAX INVOICE"}
+          <br/>
+          {responseObj ? "INVOICE " + responseObj.invoice_number : ""}
+        </div>
+      </div>
+  )
+}
+const getInvoiceTable = () =>{
+ return( <>
+  <h5>{"Invoice Information"}</h5>
+  <div className="inv-table-div">
+    <table className="invoice-sub-table">
+      <tbody className="inv-tbody">
+      <tr className="invoice-tr-hdr">
+        {columnDefs.map(ele => <th>{ele.headerName}</th>)}
+      </tr>
+        {rowData.map(ele => 
+        <tr className="invoice-tr">
+          <td>{ele.description}</td>
+          <td>{ele.unit}</td>
+          <td>{ele.hsn_or_sac}</td>
+          <td>{ele.quantity}</td>
+          <td>{formatNumberWithCommasAndDecimal(ele.rate)}</td>
+          <td>{ele.cgst}</td>
+          <td>{formatNumberWithCommasAndDecimal(ele.cgst_tax)}</td>
+          <td>{ele.sgst}</td>
+          <td>{formatNumberWithCommasAndDecimal(ele.sgst_tax)}</td>
+          <td>{formatNumberWithCommasAndDecimal(ele.item_total)}</td>
+        </tr>)}</tbody>
+    </table>
+    </div>
+  </>);
+}
   return (
     <React.Fragment>
       <div className="view-invoice" id="view-invoice">
@@ -346,113 +431,101 @@ const ViewInvoice = (props) => {
           }}
         >
           {responseObj && (
-            <GenericPdfDownloader
-              downloadFileName={"view-invoice-" + responseObj.invoice_number}
-              rootElementId="view-invoice"
-            />
+            <button
+            type="submit"
+            className="btn btn-outline-primary w-xl mx-3"
+            onClick={downloadPDF}
+          >
+            Download PDF
+          </button>
           )}
           <button type="submit" className="btn btn-primary w-xl mx-3">
             Send on Mail
           </button>
         </div>
-        <Row>
-          <Col>
-            <Card>
-              <CardBody>
-                <div class="card-content">
-                  <div class="image-container">
-                    <img
-                      src={require("../../assets/images/Willsmeet-Logo.png")}
-                      alt="Company Logo"
-                      class="card-image"
-                    />
+           
+              <Card>
+                <CardBody>
+                  <div class="card-content">
+                    <div class="image-container">
+                      <img
+                        src={require("../../assets/images/Willsmeet-Logo.png")}
+                        alt="Company Logo"
+                        class="card-image"
+                      />
+                    </div> 
+                    {getBaseDetails()}
                   </div>
-                  <div class="details">
-                    <h3>
+                </CardBody>
+              </Card>
+          <div id="invoice-container">
+              <Row>
+                <Col>
+                  <Card className="col-style">
+                    <CardBody>{responseObj && getInvoiceInfo()}</CardBody>
+                  </Card>
+                </Col>
+                <Col>
+                  <Card className="col-style">
+                    <CardBody>
+                      {responseObj && getAddress("billing")}
                       <br />
-                      <span>Bansi Office Solutions Private Limited</span>
-                    </h3>
-                    #1496, 19th Main Road, Opp Park Square Apartment, HSR
-                    Layout, Bangalore Karnataka 560102, India
-                    <br />
-                    GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
-                    <br />
-                    MSME No : UDYAM-KR-03-0065095
-                    <br />
-                    Web: www.willsmeet.com, Email:sales@willsmeet.com
-                    <br />
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Card className="col-style">
-              <CardBody>{responseObj && getInvoiceInfo()}</CardBody>
-            </Card>
-          </Col>
-          <Col>
-            <Card className="col-style">
-              <CardBody>
-                {responseObj && getAddress("billing")}
-                <br />
-                {responseObj && getAddress("shipping")}
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col className="col-12">
-            <Card>
-              <CardBody>
-                <div
-                  className="ag-theme-quartz"
-                  style={{
-                    height: "300px",
-                    width: "100%",
-                  }}
-                >
-                  <AgGridReact
-                    ref={gridRef}
-                    rowHeight={60}
-                    suppressRowClickSelection={true}
-                    columnDefs={columnDefs}
-                    pagination={false}
-                    rowSelection="multiple"
-                    reactiveCustomComponents
-                    autoSizeStrategy={autoSizeStrategy}
-                    onGridReady={(event) => event.api.sizeColumnsToFit()}
-                    rowData={rowData}
-                  ></AgGridReact>
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Card className="col-style">
-              <CardBody>{responseObj && getTermsSection()}</CardBody>
-            </Card>
-          </Col>
-          <Col>
-            <Card className="col-style">
-              <CardBody>
-                {responseObj && getInvoiceFinalDetails()}
-                <div class="image-container-seal">
-                  <img
-                    src={require("../../assets/images/bansi-seal.png")}
-                    alt="Company Seal"
-                    class="card-image-seal"
-                  />
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
+                      {responseObj && getAddress("shipping")}
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="col-12">
+                  <Card>
+                    <CardBody>
+                      <div
+                        className="ag-theme-quartz"
+                        style={{
+                          height: "300px",
+                          width: "100%",
+                        }}
+                      >
+                        {getInvoiceTable()}
+                      {/*} <AgGridReact
+                          ref={gridRef}
+                          rowHeight={60}
+                          suppressRowClickSelection={true}
+                          columnDefs={columnDefs}
+                          pagination={false}
+                          rowSelection="multiple"
+                          reactiveCustomComponents
+                          autoSizeStrategy={autoSizeStrategy}
+                          onGridReady={(event) => event.api.sizeColumnsToFit()}
+                          rowData={rowData}
+                      ></AgGridReact>*/}
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Card className="col-style">
+                    <CardBody>{responseObj && getTermsSection()}</CardBody>
+                  </Card>
+                </Col>
+                <Col>
+                  <Card className="col-style">
+                    <CardBody>
+                      {responseObj && getInvoiceFinalDetails()}
+                      <div class="image-container-seal">
+                        <img
+                          src={require("../../assets/images/bansi-seal.png")}
+                          alt="Company Seal"
+                          class="card-image-seal"
+                        />
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
+          </div>
       </div>
     </React.Fragment>
   );
