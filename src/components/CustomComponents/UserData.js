@@ -15,6 +15,8 @@ import { getClientUsersReq } from "../../service/usersService";
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import ActionComponent from "./ActionComponent";
+
 
 import * as Yup from "yup";
 import AddUser from "./AddUser";
@@ -81,6 +83,15 @@ const UserData = (props) => {
     { field: "UserRole" },
     { field: "Contact" },
     { field: "Associated Branches" },
+    {
+      headerName: "Action",
+      field: "action",
+      cellClass: "actions-button-cell",
+      cellRenderer: ActionComponent,
+      sortable: false,
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
   ]);
 
   //For creating new User need Formik for validation schema
@@ -217,6 +228,7 @@ const UserData = (props) => {
                       </div>
                     }
                   </td>
+                  <td><ActionComponent data={user}/></td>
                 </tr>
               ))
             ) : (

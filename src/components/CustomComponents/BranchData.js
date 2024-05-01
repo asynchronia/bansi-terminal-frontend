@@ -19,6 +19,7 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import AddBranch from "./AddBranch";
 import * as Yup from "yup";
 import { TableHead } from "@mui/material";
+import ActionComponent from "./ActionComponent";
 
 const BranchData = (props) => {
   const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
@@ -35,7 +36,9 @@ const BranchData = (props) => {
         limit: 5,
       });
       let array = response?.payload?.branches;
+      console.log(array);
       const newArray = array.map((item) => ({
+        _id:item._id,
         Name: item.name,
         isPrimary: item.isPrimary,
         AssociatedWarehouse: item.associatedWarehouse.code,
@@ -144,10 +147,11 @@ const BranchData = (props) => {
           <tbody>
             {branchData.length > 0 ? (
               branchData.map((branch) => (
-                <tr>
+                <tr key={branch._id}>
                   <td>{branch.Name}</td>
                   <td>{branch.AssociatedWarehouse}</td>
                   <td>{branch.Contact}</td>
+                  <td><ActionComponent data={branch} openModal={openModal} setOpenModal={setOpenModal} /></td>
                 </tr>
               ))
             ) : (
