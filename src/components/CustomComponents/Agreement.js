@@ -105,8 +105,7 @@ const Agreement = (props) => {
 
   const getListOfRowData = async (data) => {
     const response = await searchItemReq(data);
-    console.log(response.payload.items);
-    console.log(agreementData);
+   
     setRowData(response?.payload?.items);
   };
 
