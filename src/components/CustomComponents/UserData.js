@@ -53,9 +53,10 @@ const UserData = (props) => {
         clientId: clientId,
       });
       let array = response?.payload;
-      // console.log(response)
+      
 
       const newArray = array.map((item) => ({
+        _id:item._id,
         UserName: item.firstName + " " + item.lastName,
         UserRole: getRoleName(item.role),
         Contact: item.contact,
@@ -213,7 +214,7 @@ const UserData = (props) => {
           <tbody>
             {userData.length > 0 ? (
               userData.map((user) => (
-                <tr>
+                <tr key={user._id}>
                   <td>{user.UserName}</td>
                   <td>{user.UserRole}</td>
                   <td>{user.Contact}</td>
@@ -228,7 +229,7 @@ const UserData = (props) => {
                       </div>
                     }
                   </td>
-                  <td><ActionComponent data={user}/></td>
+                  <td><ActionComponent data={user} openModal={openModal} setOpenModal={setOpenModal}/></td>
                 </tr>
               ))
             ) : (
