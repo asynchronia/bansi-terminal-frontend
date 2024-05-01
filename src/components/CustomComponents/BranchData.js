@@ -36,7 +36,6 @@ const BranchData = (props) => {
         limit: 5,
       });
       let array = response?.payload?.branches;
-      console.log(array);
       const newArray = array.map((item) => ({
         _id:item._id,
         Name: item.name,
@@ -135,7 +134,7 @@ const BranchData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%" }}>
+      <div style={{ maxHeight: 309, width: "100%" , overflowX:'scroll'}}>
         <Table>
           <thead>
             <tr>

@@ -201,7 +201,7 @@ const UserData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%" }}>
+      <div style={{ maxHeight: 309, width: "100%",  overflowX:'scroll' }}>
         <Table>
           <thead>
             <tr>
