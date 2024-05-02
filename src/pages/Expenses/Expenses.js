@@ -29,6 +29,7 @@ const Expenses = (props) => {
     "page": 1,
     "limit": 200
   };
+  const [pageNo, setPageNo] = useState(1);
   const columnDefs = [
     {
         headerName: "Order Date",
@@ -99,12 +100,29 @@ const Expenses = (props) => {
 
   
   const getListOfRowData = useCallback(async (body) => {
-    dispatch(changePreloader(true));
-    const response = await getExpensesReq(body);
-
-    setRowData(response.data);
-    dispatch(changePreloader(false));
-  });
+    if (rowData[(pageNo - 1) * paginationPageSize]) {
+       return;
+     }
+     dispatch(changePreloader(true));
+     console.log('body', body);
+     const response = await getExpensesReq(body);
+ 
+     const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+     let filledRows;
+ 
+     if (response.length < paginationPageSize) {
+       filledRows = [...response.data];
+     } else {
+       filledRows = [...response.data, ...emptyObjects];
+     }
+ 
+     const newData = [...rowData];
+     newData.splice((pageNo - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+   
+     setRowData(newData);
+ 
+     dispatch(changePreloader(false));
+   }, [pageNo]);
 
   useEffect(() => {
     props.setBreadcrumbItems("Expenses", breadcrumbItems);

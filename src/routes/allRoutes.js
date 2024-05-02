@@ -51,7 +51,7 @@ import Expenses from "../pages/Expenses/Expenses"
 import ViewEstimate from "../pages/Orders/ViewEstimate"
 import AgreementItemsListing from "../pages/Items/AgreementItemsListing"
 import AgreementItemView from "../pages/Items/AgreementItemView"
-
+//import UserProfile from "../pages/Users/UserProfile";
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
 // import ChartsJs from "../pages/Charts/charts-chartjs";
@@ -157,7 +157,7 @@ const userRoutes = [
   // { path: "/kanbanboard", component: <Kanban /> },
 
   // // // //profile
-  // { path: "/profile", component: <UserProfile /> },
+  //{ path: "/profile", component: <UserProfile/> },
 
   // // //Email
   // { path: "/email-inbox", component: <EmailInbox /> },
