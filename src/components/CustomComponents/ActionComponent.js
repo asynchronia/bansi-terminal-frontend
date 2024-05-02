@@ -4,10 +4,13 @@ import CustomDropdown from "./CustomDropdown";
 import "./styles/ActionComponent.scss";
 import { getBranchByIdReq } from "../../service/branchService";
 import { getUserByIdReq } from "../../service/usersService";
+import { Modal } from "reactstrap";
+import DeleteConfirm from "./DeleteConfirm";
 const ActionComponent = (props) => {
   const { setEdit, type, data, clientId, validation, openModal, setOpenModal } =
     props;
   const [menu, setMenu] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const getBranchData = async () => {
     try {
@@ -76,12 +79,16 @@ const ActionComponent = (props) => {
     }
   };
 
-  const onDeleteClick = () => {};
+  const onDeleteClick = () => {
+    setDeleteModal(true);
+  };
 
-  //onclicking on edit when type is branch, editBranch popup will show up that needs, clientId and branchId to get the data.
-  //Branch id is available in data need client Id from props.
 
   return (
+    <>
+    <Modal size="m" isOpen={deleteModal}>
+    <DeleteConfirm setDeleteModal={setDeleteModal}/>
+    </Modal>
     <CustomDropdown
       isOpen={menu}
       direction={"bottom"}
@@ -91,6 +98,7 @@ const ActionComponent = (props) => {
         { label: "Delete", onClick: onDeleteClick },
       ]}
     />
+    </>
   );
 };
 export default ActionComponent;
