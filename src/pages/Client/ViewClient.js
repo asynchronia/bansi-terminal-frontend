@@ -25,11 +25,12 @@ import {
 import AddBranch from "../../components/CustomComponents/AddBranch";
 import BranchData from "../../components/CustomComponents/BranchData";
 import UserData from "../../components/CustomComponents/UserData";
-import { createBranchReq } from "../../service/branchService";
+import { createBranchReq, updateBranchReq } from "../../service/branchService";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { signinReq } from "../../service/authService";
 import { getTaxesReq } from "../../service/itemService";
+import { updateUserReq } from "../../service/usersService";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -212,28 +213,59 @@ const ViewClient = (props) => {
     }
   };
 
-  const handleSubmitBranch = async (data) => {
-    try {
-      const response = await createBranchReq(data);
-      if (response.success === true) {
-        notify("Success", response.message);
-      } else {
-        notify("Error", response.message);
+  const handleSubmitBranch = async (data, editId) => {
+    if (editId) {
+      const { clientId, ...restData } = data;
+      const body = { ...restData, id: editId };
+      try {
+        const response = await updateBranchReq(body);
+        if (response.success === true) {
+          notify("Success", response.message);
+        } else {
+          notify("Error", response.message);
+        }
+      } catch (error) {
+        notify("Error", error.message);
       }
-    } catch (error) {
-      notify("Error", error.message);
+    } else {
+      try {
+        const response = await createBranchReq(data);
+        if (response.success === true) {
+          notify("Success", response.message);
+        } else {
+          notify("Error", response.message);
+        }
+      } catch (error) {
+        notify("Error", error.message);
+      }
     }
   };
-  const handleSubmitUser = async (data) => {
-    try {
-      const response = await signinReq(data);
-      if (response.success === true) {
-        notify("Success", response.message);
-      } else {
-        notify("Error", response.message);
+  const handleSubmitUser = async (data, editId) => {
+    if (editId) {
+      const { clientId, ...restData } = data;
+      const body = { ...restData, id: editId };
+      try {
+        const response = await updateUserReq(body);
+        if (response.success === true) {
+          notify("Success", response.message);
+        } else {
+          notify("Error", response.message);
+        }
+      } catch (error) {
+        notify("Error", error.message);
       }
-    } catch (error) {
-      notify("Error", error.message);
+
+    } else {
+      try {
+        const response = await signinReq(data);
+        if (response.success === true) {
+          notify("Success", response.message);
+        } else {
+          notify("Error", response.message);
+        }
+      } catch (error) {
+        notify("Error", error.message);
+      }
     }
   };
 

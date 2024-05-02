@@ -1,0 +1,29 @@
+.table-action-btn{
+    display:inline-block;
+}
+.client-drop-down-item{
+    .btn{
+        width: 30px;
+        padding-right: 6px;
+        padding-left: 6px;
+        color: black;
+        background-color: white;
+    }
+    .btn-secondary{
+        border: 2px solid  #D3D3D3;
+        background-color: white;
+    }
+    .btn-secondary:hover{
+        border: 2px solid  #D3D3D3;
+        background-color: white;
+        color: black;
+    }
+    .btn-check:checked + &,
+    :not(.btn-check) + &:active,
+    &:first-child:active,
+    &.active,
+    &.show { 
+        // override for the checkbox/radio buttons
+        color: black !important;
+      }
+}
