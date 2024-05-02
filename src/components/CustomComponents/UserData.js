@@ -28,7 +28,7 @@ const UserData = (props) => {
 
   const gridRef = useRef();
   const [userData, setUserData] = useState([]);
-  const [page, setPage] = useState(1);
+  const [edit, setEdit] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
 
   const getRoleName = (roleId) => {
@@ -69,11 +69,6 @@ const UserData = (props) => {
 
   useEffect(() => {
     getUserData();
-  }, []);
-
-  const onPaginationChanged = useCallback((event) => {
-    const page = gridRef.current.api.paginationGetCurrentPage() + 1;
-    setPage(page);
   }, []);
 
   const [colDefs, setColDefs] = useState([
@@ -129,7 +124,7 @@ const UserData = (props) => {
         associatedBranches: branchArray,
       };
 
-      handleSubmit(newUser);
+      handleSubmit(newUser, edit);
     },
   });
 
@@ -242,6 +237,7 @@ const UserData = (props) => {
                       data={user}
                       clientId={clientId}
                       validation={validation}
+                      setEdit={setEdit}
                     />
                   </td>
                 </tr>

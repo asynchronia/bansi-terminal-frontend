@@ -26,13 +26,13 @@ const BranchData = (props) => {
     props;
 
   const [branchData, setBranchData] = useState([]);
-  const [page, setPage] = useState(1);
+  const [edit, setEdit] = useState(null);
 
   const getBranchData = async () => {
     try {
       const response = await getBranchListReq({
         clientId: clientId,
-        page: page,
+        page: 1,
         limit: 5,
       });
       let array = response?.payload?.branches;
@@ -72,7 +72,7 @@ const BranchData = (props) => {
     }),
     onSubmit: (values) => {
       const newBranch = { ...values.primaryBranch, clientId: clientId };
-      handleSubmit(newBranch);
+      handleSubmit(newBranch, edit);
     },
   });
   return (
@@ -158,6 +158,7 @@ const BranchData = (props) => {
                       data={branch}
                       clientId={clientId}
                       validation={validation}
+                      setEdit={setEdit} 
                     />
                   </td>
                 </tr>

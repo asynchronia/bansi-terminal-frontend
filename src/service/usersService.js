@@ -1,7 +1,12 @@
-import { getClientUsers, getUserById, getUserList, getUserRole, getWarehouseList} from "../api";
+import { getClientUsers, getUserById, getUserList, getUserRole, getWarehouseList, updateUser} from "../api";
 
 export const getUserListReq = async (body) => {
     const response = await getUserList(body);
+    return response;
+};
+
+export const updateUserReq = async (body) => {
+    const response = await updateUser(body);
     return response;
 };
 

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Card, CardBody, Col, Input, Label, Row } from "reactstrap";
 import { getWarehouseListReq } from "../../service/branchService";
 
-const AddBranch = ({ validation }) => {
+const AddBranch = ({ edit, setEdit, validation }) => {
   const [warehouseList, setWarehouseList] = useState([]);
 
   const searchAllWareHouses = async () => {
