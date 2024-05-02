@@ -27,6 +27,24 @@ const AllInvoices = (props) => {
   let navigate = useNavigate();
   let dispatch = useDispatch();
   const effectCalled = useRef(false);
+  // enables pagination in the grid
+  const pagination = true;
+
+  // sets 10 rows per page (default is 100)
+  // allows the user to select the page size from a predefined list of page sizes
+  const paginationPageSizeSelector = [25, 50, 100];
+
+  const [allCustomers, setAllCustomers] = useState([]);
+  const [customer, setCustomer] = useState("");
+  const [rowData, setRowData] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+
+  const [paginationPageSize, setPaginationPageSize] = useState(25);
+  const [currRowItem, setCurrRowItem] = useState(null);
+  const [modal_standard, setmodal_standard] = useState(false);
+  const [delaySearch, setDelaySearch] = useState("");
+  const [pageNo, setPageNo] = useState(1);
+
 
   const redirectToViewPage = (id) => {
     let path = "/view-invoice/" + id;
@@ -55,27 +73,51 @@ const AllInvoices = (props) => {
       });
     }
   };
+
+  const getListOfRowData = useCallback(async (body) => {
+   if (rowData[(pageNo - 1) * paginationPageSize]) {
+      return;
+    }
+    dispatch(changePreloader(true));
+    console.log('searchValue', searchValue);
+    console.log('body', body);
+    const response = await getInvoicesReq(body);
+
+    const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+    let filledRows;
+
+    if (response.length < paginationPageSize) {
+      filledRows = [...response];
+    } else {
+      filledRows = [...response, ...emptyObjects];
+    }
+
+    const newData = [...rowData];
+    newData.splice((pageNo - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+    let custList = new Set();
+    newData.map((val, id) => {
+      var cust = val !== undefined && val !== null? val.customer_name : "";
+      custList.add(cust);
+    });
+    let custArr = [];
+
+    custList?.forEach((val, key, set) => {
+      custArr.push(val);
+    });
+
+    setAllCustomers([...custArr]);
+    setRowData(newData);
+
+    dispatch(changePreloader(false));
+  }, [pageNo]);
+
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Invoices", link: "#" },
   ];
   const gridRef = useRef();
-  const handleDeleteResponse = (response) => {
-    if (response.success === true) {
-      notify("Success", response.message);
-    } else {
-      notify("Error", response.message);
-    }
-    setmodal_standard(false);
-    getListOfRowData();
-  };
-  const handleEditClick = (id) => {
-    console.log("GRID OBJECT >>>" + id);
-    redirectToEditPage(id);
-  };
 
   const onClickView = (id) => {
-    console.log("GRID OBJECT >>>" + id);
     redirectToViewPage(id);
   };
 
@@ -176,23 +218,7 @@ const AllInvoices = (props) => {
   const autoSizeStrategy = {
     type: "fitGridWidth",
   };
-  // enables pagination in the grid
-  const pagination = true;
-
-  // sets 10 rows per page (default is 100)
-  // allows the user to select the page size from a predefined list of page sizes
-  const paginationPageSizeSelector = [25, 50, 100];
-
-  const [allCustomers, setAllCustomers] = useState([]);
-  const [customer, setCustomer] = useState("");
-  const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
-
-  const [paginationPageSize, setPaginationPageSize] = useState(25);
-  const [currRowItem, setCurrRowItem] = useState(null);
-  const [modal_standard, setmodal_standard] = useState(false);
-  const [delaySearch, setDelaySearch] = useState("");
-
+  
   let bodyObject = {
     page: 1,
     limit: 200,
@@ -208,81 +234,23 @@ const AllInvoices = (props) => {
   }
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
-    let pageSize = gridRef.current.api.paginationGetPageSize();
-    setPaginationPageSize(pageSize);
-  }, []);
-  /*
-{
-    "page": 1,
-    "limit": 10,
-    "search": "p",
-    "sort": {
-        "key": "createdAt",
-        "order": "asc"
-    },
-    "filter": {
-        "category": "65bab211ce0f79d56447c537"
+    const pageSize = gridRef.current.api.paginationGetPageSize();
+
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
     }
-}
-* */
-  const getListOfRowData = useCallback(async (body) => {
-    dispatch(changePreloader(true));
-    const response = await getInvoicesReq(body);
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
 
-    let custList = new Set();
-    response.map((val, id) => {
-      custList.add(val.customer_name);
-    });
-    let custArr = [];
-
-    custList?.forEach((val, key, set) => {
-      custArr.push(val);
-    });
-
-    setAllCustomers([...custArr]);
-    setRowData(response);
-    setBodyObjectReq(body);
-    dispatch(changePreloader(false));
-  });
-
-  useEffect(() => {
-    props.setBreadcrumbItems("Invoices", breadcrumbItems);
-    if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
-      effectCalled.current = true;
+    if (pageNo !== newPage) {
+      setPageNo(newPage);
     }
   }, []);
-
-  useEffect(() => {
-    props.setBreadcrumbItems("Invoices", breadcrumbItems);
-    if (customer && customer !== undefined && customer !== "") {
-      let bodyObjectWithCategory = { ...bodyObjectReq };
-      bodyObjectWithCategory.filter = {};
-      bodyObjectWithCategory.filter.customer_name = customer;
-      getListOfRowData(bodyObjectWithCategory);
-    } else {
-      let bodyObjectWithCategory = { ...bodyObjectReq };
-      delete bodyObjectWithCategory["filter"];
-      getListOfRowData(bodyObjectWithCategory);
-    }
-  }, [customer]);
-
-  useEffect(() => {
-    props.setBreadcrumbItems("Invoices", breadcrumbItems);
-    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.search = delaySearch;
-      getListOfRowData(bodyObjectWithCategory);
-    } else {
-      getListOfRowData(bodyObject);
-    }
-  }, [delaySearch]);
+ 
 
   useEffect(() => {
     props.setBreadcrumbItems("Invoices", breadcrumbItems);
     if (paginationPageSize && paginationPageSize !== undefined) {
       let bodyObjectWithCategory = { ...bodyObject };
-      // bodyObjectWithCategory.limit=
       getListOfRowData(bodyObjectWithCategory);
     }
   }, [paginationPageSize]);
@@ -303,76 +271,10 @@ const AllInvoices = (props) => {
     return () => clearTimeout(timerId);
   };
 
-  /*
-const onGridReady = useCallback((params) => {
-  setGridApi(e.api);
-    createItemReq
-      .then((resp) => resp.json())
-      .then((data) => {
-        // add id to data
-        var idSequence = 1;
-        data.forEach(function (item) {
-          item.id = idSequence++;
-        });
-        // setup the fake server with entire dataset
-        var fakeServer = new FakeServer(data);
-        // create datasource with a reference to the fake server
-        var datasource = getItemsReq(fakeServer);
-        // register the datasource with the grid
-        params.api.setGridOption('serverSideDatasource', datasource);
-      });
-  }, []);
-*/
   return (
     <React.Fragment>
       <ToastContainer position="top-center" theme="colored" />
-      <Modal
-        isOpen={modal_standard}
-        toggle={() => {
-          tog_standard();
-        }}
-      >
-        <div className="modal-header">
-          <h5 className="modal-title mt-0" id="myModalLabel">
-            Confirm
-          </h5>
-          <button
-            type="button"
-            onClick={() => {
-              setmodal_standard(false);
-            }}
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div className="modal-body">
-          <h5>Are you sure you want to delete {currRowItem?.title} ? </h5>
-        </div>
-        <div className="modal-footer">
-          <button
-            type="button"
-            onClick={() => {
-              setmodal_standard(false);
-            }}
-            className="btn btn-secondary waves-effect"
-            data-dismiss="modal"
-          >
-            Close
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary waves-effect waves-light"
-            onClick={() => {
-              // deleteItem(currRowItem)
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      </Modal>
+     
       <div className="all-invoices">
         <Row>
           <Col className="col-12">
