@@ -17,7 +17,6 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import ActionComponent from "./ActionComponent";
 
-
 import * as Yup from "yup";
 import AddUser from "./AddUser";
 import { Chip } from "@mui/material";
@@ -53,10 +52,9 @@ const UserData = (props) => {
         clientId: clientId,
       });
       let array = response?.payload;
-      
 
       const newArray = array.map((item) => ({
-        _id:item._id,
+        _id: item._id,
         UserName: item.firstName + " " + item.lastName,
         UserRole: getRoleName(item.role),
         Contact: item.contact,
@@ -72,7 +70,6 @@ const UserData = (props) => {
   useEffect(() => {
     getUserData();
   }, []);
-
 
   const onPaginationChanged = useCallback((event) => {
     const page = gridRef.current.api.paginationGetCurrentPage() + 1;
@@ -201,7 +198,7 @@ const UserData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%",  overflowX:'scroll' }}>
+      <div style={{ maxHeight: 309, width: "100%", overflowX: "scroll" }}>
         <Table>
           <thead>
             <tr>
@@ -218,24 +215,41 @@ const UserData = (props) => {
                   <td>{user.UserName}</td>
                   <td>{user.UserRole}</td>
                   <td>{user.Contact}</td>
-                  <td style={{ width: 'min-content' }}>
+                  <td style={{ width: "min-content" }}>
                     {
-                      <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap'}}>
-                        {
-                          user.associatedBranches.map((branch, index) => (
-                            <Chip size="small" key={index} label={`${branch.name}`} />
-                          ))
-                        }
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "3px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {user.associatedBranches.map((branch, index) => (
+                          <Chip
+                            size="small"
+                            key={index}
+                            label={`${branch.address}`}
+                          />
+                        ))}
                       </div>
                     }
                   </td>
-                  <td><ActionComponent data={user} openModal={openModal} setOpenModal={setOpenModal}/></td>
+                  <td>
+                    <ActionComponent
+                      openModal={openModal}
+                      setOpenModal={setOpenModal}
+                      type={"user"}
+                      data={user}
+                      clientId={clientId}
+                      validation={validation}
+                    />
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td></td>
-                <td style={{ textAlign: 'center' }}>No Rows to Show</td>
+                <td style={{ textAlign: "center" }}>No Rows to Show</td>
                 <td></td>
               </tr>
             )}

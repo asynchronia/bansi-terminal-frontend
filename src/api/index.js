@@ -19,6 +19,7 @@ const API_URL = {
     signin: '/api/users/signup',
     createAgreement: '/api/agreements/create',
     getBranchList: '/api/branch/list',
+    getBranchById:'/api/branch',
     createBranch: '/api/branch/create',
     getWarehouseList: '/api/branch/warehouse-list',
     getUserList: '/api/users/get/users',
@@ -37,6 +38,7 @@ const API_URL = {
     getEstimate: '/api/estimates/id/',
     getAgreementItems: '/api/items/agreement-item-list',
     getClientUsers: '/api/users/get/client-users',
+    getUserById:'/api/users/get/user'
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -176,6 +178,17 @@ export async function getClientUsers(body) {
     });
 }
 
+export async function getUserById(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getUserById}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
 export async function getUserRole() {
     return new Promise((resolve) => {
         axios
@@ -191,6 +204,17 @@ export async function getBranchList(body) {
     return new Promise((resolve) => {
         axios
             .post(`${baseUrl}${API_URL.getBranchList}`, body, { headers: getHeaders() })
+            .then((res) => {
+                resolve(res.data);
+                return res.data;
+            });
+    });
+}
+
+export async function getBranchById(body) {
+    return new Promise((resolve) => {
+        axios
+            .post(`${baseUrl}${API_URL.getBranchById}`, body, { headers: getHeaders() })
             .then((res) => {
                 resolve(res.data);
                 return res.data;

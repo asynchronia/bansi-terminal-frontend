@@ -37,7 +37,7 @@ const BranchData = (props) => {
       });
       let array = response?.payload?.branches;
       const newArray = array.map((item) => ({
-        _id:item._id,
+        _id: item._id,
         Name: item.name,
         isPrimary: item.isPrimary,
         AssociatedWarehouse: item.associatedWarehouse.code,
@@ -134,7 +134,7 @@ const BranchData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%" , overflowX:'scroll'}}>
+      <div style={{ maxHeight: 309, width: "100%", overflowX: "scroll" }}>
         <Table>
           <thead>
             <tr>
@@ -150,7 +150,16 @@ const BranchData = (props) => {
                   <td>{branch.Name}</td>
                   <td>{branch.AssociatedWarehouse}</td>
                   <td>{branch.Contact}</td>
-                  <td><ActionComponent data={branch} openModal={openModal} setOpenModal={setOpenModal} /></td>
+                  <td>
+                    <ActionComponent
+                      openModal={openModal}
+                      setOpenModal={setOpenModal}
+                      type={"branch"}
+                      data={branch}
+                      clientId={clientId}
+                      validation={validation}
+                    />
+                  </td>
                 </tr>
               ))
             ) : (
