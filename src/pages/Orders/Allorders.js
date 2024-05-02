@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import { Row, Col, Card, CardBody } from "reactstrap"
+import { Row, Col, Card, CardBody, Input } from "reactstrap"
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles//ag-grid.css';
 import 'ag-grid-community/styles//ag-theme-quartz.css';
@@ -33,6 +33,8 @@ const AllOrders = (props) => {
   const [rowData, setRowData] = useState([]);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [page, setPage] = useState(1);
+  const [searchValue, setSearchValue] = useState('');
+  const [inputValue, setInputValue] = useState('');
 
   const redirectToViewPage = (id) => {
     let path = `/order/${id.salesorder_id}`;
@@ -47,18 +49,32 @@ const AllOrders = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems('All Orders', breadcrumbItems);
-    getListOfRowData('page');
-  }, [page, paginationPageSize]);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
+    if(searchValue) {
+      body.search_text = searchValue;
+    }
+    getListOfRowData(body);
+  }, [page, paginationPageSize, searchValue]);
 
   const getListOfRowData = useCallback(async (body) => {
     if (rowData[(page - 1) * paginationPageSize]) {
       return;
     }
     dispatch(changePreloader(true));
-    const response = await getOrdersReq({
-      page: page,
-      limit: paginationPageSize,
-    });
+    // const body = {
+    //   page: page,
+    //   limit: paginationPageSize,
+    // }
+
+    // if(searchValue) {
+    //   body.search_text = searchValue;
+    // }
+    console.log('searchValue', searchValue);
+    console.log('body', body);
+    const response = await getOrdersReq(body);
 
     const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
     let filledRows;
@@ -74,7 +90,7 @@ const AllOrders = (props) => {
     setRowData(newData);
 
     dispatch(changePreloader(false));
-  }, [page, paginationPageSize]);
+  }, [page, paginationPageSize, searchValue]);
 
   const redirectToEditPage = (id) => {
     let path = "/edit-item";
@@ -109,6 +125,17 @@ const AllOrders = (props) => {
     }
   }, []);
 
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  }
+
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+    setPage(1);
+    setRowData([]);
+  }
+
   const gridRef = useRef();
 
   const breadcrumbItems = [
@@ -134,52 +161,52 @@ const AllOrders = (props) => {
       headerCheckboxSelection: true, checkboxSelection: true, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      width : 150,sortable:false
+      width: 150, sortable: false
     },
     {
       headerName: "Order No.", field: "salesorder_id", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      width: 200,sortable:false
+      width: 200, sortable: false
     },
     {
       headerName: "Client", field: "customer_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      width : 200,sortable:false
+      width: 200, sortable: false
     },
     {
       headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      width : 110,sortable:false
+      width: 110, sortable: false
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
-      width : 130,sortable:false
+      width: 130, sortable: false
     },
     {
       headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Invoice",
-      width : 80,sortable:false
+      width: 80, sortable: false
     },
     {
       headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Payment",
-      width : 100,sortable:false
+      width: 100, sortable: false
     },
     {
       headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Shipment",
-      width : 100,sortable:false
+      width: 100, sortable: false
 
     },
     {
@@ -192,7 +219,7 @@ const AllOrders = (props) => {
         handleViewClick: handleViewClick,
       }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
-      width : 80
+      width: 80
     }
   ]
   const notify = (type, message) => {
@@ -217,6 +244,27 @@ const AllOrders = (props) => {
           <Col className="col-12">
             <Card>
               <CardBody>
+                <div className="button-section">
+                  <div className="button-right-section">
+                    <div className="invoice-search-box">
+                      <div className="search-box position-relative">
+                        <Input
+                          type="text"
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
+                          className="form-control rounded border"
+                          placeholder="Search by sales order number or customer name..."
+                        />
+                        <i className="mdi mdi-magnify search-icon"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div
                   className="ag-theme-quartz"
                   style={{
