@@ -6,7 +6,14 @@ import { FormControl, InputLabel, MenuItem, Select, Chip } from "@mui/material";
 const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }) => {
   const [roleList, setRolelist] = useState([]);
   const [branchList, setBranchList] = useState([]);
-  
+
+  useEffect(()=>{
+    if(validation.values.primaryUser.associatedBranches.length > 0){
+      setSelectedItems(validation.values.primaryUser.associatedBranches)
+    }
+  }, [])
+
+
 
   const handleChange = (event) => {
     setSelectedItems(event.target.value);
@@ -42,7 +49,7 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
 
   useEffect(() => {
     searchAllRole();
-    if(modal){
+    if(modal ){
       getBranchList();
     }
     

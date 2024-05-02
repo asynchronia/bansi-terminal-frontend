@@ -15,6 +15,7 @@ import { getClientUsersReq } from "../../service/usersService";
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import ActionComponent from "./ActionComponent";
 
 import * as Yup from "yup";
 import AddUser from "./AddUser";
@@ -27,7 +28,7 @@ const UserData = (props) => {
 
   const gridRef = useRef();
   const [userData, setUserData] = useState([]);
-  const [page, setPage] = useState(1);
+  const [edit, setEdit] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
 
   const getRoleName = (roleId) => {
@@ -51,9 +52,9 @@ const UserData = (props) => {
         clientId: clientId,
       });
       let array = response?.payload;
-      // console.log(response)
 
       const newArray = array.map((item) => ({
+        _id: item._id,
         UserName: item.firstName + " " + item.lastName,
         UserRole: getRoleName(item.role),
         Contact: item.contact,
@@ -70,17 +71,20 @@ const UserData = (props) => {
     getUserData();
   }, []);
 
-
-  const onPaginationChanged = useCallback((event) => {
-    const page = gridRef.current.api.paginationGetCurrentPage() + 1;
-    setPage(page);
-  }, []);
-
   const [colDefs, setColDefs] = useState([
     { field: "UserName" },
     { field: "UserRole" },
     { field: "Contact" },
     { field: "Associated Branches" },
+    {
+      headerName: "Action",
+      field: "action",
+      cellClass: "actions-button-cell",
+      cellRenderer: ActionComponent,
+      sortable: false,
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
   ]);
 
   //For creating new User need Formik for validation schema
@@ -120,7 +124,7 @@ const UserData = (props) => {
         associatedBranches: branchArray,
       };
 
-      handleSubmit(newUser);
+      handleSubmit(newUser, edit);
     },
   });
 
@@ -189,7 +193,7 @@ const UserData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%" }}>
+      <div style={{ maxHeight: 309, width: "100%", overflowX: "scroll" }}>
         <Table>
           <thead>
             <tr>
@@ -202,27 +206,46 @@ const UserData = (props) => {
           <tbody>
             {userData.length > 0 ? (
               userData.map((user) => (
-                <tr>
+                <tr key={user._id}>
                   <td>{user.UserName}</td>
                   <td>{user.UserRole}</td>
                   <td>{user.Contact}</td>
-                  <td style={{ width: 'min-content' }}>
+                  <td style={{ width: "min-content" }}>
                     {
-                      <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap'}}>
-                        {
-                          user.associatedBranches.map((branch, index) => (
-                            <Chip size="small" key={index} label={`${branch.name}`} />
-                          ))
-                        }
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "3px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {user.associatedBranches.map((branch, index) => (
+                          <Chip
+                            size="small"
+                            key={index}
+                            label={`${branch.address}`}
+                          />
+                        ))}
                       </div>
                     }
+                  </td>
+                  <td>
+                    <ActionComponent
+                      openModal={openModal}
+                      setOpenModal={setOpenModal}
+                      type={"user"}
+                      data={user}
+                      clientId={clientId}
+                      validation={validation}
+                      setEdit={setEdit}
+                    />
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td></td>
-                <td style={{ textAlign: 'center' }}>No Rows to Show</td>
+                <td style={{ textAlign: "center" }}>No Rows to Show</td>
                 <td></td>
               </tr>
             )}
