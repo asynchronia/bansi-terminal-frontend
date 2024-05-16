@@ -23,7 +23,7 @@ import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
 
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
-import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
+// import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
 import {
   editItemReq,
