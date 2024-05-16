@@ -496,8 +496,9 @@ const onGridReady = useCallback((params) => {
                         <div
                           style={{
                             position: "absolute",
-                            background: "white",
+                            background: "#f5f5f5",
                             minWidth: "300px",
+                            padding:'2px 0px'
                           }}
                         >
                           <MultipleLayerSelect

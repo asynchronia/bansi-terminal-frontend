@@ -8,6 +8,7 @@ import {
   Input,
   CardTitle,
   Form,
+  Modal,
 } from "reactstrap";
 import "react-toastify/dist/ReactToastify.css";
 import Dropzone from "react-dropzone";
@@ -23,7 +24,7 @@ import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
 
 import { ToastContainer, toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
-import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
+// import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
 import {
   editItemReq,
@@ -32,6 +33,8 @@ import {
   getTaxesReq,
 } from "../../service/itemService";
 import StyledButton from "../../components/Common/StyledButton";
+import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
+import { updateItemStatusReq } from "../../service/statusService";
 
 const EditItems = (props) => {
   const [itemsData, setItemsData] = useState({});
@@ -59,6 +62,10 @@ const EditItems = (props) => {
     inventory: "",
     costPrice: "",
     sellingPrice: "",
+  });
+
+  const [openModal, setOpenModal] = useState({
+    status: false,
   });
 
   const [fieldInvalid, setFieldInvalid] = useState(false);
@@ -439,9 +446,59 @@ const EditItems = (props) => {
   const handleTypeChange = (e) => {
     setTypeValue(e.target.value);
   };
+  const handleModalToggle = (key) => {
+    setOpenModal((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
+    removeBodyCss();
+  };
+
+  function removeBodyCss() {
+    document.body.classList.add("no_padding");
+  }
+
+  const handleItemStatus = async () => {
+    try {
+      let values ={
+        _id: id,
+        status: validation.values.status
+    }
+
+      const response = await updateItemStatusReq(values);
+      console.log(response)
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
+  };
+
+  const handleStatusChange = (e) => {
+    const { name, value } = e.target;
+    validation.setFieldValue(name, value); 
+    setOpenModal({...openModal, status:true})
+  };
+
 
   return (
     <div style={{ position: "relative" }}>
+      <Modal
+        isOpen={openModal.status}
+        toggle={() => {
+          handleModalToggle("status");
+        }}
+      >
+        <StatusConfirm
+          type={"Item"}
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          handleSubmitStatus={handleItemStatus}
+        />
+      </Modal>
       <ToastContainer position="top-center" theme="colored" />
       <Form className="form-horizontal mt-4">
         <Row>
@@ -492,9 +549,7 @@ const EditItems = (props) => {
                     ) : null}
                   </div>
                   <div className="mt-3 mb-0">
-                    <label className="form-label focus-width">
-                      Category
-                    </label>
+                    <label className="form-label focus-width">Category</label>
                     <label
                       name="category"
                       id="category"
@@ -506,11 +561,8 @@ const EditItems = (props) => {
                       }}
                       className="form-control"
                     >
-                     
-                        {categoryData.name}
-                       
+                      {categoryData.name}
                     </label>
-                   
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
@@ -546,7 +598,7 @@ const EditItems = (props) => {
                 // id = "status"
                 value={validation.values.status}
                 onBlur={validation.handleBlur}
-                onChange={validation.handleChange}
+                onChange={handleStatusChange}
               >
                 <option value="published">Published</option>
                 <option value="draft">Draft</option>
@@ -557,7 +609,7 @@ const EditItems = (props) => {
                 onClick={onEditItemClick}
                 isLoading={isButtonLoading}
               >
-              <Edit style={{ marginRight: "5px", fill: "white" }} />
+                <Edit style={{ marginRight: "5px", fill: "white" }} />
                 Edit
               </StyledButton>
             </div>
@@ -697,6 +749,7 @@ const EditItems = (props) => {
                 <h4 className="card-title">Type</h4>
                 <div className="mb-1">
                   <select
+                  disabled={true}
                     name="itemType"
                     id="itemType"
                     value={typeValue}
@@ -742,7 +795,7 @@ const EditItems = (props) => {
                 </div>
                 {variantData.map((row) => (
                   <AllVariantRows
-                  editPage={editPage}
+                    editPage={editPage}
                     data={row}
                     key={row._id}
                     _id={row._id}

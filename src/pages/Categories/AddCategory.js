@@ -254,14 +254,13 @@ const AddCategory = (props) => {
               </tr>    
               </thead>
             </Table>
-
               <div>
-                {allCategories.map((category) => (
+                {allCategories.map((category, index) => (
                   <div
                     key={category._id}
-                   className="option"
+                    className="option"
                   >
-                    <Row>
+                    <Row className={index!==0?"my-2":null}>
                       <Col
                         xs="1"
                         onClick={() => handleCategoryClick(category._id)}

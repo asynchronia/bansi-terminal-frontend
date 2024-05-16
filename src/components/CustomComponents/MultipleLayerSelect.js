@@ -1,45 +1,47 @@
 import React, { useState } from "react";
 
-
-
-const MultipleLayerSelect = ({categories,setCategoryData}) => {
- 
-
-
+const MultipleLayerSelect = ({ categories, setCategoryData }) => {
   const handleCategoryClick = (categoryId, categoryName) => {
-    setCategoryData({ id: categoryId, name: categoryName, show:false });
+    setCategoryData({ id: categoryId, name: categoryName, show: false });
   };
 
   const handleChildClick = (event, childId, childName) => {
     event.stopPropagation();
-    setCategoryData({ id: childId, name: childName , show:false });
+    setCategoryData({ id: childId, name: childName, show: false });
   };
 
   const handleGrandchildClick = (event, grandchildId, grandchildName) => {
     event.stopPropagation();
-    setCategoryData({ id: grandchildId, name: grandchildName, show:false  });
+    setCategoryData({ id: grandchildId, name: grandchildName, show: false });
   };
 
   return (
-    <div style={{ maxHeight: "200px", overflowY: "scroll"}}>
+    <div style={{ maxHeight: "200px", overflowY: "scroll" }}>
       {categories.map((category) => (
         <div
           style={{
-            border: "1px solid #dee2e6",
             padding: "3px 8px",
             cursor: "pointer",
+            border: "none",
           }}
           key={category._id}
           className="option"
           onClick={() => handleCategoryClick(category._id, category.name)}
         >
-          {` ${category.name}`}
+          <h6
+            onMouseEnter={(event) => {
+              event.target.style.backgroundColor = "#bfd8f7";
+            }}
+            onMouseLeave={(event) => {
+              event.target.style.backgroundColor = "#f5f5f5";
+            }}
+            style={{ fontWeight: "bolder", padding: "3px" }}
+          >{` ${category.name}`}</h6>
           {category.children && (
             <div className="child-options">
               {category.children.map((child) => (
                 <div
                   style={{
-                    border: "1px solid #dee2e6",
                     padding: "3px 8px",
                     cursor: "pointer",
                   }}
@@ -49,11 +51,18 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
                     handleChildClick(event, child._id, child.name)
                   }
                 >
-                {` ${child.name}`}
+                  <div
+                    onMouseEnter={(event) => {
+                      event.target.style.backgroundColor = "#bfd8f7";
+                    }}
+                    onMouseLeave={(event) => {
+                      event.target.style.backgroundColor = "#f5f5f5";
+                    }}
+                    style={{ padding: "2px" }}
+                  >{` ${child.name}`}</div>
                   {child.children && (
                     <div
                       style={{
-                        border: "1px solid #dee2e6",
                         padding: "2px 8px",
                         cursor: "pointer",
                       }}
@@ -71,7 +80,15 @@ const MultipleLayerSelect = ({categories,setCategoryData}) => {
                             )
                           }
                         >
-                           {`${grandchild.name}`}
+                          <div
+                            onMouseEnter={(event) => {
+                              event.target.style.backgroundColor = "#bfd8f7";
+                            }}
+                            onMouseLeave={(event) => {
+                              event.target.style.backgroundColor = "#f5f5f5";
+                            }}
+                            style={{ padding: "2px" }}
+                          >{` ${grandchild.name}`}</div>
                         </div>
                       ))}
                     </div>

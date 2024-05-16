@@ -15,7 +15,7 @@ import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import RequirePermission from "../../routes/middleware/requirePermission";
 import { changePreloader } from "../../store/actions";
-import {ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 
 const ViewItems = (props, { route, navigate }) => {
   let dispatch = useDispatch();
@@ -26,7 +26,6 @@ const ViewItems = (props, { route, navigate }) => {
   const { id } = useParams();
   const effectCalled = useRef(false);
   const gridRef = useRef();
-
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -165,11 +164,12 @@ const ViewItems = (props, { route, navigate }) => {
               display: "flex",
             }}
           >
-            <select className="form-select focus-width" name="status">
+            <select value={itemsData?.status} className="form-select focus-width" name="status">
               <option value="active">Published</option>
               <option value="draft">Draft</option>
             </select>
             <button
+              disabled={itemsData.status === "published"}
               type="submit"
               onClick={() => handleEditClick(itemsData?._id)}
               className="btn btn-primary w-xl mx-3"
@@ -204,7 +204,8 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.hsnCode}</p>
-                      </Col><hr/>
+                      </Col>
+                      <hr />
                     </Row>
                   </div>
                   <div>
@@ -215,7 +216,8 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.category?.name}</p>
-                      </Col><hr/>
+                      </Col>
+                      <hr />
                     </Row>
                   </div>
                   <div>
@@ -227,7 +229,8 @@ const ViewItems = (props, { route, navigate }) => {
                       <Col xs="8">
                         {" "}
                         <p>{itemsData?.itemType}</p>
-                      </Col><hr/>
+                      </Col>
+                      <hr />
                     </Row>
                   </div>
                 </CardBody>
@@ -245,7 +248,8 @@ const ViewItems = (props, { route, navigate }) => {
                       </Col>
                       <Col xs="8">
                         <p>{itemsData?.taxPreference}</p>
-                      </Col><hr/>
+                      </Col>
+                      <hr />
                     </Row>
                   </div>
                   <div>
@@ -258,7 +262,8 @@ const ViewItems = (props, { route, navigate }) => {
                         <p>
                           {taxData && taxData[0] && <p>{taxData[0].name}</p>}
                         </p>
-                      </Col><hr/>
+                      </Col>
+                      <hr />
                     </Row>
                   </div>
                   <div>
@@ -270,7 +275,8 @@ const ViewItems = (props, { route, navigate }) => {
                       <Col xs="8">
                         {" "}
                         <p>{itemsData?.itemType}</p>
-                      </Col><hr/>
+                      </Col>
+                      <hr />
                     </Row>
                   </div>
                 </CardBody>
