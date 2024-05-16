@@ -8,8 +8,8 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
   const [branchList, setBranchList] = useState([]);
 
   useEffect(()=>{
-    if(validation.values.primaryUser.associatedBranches.length > 0){
-      setSelectedItems(validation.values.primaryUser.associatedBranches)
+    if(validation?.values?.primaryUser?.associatedBranches?.length > 0){
+      setSelectedItems(validation.values?.primaryUser?.associatedBranches)
     }
   }, [])
 
