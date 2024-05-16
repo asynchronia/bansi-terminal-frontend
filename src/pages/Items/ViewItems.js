@@ -169,7 +169,7 @@ const ViewItems = (props, { route, navigate }) => {
               <option value="draft">Draft</option>
             </select>
             <button
-              disabled={itemsData.status === "published"}
+              disabled={itemsData?.status === "published"}
               type="submit"
               onClick={() => handleEditClick(itemsData?._id)}
               className="btn btn-primary w-xl mx-3"
