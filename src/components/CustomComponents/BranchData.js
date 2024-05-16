@@ -18,7 +18,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import AddBranch from "./AddBranch";
 import * as Yup from "yup";
-import { TableHead } from "@mui/material";
+import { Chip, TableHead } from "@mui/material";
 import ActionComponent from "./ActionComponent";
 
 const BranchData = (props) => {
@@ -75,6 +75,7 @@ const BranchData = (props) => {
       handleSubmit(newBranch, edit);
     },
   });
+
   return (
     <div>
       <Modal
@@ -147,7 +148,15 @@ const BranchData = (props) => {
             {branchData.length > 0 ? (
               branchData.map((branch) => (
                 <tr key={branch._id}>
-                  <td>{branch.Name}</td>
+                  <td>
+                    {branch.Name}{" "}
+                    <span>
+                      {" "}
+                      {branch.isPrimary ? (
+                        <Chip className="mx-1" size="sm" label="Primary" />
+                      ) : null}
+                    </span>
+                  </td>
                   <td>{branch.AssociatedWarehouse}</td>
                   <td>{branch.Contact}</td>
                   <td>
@@ -158,7 +167,7 @@ const BranchData = (props) => {
                       data={branch}
                       clientId={clientId}
                       validation={validation}
-                      setEdit={setEdit} 
+                      setEdit={setEdit}
                     />
                   </td>
                 </tr>
