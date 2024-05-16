@@ -164,7 +164,7 @@ const ViewItems = (props, { route, navigate }) => {
               display: "flex",
             }}
           >
-            <select className="form-select focus-width" name="status">
+            <select value={itemsData?.status} className="form-select focus-width" name="status">
               <option value="active">Published</option>
               <option value="draft">Draft</option>
             </select>
