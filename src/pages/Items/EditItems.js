@@ -749,6 +749,7 @@ const EditItems = (props) => {
                 <h4 className="card-title">Type</h4>
                 <div className="mb-1">
                   <select
+                  disabled={true}
                     name="itemType"
                     id="itemType"
                     value={typeValue}
