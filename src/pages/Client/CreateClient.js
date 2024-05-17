@@ -158,7 +158,7 @@ const CreateClient = (props) => {
         >
           <select className="form-select focus-width" name="status">
             <option value="active">Published</option>
-            <option value="draft">Draft</option>
+            <option value="inactive">Draft</option>
           </select>
           <StyledButton
             color={"primary"}

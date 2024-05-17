@@ -400,7 +400,7 @@ const ViewClient = (props) => {
           value={clientData?.status}
         >
           <option value="active">Published</option>
-          <option value="draft">Draft</option>
+          <option value="inactive">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
           Edit
