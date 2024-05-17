@@ -32,7 +32,8 @@ import { signinReq } from "../../service/authService";
 import { getTaxesReq } from "../../service/itemService";
 import { updateUserReq } from "../../service/usersService";
 import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
-import { updateUserStatusReq } from "../../service/statusService";
+import { updateClientStatusReq} from "../../service/statusService";
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -56,8 +57,6 @@ const ViewClient = (props) => {
     branch: true,
     user: false,
   });
-
-  const [isDeactivated, setIsDeactivated] = useState(false);
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -203,11 +202,11 @@ const ViewClient = (props) => {
   const handleClientStatus = async () => {
     try {
       let values = {
-        email: clientData?.email,
-        isDeactivated: isDeactivated,
+        clientId: id,
+        status: clientData?.status,
       };
 
-      const response = await updateUserStatusReq(values);
+      const response = await updateClientStatusReq(values);
       if (response.success === true) {
         notify("Success", response.message);
       } else {
@@ -292,12 +291,7 @@ const ViewClient = (props) => {
   };
 
   const handleStatus = (e) => {
-    const selectedValue = e.target.value;
-    if (selectedValue === 'active') {
-      setIsDeactivated(false);
-    } else if (selectedValue === 'draft') {
-      setIsDeactivated(true);
-    }
+    setClientData({...clientData, status:e.target.value});
     setOpenModal({ ...openModal, status: true });
   };
 
@@ -334,6 +328,7 @@ const ViewClient = (props) => {
     }
   };
 
+
   const downloadPDF = () => {
     const data = [...displayTableData];
 
@@ -349,7 +344,6 @@ const ViewClient = (props) => {
     doc.save("Agreement.pdf");
   };
 
-  console.log(isDeactivated)
 
   useEffect(() => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
@@ -404,12 +398,13 @@ const ViewClient = (props) => {
           onChange={handleStatus}
           className="form-select focus-width"
           name="status"
+          value={clientData?.status}
         >
           <option value="active">Published</option>
-          <option value="draft">Draft</option>
+          <option value="inactive">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
-          Edit
+        <Edit style={{ marginRight: "5px", fill: "white" }} />Edit
         </button>
       </div>
       <Row>

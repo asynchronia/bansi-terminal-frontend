@@ -41,7 +41,7 @@ const API_URL = {
   getAgreementItems: "/api/items/agreement-item-list",
   getClientUsers: "/api/users/get/client-users",
   getUserById: "/api/users/get/user",
-  updateUserStatus:'/api/users/status',
+  updateClientStatus:'/api/clients/update-status',
   updateItemStatus:'/api/items/update-status'
 };
 
@@ -88,10 +88,10 @@ export async function updateItemStatus(body) {
   });
 }
 
-export async function updateUserStatus(body) {
+export async function updateClientStatus(body) {
   return new Promise((resolve) => {
     axios
-      .post(`${baseUrl}${API_URL.updateUserStatus}`, body, { headers: getHeaders() })
+      .post(`${baseUrl}${API_URL.updateClientStatus}`, body, { headers: getHeaders() })
       .then((res) => {
         resolve(res.data);
         return res.data;
