@@ -19,7 +19,7 @@ const CreateOrder = (props) => {
   ];
 
   useEffect(() => {
-    props.setBreadcrumbItems('Create Order', breadcrumbItems);
+    props.setBreadcrumbItems('Create Purchase Order', breadcrumbItems);
   },[]);
 
   return (

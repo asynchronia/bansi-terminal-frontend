@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
     return localAuth ? JSON.parse(localAuth) : {};
   });
 
-  console.log('AuthProvider', auth);
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
       {children}

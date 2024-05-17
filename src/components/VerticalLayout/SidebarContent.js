@@ -207,9 +207,9 @@ const SidebarContent = props => {
                 <span>Sales Order</span>
               </Link>
               <ul className="sub-menu" >
-                {/* <li>
+                <li>
                   <Link to="/create-order">Create Order</Link>
-                </li> */}
+                </li>
                 <li>
                   <Link to="/orders">All Orders</Link>
                 </li>

@@ -180,7 +180,7 @@ const AllOrders = (props) => {
       headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      width: 110, sortable: false
+      width: 120, sortable: false
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
@@ -219,7 +219,7 @@ const AllOrders = (props) => {
         handleViewClick: handleViewClick,
       }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
-      width: 80
+      width: 90
     }
   ]
   const notify = (type, message) => {
