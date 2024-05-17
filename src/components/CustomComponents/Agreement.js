@@ -105,7 +105,7 @@ const Agreement = (props) => {
 
   const getListOfRowData = async (data) => {
     const response = await searchItemReq(data);
-    // console.log(response.payload.items);
+   
     setRowData(response?.payload?.items);
   };
 
@@ -220,48 +220,64 @@ const Agreement = (props) => {
                   </Row>
                 ) : (
                   rowData?.map((item) =>
-                    item?.variant?.map((variant) => (
-                      <Row
-                        onClick={() => {
-                          handleAddToAgreement(
-                            item._id,
-                            variant._id,
-                            variant.sellingPrice
-                          );
-                          handleDisplayData(
-                            item,
-                            item._id,
-                            variant._id,
-                            variant,
-                            item.title
-                          );
-                        }}
-                        className="py-3"
-                        style={{
-                          borderBottom: "1px solid #f4f4f4",
-                          cursor: "pointer",
-                        }}
-                        key={variant._id}
-                      >
-                        <Col>
-                          <p>{item.title}</p>
-                          <div sx={{ display: "flex", gap: "3px" }}>
-                            {variant.attributes
-                              ? variant?.attributes?.map((attribute) => (
-                                  <Chip
-                                    size="small"
-                                    key={attribute._id}
-                                    label={`${attribute.name}-${attribute.value}`}
-                                  />
-                                ))
-                              : null}
-                          </div>
-                        </Col>
-                        <Col>{variant.sku}</Col>
-                        <Col>{variant.costPrice}</Col>
-                        <Col>{variant.sellingPrice}</Col>
-                      </Row>
-                    ))
+                    item?.variant?.map((variant) => {
+                      
+                      const attributePresent = agreementData.some(
+                        (agreementItem) =>
+                          agreementItem.variants.some(
+                            (agreementVariant) =>
+                              agreementVariant.variant === variant._id
+                          )
+                      );
+
+                      
+                      if (!attributePresent) {
+                        return (
+                          <Row
+                            onClick={() => {
+                              handleAddToAgreement(
+                                item._id,
+                                variant._id,
+                                variant.sellingPrice
+                              );
+                              handleDisplayData(
+                                item,
+                                item._id,
+                                variant._id,
+                                variant,
+                                item.title
+                              );
+                            }}
+                            className="py-3"
+                            style={{
+                              borderBottom: "1px solid #f4f4f4",
+                              cursor: "pointer",
+                            }}
+                            key={variant._id}
+                          >
+                            <Col>
+                              <p>{item.title}</p>
+                              <div sx={{ display: "flex", gap: "3px" }}>
+                                {variant.attributes
+                                  ? variant?.attributes?.map((attribute) => (
+                                      <Chip
+                                        size="small"
+                                        key={attribute._id}
+                                        label={`${attribute.name}-${attribute.value}`}
+                                      />
+                                    ))
+                                  : null}
+                              </div>
+                            </Col>
+                            <Col>{variant.sku}</Col>
+                            <Col>{variant.costPrice}</Col>
+                            <Col>{variant.sellingPrice}</Col>
+                          </Row>
+                        );
+                      } else {
+                        return null;
+                      }
+                    })
                   )
                 )
               ) : (

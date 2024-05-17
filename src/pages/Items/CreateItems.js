@@ -373,7 +373,7 @@ const CreateItems = (props) => {
                         : `Select Category`}
                     </label>
                     {categoryData.show ? (
-                      <div style={{position:'absolute', width:'90%', zIndex:2, background:'#FFFFFF'}}>
+                      <div style={{position:'absolute', width:'90%', zIndex:2, background: "#f5f5f5",}}>
                         <MultipleLayerSelect
                           categories={allCategories}
                           setCategoryData={setCategoryData}
