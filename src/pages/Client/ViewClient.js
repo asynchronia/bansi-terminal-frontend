@@ -33,6 +33,7 @@ import { getTaxesReq } from "../../service/itemService";
 import { updateUserReq } from "../../service/usersService";
 import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
 import { updateClientStatusReq} from "../../service/statusService";
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -403,7 +404,7 @@ const ViewClient = (props) => {
           <option value="inactive">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
-          Edit
+        <Edit style={{ marginRight: "5px", fill: "white" }} />Edit
         </button>
       </div>
       <Row>
