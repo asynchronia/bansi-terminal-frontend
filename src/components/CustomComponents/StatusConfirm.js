@@ -5,10 +5,11 @@ const StatusConfirm = (props) => {
   const { type, openModal, setOpenModal, handleSubmitStatus } = props;
   return (
     <Card className="text-center">
+     
+      <CardBody>
       <CardHeader>
         <h2>Do you want to change the {type} status?</h2>
       </CardHeader>
-      <CardBody>
         <Row>
           <Col>
             <button onClick={handleSubmitStatus} className="btn btn-primary w-xl mb-1">Yes</button>
