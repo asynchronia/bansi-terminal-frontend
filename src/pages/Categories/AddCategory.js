@@ -50,7 +50,7 @@ const AddCategory = (props) => {
   }, []);
 
   const validation = useFormik({
-   
+
     enableReinitialize: true,
 
     initialValues: {
@@ -66,10 +66,12 @@ const AddCategory = (props) => {
       setIsButtonLoading(true);
       let body = {
         name: values.categoryName,
-        description: values.categoryDescription,
       };
-      if(values.categoryParent && values.categoryParent !== ""){
-       body. parentCategoryId = values.categoryParent
+      if (values.categoryDescription && values.categoryDescription !== "") {
+        body.description = values.categoryDescription;
+      }
+      if (values.categoryParent && values.categoryParent !== "") {
+        body.parentCategoryId = values.categoryParent
       }
       handleSubmit(body, resetForm);
     },
@@ -128,7 +130,7 @@ const AddCategory = (props) => {
     });
   };
 
-  const onCreateCategoryClick=(e)=>{
+  const onCreateCategoryClick = (e) => {
     e.preventDefault();
     validation.handleSubmit();
     return false;
@@ -145,7 +147,7 @@ const AddCategory = (props) => {
               <hr />
               <Form
                 className="form-horizontal mt-4"
-                
+
               >
                 <div className="mb-3">
                   <Label>Category Name</Label>
@@ -160,13 +162,13 @@ const AddCategory = (props) => {
                     value={validation.values.categoryName || ""}
                     invalid={
                       validation.touched.categoryName &&
-                      validation.errors.categoryName
+                        validation.errors.categoryName
                         ? true
                         : false
                     }
                   />
                   {validation.touched.categoryName &&
-                  validation.errors.categoryName ? (
+                    validation.errors.categoryName ? (
                     <FormFeedback type="invalid">
                       {validation.errors.categoryName}
                     </FormFeedback>
@@ -183,7 +185,7 @@ const AddCategory = (props) => {
                     className="form-select focus-width"
                     invalid={
                       validation.touched.categoryParent &&
-                      validation.errors.categoryParent
+                        validation.errors.categoryParent
                         ? true
                         : false
                     }
@@ -196,7 +198,7 @@ const AddCategory = (props) => {
                     ))}
                   </select>
                   {validation.touched.categoryParent &&
-                  validation.errors.categoryParent ? (
+                    validation.errors.categoryParent ? (
                     <FormFeedback type="invalid">
                       {validation.errors.categoryParent}
                     </FormFeedback>
@@ -216,7 +218,7 @@ const AddCategory = (props) => {
                       value={validation.values.categoryDescription || ""}
                     ></textarea>
                     {validation.touched.categoryDescription &&
-                    validation.errors.categoryDescription ? (
+                      validation.errors.categoryDescription ? (
                       <FormFeedback type="invalid" className="d-block">
                         {validation.errors.categoryDescription}
                       </FormFeedback>
@@ -225,14 +227,14 @@ const AddCategory = (props) => {
                 </div>
                 <div className="mb-3 row mt-4">
                   <div className="col-12 text-start">
-                  <StyledButton
-                color={"primary"}
-                className={"w-md"}
-                onClick={onCreateCategoryClick}
-                isLoading={isButtonLoading}
-              >
-                Submit
-              </StyledButton>
+                    <StyledButton
+                      color={"primary"}
+                      className={"w-md"}
+                      onClick={onCreateCategoryClick}
+                      isLoading={isButtonLoading}
+                    >
+                      Submit
+                    </StyledButton>
                   </div>
                 </div>
               </Form>
@@ -242,32 +244,31 @@ const AddCategory = (props) => {
         <Col xl={7}>
           <Card>
             <CardBody>
-            <Table>
-              <thead>
-              <tr>
-                <th>
-                Category Name
-                </th>
-                <th>
-                Category Description
-                </th>
-              </tr>    
-              </thead>
-            </Table>
-
+              <Table>
+                <thead>
+                  <tr>
+                    <th>
+                      Category Name
+                    </th>
+                    <th>
+                      Category Description
+                    </th>
+                  </tr>
+                </thead>
+              </Table>
               <div>
-                {allCategories.map((category) => (
+                {allCategories.map((category, index) => (
                   <div
                     key={category._id}
-                   className="option"
+                    className="option"
                   >
-                    <Row>
+                    <Row className={index !== 0 ? "my-2" : null}>
                       <Col
                         xs="1"
                         onClick={() => handleCategoryClick(category._id)}
                       >
                         {category.children &&
-                        openCategories.includes(category._id) ? (
+                          openCategories.includes(category._id) ? (
                           <i className="mdi mdi-24px mdi-minus" />
                         ) : category.children ? (
                           <i className="mdi mdi-24px mdi-plus" />
@@ -277,15 +278,14 @@ const AddCategory = (props) => {
                         <label className="h6 mt-2">{` ${category.name}`}</label>
                       </Col>
                       <Col xs="6">
-                        <label className="h6  mt-2">{` ${
-                          category?.description || ""
-                        }`}</label>
+                        <label className="h6  mt-2">{` ${category?.description || ""
+                          }`}</label>
                       </Col>
                     </Row>
 
                     {category.children &&
                       openCategories.includes(category._id) && (
-                        <div  className="child-options opened mx-2">
+                        <div className="child-options opened mx-2">
                           {category.children.map((child) => (
                             <div key={child._id} className="child-option">
                               <Row>
@@ -296,7 +296,7 @@ const AddCategory = (props) => {
                                   xs="1"
                                 >
                                   {child.children &&
-                                  openCategories.includes(child._id) ? (
+                                    openCategories.includes(child._id) ? (
                                     <i className="mdi mdi-24px mdi-minus" />
                                   ) : child.children ? (
                                     <i className="mdi mdi-24px mdi-plus" />
@@ -306,9 +306,8 @@ const AddCategory = (props) => {
                                   <label className="h6 mt-2 ">{` ${child.name}`}</label>
                                 </Col>
                                 <Col xs="6">
-                                  <label className="h6 mt-2">{` ${
-                                    child?.description || ""
-                                  }`}</label>
+                                  <label className="h6 mt-2">{` ${child?.description || ""
+                                    }`}</label>
                                 </Col>
                               </Row>
 
@@ -326,9 +325,8 @@ const AddCategory = (props) => {
                                             <label className="h5 mt-2">{` ${grandchild.name}`}</label>
                                           </Col>
                                           <Col xs="6">
-                                            <label className="h5 mt-2">{` ${
-                                              grandchild?.description || ""
-                                            }`}</label>
+                                            <label className="h5 mt-2">{` ${grandchild?.description || ""
+                                              }`}</label>
                                           </Col>
                                         </Row>
                                       </div>

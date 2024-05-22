@@ -31,6 +31,9 @@ import "jspdf-autotable";
 import { signinReq } from "../../service/authService";
 import { getTaxesReq } from "../../service/itemService";
 import { updateUserReq } from "../../service/usersService";
+import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
+import { updateClientStatusReq} from "../../service/statusService";
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -46,6 +49,7 @@ const ViewClient = (props) => {
     agreement: false,
     branch: false,
     user: false,
+    status: false,
   });
   const { id } = useParams();
 
@@ -195,6 +199,24 @@ const ViewClient = (props) => {
     { title: "View", link: "/client/:id" },
   ]);
 
+  const handleClientStatus = async () => {
+    try {
+      let values = {
+        clientId: id,
+        status: clientData?.status,
+      };
+
+      const response = await updateClientStatusReq(values);
+      if (response.success === true) {
+        notify("Success", response.message);
+      } else {
+        notify("Error", response.message);
+      }
+    } catch (error) {
+      notify("Error", error.message);
+    }
+  };
+
   const handleSubmitAgreement = async () => {
     try {
       let values = {
@@ -254,7 +276,6 @@ const ViewClient = (props) => {
       } catch (error) {
         notify("Error", error.message);
       }
-
     } else {
       try {
         const response = await signinReq(data);
@@ -267,6 +288,11 @@ const ViewClient = (props) => {
         notify("Error", error.message);
       }
     }
+  };
+
+  const handleStatus = (e) => {
+    setClientData({...clientData, status:e.target.value});
+    setOpenModal({ ...openModal, status: true });
   };
 
   const handleModalToggle = (key) => {
@@ -302,6 +328,7 @@ const ViewClient = (props) => {
     }
   };
 
+
   const downloadPDF = () => {
     const data = [...displayTableData];
 
@@ -316,6 +343,7 @@ const ViewClient = (props) => {
 
     doc.save("Agreement.pdf");
   };
+
 
   useEffect(() => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
@@ -345,6 +373,19 @@ const ViewClient = (props) => {
       <Modal>
         <AddBranch />
       </Modal>
+      <Modal
+        isOpen={openModal.status}
+        toggle={() => {
+          handleModalToggle("status");
+        }}
+      >
+        <StatusConfirm
+          type={"Client"}
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          handleSubmitStatus={handleClientStatus}
+        />
+      </Modal>
       <div
         style={{
           position: "absolute",
@@ -353,12 +394,17 @@ const ViewClient = (props) => {
           display: "flex",
         }}
       >
-        <select className="form-select focus-width" name="status">
+        <select
+          onChange={handleStatus}
+          className="form-select focus-width"
+          name="status"
+          value={clientData?.status}
+        >
           <option value="active">Published</option>
-          <option value="draft">Draft</option>
+          <option value="inactive">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
-          Edit
+        <Edit style={{ marginRight: "5px", fill: "white" }} />Edit
         </button>
       </div>
       <Row>
