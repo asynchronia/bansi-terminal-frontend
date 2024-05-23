@@ -14,12 +14,14 @@ const API_URL = {
   getInvoices: "/api/invoices/list",
   searchItem: "/api/items/search",
   getOrderList: "/api/orders/list",
+  getPurchaseOrderList: "/api/purchaseorders/list",
   getPaymentList: "/api/payments/list",
   login: "/api/users/login",
   signin: "/api/users/signup",
   updateUser: "/api/users/update",
   createAgreement: "/api/agreements/create",
   getBranchList: "/api/branch/list",
+  getClientBranchList: "/api/branch/list-client",
   getBranchById: "/api/branch",
   createBranch: "/api/branch/create",
   updateBranch: "/api/branch/update",
@@ -240,6 +242,32 @@ export async function getBranchList(body) {
   return new Promise((resolve) => {
     axios
       .post(`${baseUrl}${API_URL.getBranchList}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function getClientBranchList() {
+  return new Promise((resolve) => {
+    axios
+      .get(`${baseUrl}${API_URL.getClientBranchList}`, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function getPurchaseOrderList() {
+  return new Promise((resolve) => {
+    axios
+      .get(`${baseUrl}${API_URL.getPurchaseOrderList}`, {
         headers: getHeaders(),
       })
       .then((res) => {

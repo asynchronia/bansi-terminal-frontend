@@ -204,14 +204,14 @@ const SidebarContent = props => {
             <li>
               <Link to="/#" className="has-arrow waves-effect">
                 <i className="mdi mdi-cart-outline"></i>
-                <span>Sales Order</span>
+                <span>Purchase Order</span>
               </Link>
               <ul className="sub-menu" >
                 <li>
                   <Link to="/create-order">Create Order</Link>
                 </li>
                 <li>
-                  <Link to="/orders">All Orders</Link>
+                  <Link to="/purchase-orders">All Orders</Link>
                 </li>
                 <li>
                   <Link to="/estimates">Estimates</Link>
@@ -221,6 +221,12 @@ const SidebarContent = props => {
                 </li> */}
               </ul>
             </li>
+            <li>
+                <Link to="/ongoing-orders" className=" waves-effect">
+                  <i className="mdi mdi-cart-outline"></i>
+                  <span>Ongoing Orders</span>
+                </Link>
+              </li>
             <li>
               <Link to="/#" className="has-arrow waves-effect">
                 <i className="mdi mdi-receipt" ></i>

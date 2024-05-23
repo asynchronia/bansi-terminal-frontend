@@ -51,6 +51,7 @@ import Expenses from "../pages/Expenses/Expenses"
 import ViewEstimate from "../pages/Orders/ViewEstimate"
 import AgreementItemsListing from "../pages/Items/AgreementItemsListing"
 import AgreementItemView from "../pages/Items/AgreementItemView"
+import ViewPurchaseOrder from "../pages/Orders/ViewPurchaseOrder"
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -130,6 +131,8 @@ const userRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/quotations", component: <Quotations /> },
   { path: "/orders", component: <Allorders /> },
+  { path: "/purchase-orders", component: <ViewPurchaseOrder /> },
+  { path: "/ongoing-orders", component: <Allorders /> },
   { path: "/create-order", component: <Createorder /> },
   { path: "/client/:id", component: <ViewClient />},
   { path: "/invoices", component: <AllInvoices />},

@@ -22,7 +22,6 @@ const DropdownMenuBtn = (props) =>{
           items={[
             { label: 'Update Order', onClick: onEditOrder },
             { label: 'View Order', onClick: onViewClick },
-            { label: 'Change Status' },
             { label: 'Delete Order', onClick: onDeleteOrder }  
           ]}
         />

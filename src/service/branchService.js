@@ -5,12 +5,14 @@ import {
   getWarehouseList,
   getUserRole,
   updateBranch,
+  getClientBranchList,
 } from "../api";
 
 export const getBranchListReq = async (body) => {
   const response = await getBranchList(body);
   return response;
 };
+
 export const getBranchByIdReq = async (body) => {
   const response = await getBranchById(body);
   return response;
@@ -32,5 +34,10 @@ export const getWarehouseListReq = async () => {
 
 export const getUserRoleReq = async () => {
   const response = await getUserRole();
+  return response;
+};
+
+export const getClientBranchListReq = async () => {
+  const response = await getClientBranchList();
   return response;
 };
