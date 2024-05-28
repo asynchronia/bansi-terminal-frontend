@@ -14,9 +14,11 @@ import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.
 import StyledButton from "../../components/Common/StyledButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 
 const CreateOrder = (props) => {
   document.title = "Create Purchase Order";
+  let navigate = useNavigate();
   const dispatch = useDispatch();
   const [branchList, setBranchList] = useState([]);
   const effectCalled = useRef(false);
@@ -39,6 +41,7 @@ const CreateOrder = (props) => {
   const [error, setError] = useState("");
   const [shippingAddressError, setShippingAddressError] = useState("");
   const [billingAddressError, setBillingAddressError] = useState("");
+  const [validDate, setValidDate] = useState();
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -49,6 +52,13 @@ const CreateOrder = (props) => {
   const bodyObject = {
     page: 1,
     limit: 200,
+  };
+
+  const redirectToPurchaseDetails = () => {
+    let path = `/purchase-order-details/`;
+    setTimeout(() => {
+      navigate(path);
+    }, 300);
   };
 
   const handleSearchQuery = (event) => {
@@ -293,9 +303,24 @@ const CreateOrder = (props) => {
 
   const onCreatePurchaseOrderClick = (e) => {
     e.preventDefault();
+    if (selectedItems.length > 0) {
+      redirectToPurchaseDetails();
+    } else {
+      alert("Please select an atleast 1 item!");
+    }
     // validation.handleSubmit();
 
-    // const validationErrors = validation.validate();
+    // const formData = {
+    //   shippingAddress: shippingAddress,
+    //   billingAddress: billingAddress,
+    //   // Add other form fields here if needed
+    // };
+
+    // const validationErrors = validation.validationSchema.validate(
+    //   { billingAddress, shippingAddress },
+    //   { abortEarly: false }
+    // );
+    // console.log(validationErrors);
 
     // if (validationErrors) {
     //   // Check if shippingAddress has an error
@@ -334,33 +359,53 @@ const CreateOrder = (props) => {
   const handleChangeDate = (e) => {
     let input = e.target.value.replace(/\D/g, "");
 
-    if (input.length > 8) {
+    if (e.nativeEvent.inputType === "deleteContentBackward") {
+      const lastHyphenIndex = date.lastIndexOf("-");
+      console.log("Last hyphen Index: ", lastHyphenIndex);
+      if (lastHyphenIndex !== -1) {
+        input = input.slice(0, lastHyphenIndex - 1);
+      } else {
+        input = input.slice(0, -1);
+      }
+    } else {
       input = input.slice(0, 8);
-    }
 
-    if (input.length > 2) {
-      input = input.slice(0, 2) + "-" + input.slice(2);
-    }
-    if (input.length > 5) {
-      input = input.slice(0, 5) + "-" + input.slice(5);
+      if (input.length >= 2 && input.charAt(2) !== "-") {
+        input = input.slice(0, 2) + "-" + input.slice(2);
+      }
+      if (input.length >= 5 && input.charAt(5) !== "-") {
+        input = input.slice(0, 5) + "-" + input.slice(5);
+      }
     }
 
     setDate(input);
 
-    if (input.length === 10) {
-      const [day, month, year] = input.split("-").map(Number);
+    // if (input.length === 10) {
+    //   const [day, month, year] = input.split("-").map(Number);
 
-      if (month < 1 || month > 12) {
-        setError("Invalid month");
-      } else if (day < 1 || day > 31) {
-        setError("Invalid day");
-      } else {
-        setError("");
-      }
-    } else {
-      setError("");
-    }
+    //   if (month < 1 || month > 12) {
+    //     setError("Invalid month");
+    //   } else if (day < 1 || day > 31) {
+    //     setError("Invalid day");
+    //   } else {
+    //     setError("");
+    //   }
+    // } else {
+    //   setError("");
+    // }
   };
+
+  useEffect(() => {
+    // regex for DD-MM-YYYY
+    const regexddmmyyyy =
+      /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
+
+    if (regexddmmyyyy.test(date)) {
+      setValidDate(true);
+    } else {
+      setValidDate(false);
+    }
+  }, [date]);
 
   const renderRowData = () => {
     if (!loadedData) {
@@ -573,6 +618,9 @@ const CreateOrder = (props) => {
                         value={date}
                         onChange={handleChangeDate}
                       />
+                      {date.length === 10 && !validDate ? (
+                        <p className="text-danger">Invalid Date!</p>
+                      ) : null}
                     </div>
                   </Row>
                 </CardBody>
@@ -693,6 +741,9 @@ const CreateOrder = (props) => {
                       <span>Sub Total :</span>
                       <span>{formatNumberWithCommasAndDecimal(subTotal)}</span>
                     </h5>
+                    <div style={{ fontSize: "0.7rem" }}>
+                      Total Quantity: {selectedItems.length}
+                    </div>
                     <hr />
                     <h5
                       className="mb-0"
