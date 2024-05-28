@@ -32,8 +32,9 @@ import { signinReq } from "../../service/authService";
 import { getTaxesReq } from "../../service/itemService";
 import { updateUserReq } from "../../service/usersService";
 import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
-import { updateClientStatusReq} from "../../service/statusService";
+import { updateClientStatusReq } from "../../service/statusService";
 import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
+import ENV from "../../utility/env";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -56,6 +57,10 @@ const ViewClient = (props) => {
   const [seletedData, setSelectedData] = useState({
     branch: true,
     user: false,
+  });
+  const [additionalData, setAdditionalData] = useState({
+    url: "",
+    validity: "",
   });
 
   const notify = (type, message) => {
@@ -148,6 +153,11 @@ const ViewClient = (props) => {
       } else {
         setAgreementAvailable({ loading: false, value: false });
       }
+
+      setAdditionalData((prevData) => ({
+        ...prevData,
+        url: res.payload.document,
+      }));
     } catch (error) {
       if (error === 404) {
         setAgreementAvailable({ loading: false, value: false });
@@ -222,6 +232,7 @@ const ViewClient = (props) => {
       let values = {
         clientId: id,
         items: [...agreementData],
+        document: additionalData.url,
       };
 
       const response = await createAgreementReq(values);
@@ -291,7 +302,7 @@ const ViewClient = (props) => {
   };
 
   const handleStatus = (e) => {
-    setClientData({...clientData, status:e.target.value});
+    setClientData({ ...clientData, status: e.target.value });
     setOpenModal({ ...openModal, status: true });
   };
 
@@ -330,24 +341,37 @@ const ViewClient = (props) => {
 
 
   const downloadPDF = () => {
-    const data = [...displayTableData];
+    // const data = [...displayTableData];
 
-    const doc = new jsPDF();
-    const tableColumn = Object.keys(data[0]);
-    const tableRows = data.map((obj) => Object.values(obj));
+    // const doc = new jsPDF();
+    // const tableColumn = Object.keys(data[0]);
+    // const tableRows = data.map((obj) => Object.values(obj));
 
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-    });
+    // doc.autoTable({
+    //   head: [tableColumn],
+    //   body: tableRows,
+    // });
 
-    doc.save("Agreement.pdf");
+    // doc.save("Agreement.pdf");
+    const fileKey = additionalData.url;
+    if (!fileKey) {
+      toast.info("No file available for download", {
+        position: "top-center",
+        theme: "colored",
+      });
+      return;
+    }
+    const fileUrl = `${ENV.FILE_SERVER_BASEURL}/${fileKey}`;
+    window.open(fileUrl, '_blank');
   };
 
 
   useEffect(() => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
   }, [breadcrumbItems]);
+
+  console.log(agreementData, "agreementData")
+  console.log(additionalData, "additionalData")
 
   return (
     <div style={{ position: "relative" }}>
@@ -368,6 +392,7 @@ const ViewClient = (props) => {
           setAgreementData={setAgreementData}
           openModal={openModal}
           setOpenModal={setOpenModal}
+          setAdditionalData={setAdditionalData}
         />
       </Modal>
       <Modal>
@@ -404,7 +429,7 @@ const ViewClient = (props) => {
           <option value="inactive">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
-        <Edit style={{ marginRight: "5px", fill: "white" }} />Edit
+          <Edit style={{ marginRight: "5px", fill: "white" }} />Edit
         </button>
       </div>
       <Row>

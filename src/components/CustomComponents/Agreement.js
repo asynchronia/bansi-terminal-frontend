@@ -4,6 +4,9 @@ import { searchItemReq } from "../../service/itemService";
 import { v4 as uuidv4 } from "uuid";
 import AgreementTable from "./AgreementTable";
 import { Chip, CircularProgress, TableHead } from "@mui/material";
+import { getUploadUrlReq } from "../../service/fileService";
+import axios from "axios";
+import StyledButton from "../Common/StyledButton";
 
 const Agreement = (props) => {
   const {
@@ -15,6 +18,7 @@ const Agreement = (props) => {
     setDisplayTableData,
     openModal,
     setOpenModal,
+    setAdditionalData,
   } = props;
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
@@ -23,6 +27,7 @@ const Agreement = (props) => {
     name: null,
     url: null,
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleShowData = (value) => {
     setShowRowData(value);
@@ -105,17 +110,39 @@ const Agreement = (props) => {
 
   const getListOfRowData = async (data) => {
     const response = await searchItemReq(data);
-   
+
     setRowData(response?.payload?.items);
   };
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
+    setIsUploading(true);
     const file = event.target.files[0];
-    const fileUrl = URL.createObjectURL(file);
+    const getUploadUrl = async () => {
+      const { url } = await getUploadUrlReq();
+      return url;
+    };
+    const fileUrl = await getUploadUrl();
+    console.log('fileUrl', fileUrl);
+
+    const parsedUrl = new URL(fileUrl);
+    const fileKey = parsedUrl.pathname.substring(1);
+
+    console.log('fileKey', fileKey);
+
+    await axios.put(fileUrl, file, {
+      headers: {
+        "Content-Type": "application/pdf",
+      },
+    });
     setFileData({
       name: file.name,
       url: fileUrl,
     });
+    setAdditionalData((prevData) => ({
+      ...prevData,
+      url: fileKey,
+    }));
+    setIsUploading(false);
   };
 
   const fileInputRef = useRef(null);
@@ -178,7 +205,12 @@ const Agreement = (props) => {
                 style={{ display: "none" }}
                 onChange={handleFileUpload}
               />
-              <Button className="btn-primary" onClick={handleButtonClick}>
+              <StyledButton
+                color={"primary"}
+                className={"w-md"}
+                onClick={handleButtonClick}
+                isLoading={isUploading}
+              >
                 {fileData.name ? (
                   <div>{fileData.name}</div>
                 ) : (
@@ -187,7 +219,7 @@ const Agreement = (props) => {
                     Upload PDF
                   </div>
                 )}
-              </Button>
+              </StyledButton>
             </Col>
           </Row>
 
@@ -221,7 +253,7 @@ const Agreement = (props) => {
                 ) : (
                   rowData?.map((item) =>
                     item?.variant?.map((variant) => {
-                      
+
                       const attributePresent = agreementData.some(
                         (agreementItem) =>
                           agreementItem.variants.some(
@@ -230,7 +262,7 @@ const Agreement = (props) => {
                           )
                       );
 
-                      
+
                       if (!attributePresent) {
                         return (
                           <Row
@@ -260,12 +292,12 @@ const Agreement = (props) => {
                               <div sx={{ display: "flex", gap: "3px" }}>
                                 {variant.attributes
                                   ? variant?.attributes?.map((attribute) => (
-                                      <Chip
-                                        size="small"
-                                        key={attribute._id}
-                                        label={`${attribute.name}-${attribute.value}`}
-                                      />
-                                    ))
+                                    <Chip
+                                      size="small"
+                                      key={attribute._id}
+                                      label={`${attribute.name}-${attribute.value}`}
+                                    />
+                                  ))
                                   : null}
                               </div>
                             </Col>
@@ -308,3 +340,7 @@ const Agreement = (props) => {
 };
 
 export default Agreement;
+
+//check the file type in file manager
+//get object API in backend
+//download the file from the url

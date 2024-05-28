@@ -1,5 +1,5 @@
 import axios from "axios";
-import { reject } from "lodash";
+import { get, reject } from "lodash";
 
 const baseUrl = process.env.API_BASE_URL || "http://localhost:3000";
 
@@ -41,8 +41,9 @@ const API_URL = {
   getAgreementItems: "/api/items/agreement-item-list",
   getClientUsers: "/api/users/get/client-users",
   getUserById: "/api/users/get/user",
-  updateClientStatus:'/api/clients/update-status',
-  updateItemStatus:'/api/items/update-status'
+  updateClientStatus: '/api/clients/update-status',
+  updateItemStatus: '/api/items/update-status',
+  getUploadUrl: "/api/file/upload-url",
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -276,17 +277,17 @@ export async function updateBranch(body) {
 }
 
 export async function updateUser(body) {
-    return new Promise((resolve) => {
-      axios
-        .post(`${baseUrl}${API_URL.updateUser}`, body, {
-          headers: getHeaders(),
-        })
-        .then((res) => {
-          resolve(res.data);
-          return res.data;
-        });
-    });
-  }
+  return new Promise((resolve) => {
+    axios
+      .post(`${baseUrl}${API_URL.updateUser}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
 
 export async function getWarehouseList(body) {
   return new Promise((resolve) => {
@@ -582,6 +583,19 @@ export async function getAgreementItems(body) {
   return new Promise((resolve) => {
     axios
       .post(`${baseUrl}${API_URL.getAgreementItems}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function getUploadUrl() {
+  return new Promise((resolve) => {
+    axios
+      .get(`${baseUrl}${API_URL.getUploadUrl}`, {
         headers: getHeaders(),
       })
       .then((res) => {
