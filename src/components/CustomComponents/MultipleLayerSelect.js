@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const MultipleLayerSelect = ({ categories, setCategoryData }) => {
+const MultipleLayerSelect = ({ categories, setCategoryData, levelTwo }) => {
   const handleCategoryClick = (categoryId, categoryName) => {
     setCategoryData({ id: categoryId, name: categoryName, show: false });
   };
@@ -60,7 +60,7 @@ const MultipleLayerSelect = ({ categories, setCategoryData }) => {
                     }}
                     style={{ padding: "2px" }}
                   >{` ${child.name}`}</div>
-                  {child.children && (
+                  {levelTwo && child.children &&(
                     <div
                       style={{
                         padding: "2px 8px",
@@ -68,7 +68,7 @@ const MultipleLayerSelect = ({ categories, setCategoryData }) => {
                       }}
                       className="grandchild-options"
                     >
-                      {child.children.map((grandchild) => (
+                      {levelTwo? child.children.map((grandchild) => (
                         <div
                           key={grandchild._id}
                           className="grandchild-option"
@@ -90,7 +90,7 @@ const MultipleLayerSelect = ({ categories, setCategoryData }) => {
                             style={{ padding: "2px" }}
                           >{` ${grandchild.name}`}</div>
                         </div>
-                      ))}
+                      )):null}
                     </div>
                   )}
                 </div>
