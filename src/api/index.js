@@ -43,9 +43,9 @@ const API_URL = {
   getAgreementItems: "/api/items/agreement-item-list",
   getClientUsers: "/api/users/get/client-users",
   getUserById: "/api/users/get/user",
-  updateUserStatus:'/api/users/status',
-  updateItemStatus:'/api/items/update-status',
-  createPurchaseOrder:'/api/purchaseorders/create',
+  updateUserStatus: "/api/users/status",
+  updateItemStatus: "/api/items/update-status",
+  createPurchaseOrder: "/api/purchaseorders/create",
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -83,7 +83,9 @@ export async function createItem(body) {
 export async function updateItemStatus(body) {
   return new Promise((resolve) => {
     axios
-      .post(`${baseUrl}${API_URL.updateItemStatus}`, body, { headers: getHeaders() })
+      .post(`${baseUrl}${API_URL.updateItemStatus}`, body, {
+        headers: getHeaders(),
+      })
       .then((res) => {
         resolve(res.data);
         return res.data;
@@ -94,7 +96,9 @@ export async function updateItemStatus(body) {
 export async function updateUserStatus(body) {
   return new Promise((resolve) => {
     axios
-      .post(`${baseUrl}${API_URL.updateUserStatus}`, body, { headers: getHeaders() })
+      .post(`${baseUrl}${API_URL.updateUserStatus}`, body, {
+        headers: getHeaders(),
+      })
       .then((res) => {
         resolve(res.data);
         return res.data;
@@ -281,7 +285,9 @@ export async function getPurchaseOrderList() {
 export async function createPurchaseOrder(body) {
   return new Promise((resolve) => {
     axios
-      .post(`${baseUrl}${API_URL.createPurchaseOrder}`, body, { headers: getHeaders() })
+      .post(`${baseUrl}${API_URL.createPurchaseOrder}`, body, {
+        headers: getHeaders(),
+      })
       .then((res) => {
         resolve(res.data);
         return res.data;
@@ -316,17 +322,17 @@ export async function updateBranch(body) {
 }
 
 export async function updateUser(body) {
-    return new Promise((resolve) => {
-      axios
-        .post(`${baseUrl}${API_URL.updateUser}`, body, {
-          headers: getHeaders(),
-        })
-        .then((res) => {
-          resolve(res.data);
-          return res.data;
-        });
-    });
-  }
+  return new Promise((resolve) => {
+    axios
+      .post(`${baseUrl}${API_URL.updateUser}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
 
 export async function getWarehouseList(body) {
   return new Promise((resolve) => {

@@ -15,7 +15,7 @@ import StyledButton from "../../components/Common/StyledButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
-import {createPurchaseOrderReq} from "../../service/purchaseService"
+import { createPurchaseOrderReq } from "../../service/purchaseService";
 
 const CreateOrder = (props) => {
   document.title = "Create Purchase Order";
@@ -47,6 +47,7 @@ const CreateOrder = (props) => {
   const [deliveryDateError, setDeliveryDateError] = useState("");
   const [poNumberError, setPoNumberError] = useState("");
   const [agreementId, setAgreementId] = useState(0);
+  const [status, setStatus] = useState("draft");
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -96,7 +97,7 @@ const CreateOrder = (props) => {
     );
     setBillingAddress(selectedBranch?.address || "");
     setBillingId(selectedId);
-    validation.setFieldValue("billingAddress",billingAddress);
+    validation.setFieldValue("billingAddress", billingAddress);
   };
 
   const handleShippingChange = (event) => {
@@ -106,7 +107,11 @@ const CreateOrder = (props) => {
     );
     setShippingAddress(selectedBranch?.address || "");
     setShippingId(selectedId);
-    validation.setFieldValue("shippingAddress",shippingAddress);
+    validation.setFieldValue("shippingAddress", shippingAddress);
+  };
+
+  const handleStatusChange = (event) => {
+    setStatus(event.target.value);
   };
 
   const validation = useFormik({
@@ -130,8 +135,7 @@ const CreateOrder = (props) => {
       redirectToPurchaseDetails();
     },
   });
-  
-  
+
   const getListOfRowData = async () => {
     try {
       const response = await getAgreementItemsReq(bodyObject);
@@ -153,12 +157,18 @@ const CreateOrder = (props) => {
     const newItem = {
       id: item._id,
       title: item.title,
+      name: item.title,
+      description: item.description,
+      type: item.itemType,
+      unit: item.itemUnit,
       hsnCode: item.hsnCode,
+      taxPreference: item.taxPreference,
       category: item.category.name,
       price: variant.price,
       qty: 1,
       gst: taxName,
       variant: variant,
+      taxes: item.taxes,
     };
 
     if (
@@ -292,9 +302,9 @@ const CreateOrder = (props) => {
   const onCreatePurchaseOrderClick = (e) => {
     e.preventDefault();
     validation.handleSubmit();
-    
+
     const validationErrors = validation.errors;
-    
+
     // Clearing individual error states if corresponding fields are valid
     // if (!validationErrors.billingAddress) {
     //   setBillingAddressError("");
@@ -308,25 +318,25 @@ const CreateOrder = (props) => {
     // if (!validationErrors.deliveryDate) {
     //   setDeliveryDateError("");
     // }
-  
+
     // if (Object.keys(validationErrors).length > 0) {
     //   // Handling validation errors
     //   if (validationErrors.billingAddress) {
     //     setBillingAddressError(validationErrors.billingAddress);
     //   }
-  
+
     //   if (validationErrors.shippingAddress) {
     //     setShippingAddressError(validationErrors.shippingAddress);
     //   }
-  
+
     //   if (validationErrors.poNumber) {
     //     setPoNumberError(validationErrors.poNumber);
     //   }
-  
+
     //   if (validationErrors.deliveryDate) {
     //     setDeliveryDateError(validationErrors.deliveryDate);
     //   }
-  
+
     //   return;
     // }
     // If all validations pass, proceed with further logic
@@ -334,17 +344,69 @@ const CreateOrder = (props) => {
       // validation.handleSubmit();
       // to be filled with api creation logic
 
-      createPurchaseOrderReq(values);
+      createPurchaseOrderReq({
+        purchaseOrderNumber: poNumber,
+        agreementId: agreementId,
+        status: status,
+        deliveryDate: date,
+        billingBranchId: billingId,
+        shippingBranchId: shippingId,
+        items: [
+          selectedItems.map((item) => ({
+            itemId: item.id,
+            variantId: item.variant._id,
+            unitPrice: item.price,
+            quantity: item.qty,
+            itemName: item.name,
+            itemDescription: item.description,
+            itemType: item.type,
+            itemUnit: item.unit,
+            hsnCode: item.hsnCode,
+            taxPreference: item.taxPreference,
+            taxes: item.taxes.map((tax) => ({
+              taxId: tax._id,
+              taxName: tax.name,
+              taxPercentage: tax.rate,
+            })),
+          })),
+        ],
+      });
 
+      // console.log("Api Params: ", {
+      //   purchaseOrderNumber: poNumber,
+      //   agreementId: agreementId,
+      //   status: status,
+      //   deliveryDate: date,
+      //   billingBranchId: billingId,
+      //   shippingBranchId: shippingId,
+      //   items: [
+      //     selectedItems.map((item) => ({
+      //       itemId: item.id,
+      //       variantId: item.variant._id,
+      //       unitPrice: item.price,
+      //       quantity: item.qty,
+      //       itemName: item.name,
+      //       itemDescription: item.description,
+      //       itemType: item.type,
+      //       itemUnit: item.unit,
+      //       hsnCode: item.hsnCode,
+      //       taxPreference: item.taxPreference,
+      //       taxes: item.taxes.map((tax) => ({
+      //         taxId: tax._id,
+      //         taxName: tax.name,
+      //         taxPercentage: tax.rate,
+      //       })),
+      //     })),
+      //   ],
+      // });
 
       redirectToPurchaseDetails();
     } else {
       alert("Please select at least 1 item!");
     }
-    
+
     return false;
   };
-  
 
   const handleClickPO = () => {
     if (!poNumber.startsWith("PO ")) {
@@ -354,7 +416,7 @@ const CreateOrder = (props) => {
 
   const handleChangePO = (e) => {
     let value = e.target.value;
-  
+
     if (value === "PO ") {
       setPoNumber(value);
     } else if (value.length <= 2 && !value.startsWith("PO")) {
@@ -364,16 +426,15 @@ const CreateOrder = (props) => {
     } else {
       setPoNumber(value);
     }
-    validation.setFieldValue("poNumber",poNumber);
+    validation.setFieldValue("poNumber", poNumber);
   };
-  
 
   const handleChangeDate = (e) => {
     let input = e.target.value.replace(/\D/g, "");
 
     if (e.nativeEvent.inputType === "deleteContentBackward") {
       const lastHyphenIndex = date.lastIndexOf("-");
-      console.log("Last hyphen Index: ", lastHyphenIndex);
+      // console.log("Last hyphen Index: ", lastHyphenIndex);
       if (lastHyphenIndex !== -1) {
         input = input.slice(0, lastHyphenIndex - 1);
       } else {
@@ -391,7 +452,7 @@ const CreateOrder = (props) => {
     }
 
     setDate(input);
-    validation.setFieldValue("deliveryDate",date);
+    validation.setFieldValue("deliveryDate", date);
     // if (input.length === 10) {
     //   const [day, month, year] = input.split("-").map(Number);
 
@@ -482,7 +543,12 @@ const CreateOrder = (props) => {
             display: "flex",
           }}
         >
-          <select className="form-select focus-width" name="status">
+          <select
+            className="form-select focus-width"
+            name="status"
+            value={status}
+            onChange={handleStatusChange}
+          >
             <option value="draft">Draft</option>
             <option value="active">Published</option>
           </select>
@@ -558,7 +624,9 @@ const CreateOrder = (props) => {
                           ))}
                         </select>
                         {billingAddressError && (
-                          <span style={{ color: "red" }}>{billingAddressError}</span>
+                          <span style={{ color: "red" }}>
+                            {billingAddressError}
+                          </span>
                         )}
                         <div className="mt-2">
                           <p />
@@ -588,7 +656,9 @@ const CreateOrder = (props) => {
                           ))}
                         </select>
                         {shippingAddressError && (
-                          <span style={{ color: "red" }}>{shippingAddressError}</span>
+                          <span style={{ color: "red" }}>
+                            {shippingAddressError}
+                          </span>
                         )}
                         <div className="mt-2">
                           <p />
@@ -636,8 +706,10 @@ const CreateOrder = (props) => {
                         onBlur={validation.handleBlur}
                       />
                       {deliveryDateError && (
-                          <span style={{ color: "red" }}>{deliveryDateError}</span>
-                        )}
+                        <span style={{ color: "red" }}>
+                          {deliveryDateError}
+                        </span>
+                      )}
                       {date.length === 10 && !validDate ? (
                         <p className="text-danger">Invalid Date!</p>
                       ) : null}
@@ -668,7 +740,7 @@ const CreateOrder = (props) => {
                           onChange={handleSearchQuery}
                         />
                       </Col>
-                    </Row >
+                    </Row>
 
                     {showRowData && (
                       <div
@@ -708,8 +780,8 @@ const CreateOrder = (props) => {
                     }}
                   >
                     <Table hover>
-                        <thead>
-                      <tr>
+                      <thead>
+                        <tr>
                           <th>Item Name</th>
                           <th>HSN Code</th>
                           <th>Category</th>
@@ -718,9 +790,9 @@ const CreateOrder = (props) => {
                           <th>Total</th>
                           <th>GST</th>
                           <th></th>
-                      </tr>
-                        </thead>
-                          {renderSelectedItems()}
+                        </tr>
+                      </thead>
+                      {renderSelectedItems()}
                     </Table>
                   </Row>
                 </CardBody>
