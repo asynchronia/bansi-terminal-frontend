@@ -1,8 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Row,
   Col,
@@ -28,6 +24,7 @@ import {
 
 import "react-toastify/dist/ReactToastify.css";
 import StyledButton from "../../components/Common/StyledButton";
+import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 
 const AddCategory = (props) => {
   document.title = "Categories";
@@ -40,17 +37,26 @@ const AddCategory = (props) => {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const getCategories = useCallback(async () => {
-    const response = await getCategoriesReq();
-    let categories = response?.payload?.categories;
-    setAllCategories(categories);
+    try {
+      const response = await getCategoriesReq();
+      let categories = response?.payload?.categories;
+      setAllCategories(categories);
+    } catch (error) {
+      console.log(error);
+    }
   });
   useEffect(() => {
     props.setBreadcrumbItems("Category", breadcrumbItems);
     getCategories();
   }, []);
 
+  const [categoryData, setCategoryData] = useState({
+    name: "",
+    id: null,
+    show: false,
+  });
+
   const validation = useFormik({
-   
     enableReinitialize: true,
 
     initialValues: {
@@ -59,19 +65,22 @@ const AddCategory = (props) => {
       categoryDescription: "",
     },
     validationSchema: Yup.object({
-      categoryName: Yup.string().required("Please Enter Category Name")
+      categoryName: Yup.string().required("Please Enter Category Name"),
       //categoryParent: Yup.string().required("Please Enter Parent Category"),
     }),
     onSubmit: (values, { resetForm }) => {
       setIsButtonLoading(true);
       let body = {
         name: values.categoryName,
-        description: values.categoryDescription,
       };
-      if(values.categoryParent && values.categoryParent !== ""){
-       body. parentCategoryId = values.categoryParent
+      if (values.categoryDescription && values.categoryDescription !== "") {
+        body.description = values.categoryDescription;
       }
-      handleSubmit(body, resetForm);
+      if (categoryData.id && categoryData.id !== null) {
+        body.parentCategoryId = categoryData.id;
+      }
+      // handleSubmit(body, resetForm);
+      console.log(body);
     },
   });
 
@@ -128,11 +137,11 @@ const AddCategory = (props) => {
     });
   };
 
-  const onCreateCategoryClick=(e)=>{
+  const onCreateCategoryClick = (e) => {
     e.preventDefault();
     validation.handleSubmit();
     return false;
-  }
+  };
 
   return (
     <React.Fragment>
@@ -143,10 +152,7 @@ const AddCategory = (props) => {
             <CardBody>
               <CardTitle className="h4">Item Primary</CardTitle>
               <hr />
-              <Form
-                className="form-horizontal mt-4"
-                
-              >
+              <Form className="form-horizontal mt-4">
                 <div className="mb-3">
                   <Label>Category Name</Label>
                   <Input
@@ -172,7 +178,7 @@ const AddCategory = (props) => {
                     </FormFeedback>
                   ) : null}
                 </div>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <Label htmlFor="categoryParent">Parent Category</Label>
                   <select
                     onChange={validation.handleChange}
@@ -183,7 +189,7 @@ const AddCategory = (props) => {
                     className="form-select focus-width"
                     invalid={
                       validation.touched.categoryParent &&
-                      validation.errors.categoryParent
+                        validation.errors.categoryParent
                         ? true
                         : false
                     }
@@ -196,10 +202,44 @@ const AddCategory = (props) => {
                     ))}
                   </select>
                   {validation.touched.categoryParent &&
-                  validation.errors.categoryParent ? (
+                    validation.errors.categoryParent ? (
                     <FormFeedback type="invalid">
                       {validation.errors.categoryParent}
                     </FormFeedback>
+                  ) : null}
+                </div> */}
+                <div className="mt-3 mb-0">
+                  <label className="form-label">Category Parent</label>
+                  <label
+                    name="category"
+                    id="category"
+                    onClick={() => {
+                      setCategoryData({
+                        ...categoryData,
+                        show: !categoryData.show,
+                      });
+                    }}
+                    className="form-select focus-width"
+                  >
+                    {categoryData.name !== ""
+                      ? `Category: ${categoryData.name}`
+                      : `Select Category`}
+                  </label>
+                  {categoryData.show ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        width: "90%",
+                        zIndex: 2,
+                        background: "#f5f5f5",
+                      }}
+                    >
+                      <MultipleLayerSelect
+                        levelTwo={false}
+                        categories={allCategories}
+                        setCategoryData={setCategoryData}
+                      />
+                    </div>
                   ) : null}
                 </div>
                 <div className="form-group mb-3">
@@ -225,14 +265,14 @@ const AddCategory = (props) => {
                 </div>
                 <div className="mb-3 row mt-4">
                   <div className="col-12 text-start">
-                  <StyledButton
-                color={"primary"}
-                className={"w-md"}
-                onClick={onCreateCategoryClick}
-                isLoading={isButtonLoading}
-              >
-                Submit
-              </StyledButton>
+                    <StyledButton
+                      color={"primary"}
+                      className={"w-md"}
+                      onClick={onCreateCategoryClick}
+                      isLoading={isButtonLoading}
+                    >
+                      Submit
+                    </StyledButton>
                   </div>
                 </div>
               </Form>
@@ -242,25 +282,18 @@ const AddCategory = (props) => {
         <Col xl={7}>
           <Card>
             <CardBody>
-            <Table>
-              <thead>
-              <tr>
-                <th>
-                Category Name
-                </th>
-                <th>
-                Category Description
-                </th>
-              </tr>    
-              </thead>
-            </Table>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Category Name</th>
+                    <th>Category Description</th>
+                  </tr>
+                </thead>
+              </Table>
               <div>
                 {allCategories.map((category, index) => (
-                  <div
-                    key={category._id}
-                    className="option"
-                  >
-                    <Row className={index!==0?"my-2":null}>
+                  <div key={category._id} className="option">
+                    <Row className={index !== 0 ? "my-2" : null}>
                       <Col
                         xs="1"
                         onClick={() => handleCategoryClick(category._id)}
@@ -284,7 +317,7 @@ const AddCategory = (props) => {
 
                     {category.children &&
                       openCategories.includes(category._id) && (
-                        <div  className="child-options opened mx-2">
+                        <div className="child-options opened mx-2">
                           {category.children.map((child) => (
                             <div key={child._id} className="child-option">
                               <Row>

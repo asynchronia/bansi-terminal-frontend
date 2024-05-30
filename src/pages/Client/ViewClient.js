@@ -32,7 +32,9 @@ import { signinReq } from "../../service/authService";
 import { getTaxesReq } from "../../service/itemService";
 import { updateUserReq } from "../../service/usersService";
 import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
-import { updateUserStatusReq } from "../../service/statusService";
+import { updateClientStatusReq } from "../../service/statusService";
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
+import ENV from "../../utility/env";
 
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
@@ -56,8 +58,10 @@ const ViewClient = (props) => {
     branch: true,
     user: false,
   });
-
-  const [isDeactivated, setIsDeactivated] = useState(false);
+  const [additionalData, setAdditionalData] = useState({
+    url: "",
+    validity: "",
+  });
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -149,6 +153,11 @@ const ViewClient = (props) => {
       } else {
         setAgreementAvailable({ loading: false, value: false });
       }
+
+      setAdditionalData((prevData) => ({
+        ...prevData,
+        url: res.payload.document,
+      }));
     } catch (error) {
       if (error === 404) {
         setAgreementAvailable({ loading: false, value: false });
@@ -203,11 +212,11 @@ const ViewClient = (props) => {
   const handleClientStatus = async () => {
     try {
       let values = {
-        email: clientData?.email,
-        isDeactivated: isDeactivated,
+        clientId: id,
+        status: clientData?.status,
       };
 
-      const response = await updateUserStatusReq(values);
+      const response = await updateClientStatusReq(values);
       if (response.success === true) {
         notify("Success", response.message);
       } else {
@@ -223,6 +232,7 @@ const ViewClient = (props) => {
       let values = {
         clientId: id,
         items: [...agreementData],
+        document: additionalData.url,
       };
 
       const response = await createAgreementReq(values);
@@ -292,12 +302,7 @@ const ViewClient = (props) => {
   };
 
   const handleStatus = (e) => {
-    const selectedValue = e.target.value;
-    if (selectedValue === 'active') {
-      setIsDeactivated(false);
-    } else if (selectedValue === 'draft') {
-      setIsDeactivated(true);
-    }
+    setClientData({ ...clientData, status: e.target.value });
     setOpenModal({ ...openModal, status: true });
   };
 
@@ -334,26 +339,39 @@ const ViewClient = (props) => {
     }
   };
 
+
   const downloadPDF = () => {
-    const data = [...displayTableData];
+    // const data = [...displayTableData];
 
-    const doc = new jsPDF();
-    const tableColumn = Object.keys(data[0]);
-    const tableRows = data.map((obj) => Object.values(obj));
+    // const doc = new jsPDF();
+    // const tableColumn = Object.keys(data[0]);
+    // const tableRows = data.map((obj) => Object.values(obj));
 
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-    });
+    // doc.autoTable({
+    //   head: [tableColumn],
+    //   body: tableRows,
+    // });
 
-    doc.save("Agreement.pdf");
+    // doc.save("Agreement.pdf");
+    const fileKey = additionalData.url;
+    if (!fileKey) {
+      toast.info("No file available for download", {
+        position: "top-center",
+        theme: "colored",
+      });
+      return;
+    }
+    const fileUrl = `${ENV.FILE_SERVER_BASEURL}/${fileKey}`;
+    window.open(fileUrl, '_blank');
   };
 
-  console.log(isDeactivated)
 
   useEffect(() => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
   }, [breadcrumbItems]);
+
+  console.log(agreementData, "agreementData")
+  console.log(additionalData, "additionalData")
 
   return (
     <div style={{ position: "relative" }}>
@@ -374,6 +392,7 @@ const ViewClient = (props) => {
           setAgreementData={setAgreementData}
           openModal={openModal}
           setOpenModal={setOpenModal}
+          setAdditionalData={setAdditionalData}
         />
       </Modal>
       <Modal>
@@ -404,12 +423,13 @@ const ViewClient = (props) => {
           onChange={handleStatus}
           className="form-select focus-width"
           name="status"
+          value={clientData?.status}
         >
           <option value="active">Published</option>
-          <option value="draft">Draft</option>
+          <option value="inactive">Draft</option>
         </select>
         <button type="submit" className="btn btn-primary w-xl mx-3">
-          Edit
+          <Edit style={{ marginRight: "5px", fill: "white" }} />Edit
         </button>
       </div>
       <Row>

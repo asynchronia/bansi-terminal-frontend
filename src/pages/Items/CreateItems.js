@@ -375,6 +375,7 @@ const CreateItems = (props) => {
                     {categoryData.show ? (
                       <div style={{position:'absolute', width:'90%', zIndex:2, background: "#f5f5f5",}}>
                         <MultipleLayerSelect
+                          levelTwo={true}
                           categories={allCategories}
                           setCategoryData={setCategoryData}
                         />
