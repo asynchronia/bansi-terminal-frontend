@@ -31,16 +31,23 @@ const ViewPurchaseOrder = (props) => {
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
 
+  // const redirectToViewPage = (id) => {
+  //   console.log(id.order_id);
+  //   let path = `/order/${id.order_id}`;
+  //   setTimeout(() => {
+  //     navigate(path, id.order_id);
+  //   }, 300);
+  // }
+
   const redirectToViewPage = (id) => {
-    console.log(id.order_id);
-    let path = `/order/${id.order_id}`;
+    let path = `/purchase-order-details/${id}`;
     setTimeout(() => {
-      navigate(path, id.order_id);
+      navigate(path,id);
     }, 300);
-  }
+  };
 
   const handleViewClick = (id) => {
-    redirectToViewPage(id);
+    redirectToViewPage(id.order_id);
   }
 
   useEffect(() => {

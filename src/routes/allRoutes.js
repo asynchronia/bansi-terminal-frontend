@@ -146,7 +146,7 @@ const userRoutes = [
   { path: "/view-estimate/:id", component: <ViewEstimate /> },
   { path: "/agreement-items", component: <AgreementItemsListing /> },
   { path: "/view-agreement-item/:id", component: <AgreementItemView /> },
-  { path: "/purchase-order-details", component: <PurchaseOrderDetails /> },
+  { path: "/purchase-order-details/:id", component: <PurchaseOrderDetails /> },
   // // this route should be at the end of all other routes
   {
     path: "/",

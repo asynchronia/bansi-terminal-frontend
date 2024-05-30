@@ -15,9 +15,9 @@ const OrderStatusRenderer = ({ value }) => {
       color = "error";
       label = "Closed";
       break;
-    case "open" || "confirmed":
+    case 'published' || "Published":
       color = "success";
-      label = "Open";
+      label = "Published";
       break;
     default:
       return "";

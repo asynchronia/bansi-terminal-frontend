@@ -47,6 +47,7 @@ const API_URL = {
   updateItemStatus: "/api/items/update-status",
   createPurchaseOrder: "/api/purchaseorders/create",
   getPurchaseOrderDetails: "/api/purchaseorders",
+  purchaseOrderStatusChange: "/api/purchaseorders/status",
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -298,6 +299,19 @@ export async function createPurchaseOrder(body) {
   return new Promise((resolve) => {
     axios
       .post(`${baseUrl}${API_URL.createPurchaseOrder}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function purchaseOrderStatusChange(body) {
+  return new Promise((resolve) => {
+    axios
+      .post(`${baseUrl}${API_URL.purchaseOrderStatusChange}`, body, {
         headers: getHeaders(),
       })
       .then((res) => {

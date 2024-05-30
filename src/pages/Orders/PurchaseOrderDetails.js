@@ -1,79 +1,114 @@
-import React, { useState,useEffect,useRef } from "react";
-import { Row, Col, Card, CardBody } from "reactstrap";
+import React, { useState, useEffect, useRef } from "react";
+import { Row, Col, Card, CardBody, Modal } from "reactstrap";
 import { ToastContainer } from "react-toastify";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import StyledButton from "../../components/Common/StyledButton";
 import { ReactComponent as CorrectSign } from "../../assets/images/svg/correct-sign.svg";
-import { ReactComponent as EditSign } from "../../assets/images/svg/edit-button.svg";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { connect } from "react-redux";
-import { getPurchaseOrderDetailsReq } from "../../service/purchaseService";
-
+import { getPurchaseOrderDetailsReq, purchaseOrderStatusChangeReq } from "../../service/purchaseService";
+import { useParams } from "react-router-dom";
+import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
+import ApproveConfirm from "../../components/CustomComponents/ApproveConfirm";
 
 const PurchaseOrderDetails = (props) => {
-  const [subTotal, setSubTotal] = useState(0);
-  const [gstTotal, setGstTotal] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [selectedItems, setSelectedItems] = useState([]);
+  const { id } = useParams();
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  
+  const [itemsData, setItemsData] = useState([]);
+  const [orderInfo, setOrderInfo] = useState({});
+  const [status, setStatus] = useState("");
+  const [publishModal, setPublishModal] = useState(false);
+  const [approveModal, setApproveModal] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
+
+
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Purchase Order", link: "#" },
-    { title: "Purchase Order" + {}, link: "#" },
+    { title: "Purchase Order", link: "#" },
   ];
-  
-  const data = {
-    id : "66452914796a60ed23ca91df",
-  }
+
+  const body = {
+    "purchaseOrderId": id,
+    "status": "published"
+  };
 
   const effectCalled = useRef(false);
 
-  const getPurchaseOrderDetails=async ()=>{
-    const response = await getPurchaseOrderDetailsReq(data.id);
-    console.log(response);
+  async function handlePurchaseOrderStatusChange() {
+    setIsButtonLoading(true);
+    try {
+      const response = await purchaseOrderStatusChangeReq(body);
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        console.error('Bad Request:', error);
+        // Handle the 400 error here, e.g., show an error message to the user
+      } else {
+        console.error('Failed to change purchase order status:', error);
+      }
+    } finally {
+      setIsButtonLoading(false);
+    }
+  }
+  
+
+  const submitPurchaseOrder = () => {
+    setApproveModal(true);
   }
 
+  const handleStatusChange = (event) => {
+    const newStatus = event.target.value;
+    if (newStatus === 'published') {
+      setPublishModal(true);
+    }
+    setStatus(newStatus);
+  };
+
+  const getPurchaseOrderDetails = async () => {
+    const response = await getPurchaseOrderDetailsReq(id);
+    const purchaseOrder = response?.purchaseOrder;
+
+    setItemsData(purchaseOrder?.items);
+    setOrderInfo(purchaseOrder);
+    setStatus(purchaseOrder?.status);
+    if(purchaseOrder?.status === 'published'){
+        setIsDisabled(true);
+      }
+      else{
+        setIsDisabled(false);
+      }
+
+
+    let subTotal = 0;
+    let totalQuantity = 0;
+    let gstTotal = 0;
+
+    purchaseOrder.items.forEach((item) => {
+      subTotal += item.unitPrice * item.quantity;
+      totalQuantity += item.quantity;
+      item.taxes.forEach((tax) => {
+        gstTotal += (item.unitPrice * item.quantity * tax.taxPercentage) / 100;
+      });
+    });
+
+    const total = subTotal + gstTotal;
+
+    setOrderInfo({
+      ...purchaseOrder,
+      subTotal,
+      totalQuantity,
+      gstTotal,
+      total,
+    });
+  };
+
   useEffect(() => {
-    props.setBreadcrumbItems("Order "+{}, breadcrumbItems);
+    props.setBreadcrumbItems("Purchase Order", breadcrumbItems);
     if (!effectCalled.current) {
       getPurchaseOrderDetails();
       effectCalled.current = true;
     }
   }, []);
-
-  const Items = {
-    Item1: {
-      name: "PUN - Printed Register 8q",
-      rate: "₹ 0.00",
-      ordered: "1 Nos",
-      amount: "₹ 0.00",
-    },
-    Item2: {
-      name: "PUN - Printed Register 8q",
-      rate: "₹ 0.00",
-      ordered: "1 Nos",
-      amount: "₹ 0.00",
-    },
-    Item3: {
-      name: "PUN - Printed Register 8q",
-      rate: "₹ 0.00",
-      ordered: "1 Nos",
-      amount: "₹ 0.00",
-    },
-    Item4: {
-      name: "PUN - Printed Register 8q",
-      rate: "₹ 0.00",
-      ordered: "1 Nos",
-      amount: "₹ 0.00",
-    },
-    Item5: {
-      name: "PUN - Printed Register 8q",
-      rate: "₹ 0.00",
-      ordered: "1 Nos",
-      amount: "₹ 0.00",
-    },
-  };
 
   return (
     <>
@@ -87,25 +122,33 @@ const PurchaseOrderDetails = (props) => {
             display: "flex",
           }}
         >
-          <StyledButton
-            className={"w-md mx-2 bg-white text-black border-0"}
-            isLoading={isButtonLoading}
+          <Modal size="m" isOpen={publishModal}>
+            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
+          </Modal>
+          <Modal size="m" isOpen={approveModal}>
+            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange}/>
+          </Modal>
+          <select
+            className="form-select focus-width"
+            name="status"
+            disabled={isDisabled}
+            value={status} // Bind status state to select element
+            onChange={handleStatusChange} // Update status on change
           >
-            <EditSign className="me-1" />
-            Edit
-          </StyledButton>
-          <select className="form-select focus-width" name="status">
             <option value="draft">Draft</option>
-            <option value="active">Published</option>
+            <option value="published">Published</option>
           </select>
-          <StyledButton
-            color={"success"}
-            className={"w-md mx-2"}
-            isLoading={isButtonLoading}
-          >
-            <CorrectSign className="me-1" />
-            Approve
-          </StyledButton>
+          {status === 'published' && (
+            <StyledButton
+              color={"success"}
+              className={"w-md mx-2"}
+              isLoading={isButtonLoading}
+              onClick={submitPurchaseOrder}
+            >
+              <CorrectSign className="me-1" />
+              Approve
+            </StyledButton>
+          )}
         </div>
       </div>
       <Card>
@@ -136,7 +179,7 @@ const PurchaseOrderDetails = (props) => {
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">PO #BLR/S0/11742</span>
+              <span className="purchase-order-no">{}</span>
             </div>
           </div>
         </CardBody>
@@ -149,104 +192,40 @@ const PurchaseOrderDetails = (props) => {
             <Col xl="7">
               <Card>
                 <CardBody>
-                  <Row>
-                    <div className="d-flex align-items-md-center">
-                      <Col>
-                        <p className="mt-2"> Order Date </p>
-                      </Col>
-                      <Col>
-                        <h6 className="justify-content-start">19/03/2024</h6>
-                      </Col>
-                      <hr />
-                    </div>
+                  <Row className="mb-4">
+                    <Col>Order Date</Col>
+                    <Col>{new Date(orderInfo?.createdAt).toLocaleDateString()}</Col>
                   </Row>
-                  <Row>
-                    <div className="d-flex justify-content-between align-items-md-center">
-                      <Col>
-                        <p className="mt-2"> Payment Terms </p>
-                      </Col>
-                      <Col>
-                        <h6 className="justify-content-start">Net 30</h6>
-                      </Col>
-                      <hr />
-                    </div>
+                  <Row className="mb-4">
+                    <Col>Payment Terms</Col>
+                    <Col></Col>
                   </Row>
-                  <Row>
-                    <div className="d-flex justify-content-between align-items-md-center">
-                      <Col>
-                        <p className="mt-2"> Delivery Method </p>
-                      </Col>
-                      <Col>
-                        <h6 className="justify-content-start">By Vehicle</h6>
-                      </Col>
-                      <hr />
-                    </div>
+                  <Row className="mb-4">
+                    <Col>Delivery Method</Col>
+                    <Col></Col>
                   </Row>
-                  <Row>
-                    <div className="d-flex justify-content-between align-items-md-center">
-                      <Col>
-                        <p className="mt-2"> PO NO </p>
-                      </Col>
-                      <Col>
-                        <h6 className="justify-content-start">From Office</h6>
-                      </Col>
-                      <hr />
-                    </div>
+                  <Row className="mb-4">
+                    <Col>PO NO</Col>
+                    <Col></Col>
                   </Row>
-                  <Row>
-                    <div className="d-flex justify-content-between align-items-md-center">
-                      <Col>
-                        <p className="mt-2"> Acknowledgement Uploaded </p>
-                      </Col>
-                      <Col>
-                        <h6 className="justify-content-start">No</h6>
-                      </Col>
-                    </div>
+                  <Row className="mb-4">
+                    <Col>Acknowledgement Uploaded</Col>
+                    <Col></Col>
                   </Row>
                 </CardBody>
               </Card>
             </Col>
             <Col xl="5">
               <Card>
-                <CardBody>
-                  <span>
-                    <h6>Billing Address</h6>
-                  </span>
-                  <span>
-                    <p className="m-0">IP EXPRESS CARGO</p>
-                  </span>
-                  <span>
-                    <p className="m-0">
-                      SHOP NO:22 & 23, CTS NO: 1184, PLOT NO:559,
-                    </p>
-                  </span>
-                  <span>
-                    <p className="m-0">
-                      FIRST FLOOR, SHRINATH PLAZA, SHIVAJI NAGAR,
-                    </p>
-                  </span>
-                  <span>
-                    <p className="m-0">PUNE, MAHARASHTRA,</p>
-                  </span>
-                  <span>
-                    <p>INDIA - 412207</p>
-                  </span>
-
-                  <span>
-                    <h6>Shipping Address</h6>
-                  </span>
-                  <span>
-                    <p className="m-0">IP EXPRESS CARGO</p>
-                  </span>
-                  <span>
-                    <p className="m-0">JADHAV WAREHOUSE, WAGHOLI</p>
-                  </span>
-                  <span>
-                    <p className="m-0">PUNE, MAHARASHTRA,</p>
-                  </span>
-                  <span>
-                    <p className="m-0">INDIA - 412207</p>
-                  </span>
+                <CardBody className="d-flex flex-column">
+                  <div style={{ flex: 1 }}>
+                    <h4 className="card-title">Billing Address</h4>
+                    <p>{orderInfo.billing?.address}</p>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <h4 className="card-title">Shipping Address</h4>
+                    <p>{orderInfo.shipping?.address}</p>
+                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -262,32 +241,27 @@ const PurchaseOrderDetails = (props) => {
                     <h4 className="card-title mt-1">Sales Information</h4>
                   </div>
                   <Row className="mb-4">
-                    <Col>Item & Description</Col>
-                    <Col>Rate</Col>
-                    <Col>Ordered</Col>
-                    <Col>Amount</Col>
+                    <Col xl="4">Item & Description</Col>
+                    <Col xl="3">Rate</Col>
+                    <Col xl="3">Ordered</Col>
+                    <Col xl="2">Amount</Col>
                   </Row>
-
-                  {Object.keys(Items).map((key) => {
-                    const item = Items[key];
-                    return (
-                      <Row key={key} className="mb-4">
-                        <Col>
-                          <span>{item.name}</span>
-                          <br />
-                          {/* <span>{item.name}</span>{" "} */}
-                        </Col>
-                        <Col>
-                          <h6>{item.rate}</h6>
-                        </Col>
-                        <Col>{item.ordered}</Col>
-                        <Col>
-                          {" "}
-                          <h6>{item.amount}</h6>
-                        </Col>
-                      </Row>
-                    );
-                  })}
+                  {itemsData && itemsData.map((item, index) => (
+                    <Row key={index} className="mb-4">
+                      <Col xl="4">
+                        <span>{item.itemName}</span>
+                        <br />
+                        <span>{item.itemDescription}</span>
+                      </Col>
+                      <Col xl="3">
+                        <h6>{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
+                      </Col>
+                      <Col xl="3">{item.quantity} Nos</Col>
+                      <Col xl="2">
+                        <h6>{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
+                      </Col>
+                    </Row>
+                  ))}
                 </CardBody>
               </Card>
             </Col>
@@ -305,10 +279,10 @@ const PurchaseOrderDetails = (props) => {
                       }}
                     >
                       <span>Sub Total :</span>
-                      <span>{formatNumberWithCommasAndDecimal(subTotal)}</span>
+                      <span>{formatNumberWithCommasAndDecimal(orderInfo.subTotal)}</span>
                     </h5>
                     <div style={{ fontSize: "0.7rem" }}>
-                      Total Quantity: {selectedItems.length}
+                      Total Quantity: {orderInfo.totalQuantity}
                     </div>
                     <hr />
                     <h5
@@ -319,7 +293,7 @@ const PurchaseOrderDetails = (props) => {
                       }}
                     >
                       <span>GST :</span>
-                      <span>{formatNumberWithCommasAndDecimal(gstTotal)}</span>
+                      <span>{formatNumberWithCommasAndDecimal(orderInfo.gstTotal)}</span>
                     </h5>
                     <hr />
                     <h5
@@ -330,7 +304,7 @@ const PurchaseOrderDetails = (props) => {
                       }}
                     >
                       <span>Total :</span>
-                      <span>{formatNumberWithCommasAndDecimal(total)}</span>
+                      <span>{formatNumberWithCommasAndDecimal(orderInfo.total)}</span>
                     </h5>
                   </div>
                 </CardBody>

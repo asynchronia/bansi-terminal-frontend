@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { connect, useDispatch } from "react-redux";
-import { Row, Col, Card, CardBody, Input, Label, Table } from "reactstrap";
+import { Row, Col, Card, CardBody, Input, Label, Table, Modal } from "reactstrap";
 import { CircularProgress, TableBody } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -16,6 +16,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { createPurchaseOrderReq } from "../../service/purchaseService";
+import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 
 const CreateOrder = (props) => {
   document.title = "Create Purchase Order";
@@ -48,6 +49,7 @@ const CreateOrder = (props) => {
   const [poNumberError, setPoNumberError] = useState("");
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
+  const [publishModal, setPublishModal] = useState(false);
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -60,10 +62,10 @@ const CreateOrder = (props) => {
     limit: 200,
   };
 
-  const redirectToPurchaseDetails = () => {
-    let path = `/purchase-order-details/`;
+  const redirectToPurchaseDetails = (id) => {
+    let path = `/purchase-order-details/${id}`;
     setTimeout(() => {
-      navigate(path);
+      navigate(path,id);
     }, 300);
   };
 
@@ -111,6 +113,9 @@ const CreateOrder = (props) => {
   };
 
   const handleStatusChange = (event) => {
+    if(event.target.value === 'published'){
+      setPublishModal(true);
+    }
     setStatus(event.target.value);
   };
 
@@ -131,7 +136,6 @@ const CreateOrder = (props) => {
       selectedItems: Yup.array().min(1, "Please select at least one item"),
     }),
     onSubmit: (values) => {
-      console.log("validation.errors");
       redirectToPurchaseDetails();
     },
   });
@@ -300,6 +304,7 @@ const CreateOrder = (props) => {
   }, [props, breadcrumbItems, getBranchData]);
 
   const onCreatePurchaseOrderClick = (e) => {
+    setIsButtonLoading(true);
     e.preventDefault();
     validation.handleSubmit();
 
@@ -341,22 +346,29 @@ const CreateOrder = (props) => {
     // }
     // If all validations pass, proceed with further logic
     if (selectedItems.length > 0) {
+      async function handlePurchaseOrderCreation() {
+        try {
+          const response = await createPurchaseOrderReq(body);
+          console.log(response?.payload?.purchaseOrder?._id);
+          redirectToPurchaseDetails(response?.payload?.purchaseOrder?._id);
+        } catch (error) {
+          console.error('Failed to create purchase order:', error);
+        }
+      }
       // validation.handleSubmit();
-      // to be filled with api creation logic
-
-      createPurchaseOrderReq({
+      const formattedDate = date.split('-').reverse().join('-');
+      const body = {
         purchaseOrderNumber: poNumber,
         agreementId: agreementId,
         status: status,
-        deliveryDate: date,
+        deliveryDate: formattedDate,
         billingBranchId: billingId,
         shippingBranchId: shippingId,
-        items: [
-          selectedItems.map((item) => ({
+        items: selectedItems.map((item) => ({
             itemId: item.id,
             variantId: item.variant._id,
             unitPrice: item.price,
-            quantity: item.qty,
+            quantity: selectedQuantities[`${item.id}-${item.variant._id}`],
             itemName: item.name,
             itemDescription: item.description,
             itemType: item.type,
@@ -369,42 +381,13 @@ const CreateOrder = (props) => {
               taxPercentage: tax.rate,
             })),
           })),
-        ],
-      });
+      }
 
-      // console.log("Api Params: ", {
-      //   purchaseOrderNumber: poNumber,
-      //   agreementId: agreementId,
-      //   status: status,
-      //   deliveryDate: date,
-      //   billingBranchId: billingId,
-      //   shippingBranchId: shippingId,
-      //   items: [
-      //     selectedItems.map((item) => ({
-      //       itemId: item.id,
-      //       variantId: item.variant._id,
-      //       unitPrice: item.price,
-      //       quantity: item.qty,
-      //       itemName: item.name,
-      //       itemDescription: item.description,
-      //       itemType: item.type,
-      //       itemUnit: item.unit,
-      //       hsnCode: item.hsnCode,
-      //       taxPreference: item.taxPreference,
-      //       taxes: item.taxes.map((tax) => ({
-      //         taxId: tax._id,
-      //         taxName: tax.name,
-      //         taxPercentage: tax.rate,
-      //       })),
-      //     })),
-      //   ],
-      // });
-
-      redirectToPurchaseDetails();
+      handlePurchaseOrderCreation();
     } else {
       alert("Please select at least 1 item!");
     }
-
+    setIsButtonLoading(false);
     return false;
   };
 
@@ -434,7 +417,6 @@ const CreateOrder = (props) => {
 
     if (e.nativeEvent.inputType === "deleteContentBackward") {
       const lastHyphenIndex = date.lastIndexOf("-");
-      // console.log("Last hyphen Index: ", lastHyphenIndex);
       if (lastHyphenIndex !== -1) {
         input = input.slice(0, lastHyphenIndex - 1);
       } else {
@@ -543,6 +525,9 @@ const CreateOrder = (props) => {
             display: "flex",
           }}
         >
+          <Modal size="m" isOpen={publishModal}>
+            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus}/>
+          </Modal>
           <select
             className="form-select focus-width"
             name="status"
@@ -550,7 +535,7 @@ const CreateOrder = (props) => {
             onChange={handleStatusChange}
           >
             <option value="draft">Draft</option>
-            <option value="active">Published</option>
+            <option value="published">Published</option>
           </select>
           <StyledButton
             color={"primary"}
@@ -583,9 +568,7 @@ const CreateOrder = (props) => {
               GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
               <br />
               MSME No : UDYAM-KR-03-0065095
-              <br />
-              Web: www.willsmeet.com, Email:sales@willsmeet.com
-              <br />
+              <br /> Web: www.willsmeet.com, Email:sales@willsmeet.com
             </div>
             <div>
               <span className="purchase-order">Purchase Order</span>
