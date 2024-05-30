@@ -1,8 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Row,
   Col,
@@ -28,6 +24,7 @@ import {
 
 import "react-toastify/dist/ReactToastify.css";
 import StyledButton from "../../components/Common/StyledButton";
+import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 
 const AddCategory = (props) => {
   document.title = "Categories";
@@ -40,17 +37,26 @@ const AddCategory = (props) => {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const getCategories = useCallback(async () => {
-    const response = await getCategoriesReq();
-    let categories = response?.payload?.categories;
-    setAllCategories(categories);
+    try {
+      const response = await getCategoriesReq();
+      let categories = response?.payload?.categories;
+      setAllCategories(categories);
+    } catch (error) {
+      console.log(error);
+    }
   });
   useEffect(() => {
     props.setBreadcrumbItems("Category", breadcrumbItems);
     getCategories();
   }, []);
 
-  const validation = useFormik({
+  const [categoryData, setCategoryData] = useState({
+    name: "",
+    id: null,
+    show: false,
+  });
 
+  const validation = useFormik({
     enableReinitialize: true,
 
     initialValues: {
@@ -59,7 +65,7 @@ const AddCategory = (props) => {
       categoryDescription: "",
     },
     validationSchema: Yup.object({
-      categoryName: Yup.string().required("Please Enter Category Name")
+      categoryName: Yup.string().required("Please Enter Category Name"),
       //categoryParent: Yup.string().required("Please Enter Parent Category"),
     }),
     onSubmit: (values, { resetForm }) => {
@@ -70,10 +76,11 @@ const AddCategory = (props) => {
       if (values.categoryDescription && values.categoryDescription !== "") {
         body.description = values.categoryDescription;
       }
-      if (values.categoryParent && values.categoryParent !== "") {
-        body.parentCategoryId = values.categoryParent
+      if (categoryData.id && categoryData.id !== null) {
+        body.parentCategoryId = categoryData.id;
       }
-      handleSubmit(body, resetForm);
+      // handleSubmit(body, resetForm);
+      console.log(body);
     },
   });
 
@@ -134,7 +141,7 @@ const AddCategory = (props) => {
     e.preventDefault();
     validation.handleSubmit();
     return false;
-  }
+  };
 
   return (
     <React.Fragment>
@@ -145,10 +152,7 @@ const AddCategory = (props) => {
             <CardBody>
               <CardTitle className="h4">Item Primary</CardTitle>
               <hr />
-              <Form
-                className="form-horizontal mt-4"
-
-              >
+              <Form className="form-horizontal mt-4">
                 <div className="mb-3">
                   <Label>Category Name</Label>
                   <Input
@@ -162,19 +166,19 @@ const AddCategory = (props) => {
                     value={validation.values.categoryName || ""}
                     invalid={
                       validation.touched.categoryName &&
-                        validation.errors.categoryName
+                      validation.errors.categoryName
                         ? true
                         : false
                     }
                   />
                   {validation.touched.categoryName &&
-                    validation.errors.categoryName ? (
+                  validation.errors.categoryName ? (
                     <FormFeedback type="invalid">
                       {validation.errors.categoryName}
                     </FormFeedback>
                   ) : null}
                 </div>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <Label htmlFor="categoryParent">Parent Category</Label>
                   <select
                     onChange={validation.handleChange}
@@ -203,6 +207,40 @@ const AddCategory = (props) => {
                       {validation.errors.categoryParent}
                     </FormFeedback>
                   ) : null}
+                </div> */}
+                <div className="mt-3 mb-0">
+                  <label className="form-label">Category Parent</label>
+                  <label
+                    name="category"
+                    id="category"
+                    onClick={() => {
+                      setCategoryData({
+                        ...categoryData,
+                        show: !categoryData.show,
+                      });
+                    }}
+                    className="form-select focus-width"
+                  >
+                    {categoryData.name !== ""
+                      ? `Category: ${categoryData.name}`
+                      : `Select Category`}
+                  </label>
+                  {categoryData.show ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        width: "90%",
+                        zIndex: 2,
+                        background: "#f5f5f5",
+                      }}
+                    >
+                      <MultipleLayerSelect
+                        levelTwo={false}
+                        categories={allCategories}
+                        setCategoryData={setCategoryData}
+                      />
+                    </div>
+                  ) : null}
                 </div>
                 <div className="form-group mb-3">
                   <label className="col-form-label">Category Description</label>
@@ -218,7 +256,7 @@ const AddCategory = (props) => {
                       value={validation.values.categoryDescription || ""}
                     ></textarea>
                     {validation.touched.categoryDescription &&
-                      validation.errors.categoryDescription ? (
+                    validation.errors.categoryDescription ? (
                       <FormFeedback type="invalid" className="d-block">
                         {validation.errors.categoryDescription}
                       </FormFeedback>
@@ -247,28 +285,21 @@ const AddCategory = (props) => {
               <Table>
                 <thead>
                   <tr>
-                    <th>
-                      Category Name
-                    </th>
-                    <th>
-                      Category Description
-                    </th>
+                    <th>Category Name</th>
+                    <th>Category Description</th>
                   </tr>
                 </thead>
               </Table>
               <div>
                 {allCategories.map((category, index) => (
-                  <div
-                    key={category._id}
-                    className="option"
-                  >
+                  <div key={category._id} className="option">
                     <Row className={index !== 0 ? "my-2" : null}>
                       <Col
                         xs="1"
                         onClick={() => handleCategoryClick(category._id)}
                       >
                         {category.children &&
-                          openCategories.includes(category._id) ? (
+                        openCategories.includes(category._id) ? (
                           <i className="mdi mdi-24px mdi-minus" />
                         ) : category.children ? (
                           <i className="mdi mdi-24px mdi-plus" />
@@ -278,8 +309,9 @@ const AddCategory = (props) => {
                         <label className="h6 mt-2">{` ${category.name}`}</label>
                       </Col>
                       <Col xs="6">
-                        <label className="h6  mt-2">{` ${category?.description || ""
-                          }`}</label>
+                        <label className="h6  mt-2">{` ${
+                          category?.description || ""
+                        }`}</label>
                       </Col>
                     </Row>
 
@@ -296,7 +328,7 @@ const AddCategory = (props) => {
                                   xs="1"
                                 >
                                   {child.children &&
-                                    openCategories.includes(child._id) ? (
+                                  openCategories.includes(child._id) ? (
                                     <i className="mdi mdi-24px mdi-minus" />
                                   ) : child.children ? (
                                     <i className="mdi mdi-24px mdi-plus" />
@@ -306,8 +338,9 @@ const AddCategory = (props) => {
                                   <label className="h6 mt-2 ">{` ${child.name}`}</label>
                                 </Col>
                                 <Col xs="6">
-                                  <label className="h6 mt-2">{` ${child?.description || ""
-                                    }`}</label>
+                                  <label className="h6 mt-2">{` ${
+                                    child?.description || ""
+                                  }`}</label>
                                 </Col>
                               </Row>
 
@@ -325,8 +358,9 @@ const AddCategory = (props) => {
                                             <label className="h5 mt-2">{` ${grandchild.name}`}</label>
                                           </Col>
                                           <Col xs="6">
-                                            <label className="h5 mt-2">{` ${grandchild?.description || ""
-                                              }`}</label>
+                                            <label className="h5 mt-2">{` ${
+                                              grandchild?.description || ""
+                                            }`}</label>
                                           </Col>
                                         </Row>
                                       </div>

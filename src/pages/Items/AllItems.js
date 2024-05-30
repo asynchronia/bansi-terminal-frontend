@@ -498,10 +498,11 @@ const onGridReady = useCallback((params) => {
                             position: "absolute",
                             background: "#f5f5f5",
                             minWidth: "300px",
-                            padding:'2px 0px'
+                            padding: "2px 0px",
                           }}
                         >
                           <MultipleLayerSelect
+                            levelTwo={true}
                             categories={allCategories}
                             setCategoryData={setCategoryData}
                           />

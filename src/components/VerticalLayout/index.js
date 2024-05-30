@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types'
-import React, { useEffect } from "react"
+import PropTypes from "prop-types";
+import React, { useEffect } from "react";
 
-import { connect } from "react-redux"
+import { connect } from "react-redux";
 import { Container } from "reactstrap";
-import withRouter from '../../components/Common/withRouter';
+import withRouter from "../../components/Common/withRouter";
 import {
   changeLayout,
   changeSidebarTheme,
@@ -12,22 +12,21 @@ import {
   changeLayoutWidth,
   changeColor,
   showRightSidebarAction,
-  changeMode
-} from "../../store/actions"
+  changeMode,
+} from "../../store/actions";
 
 import { useSelector, useDispatch } from "react-redux";
-import { createSelector } from 'reselect';
+import { createSelector } from "reselect";
 
 // Layout Related Components
-import Header from "./Header"
-import Sidebar from "./Sidebar"
+import Header from "./Header";
+import Sidebar from "./Sidebar";
 // import Footer from "./Footer"
 // import Rightbar from "../CommonForBoth/Rightbar"
 //Import Breadcrumb
-import Breadcrumb from "../../components/Common/Breadcrumb"
+import Breadcrumb from "../../components/Common/Breadcrumb";
 
 const Layout = (props) => {
-
   const dispatch = useDispatch();
   const selectLayoutState = (state) => state.Layout;
 
@@ -39,9 +38,10 @@ const Layout = (props) => {
       leftSideBarType: layout.leftSideBarType,
       topbarTheme: layout.topbarTheme,
       layoutColor: layout.layoutColor,
-      layoutMode:layout.layoutMode,
+      layoutMode: layout.layoutMode,
       isPreloader: layout.isPreloader,
-    }));
+    })
+  );
 
   const {
     leftSideBarTheme,
@@ -64,15 +64,15 @@ const Layout = (props) => {
         dispatch(showRightSidebarAction(false));
       }
     };
-  
+
     //init body click event fot toggle rightbar
     document.body.addEventListener("click", hideRightbar, true);
-  
+
     // Cleanup the event listener on component unmount
     return () => {
       document.body.removeEventListener("click", hideRightbar, true);
     };
-  }, [dispatch]); 
+  }, [dispatch]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -118,9 +118,6 @@ const Layout = (props) => {
     }
   }, [layoutColor, dispatch]);
 
-
-  
-
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   const toggleMenuCallback = () => {
@@ -131,25 +128,22 @@ const Layout = (props) => {
     }
   };
 
-
   return (
     <React.Fragment>
       {isPreloader && (
-
         <div id="preloader">
-        <div id="status">
-          <div className="spinner-chase">
-            <div className="chase-dot"></div>
-            <div className="chase-dot"></div>
-            <div className="chase-dot"></div>
-            <div className="chase-dot"></div>
-            <div className="chase-dot"></div>
-            <div className="chase-dot"></div>
+          <div id="status">
+            <div className="spinner-chase">
+              <div className="chase-dot"></div>
+              <div className="chase-dot"></div>
+              <div className="chase-dot"></div>
+              <div className="chase-dot"></div>
+              <div className="chase-dot"></div>
+              <div className="chase-dot"></div>
+            </div>
           </div>
         </div>
-      </div>
-        )}
-
+      )}
       <div id="layout-wrapper">
         <Header toggleMenuCallback={toggleMenuCallback} />
         <Sidebar
@@ -167,17 +161,16 @@ const Layout = (props) => {
             </Container>
           </div>
         </div>
-       {/*<Footer />*/}
+        {/*<Footer />*/}
       </div>
     </React.Fragment>
-  )
-}
-
+  );
+};
 
 Layout.propTypes = {
   changeLayoutWidth: PropTypes.func,
   changeColor: PropTypes.func,
-  changeMode:PropTypes.func,
+  changeMode: PropTypes.func,
   changeSidebarTheme: PropTypes.func,
   changeSidebarType: PropTypes.func,
   changeTopbarTheme: PropTypes.func,
@@ -188,14 +181,14 @@ Layout.propTypes = {
   leftSideBarType: PropTypes.any,
   location: PropTypes.object,
   showRightSidebar: PropTypes.any,
-  topbarTheme: PropTypes.any
-}
+  topbarTheme: PropTypes.any,
+};
 
-const mapStatetoProps = state => {
+const mapStatetoProps = (state) => {
   return {
     ...state.Layout,
-  }
-}
+  };
+};
 export default connect(mapStatetoProps, {
   changeLayout,
   changeColor,
@@ -204,4 +197,4 @@ export default connect(mapStatetoProps, {
   changeSidebarType,
   changeTopbarTheme,
   changeLayoutWidth,
-})(withRouter(Layout))
+})(withRouter(Layout));
