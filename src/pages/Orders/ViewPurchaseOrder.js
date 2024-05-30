@@ -3,19 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { Row, Col, Card, CardBody, Input } from "reactstrap"
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles//ag-grid.css';
-import 'ag-grid-community/styles//ag-theme-quartz.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { connect, useDispatch } from "react-redux";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import { getOrdersReq } from "../../service/orderService";
-import OrderStatusRenderer from "./OrderStatusRenderer";
-import CircleRenderer from "./CircleRenderer";
 import { changePreloader } from "../../store/actions";
+import { getPurchaseOrderListReq } from "../../service/purchaseService";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
+import OrderStatusRenderer from "./OrderStatusRenderer";
 
-const AllOrders = (props) => {
-  document.title = "All Orders";
+const ViewPurchaseOrder = (props) => {
+  document.title = "All Purchase Orders";
   let dispatch = useDispatch();
   let navigate = useNavigate();
   const effectCalled = useRef(false);
@@ -23,11 +22,7 @@ const AllOrders = (props) => {
   const autoSizeStrategy = {
     type: 'fitGridWidth'
   };
-  // enables pagination in the grid
   const pagination = true;
-
-  // sets 10 rows per page (default is 100)
-  // allows the user to select the page size from a predefined list of page sizes
   const paginationPageSizeSelector = [25, 50, 100];
 
   const [rowData, setRowData] = useState([]);
@@ -36,15 +31,23 @@ const AllOrders = (props) => {
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
 
+  // const redirectToViewPage = (id) => {
+  //   console.log(id.order_id);
+  //   let path = `/order/${id.order_id}`;
+  //   setTimeout(() => {
+  //     navigate(path, id.order_id);
+  //   }, 300);
+  // }
+
   const redirectToViewPage = (id) => {
-    let path = `/order/${id.salesorder_id}`;
+    let path = `/purchase-order-details/${id}`;
     setTimeout(() => {
-      navigate(path, id);
+      navigate(path,id);
     }, 300);
-  }
+  };
 
   const handleViewClick = (id) => {
-    redirectToViewPage(id);
+    redirectToViewPage(id.order_id);
   }
 
   useEffect(() => {
@@ -53,52 +56,46 @@ const AllOrders = (props) => {
       page: page,
       limit: paginationPageSize,
     }
-    if(searchValue) {
+    if (searchValue) {
       body.search_text = searchValue;
     }
     getListOfRowData(body);
   }, [page, paginationPageSize, searchValue]);
 
   const getListOfRowData = useCallback(async (body) => {
-    if (rowData[(page - 1) * paginationPageSize]) {
-      return;
-    }
     dispatch(changePreloader(true));
-    // const body = {
-    //   page: page,
-    //   limit: paginationPageSize,
-    // }
-
-    // if(searchValue) {
-    //   body.search_text = searchValue;
-    // }
-    console.log('searchValue', searchValue);
-    console.log('body', body);
-    const response = await getOrdersReq(body);
-
-    const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
-    let filledRows;
-
-    if (response.length < paginationPageSize) {
-      filledRows = [...response];
-    } else {
-      filledRows = [...response, ...emptyObjects];
+  
+    try {
+      const response = await getPurchaseOrderListReq(body);
+  
+      if (!response || !response.purchaseOrders || !Array.isArray(response.purchaseOrders)) {
+        console.error("Unexpected response format:", response);
+        return;
+      }
+  
+      const newData = response.purchaseOrders.map(order => ({
+        order_id: order._id,
+        client_name: order.clientId.name,
+        createdAt: formatDate(order.createdAt),
+        total: order.items.reduce((total, item) => total + (item.unitPrice * item.quantity), 0),
+        order_status: order.status,
+      }));
+  
+      setRowData(newData);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
     }
-
-    const newData = [...rowData];
-    newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
-    setRowData(newData);
-
-    dispatch(changePreloader(false));
-  }, [page, paginationPageSize, searchValue]);
+  }, [dispatch]);
 
   const redirectToEditPage = (id) => {
     let path = "/edit-item";
     setTimeout(() => {
       navigate(path, id);
     }, 300);
-
   }
+
   const handleDeleteResponse = (response) => {
     if (response.success === true) {
       notify("Success", response.message);
@@ -107,11 +104,12 @@ const AllOrders = (props) => {
     }
     getListOfRowData();
   }
+
   const handleEditClick = (id) => {
     redirectToEditPage(id);
   }
+
   const onPaginationChanged = useCallback((event) => {
-    // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
     setPaginationPageSize(pageSize);
 
@@ -129,9 +127,37 @@ const AllOrders = (props) => {
     setInputValue(event.target.value);
   }
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = getMonthName(date.getMonth());
+    const year = date.getFullYear();
+    const ordinalDay = getOrdinal(day);
+    
+    return `${ordinalDay} ${month} ${year}`;
+  }
+  
+  const getMonthName = (monthIndex) => {
+    const months = [
+      'January', 'February', 'March', 'April',
+      'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December'
+    ];
+    return months[monthIndex];
+  }
+  
+  const getOrdinal = (day) => {
+    if (day > 3 && day < 21) return `${day}th`;
+    switch (day % 10) {
+      case 1: return `${day}st`;
+      case 2: return `${day}nd`;
+      case 3: return `${day}rd`;
+      default: return `${day}th`;
+    }
+  }
+
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
-    console.log(event.target.value);
     setPage(1);
     setRowData([]);
   }
@@ -140,74 +166,42 @@ const AllOrders = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Sales Order", link: "#" },
+    { title: "Purchase Order", link: "#" },
   ];
 
-  const agRowData = [
-    {
-      salesorder_id: "2859757000291305672",
-      customer_name: "Lakshya Digital Private Limited",
-      date: "2024-03-18",
-      total: 3425.54,
-      order_status: "closed",
-      invoiced_status: "invoiced",
-      paid_status: "unpaid",
-      status: "invoiced",
-    }
-  ]
   const columnDefs = [
     {
-      headerName: "Order Date", field: "date",
-      headerCheckboxSelection: true, checkboxSelection: true, suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      width: 150, sortable: false
-    },
-    {
-      headerName: "Order No.", field: "salesorder_id", suppressMenu: true,
+      headerName: "Order No.", field: "order_id", suppressMenu: true,
+      headerCheckboxSelection: true, checkboxSelection: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      width: 200, sortable: false
+      sortable: false
     },
     {
-      headerName: "Client", field: "customer_name", suppressMenu: true,
+      headerName: "Order Date", field: "createdAt", suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
+      sortable: false
+    },
+    {
+      headerName: "Client", field: "client_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      width: 200, sortable: false
-    },
-    {
-      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      width: 120, sortable: false
+      sortable: false
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
-      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
-      width: 130, sortable: false
+      valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) + " /-",
+      sortable: false
     },
     {
-      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      headerName: "Order Status", field: "order_status", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Invoice",
-      width: 80, sortable: false
-    },
-    {
-      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer, suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Payment",
-      width: 100, sortable: false
-    },
-    {
-      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer, suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value,
-      headerTooltip: "Shipment",
-      width: 100, sortable: false
-
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",cellRenderer: OrderStatusRenderer,
+      sortable: false
     },
     {
       headerName: "Action", field: "action", sortable: false,
@@ -219,9 +213,9 @@ const AllOrders = (props) => {
         handleViewClick: handleViewClick,
       }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
-      width: 90
     }
-  ]
+  ];
+
   const notify = (type, message) => {
     if (type === "Error") {
       toast.error(message, {
@@ -280,7 +274,6 @@ const AllOrders = (props) => {
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
                     rowSelection="multiple"
-                    reactiveCustomComponents
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
                     onPaginationChanged={onPaginationChanged}>
@@ -295,4 +288,4 @@ const AllOrders = (props) => {
   )
 }
 
-export default connect(null, { setBreadcrumbItems })(AllOrders);
+export default connect(null, { setBreadcrumbItems })(ViewPurchaseOrder);

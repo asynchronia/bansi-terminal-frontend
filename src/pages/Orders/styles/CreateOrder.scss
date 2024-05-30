@@ -1,0 +1,47 @@
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.image-container {
+  flex: 0 0 auto;
+}
+
+.details {
+  flex: 1;
+  margin-left: 20px;
+}
+
+
+
+.purchase-order  {
+  font-size: 24px;
+}
+
+.purchase-order-no  {
+  float:right;
+  font-size: 18px;
+}
+
+.vertical-line {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 100%;
+  background-color: #ccc;
+  border-right: 1px solid #ccc;
+}
+
+.equal-height-cards {
+  display: flex;
+}
+
+.equal-height-cards .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+

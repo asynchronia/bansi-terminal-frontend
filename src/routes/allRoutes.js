@@ -1,5 +1,5 @@
-import React from "react"
-import { Navigate } from "react-router-dom"
+import React from "react";
+import { Navigate } from "react-router-dom";
 
 // // Profile
 // import UserProfile from "../pages/Authentication/user-profile"
@@ -25,13 +25,13 @@ import { Navigate } from "react-router-dom"
 // import LockScreen from "../pages/AuthenticationInner/auth-lock-screen"
 
 // // Dashboard
-import Dashboard from "../pages/Dashboard/index"
+import Dashboard from "../pages/Dashboard/index";
 
 //Items
-import CreateItems from "../pages/Items/CreateItems"
-import AllItems from "../pages/Items/AllItems"
-import AddCategory from "../pages/Categories/AddCategory"
-import CreateClient from "../pages/Client/CreateClient"
+import CreateItems from "../pages/Items/CreateItems";
+import AllItems from "../pages/Items/AllItems";
+import AddCategory from "../pages/Categories/AddCategory";
+import CreateClient from "../pages/Client/CreateClient";
 import EditItems from "../pages/Items/EditItems";
 import AllClients from "../pages/Clients/AllClients";
 import Quotations from "../pages/Orders/Quotations";
@@ -40,17 +40,19 @@ import Createorder from "../pages/Orders/Createorder";
 import ViewClient from "../pages/Client/ViewClient";
 import AllInvoices from "../pages/Invoices/AllInvoices";
 import AllPayments from "../pages/Invoices/AllPayments";
-import ViewItems from "../pages/Items/ViewItems"
-import PaymentDetails from "../pages/Invoices/PaymentDetails"
+import ViewItems from "../pages/Items/ViewItems";
+import PaymentDetails from "../pages/Invoices/PaymentDetails";
 import Login from "../pages/Authentication/Login";
 import ViewInvoice from "../pages/Invoices/ViewInvoice";
 import OrderDetails from "../pages/Orders/OrderDetails";
-import Users from "../pages/Users/Users"
-import OrderEstimates from "../pages/Orders/OrderEstimates"
-import Expenses from "../pages/Expenses/Expenses"
-import ViewEstimate from "../pages/Orders/ViewEstimate"
-import AgreementItemsListing from "../pages/Items/AgreementItemsListing"
-import AgreementItemView from "../pages/Items/AgreementItemView"
+import Users from "../pages/Users/Users";
+import OrderEstimates from "../pages/Orders/OrderEstimates";
+import Expenses from "../pages/Expenses/Expenses";
+import ViewEstimate from "../pages/Orders/ViewEstimate";
+import AgreementItemsListing from "../pages/Items/AgreementItemsListing";
+import AgreementItemView from "../pages/Items/AgreementItemView";
+import ViewPurchaseOrder from "../pages/Orders/ViewPurchaseOrder";
+import PurchaseOrderDetails from "../pages/Orders/PurchaseOrderDetails";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -118,31 +120,33 @@ import AgreementItemView from "../pages/Items/AgreementItemView"
 // import Chat from "pages/Chat/Chat";
 // import Kanban from "pages/Kanban"
 
-
 const userRoutes = [
   { path: "/create-item", component: <CreateItems /> },
   { path: "/edit-item/:id", component: <EditItems /> },
   { path: "/client/add", component: <CreateClient /> },
   { path: "/items", component: <AllItems /> },
-  { path: "/view-item/:id", component: <ViewItems />},
+  { path: "/view-item/:id", component: <ViewItems /> },
   { path: "/clients", component: <AllClients /> },
   { path: "/categories", component: <AddCategory /> },
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/quotations", component: <Quotations /> },
   { path: "/orders", component: <Allorders /> },
+  { path: "/purchase-orders", component: <ViewPurchaseOrder /> },
+  { path: "/ongoing-orders", component: <Allorders /> },
   { path: "/create-order", component: <Createorder /> },
-  { path: "/client/:id", component: <ViewClient />},
-  { path: "/invoices", component: <AllInvoices />},
-  { path: "/payments", component: <AllPayments />},
-  { path: "/payment/:id", component: <PaymentDetails/>},
-  { path: "/view-invoice/:id", component: <ViewInvoice />},
-  { path: "/order/:id", component: <OrderDetails/>},
-  { path: "/users", component: <Users/>},
-  { path: "/estimates", component: <OrderEstimates/>},
-  { path: "/expenses", component: <Expenses/>},
-  { path: "/view-estimate/:id", component: <ViewEstimate />},
+  { path: "/client/:id", component: <ViewClient /> },
+  { path: "/invoices", component: <AllInvoices /> },
+  { path: "/payments", component: <AllPayments /> },
+  { path: "/payment/:id", component: <PaymentDetails /> },
+  { path: "/view-invoice/:id", component: <ViewInvoice /> },
+  { path: "/order/:id", component: <OrderDetails /> },
+  { path: "/users", component: <Users /> },
+  { path: "/estimates", component: <OrderEstimates /> },
+  { path: "/expenses", component: <Expenses /> },
+  { path: "/view-estimate/:id", component: <ViewEstimate /> },
   { path: "/agreement-items", component: <AgreementItemsListing /> },
-  { path: "/view-agreement-item/:id", component: <AgreementItemView />},
+  { path: "/view-agreement-item/:id", component: <AgreementItemView /> },
+  { path: "/purchase-order-details/:id", component: <PurchaseOrderDetails /> },
   // // this route should be at the end of all other routes
   {
     path: "/",
@@ -177,7 +181,7 @@ const userRoutes = [
   // { path: "/icons-fontawesome", component: <IconFontawesome /> },
   // { path: "/icons-themify", component: <IconThemify /> },
   // { path: "/icons-dripicons", component: <IconDripicons /> },
-  // { path: "/icons-typicons", component: <IconTypicons /> }, 
+  // { path: "/icons-typicons", component: <IconTypicons /> },
 
   // // // Tables
   // { path: "/tables-basic", component: <BasicTables /> },
@@ -225,8 +229,7 @@ const userRoutes = [
   // { path: "/pages-invoice", component: <PagesInvoice /> },
   // { path: "/pages-directory", component: <PagesDirectory /> },
   // { path: "/pages-blank", component: <PagesBlank /> },
-
-]
+];
 
 const authRoutes = [
   // { path: "/logout", component: <Logout /> },
@@ -242,6 +245,6 @@ const authRoutes = [
   // { path: "/pages-register", component: <Register1 /> },
   // { path: "/page-recoverpw", component: <Recoverpw /> },
   // { path: "/auth-lock-screen", component: <LockScreen /> },
-]
+];
 
-export { userRoutes, authRoutes }
+export { userRoutes, authRoutes };
