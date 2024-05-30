@@ -15,6 +15,7 @@ import StyledButton from "../../components/Common/StyledButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import {createPurchaseOrderReq} from "../../service/purchaseService"
 
 const CreateOrder = (props) => {
   document.title = "Create Purchase Order";
@@ -23,7 +24,9 @@ const CreateOrder = (props) => {
   const [branchList, setBranchList] = useState([]);
   const effectCalled = useRef(false);
   const [billingAddress, setBillingAddress] = useState("");
+  const [billingId, setBillingId] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
+  const [shippingId, setShippingId] = useState("");
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
   const [loadedData, setLoadedData] = useState(false);
@@ -36,12 +39,14 @@ const CreateOrder = (props) => {
   const [gstTotal, setGstTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const [orderDate, setOrderDate] = useState("");
+  const [poNumber, setPoNumber] = useState("");
   const [date, setDate] = useState("");
-  const [error, setError] = useState("");
   const [shippingAddressError, setShippingAddressError] = useState("");
   const [billingAddressError, setBillingAddressError] = useState("");
   const [validDate, setValidDate] = useState();
+  const [deliveryDateError, setDeliveryDateError] = useState("");
+  const [poNumberError, setPoNumberError] = useState("");
+  const [agreementId, setAgreementId] = useState(0);
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -90,6 +95,8 @@ const CreateOrder = (props) => {
       (branch) => branch._id === selectedId
     );
     setBillingAddress(selectedBranch?.address || "");
+    setBillingId(selectedId);
+    validation.setFieldValue("billingAddress",billingAddress);
   };
 
   const handleShippingChange = (event) => {
@@ -98,56 +105,37 @@ const CreateOrder = (props) => {
       (branch) => branch._id === selectedId
     );
     setShippingAddress(selectedBranch?.address || "");
+    setShippingId(selectedId);
+    validation.setFieldValue("shippingAddress",shippingAddress);
   };
 
   const validation = useFormik({
     enableReinitialize: true,
-
     initialValues: {
       billingAddress: "",
       shippingAddress: "",
       poNumber: "",
-      orderDate: "",
+      deliveryDate: "",
       selectedItems: [],
-      selectedQuantities: {},
-      // Any other fields you need
     },
     validationSchema: Yup.object({
       billingAddress: Yup.string().required("Please Select Billing Address"),
       shippingAddress: Yup.string().required("Please Select Shipping Address"),
       poNumber: Yup.string().required("Please Enter PO Number"),
-      orderDate: Yup.string().required("Please Enter Order Date"),
-      selectedItems: Yup.array().of(
-        Yup.object().shape({
-          id: Yup.string().required(),
-          title: Yup.string().required(),
-          hsnCode: Yup.string().required(),
-          category: Yup.string().required(),
-          price: Yup.number().required().positive(),
-          qty: Yup.number().required().positive().integer(),
-          gst: Yup.string().required(),
-          variant: Yup.object().shape({
-            _id: Yup.string().required(),
-            itemId: Yup.string().required(),
-            sku: Yup.string().required(),
-            inventory: Yup.number().required().integer(),
-            price: Yup.number().required().positive(),
-            agreementVariant: Yup.string().required(),
-          }),
-        })
-      ),
-      selectedQuantities: Yup.object().shape({
-        // to be added
-      }),
+      deliveryDate: Yup.string().required("Please Enter Delivery Date"),
+      selectedItems: Yup.array().min(1, "Please select at least one item"),
     }),
     onSubmit: (values) => {
-      console.log("Submit");
+      console.log("validation.errors");
+      redirectToPurchaseDetails();
     },
   });
-
+  
+  
   const getListOfRowData = async () => {
     try {
       const response = await getAgreementItemsReq(bodyObject);
+      setAgreementId(response[0]?.agreementId);
       if (response) {
         setRowData(response);
       } else {
@@ -303,58 +291,82 @@ const CreateOrder = (props) => {
 
   const onCreatePurchaseOrderClick = (e) => {
     e.preventDefault();
+    validation.handleSubmit();
+    
+    const validationErrors = validation.errors;
+    
+    // Clearing individual error states if corresponding fields are valid
+    // if (!validationErrors.billingAddress) {
+    //   setBillingAddressError("");
+    // }
+    // if (!validationErrors.shippingAddress) {
+    //   setShippingAddressError("");
+    // }
+    // if (!validationErrors.poNumber) {
+    //   setPoNumberError("");
+    // }
+    // if (!validationErrors.deliveryDate) {
+    //   setDeliveryDateError("");
+    // }
+  
+    // if (Object.keys(validationErrors).length > 0) {
+    //   // Handling validation errors
+    //   if (validationErrors.billingAddress) {
+    //     setBillingAddressError(validationErrors.billingAddress);
+    //   }
+  
+    //   if (validationErrors.shippingAddress) {
+    //     setShippingAddressError(validationErrors.shippingAddress);
+    //   }
+  
+    //   if (validationErrors.poNumber) {
+    //     setPoNumberError(validationErrors.poNumber);
+    //   }
+  
+    //   if (validationErrors.deliveryDate) {
+    //     setDeliveryDateError(validationErrors.deliveryDate);
+    //   }
+  
+    //   return;
+    // }
+    // If all validations pass, proceed with further logic
     if (selectedItems.length > 0) {
+      // validation.handleSubmit();
+      // to be filled with api creation logic
+
+      createPurchaseOrderReq(values);
+
+
       redirectToPurchaseDetails();
     } else {
-      alert("Please select an atleast 1 item!");
+      alert("Please select at least 1 item!");
     }
-    // validation.handleSubmit();
-
-    // const formData = {
-    //   shippingAddress: shippingAddress,
-    //   billingAddress: billingAddress,
-    //   // Add other form fields here if needed
-    // };
-
-    // const validationErrors = validation.validationSchema.validate(
-    //   { billingAddress, shippingAddress },
-    //   { abortEarly: false }
-    // );
-    // console.log(validationErrors);
-
-    // if (validationErrors) {
-    //   // Check if shippingAddress has an error
-    //   if (validationErrors.shippingAddress) {
-    //     setShippingAddressError("Please select shipping address.");
-    //   } else {
-    //     setShippingAddressError("");
-    //   }
-
-    //   if (validationErrors.billingAddress) {
-    //     setBillingAddressError("Please select shipping address.");
-    //   } else {
-    //     setBillingAddressError("");
-    //   }
-    // }
-
+    
     return false;
   };
+  
 
   const handleClickPO = () => {
-    if (!orderDate.startsWith("PO ")) {
-      setOrderDate("PO ");
+    if (!poNumber.startsWith("PO ")) {
+      setPoNumber("PO ");
     }
   };
 
   const handleChangePO = (e) => {
-    const value = e.target.value;
-
-    if (!value.startsWith("PO")) {
-      setOrderDate("PO" + value.replace(/^PO/, ""));
+    let value = e.target.value;
+  
+    if (value === "PO ") {
+      setPoNumber(value);
+    } else if (value.length <= 2 && !value.startsWith("PO")) {
+      setPoNumber("PO ");
+    } else if (!value.startsWith("PO")) {
+      setPoNumber("PO " + value);
     } else {
-      setOrderDate(value);
+      setPoNumber(value);
     }
+    validation.setFieldValue("poNumber",poNumber);
   };
+  
 
   const handleChangeDate = (e) => {
     let input = e.target.value.replace(/\D/g, "");
@@ -379,7 +391,7 @@ const CreateOrder = (props) => {
     }
 
     setDate(input);
-
+    validation.setFieldValue("deliveryDate",date);
     // if (input.length === 10) {
     //   const [day, month, year] = input.split("-").map(Number);
 
@@ -512,7 +524,7 @@ const CreateOrder = (props) => {
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">PO #BLR/S0/11742</span>
+              <span className="purchase-order-no">{poNumber}</span>
             </div>
           </div>
         </CardBody>
@@ -535,6 +547,8 @@ const CreateOrder = (props) => {
                           id="billingAddress"
                           className="form-select focus-width"
                           onChange={handleBillingChange}
+                          onBlur={validation.handleBlur}
+                          value={billingAddress}
                         >
                           <option>Select Billing Address</option>
                           {branchList.map((branch) => (
@@ -543,11 +557,9 @@ const CreateOrder = (props) => {
                             </option>
                           ))}
                         </select>
-                        {/* {billingAddressError && (
-                          <span style={{ color: "red" }}>
-                            {billingAddressError}
-                          </span>
-                        )} */}
+                        {billingAddressError && (
+                          <span style={{ color: "red" }}>{billingAddressError}</span>
+                        )}
                         <div className="mt-2">
                           <p />
                           {billingAddress}
@@ -565,6 +577,8 @@ const CreateOrder = (props) => {
                           id="shippingAddress"
                           className="form-select focus-width"
                           onChange={handleShippingChange}
+                          onBlur={validation.handleBlur}
+                          value={shippingAddress}
                         >
                           <option>Select Shipping Address</option>
                           {branchList.map((branch) => (
@@ -573,11 +587,9 @@ const CreateOrder = (props) => {
                             </option>
                           ))}
                         </select>
-                        {/* {shippingAddressError && (
-                          <span style={{ color: "red" }}>
-                            {shippingAddressError}
-                          </span>
-                        )} */}
+                        {shippingAddressError && (
+                          <span style={{ color: "red" }}>{shippingAddressError}</span>
+                        )}
                         <div className="mt-2">
                           <p />
                           {shippingAddress}
@@ -595,29 +607,37 @@ const CreateOrder = (props) => {
                     <div>
                       <h4 className="card-title">Order Info</h4>
                       <hr />
-                      <Label for="orderDate">Po Number</Label>
+                      <Label for="Po Number">Po Number</Label>
                       <Input
                         type="text"
-                        name="orderDate"
-                        id="orderDate"
-                        value={orderDate}
+                        name="poNumber"
+                        id="poNumber"
+                        value={poNumber}
                         placeholder="PO BLR/#123"
                         onClick={handleClickPO}
                         onChange={handleChangePO}
+                        onBlur={validation.handleBlur}
                       />
+                      {poNumberError && (
+                        <span style={{ color: "red" }}>{poNumberError}</span>
+                      )}
                     </div>
                   </Row>
                   <Row>
                     <div className="mt-3 mb-0">
-                      <Label for="orderDate">Expected Delivery Date</Label>
+                      <Label for="deliveryDate">Expected Delivery Date</Label>
                       <Input
                         type="text"
-                        name="orderDate"
-                        id="orderDate"
+                        name="deliveryDate"
+                        id="deliveryDate"
                         placeholder="dd-mm-yyyy"
                         value={date}
                         onChange={handleChangeDate}
+                        onBlur={validation.handleBlur}
                       />
+                      {deliveryDateError && (
+                          <span style={{ color: "red" }}>{deliveryDateError}</span>
+                        )}
                       {date.length === 10 && !validDate ? (
                         <p className="text-danger">Invalid Date!</p>
                       ) : null}
@@ -648,7 +668,7 @@ const CreateOrder = (props) => {
                           onChange={handleSearchQuery}
                         />
                       </Col>
-                    </Row>
+                    </Row >
 
                     {showRowData && (
                       <div
@@ -657,7 +677,7 @@ const CreateOrder = (props) => {
                           textAlign: "center",
                           position: "absolute",
                           zIndex: 4,
-                          width: "auto",
+                          width: "750px",
                           overflowY: "auto",
                         }}
                       >
@@ -674,11 +694,6 @@ const CreateOrder = (props) => {
                               <th>GST</th>
                             </thead>
                           </Table>
-                          {/* <Col>Item Name</Col>
-                          <Col>HSN Code</Col>
-                          <Col>Category</Col>
-                          <Col>Cost</Col>
-                          <Col>GST</Col> */}
                         </Row>
                         <hr />
                         {renderRowData()}
@@ -688,13 +703,13 @@ const CreateOrder = (props) => {
                   <Row
                     className="mt-1"
                     style={{
-                      width: "750px",
+                      width: "auto",
                       fontWeight: "bold",
                     }}
                   >
                     <Table hover>
-                      <tr>
                         <thead>
+                      <tr>
                           <th>Item Name</th>
                           <th>HSN Code</th>
                           <th>Category</th>
@@ -703,23 +718,9 @@ const CreateOrder = (props) => {
                           <th>Total</th>
                           <th>GST</th>
                           <th></th>
-                        </thead>
                       </tr>
-                      <tr
-                        style={{
-                          textAlign: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        <thead
-                          style={{
-                            textAlign: "center",
-                            justifyContent: "center",
-                          }}
-                        >
+                        </thead>
                           {renderSelectedItems()}
-                        </thead>
-                      </tr>
                     </Table>
                   </Row>
                 </CardBody>

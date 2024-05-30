@@ -1,17 +1,40 @@
-import React, { useState } from "react";
-import { Row, Col, Card, CardBody, Input, Label, Table } from "reactstrap";
+import React, { useState,useEffect,useRef } from "react";
+import { Row, Col, Card, CardBody } from "reactstrap";
 import { ToastContainer } from "react-toastify";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import StyledButton from "../../components/Common/StyledButton";
 import { ReactComponent as CorrectSign } from "../../assets/images/svg/correct-sign.svg";
 import { ReactComponent as EditSign } from "../../assets/images/svg/edit-button.svg";
+import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
+import { connect } from "react-redux";
 
-const PurchaseOrderDetails = () => {
+
+const PurchaseOrderDetails = (props) => {
   const [subTotal, setSubTotal] = useState(0);
   const [gstTotal, setGstTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [selectedItems, setSelectedItems] = useState([]);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  
+  const breadcrumbItems = [
+    { title: "Dashboard", link: "/dashboard" },
+    { title: "Purchase Order", link: "#" },
+    { title: "Purchase Order" + {}, link: "#" },
+  ];
+  
+  const effectCalled = useRef(false);
+
+  const getPurchaseOrderDetails=()=>{
+    //to be filled
+  }
+
+  useEffect(() => {
+    props.setBreadcrumbItems("Order "+{}, breadcrumbItems);
+    if (!effectCalled.current) {
+      getPurchaseOrderDetails();
+      effectCalled.current = true;
+    }
+  }, []);
 
   const Items = {
     Item1: {
@@ -314,4 +337,4 @@ const PurchaseOrderDetails = () => {
   );
 };
 
-export default PurchaseOrderDetails;
+export default connect(null, { setBreadcrumbItems })(PurchaseOrderDetails);

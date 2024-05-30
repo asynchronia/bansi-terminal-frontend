@@ -44,7 +44,8 @@ const API_URL = {
   getClientUsers: "/api/users/get/client-users",
   getUserById: "/api/users/get/user",
   updateUserStatus:'/api/users/status',
-  updateItemStatus:'/api/items/update-status'
+  updateItemStatus:'/api/items/update-status',
+  createPurchaseOrder:'/api/purchaseorders/create',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -270,6 +271,17 @@ export async function getPurchaseOrderList() {
       .get(`${baseUrl}${API_URL.getPurchaseOrderList}`, {
         headers: getHeaders(),
       })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function createPurchaseOrder(body) {
+  return new Promise((resolve) => {
+    axios
+      .post(`${baseUrl}${API_URL.createPurchaseOrder}`, body, { headers: getHeaders() })
       .then((res) => {
         resolve(res.data);
         return res.data;
