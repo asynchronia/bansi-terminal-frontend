@@ -7,6 +7,7 @@ import { ReactComponent as CorrectSign } from "../../assets/images/svg/correct-s
 import { ReactComponent as EditSign } from "../../assets/images/svg/edit-button.svg";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { connect } from "react-redux";
+import { getPurchaseOrderDetailsReq } from "../../service/purchaseService";
 
 
 const PurchaseOrderDetails = (props) => {
@@ -22,10 +23,15 @@ const PurchaseOrderDetails = (props) => {
     { title: "Purchase Order" + {}, link: "#" },
   ];
   
+  const data = {
+    id : "66452914796a60ed23ca91df",
+  }
+
   const effectCalled = useRef(false);
 
-  const getPurchaseOrderDetails=()=>{
-    //to be filled
+  const getPurchaseOrderDetails=async ()=>{
+    const response = await getPurchaseOrderDetailsReq(data.id);
+    console.log(response);
   }
 
   useEffect(() => {
