@@ -91,7 +91,7 @@ export const formatNumberWithCommasAndDecimal = (number) => {
     return ''; 
   }
   const formattedNumber = number.toLocaleString('en-IN');
-  return "₹" + formattedNumber;
+  return "₹ " + formattedNumber;
 };
 
 

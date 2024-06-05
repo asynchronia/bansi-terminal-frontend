@@ -4,18 +4,32 @@ import Chip from '@mui/material/Chip';
 const OrderStatusRenderer = ({ value }) => {
   let color = '';
   let label = '';
+  let classname = '';
   switch (value) {
     case 'draft':
-      color = "primary";
+      color = "info";
       label = "Draft";
+      classname = "mr-2";
       break;
-    case "closed":
-      color = "error";
-      label = "Closed";
-      break;
-    case "open":
+    case 'published' || "Published":
       color = "success";
-      label = "Open";
+      label = "Published";
+      break;
+    case 'approved':
+      color = "success";
+      label = "Approved";
+      break;
+    case "sent":
+      color = "error";
+      label = "Sent";
+      break;
+    case "accepted":
+      color = "primary";
+      label = "Accepted";
+      break;
+    case "rejected":
+      color = "warning";
+      label = "Rejected";
       break;
     default:
       return "";
@@ -23,7 +37,7 @@ const OrderStatusRenderer = ({ value }) => {
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <Chip color={color} label={label} variant="outlined" />
+      <Chip color={color} className={classname} label={label} variant="outlined" />
     </div>
   );
 }
