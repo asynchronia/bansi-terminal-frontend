@@ -276,11 +276,10 @@ const CreateOrder = (props) => {
         selectedQuantities[`${item.id}-${item.variant._id}`] || 1;
       const itemTotal = item.variant.price * quantity;
       subTotal += itemTotal;
-
+      console.log('item', item)
       // Check if item.taxes is defined and not empty
       if (item.gst) {
-        // Extract the GST rate from the gst string (e.g., "gst 18%")
-        const gstRate = parseFloat(item.gst.split(" ")[1]); // Extracts "18" from "gst 18%"
+        const gstRate = item.taxes[0].rate
         gstTotal += (itemTotal * gstRate) / 100;
       }
     });

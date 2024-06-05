@@ -10,6 +10,9 @@ import { getPurchaseOrderDetailsReq, purchaseOrderStatusChangeReq } from "../../
 import { useParams } from "react-router-dom";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 import ApproveConfirm from "../../components/CustomComponents/ApproveConfirm";
+import OrderStatusRenderer from "./OrderStatusRenderer";
+import RequireUserType from "../../routes/middleware/requireUserType";
+import { USER_TYPES_ENUM } from "../../utility/constants";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -20,6 +23,7 @@ const PurchaseOrderDetails = (props) => {
   const [publishModal, setPublishModal] = useState(false);
   const [approveModal, setApproveModal] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("published");
 
 
   const breadcrumbItems = [
@@ -28,14 +32,13 @@ const PurchaseOrderDetails = (props) => {
     { title: "Purchase Order", link: "#" },
   ];
 
-  const body = {
-    "purchaseOrderId": id,
-    "status": "published"
-  };
-
   const effectCalled = useRef(false);
 
-  async function handlePurchaseOrderStatusChange() {
+  async function handlePurchaseOrderStatusChange(status) {
+    const body = {
+      "purchaseOrderId": id,
+      "status": status
+    };
     setIsButtonLoading(true);
     try {
       const response = await purchaseOrderStatusChangeReq(body);
@@ -48,12 +51,22 @@ const PurchaseOrderDetails = (props) => {
       }
     } finally {
       setIsButtonLoading(false);
+      setStatus(status);
     }
   }
-  
 
   const submitPurchaseOrder = () => {
     setApproveModal(true);
+    //setSelectedStatus('sent');
+  }
+
+  const acceptPurchaseOrder = () => {
+    //setSelectedStatus('accepted')
+    handlePurchaseOrderStatusChange('accepted');
+    setStatus('accepted');
+    //setSelectedStatus('accepted');
+    //TODO: The handlePurchaseOrderStatusChange(); is taking the old value of selectedStatus
+    //TODO: ADD BUTTON LOADER, IN THE BACKEND ADD ZOHO SYNC API CALL
   }
 
   const handleStatusChange = (event) => {
@@ -71,12 +84,12 @@ const PurchaseOrderDetails = (props) => {
     setItemsData(purchaseOrder?.items);
     setOrderInfo(purchaseOrder);
     setStatus(purchaseOrder?.status);
-    if(purchaseOrder?.status === 'published'){
-        setIsDisabled(true);
-      }
-      else{
-        setIsDisabled(false);
-      }
+    if (purchaseOrder?.status !== 'draft') {
+      setIsDisabled(true);
+    }
+    else {
+      setIsDisabled(false);
+    }
 
 
     let subTotal = 0;
@@ -126,29 +139,50 @@ const PurchaseOrderDetails = (props) => {
             <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
           </Modal>
           <Modal size="m" isOpen={approveModal}>
-            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange}/>
+            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} />
           </Modal>
-          <select
-            className="form-select focus-width"
-            name="status"
-            disabled={isDisabled}
-            value={status} // Bind status state to select element
-            onChange={handleStatusChange} // Update status on change
-          >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
-          {status === 'published' && (
-            <StyledButton
-              color={"success"}
-              className={"w-md mx-2"}
-              isLoading={isButtonLoading}
-              onClick={submitPurchaseOrder}
+          {
+            status === 'draft' ? (<select
+              className="form-select focus-width"
+              name="status"
+              disabled={isDisabled}
+              value={status} // Bind status state to select element
+              onChange={handleStatusChange} // Update status on change
             >
-              <CorrectSign className="me-1" />
-              Approve
-            </StyledButton>
-          )}
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>)
+              : OrderStatusRenderer({ value: status })
+            // : (<Typography variant="body1" component="span">
+            //   <strong>Status:</strong> {status}
+            // </Typography>)
+          }
+          <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+            {status === 'published' && (
+              <StyledButton
+                color={"success"}
+                className={"w-md mx-2"}
+                isLoading={isButtonLoading}
+                onClick={submitPurchaseOrder}
+              >
+                <CorrectSign className="me-1" />
+                Approve
+              </StyledButton>
+            )}
+          </RequireUserType>
+          <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+            {status === 'sent' && (
+              <StyledButton
+                color={"success"}
+                className={"w-md mx-2"}
+                isLoading={isButtonLoading}
+                onClick={acceptPurchaseOrder}
+              >
+                <CorrectSign className="me-1" />
+                Accept
+              </StyledButton>
+            )}
+          </RequireUserType>
         </div>
       </div>
       <Card>
@@ -179,7 +213,7 @@ const PurchaseOrderDetails = (props) => {
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">{}</span>
+              <span className="purchase-order-no">{ }</span>
             </div>
           </div>
         </CardBody>

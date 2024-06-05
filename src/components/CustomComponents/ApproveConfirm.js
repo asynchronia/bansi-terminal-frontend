@@ -10,7 +10,7 @@ const ApproveConfirm = ({ setApproveModal,handlePurchaseOrderStatusChange }) => 
           <button
             onClick={() => {
               setApproveModal(false);
-              handlePurchaseOrderStatusChange();
+              handlePurchaseOrderStatusChange('sent');
 
             }}
             className="btn btn-secondary mx-3 mt-3 w-lg"
