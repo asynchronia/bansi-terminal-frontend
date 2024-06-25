@@ -160,6 +160,7 @@ const CreateOrder = (props) => {
     const taxName = item.taxes.map((tax) => tax.name).join(", ");
     const newItem = {
       id: item._id,
+      zohoItemId: item.zohoItemId,
       title: item.title,
       name: item.title,
       description: item.description,
@@ -365,6 +366,7 @@ const CreateOrder = (props) => {
         shippingBranchId: shippingId,
         items: selectedItems.map((item) => ({
             itemId: item.id,
+            zohoItemId: item.zohoItemId,
             variantId: item.variant._id,
             unitPrice: item.price,
             quantity: selectedQuantities[`${item.id}-${item.variant._id}`],
