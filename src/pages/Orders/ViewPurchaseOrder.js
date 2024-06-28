@@ -1,16 +1,16 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import { Row, Col, Card, CardBody, Input } from "reactstrap"
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
+import { AgGridReact } from 'ag-grid-react';
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
-import DropdownMenuBtn from "./DropdownMenuBtn";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import { Card, CardBody, Col, Input, Row } from "reactstrap";
+import { getPurchaseOrderListReq } from "../../service/purchaseService";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { changePreloader } from "../../store/actions";
-import { getPurchaseOrderListReq } from "../../service/purchaseService";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
+import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 
 const ViewPurchaseOrder = (props) => {
@@ -42,7 +42,7 @@ const ViewPurchaseOrder = (props) => {
   const redirectToViewPage = (id) => {
     let path = `/purchase-order-details/${id}`;
     setTimeout(() => {
-      navigate(path,id);
+      navigate(path, id);
     }, 300);
   };
 
@@ -64,15 +64,15 @@ const ViewPurchaseOrder = (props) => {
 
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-  
+
     try {
       const response = await getPurchaseOrderListReq(body);
-  
+
       if (!response || !response.purchaseOrders || !Array.isArray(response.purchaseOrders)) {
         console.error("Unexpected response format:", response);
         return;
       }
-  
+
       const newData = response.purchaseOrders.map(order => ({
         order_id: order._id,
         client_name: order.clientId.name,
@@ -80,7 +80,7 @@ const ViewPurchaseOrder = (props) => {
         total: order.items.reduce((total, item) => total + (item.unitPrice * item.quantity), 0),
         order_status: order.status,
       }));
-  
+
       setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
@@ -133,10 +133,10 @@ const ViewPurchaseOrder = (props) => {
     const month = getMonthName(date.getMonth());
     const year = date.getFullYear();
     const ordinalDay = getOrdinal(day);
-    
+
     return `${ordinalDay} ${month} ${year}`;
   }
-  
+
   const getMonthName = (monthIndex) => {
     const months = [
       'January', 'February', 'March', 'April',
@@ -145,7 +145,7 @@ const ViewPurchaseOrder = (props) => {
     ];
     return months[monthIndex];
   }
-  
+
   const getOrdinal = (day) => {
     if (day > 3 && day < 21) return `${day}th`;
     switch (day % 10) {
@@ -175,33 +175,33 @@ const ViewPurchaseOrder = (props) => {
       headerCheckboxSelection: true, checkboxSelection: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: false
+      sortable: true
     },
     {
       headerName: "Order Date", field: "createdAt", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: false
+      sortable: true
     },
     {
       headerName: "Client", field: "client_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: false
+      sortable: true
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) + " /-",
-      sortable: false
+      sortable: true
     },
     {
       headerName: "Order Status", field: "order_status", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",cellRenderer: OrderStatusRenderer,
-      sortable: false
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status", cellRenderer: OrderStatusRenderer,
+      sortable: true
     },
     {
       headerName: "Action", field: "action", sortable: false,
@@ -246,13 +246,8 @@ const ViewPurchaseOrder = (props) => {
                           type="text"
                           value={inputValue}
                           onChange={handleInputChange}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleSearch(event);
-                            }
-                          }}
                           className="form-control rounded border"
-                          placeholder="Search by sales order number or customer name..."
+                          placeholder="Search"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
@@ -270,13 +265,15 @@ const ViewPurchaseOrder = (props) => {
                     ref={gridRef}
                     suppressRowClickSelection={true}
                     columnDefs={columnDefs}
-                    pagination={pagination}
-                    paginationPageSize={paginationPageSize}
-                    paginationPageSizeSelector={paginationPageSizeSelector}
+                    pagination={true}
+                    paginationPageSize={10}
+                    paginationPageSizeSelector={[10, 25, 50]}
                     rowSelection="multiple"
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}>
+                    quickFilterText={inputValue}
+                  // onPaginationChanged={onPaginationChanged}
+                  >
                   </AgGridReact>
                 </div>
               </CardBody>
