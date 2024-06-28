@@ -11,8 +11,8 @@ import {
 } from "reactstrap";
 import { connect, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import "ag-grid-community/styles//ag-grid.css";
-import "ag-grid-community/styles//ag-theme-quartz.css";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { getInvoiceReq } from "../../service/invoiceService";
 import { ToastContainer } from "react-toastify";

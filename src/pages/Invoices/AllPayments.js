@@ -7,8 +7,8 @@ import DropdownMenuBtn from "./DropdownMenuBtn";
 import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles//ag-grid.css";
-import "ag-grid-community/styles//ag-theme-quartz.css";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
 import { formatNumberWithCommasAndDecimal } from "./invoiceUtil";
 
 //Import Action to copy breadcrumb items from local state to redux state
