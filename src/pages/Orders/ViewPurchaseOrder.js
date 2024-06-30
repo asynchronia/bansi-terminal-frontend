@@ -90,9 +90,9 @@ const ViewPurchaseOrder = (props) => {
   }, [dispatch]);
 
   const redirectToEditPage = (id) => {
-    let path = "/edit-item";
+    let path = `/purchase-orders/edit/${id.order_id}`;
     setTimeout(() => {
-      navigate(path, id);
+      navigate(path);
     }, 300);
   }
 

@@ -14,11 +14,15 @@ import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.
 import StyledButton from "../../components/Common/StyledButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { createPurchaseOrderReq } from "../../service/purchaseService";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 
 const CreateOrder = (props) => {
+  const { state } = useLocation();
+
+  console.log(props, state)
+
   document.title = "Create Purchase Order";
   let navigate = useNavigate();
   const dispatch = useDispatch();
@@ -65,7 +69,7 @@ const CreateOrder = (props) => {
   const redirectToPurchaseDetails = (id) => {
     let path = `/purchase-order-details/${id}`;
     setTimeout(() => {
-      navigate(path,id);
+      navigate(path, id);
     }, 300);
   };
 
@@ -113,7 +117,7 @@ const CreateOrder = (props) => {
   };
 
   const handleStatusChange = (event) => {
-    if(event.target.value === 'published'){
+    if (event.target.value === 'published') {
       setPublishModal(true);
     }
     setStatus(event.target.value);
@@ -253,7 +257,7 @@ const CreateOrder = (props) => {
           <td style={{ whiteSpace: "nowrap" }}>
             {formatNumberWithCommasAndDecimal(
               item.price *
-                (selectedQuantities[`${item.id}-${item.variant._id}`] || 1)
+              (selectedQuantities[`${item.id}-${item.variant._id}`] || 1)
             )}
           </td>
           <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
@@ -365,23 +369,23 @@ const CreateOrder = (props) => {
         billingBranchId: billingId,
         shippingBranchId: shippingId,
         items: selectedItems.map((item) => ({
-            itemId: item.id,
-            zohoItemId: item.zohoItemId,
-            variantId: item.variant._id,
-            unitPrice: item.price,
-            quantity: selectedQuantities[`${item.id}-${item.variant._id}`],
-            itemName: item.name,
-            itemDescription: item.description,
-            itemType: item.type,
-            itemUnit: item.unit,
-            hsnCode: item.hsnCode,
-            taxPreference: item.taxPreference,
-            taxes: item.taxes.map((tax) => ({
-              taxId: tax._id,
-              taxName: tax.name,
-              taxPercentage: tax.rate,
-            })),
+          itemId: item.id,
+          zohoItemId: item.zohoItemId,
+          variantId: item.variant._id,
+          unitPrice: item.price,
+          quantity: selectedQuantities[`${item.id}-${item.variant._id}`],
+          itemName: item.name,
+          itemDescription: item.description,
+          itemType: item.type,
+          itemUnit: item.unit,
+          hsnCode: item.hsnCode,
+          taxPreference: item.taxPreference,
+          taxes: item.taxes.map((tax) => ({
+            taxId: tax._id,
+            taxName: tax.name,
+            taxPercentage: tax.rate,
           })),
+        })),
       }
 
       handlePurchaseOrderCreation();
@@ -527,7 +531,7 @@ const CreateOrder = (props) => {
           }}
         >
           <Modal size="m" isOpen={publishModal}>
-            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus}/>
+            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
           </Modal>
           <select
             className="form-select focus-width"

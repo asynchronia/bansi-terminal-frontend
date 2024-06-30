@@ -134,6 +134,7 @@ const userRoutes = [
   { path: "/purchase-orders", component: <ViewPurchaseOrder /> },
   { path: "/ongoing-orders", component: <Allorders /> },
   { path: "/create-order", component: <Createorder /> },
+  { path: "/purchase-orders/edit/:id", component: <Createorder /> },
   { path: "/client/:id", component: <ViewClient /> },
   { path: "/invoices", component: <AllInvoices /> },
   { path: "/payments", component: <AllPayments /> },
