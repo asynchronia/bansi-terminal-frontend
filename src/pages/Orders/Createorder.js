@@ -1,6 +1,15 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { connect, useDispatch } from "react-redux";
-import { Row, Col, Card, CardBody, Input, Label, Table, Modal } from "reactstrap";
+import {
+  Row,
+  Col,
+  Card,
+  CardBody,
+  Input,
+  Label,
+  Table,
+  Modal,
+} from "reactstrap";
 import { CircularProgress, TableBody } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -14,14 +23,15 @@ import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.
 import StyledButton from "../../components/Common/StyledButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useLocation, useNavigate } from "react-router-dom";
-import { createPurchaseOrderReq } from "../../service/purchaseService";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  createPurchaseOrderReq,
+  getPurchaseOrderDetailsReq,
+} from "../../service/purchaseService";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 
 const CreateOrder = (props) => {
-  const { state } = useLocation();
-
-  console.log(props, state)
+  let { id } = useParams();
 
   document.title = "Create Purchase Order";
   let navigate = useNavigate();
@@ -29,9 +39,7 @@ const CreateOrder = (props) => {
   const [branchList, setBranchList] = useState([]);
   const effectCalled = useRef(false);
   const [billingAddress, setBillingAddress] = useState("");
-  const [billingId, setBillingId] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
-  const [shippingId, setShippingId] = useState("");
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
   const [loadedData, setLoadedData] = useState(false);
@@ -54,6 +62,8 @@ const CreateOrder = (props) => {
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
+
+  const [purchaseOrder, setPurchaseOrder] = useState(null);
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -97,27 +107,19 @@ const CreateOrder = (props) => {
   }, [dispatch]);
 
   const handleBillingChange = (event) => {
-    const selectedId = event.target.value;
-    const selectedBranch = branchList.find(
-      (branch) => branch._id === selectedId
-    );
-    setBillingAddress(selectedBranch?.address || "");
-    setBillingId(selectedId);
-    validation.setFieldValue("billingAddress", billingAddress);
+    const selectedBranch = event.target.value;
+    setBillingAddress(selectedBranch);
+    validation.setFieldValue("billingAddress", selectedBranch);
   };
 
   const handleShippingChange = (event) => {
-    const selectedId = event.target.value;
-    const selectedBranch = branchList.find(
-      (branch) => branch._id === selectedId
-    );
-    setShippingAddress(selectedBranch?.address || "");
-    setShippingId(selectedId);
-    validation.setFieldValue("shippingAddress", shippingAddress);
+    const selectedBranch = event.target.value;
+    setShippingAddress(selectedBranch);
+    validation.setFieldValue("shippingAddress", selectedBranch);
   };
 
   const handleStatusChange = (event) => {
-    if (event.target.value === 'published') {
+    if (event.target.value === "published") {
       setPublishModal(true);
     }
     setStatus(event.target.value);
@@ -163,43 +165,42 @@ const CreateOrder = (props) => {
   const handleItemSelect = (item, variant) => {
     const taxName = item.taxes.map((tax) => tax.name).join(", ");
     const newItem = {
-      id: item._id,
+      itemId: item._id,
       zohoItemId: item.zohoItemId,
-      title: item.title,
-      name: item.title,
-      description: item.description,
-      type: item.itemType,
-      unit: item.itemUnit,
+      itemName: item.title,
+      itemDescription: item.description,
+      itemType: item.itemType,
+      itemUnit: item.itemUnit,
       hsnCode: item.hsnCode,
       taxPreference: item.taxPreference,
       category: item.category.name,
-      price: variant.price,
+      unitPrice: variant.price,
       qty: 1,
       gst: taxName,
-      variant: variant,
+      variantId: variant._id,
       taxes: item.taxes,
     };
 
     if (
       !selectedItems.some(
         (selectedItem) =>
-          selectedItem.id === newItem.id &&
-          selectedItem.variant._id === variant._id
+          selectedItem.itemId === newItem.itemId &&
+          selectedItem.variantId === variant._id
       )
     ) {
       setSelectedItems([...selectedItems, newItem]);
       setSelectedQuantities({
         ...selectedQuantities,
-        [`${newItem.id}-${variant._id}`]: 1,
+        [`${item._id}-${variant._id}`]: 1,
       });
-      setSelectedVariants({ ...selectedVariants, [newItem.id]: variant._id });
+      setSelectedVariants({ ...selectedVariants, [item._id]: variant._id });
     }
     setShowRowData(false);
   };
 
   const handleItemDelete = (itemId, variantId) => {
     const updatedItems = selectedItems.filter(
-      (item) => item.id !== itemId || item.variant._id !== variantId
+      (item) => item.itemId !== itemId || item.variantId !== variantId
     );
     setSelectedItems(updatedItems);
     const updatedQuantities = { ...selectedQuantities };
@@ -231,24 +232,26 @@ const CreateOrder = (props) => {
     }
 
     return selectedItems.map((item) => (
-      <tbody key={`${item.id}-${item.variant._id}`}>
+      <tbody key={`${item.itemId}-${item.variantId}`}>
         <tr>
-          <td style={{ whiteSpace: "nowrap" }}>{item.title}</td>
+          <td style={{ whiteSpace: "nowrap" }}>{item.itemName}</td>
           <td>{item.hsnCode}</td>
           <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
           <td style={{ whiteSpace: "nowrap" }}>
-            {formatNumberWithCommasAndDecimal(item.price)}
+            {formatNumberWithCommasAndDecimal(item.unitPrice)}
           </td>
           <td>
             <Input
               type="number"
               min="1"
-              value={selectedQuantities[`${item.id}-${item.variant._id}`] || 1}
+              value={
+                selectedQuantities[`${item.itemId}-${item.variantId}`] || 1
+              }
               onChange={(e) => {
                 const quantity = parseInt(e.target.value, 10);
                 setSelectedQuantities({
                   ...selectedQuantities,
-                  [`${item.id}-${item.variant._id}`]: quantity,
+                  [`${item.itemId}-${item.variantId}`]: quantity,
                 });
                 updateTotals();
               }}
@@ -256,15 +259,15 @@ const CreateOrder = (props) => {
           </td>
           <td style={{ whiteSpace: "nowrap" }}>
             {formatNumberWithCommasAndDecimal(
-              item.price *
-              (selectedQuantities[`${item.id}-${item.variant._id}`] || 1)
+              item.unitPrice *
+              (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
             )}
           </td>
           <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
           <td>
             <Delete
               style={{ cursor: "pointer" }}
-              onClick={() => handleItemDelete(item.id, item.variant._id)}
+              onClick={() => handleItemDelete(item.itemId, item.variantId)}
             />
           </td>
         </tr>
@@ -278,13 +281,13 @@ const CreateOrder = (props) => {
 
     selectedItems.forEach((item) => {
       const quantity =
-        selectedQuantities[`${item.id}-${item.variant._id}`] || 1;
-      const itemTotal = item.variant.price * quantity;
+        selectedQuantities[`${item.itemId}-${item.variantId}`] || 1;
+      const itemTotal = item.unitPrice * quantity;
       subTotal += itemTotal;
-      console.log('item', item)
+      console.log("item", item);
       // Check if item.taxes is defined and not empty
       if (item.gst) {
-        const gstRate = item.taxes[0].rate
+        const gstRate = item.taxes[0].rate;
         gstTotal += (itemTotal * gstRate) / 100;
       }
     });
@@ -297,6 +300,19 @@ const CreateOrder = (props) => {
   useEffect(() => {
     updateTotals();
   }, [selectedItems, selectedQuantities]);
+
+  useEffect(() => {
+    id && getPurchaseOrderDetails(id);
+  }, [id]);
+
+  const getPurchaseOrderDetails = async (id) => {
+    const response = await getPurchaseOrderDetailsReq(id);
+    const purchaseOrder = response?.purchaseOrder;
+    setPurchaseOrder(purchaseOrder);
+    setBillingAddress(purchaseOrder.billing.branchId);
+    setShippingAddress(purchaseOrder.shipping.branchId);
+    setSelectedItems(purchaseOrder.items);
+  };
 
   useEffect(() => {
     props.setBreadcrumbItems("Create Purchase Order", breadcrumbItems);
@@ -356,18 +372,18 @@ const CreateOrder = (props) => {
           console.log(response?.payload?.purchaseOrder?._id);
           redirectToPurchaseDetails(response?.payload?.purchaseOrder?._id);
         } catch (error) {
-          console.error('Failed to create purchase order:', error);
+          console.error("Failed to create purchase order:", error);
         }
       }
       // validation.handleSubmit();
-      const formattedDate = date.split('-').reverse().join('-');
+      const formattedDate = date.split("-").reverse().join("-");
       const body = {
         purchaseOrderNumber: poNumber,
         agreementId: agreementId,
         status: status,
         deliveryDate: formattedDate,
-        billingBranchId: billingId,
-        shippingBranchId: shippingId,
+        billingBranchId: billingAddress,
+        shippingBranchId: shippingAddress,
         items: selectedItems.map((item) => ({
           itemId: item.id,
           zohoItemId: item.zohoItemId,
@@ -386,7 +402,7 @@ const CreateOrder = (props) => {
             taxPercentage: tax.rate,
           })),
         })),
-      }
+      };
 
       handlePurchaseOrderCreation();
     } else {
@@ -531,7 +547,10 @@ const CreateOrder = (props) => {
           }}
         >
           <Modal size="m" isOpen={publishModal}>
-            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
+            <PublishConfirm
+              setPublishModal={setPublishModal}
+              setStatus={setStatus}
+            />
           </Modal>
           <select
             className="form-select focus-width"
@@ -604,7 +623,9 @@ const CreateOrder = (props) => {
                           onBlur={validation.handleBlur}
                           value={billingAddress}
                         >
-                          <option>Select Billing Address</option>
+                          <option value="" disabled>
+                            Select Billing Address
+                          </option>
                           {branchList.map((branch) => (
                             <option key={branch._id} value={branch._id}>
                               {branch.name}
@@ -618,7 +639,11 @@ const CreateOrder = (props) => {
                         )}
                         <div className="mt-2">
                           <p />
-                          {billingAddress}
+                          {
+                            branchList.find(
+                              (branch) => branch._id === billingAddress
+                            )?.address
+                          }
                         </div>
                       </div>
                     </Col>
@@ -636,7 +661,9 @@ const CreateOrder = (props) => {
                           onBlur={validation.handleBlur}
                           value={shippingAddress}
                         >
-                          <option>Select Shipping Address</option>
+                          <option value="" disabled>
+                            Select Shipping Address
+                          </option>
                           {branchList.map((branch) => (
                             <option key={branch._id} value={branch._id}>
                               {branch.name}
@@ -650,7 +677,11 @@ const CreateOrder = (props) => {
                         )}
                         <div className="mt-2">
                           <p />
-                          {shippingAddress}
+                          {
+                            branchList.find(
+                              (branch) => branch._id === shippingAddress
+                            )?.address
+                          }
                         </div>
                       </div>
                     </Col>
