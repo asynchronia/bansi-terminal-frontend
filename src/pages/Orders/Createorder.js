@@ -27,6 +27,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   createPurchaseOrderReq,
   getPurchaseOrderDetailsReq,
+  updatePurchaseOrderReq,
 } from "../../service/purchaseService";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 
@@ -52,7 +53,7 @@ const CreateOrder = (props) => {
   const [gstTotal, setGstTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const [poNumber, setPoNumber] = useState("");
+  const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
   const [date, setDate] = useState("");
   const [shippingAddressError, setShippingAddressError] = useState("");
   const [billingAddressError, setBillingAddressError] = useState("");
@@ -77,7 +78,7 @@ const CreateOrder = (props) => {
   };
 
   const redirectToPurchaseDetails = (id) => {
-    let path = `/purchase-order-details/${id}`;
+    let path = `/purchase-orders/${id}`;
     setTimeout(() => {
       navigate(path, id);
     }, 300);
@@ -130,14 +131,14 @@ const CreateOrder = (props) => {
     initialValues: {
       billingAddress: "",
       shippingAddress: "",
-      poNumber: "",
+      purchaseOrderNumber: "",
       deliveryDate: "",
       selectedItems: [],
     },
     validationSchema: Yup.object({
       billingAddress: Yup.string().required("Please Select Billing Address"),
       shippingAddress: Yup.string().required("Please Select Shipping Address"),
-      poNumber: Yup.string().required("Please Enter PO Number"),
+      purchaseOrderNumber: Yup.string().required("Please Enter PO Number"),
       deliveryDate: Yup.string().required("Please Enter Delivery Date"),
       selectedItems: Yup.array().min(1, "Please select at least one item"),
     }),
@@ -175,10 +176,14 @@ const CreateOrder = (props) => {
       taxPreference: item.taxPreference,
       category: item.category.name,
       unitPrice: variant.price,
-      qty: 1,
+      quantity: 1,
       gst: taxName,
       variantId: variant._id,
-      taxes: item.taxes,
+      taxes: item.taxes.map((tax) => ({
+        taxId: tax._id,
+        taxName: tax.name,
+        taxPercentage: tax.rate,
+      })),
     };
 
     if (
@@ -284,10 +289,9 @@ const CreateOrder = (props) => {
         selectedQuantities[`${item.itemId}-${item.variantId}`] || 1;
       const itemTotal = item.unitPrice * quantity;
       subTotal += itemTotal;
-      console.log("item", item);
       // Check if item.taxes is defined and not empty
       if (item.gst) {
-        const gstRate = item.taxes[0].rate;
+        const gstRate = item.taxes[0].rate || item.taxes[0].taxPercentage;
         gstTotal += (itemTotal * gstRate) / 100;
       }
     });
@@ -302,17 +306,46 @@ const CreateOrder = (props) => {
   }, [selectedItems, selectedQuantities]);
 
   useEffect(() => {
-    id && getPurchaseOrderDetails(id);
-  }, [id]);
+    id && rowData && getPurchaseOrderDetails(id);
+
+    return () => {
+      setPurchaseOrderNumber('');
+      setPurchaseOrder(null);
+      setBillingAddress('');
+      setShippingAddress('');
+      setSelectedItems([]);
+    }
+  }, [id, rowData]);
 
   const getPurchaseOrderDetails = async (id) => {
     const response = await getPurchaseOrderDetailsReq(id);
     const purchaseOrder = response?.purchaseOrder;
+
     setPurchaseOrder(purchaseOrder);
+    setPurchaseOrderNumber(purchaseOrder.purchaseOrderNumber);
     setBillingAddress(purchaseOrder.billing.branchId);
     setShippingAddress(purchaseOrder.shipping.branchId);
-    setSelectedItems(purchaseOrder.items);
+
+    let items = purchaseOrder.items;
+    items.forEach(item => {
+      item.category = rowData.find(data => data._id === item.itemId)?.category.name
+      item.gst = item.taxes.map((tax) => tax.taxName).join(", ");
+      item.taxes = item.taxes.map(({ _id, ...rest }) => rest)
+    })
+
+    setDate(formatDate(purchaseOrder.deliveryDate));
+    setSelectedItems(items);
   };
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
 
   useEffect(() => {
     props.setBreadcrumbItems("Create Purchase Order", breadcrumbItems);
@@ -337,7 +370,7 @@ const CreateOrder = (props) => {
     // if (!validationErrors.shippingAddress) {
     //   setShippingAddressError("");
     // }
-    // if (!validationErrors.poNumber) {
+    // if (!validationErrors.purchaseOrderNumber) {
     //   setPoNumberError("");
     // }
     // if (!validationErrors.deliveryDate) {
@@ -354,8 +387,8 @@ const CreateOrder = (props) => {
     //     setShippingAddressError(validationErrors.shippingAddress);
     //   }
 
-    //   if (validationErrors.poNumber) {
-    //     setPoNumberError(validationErrors.poNumber);
+    //   if (validationErrors.purchaseOrderNumber) {
+    //     setPoNumberError(validationErrors.purchaseOrderNumber);
     //   }
 
     //   if (validationErrors.deliveryDate) {
@@ -368,41 +401,32 @@ const CreateOrder = (props) => {
     if (selectedItems.length > 0) {
       async function handlePurchaseOrderCreation() {
         try {
-          const response = await createPurchaseOrderReq(body);
-          console.log(response?.payload?.purchaseOrder?._id);
-          redirectToPurchaseDetails(response?.payload?.purchaseOrder?._id);
+          const response = id ? await updatePurchaseOrderReq(body) : await createPurchaseOrderReq(body);
+          const _id = id ? response?.payload?.updatedPurchaseOrder?._id : response?.payload?.purchaseOrder?._id
+          redirectToPurchaseDetails(_id);
         } catch (error) {
           console.error("Failed to create purchase order:", error);
         }
       }
       // validation.handleSubmit();
       const formattedDate = date.split("-").reverse().join("-");
+
       const body = {
-        purchaseOrderNumber: poNumber,
+        purchaseOrderNumber: purchaseOrderNumber,
         agreementId: agreementId,
         status: status,
         deliveryDate: formattedDate,
         billingBranchId: billingAddress,
         shippingBranchId: shippingAddress,
-        items: selectedItems.map((item) => ({
-          itemId: item.id,
-          zohoItemId: item.zohoItemId,
-          variantId: item.variant._id,
-          unitPrice: item.price,
-          quantity: selectedQuantities[`${item.id}-${item.variant._id}`],
-          itemName: item.name,
-          itemDescription: item.description,
-          itemType: item.type,
-          itemUnit: item.unit,
-          hsnCode: item.hsnCode,
-          taxPreference: item.taxPreference,
-          taxes: item.taxes.map((tax) => ({
-            taxId: tax._id,
-            taxName: tax.name,
-            taxPercentage: tax.rate,
-          })),
+        items: selectedItems.map(({ category, gst, _id, ...rest }) => ({
+          ...rest,
+          quantity: selectedQuantities[`${rest.itemId}-${rest.variantId}`] || rest.quantity
         })),
       };
+
+      if (id) {
+        body.purchaseOrderId = id;
+      }
 
       handlePurchaseOrderCreation();
     } else {
@@ -413,8 +437,8 @@ const CreateOrder = (props) => {
   };
 
   const handleClickPO = () => {
-    if (!poNumber.startsWith("PO ")) {
-      setPoNumber("PO ");
+    if (!purchaseOrderNumber.startsWith("PO ")) {
+      setPurchaseOrderNumber("PO ");
     }
   };
 
@@ -422,15 +446,15 @@ const CreateOrder = (props) => {
     let value = e.target.value;
 
     if (value === "PO ") {
-      setPoNumber(value);
+      setPurchaseOrderNumber(value);
     } else if (value.length <= 2 && !value.startsWith("PO")) {
-      setPoNumber("PO ");
+      setPurchaseOrderNumber("PO ");
     } else if (!value.startsWith("PO")) {
-      setPoNumber("PO " + value);
+      setPurchaseOrderNumber("PO " + value);
     } else {
-      setPoNumber(value);
+      setPurchaseOrderNumber(value);
     }
-    validation.setFieldValue("poNumber", poNumber);
+    validation.setFieldValue("purchaseOrderNumber", purchaseOrderNumber);
   };
 
   const handleChangeDate = (e) => {
@@ -567,7 +591,7 @@ const CreateOrder = (props) => {
             onClick={onCreatePurchaseOrderClick}
             isLoading={isButtonLoading}
           >
-            Save
+            {id ? 'Update' : 'Save'}
           </StyledButton>
         </div>
       </div>
@@ -597,7 +621,7 @@ const CreateOrder = (props) => {
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">{poNumber}</span>
+              <span className="purchase-order-no">{purchaseOrderNumber}</span>
             </div>
           </div>
         </CardBody>
@@ -699,9 +723,9 @@ const CreateOrder = (props) => {
                       <Label for="Po Number">Po Number</Label>
                       <Input
                         type="text"
-                        name="poNumber"
-                        id="poNumber"
-                        value={poNumber}
+                        name="purchaseOrderNumber"
+                        id="purchaseOrderNumber"
+                        value={purchaseOrderNumber}
                         placeholder="PO BLR/#123"
                         onClick={handleClickPO}
                         onChange={handleChangePO}
@@ -757,6 +781,7 @@ const CreateOrder = (props) => {
                           className="form-control m-1"
                           value={searchQuery}
                           onChange={handleSearchQuery}
+                          autoComplete="off"
                         />
                       </Col>
                     </Row>

@@ -40,7 +40,7 @@ const ViewPurchaseOrder = (props) => {
   // }
 
   const redirectToViewPage = (id) => {
-    let path = `/purchase-order-details/${id}`;
+    let path = `/purchase-orders/${id}`;
     setTimeout(() => {
       navigate(path, id);
     }, 300);
@@ -90,7 +90,7 @@ const ViewPurchaseOrder = (props) => {
   }, [dispatch]);
 
   const redirectToEditPage = (id) => {
-    let path = `/purchase-orders/edit/${id.order_id}`;
+    let path = `/purchase-orders/${id.order_id}/edit`;
     setTimeout(() => {
       navigate(path);
     }, 300);

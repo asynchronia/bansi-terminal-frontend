@@ -8,7 +8,7 @@ import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { connect } from "react-redux";
 import { convertToSalesOrderReq, getPurchaseOrderDetailsReq, purchaseOrderStatusChangeReq } from "../../service/purchaseService";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 import ApproveConfirm from "../../components/CustomComponents/ApproveConfirm";
 import OrderStatusRenderer from "./OrderStatusRenderer";
@@ -155,6 +155,8 @@ const PurchaseOrderDetails = (props) => {
             top: -50,
             right: 10,
             display: "flex",
+            alignItems: 'center',
+            gap: '1rem'
           }}
         >
           <Modal size="m" isOpen={publishModal}>
@@ -164,16 +166,20 @@ const PurchaseOrderDetails = (props) => {
             <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
           </Modal>
           {
-            status === 'draft' ? (<select
-              className="form-select focus-width"
-              name="status"
-              disabled={isDisabled}
-              value={status} // Bind status state to select element
-              onChange={handleStatusChange} // Update status on change
-            >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>)
+            status === 'draft' ? (
+              <>
+                <select
+                  className="form-select focus-width"
+                  name="status"
+                  disabled={isDisabled}
+                  value={status} // Bind status state to select element
+                  onChange={handleStatusChange} // Update status on change
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+                <Link to='edit' className="w-md btn btn-primary">Edit</Link>
+              </>)
               : OrderStatusRenderer({ value: status })
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}
@@ -318,8 +324,7 @@ const PurchaseOrderDetails = (props) => {
                   {itemsData && itemsData.map((item, index) => (
                     <Row key={index} className="mb-4">
                       <Col xl="4">
-                        <span>{item.itemName}</span>
-                        <br />
+                        <h6 className="m-0">{item.itemName}</h6>
                         <span>{item.itemDescription}</span>
                       </Col>
                       <Col xl="3">
