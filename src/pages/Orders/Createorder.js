@@ -1,6 +1,15 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { connect, useDispatch } from "react-redux";
-import { Row, Col, Card, CardBody, Input, Label, Table, Modal } from "reactstrap";
+import {
+  Row,
+  Col,
+  Card,
+  CardBody,
+  Input,
+  Label,
+  Table,
+  Modal,
+} from "reactstrap";
 import { CircularProgress, TableBody } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -14,20 +23,24 @@ import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.
 import StyledButton from "../../components/Common/StyledButton";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useNavigate } from "react-router-dom";
-import { createPurchaseOrderReq } from "../../service/purchaseService";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  createPurchaseOrderReq,
+  getPurchaseOrderDetailsReq,
+  updatePurchaseOrderReq,
+} from "../../service/purchaseService";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 
 const CreateOrder = (props) => {
+  let { id } = useParams();
+
   document.title = "Create Purchase Order";
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const [branchList, setBranchList] = useState([]);
   const effectCalled = useRef(false);
   const [billingAddress, setBillingAddress] = useState("");
-  const [billingId, setBillingId] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
-  const [shippingId, setShippingId] = useState("");
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
   const [loadedData, setLoadedData] = useState(false);
@@ -40,7 +53,7 @@ const CreateOrder = (props) => {
   const [gstTotal, setGstTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const [poNumber, setPoNumber] = useState("");
+  const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
   const [date, setDate] = useState("");
   const [shippingAddressError, setShippingAddressError] = useState("");
   const [billingAddressError, setBillingAddressError] = useState("");
@@ -50,6 +63,8 @@ const CreateOrder = (props) => {
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
+
+  const [purchaseOrder, setPurchaseOrder] = useState(null);
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -63,9 +78,9 @@ const CreateOrder = (props) => {
   };
 
   const redirectToPurchaseDetails = (id) => {
-    let path = `/purchase-order-details/${id}`;
+    let path = `/purchase-orders/${id}`;
     setTimeout(() => {
-      navigate(path,id);
+      navigate(path, id);
     }, 300);
   };
 
@@ -93,27 +108,19 @@ const CreateOrder = (props) => {
   }, [dispatch]);
 
   const handleBillingChange = (event) => {
-    const selectedId = event.target.value;
-    const selectedBranch = branchList.find(
-      (branch) => branch._id === selectedId
-    );
-    setBillingAddress(selectedBranch?.address || "");
-    setBillingId(selectedId);
-    validation.setFieldValue("billingAddress", billingAddress);
+    const selectedBranch = event.target.value;
+    setBillingAddress(selectedBranch);
+    validation.setFieldValue("billingAddress", selectedBranch);
   };
 
   const handleShippingChange = (event) => {
-    const selectedId = event.target.value;
-    const selectedBranch = branchList.find(
-      (branch) => branch._id === selectedId
-    );
-    setShippingAddress(selectedBranch?.address || "");
-    setShippingId(selectedId);
-    validation.setFieldValue("shippingAddress", shippingAddress);
+    const selectedBranch = event.target.value;
+    setShippingAddress(selectedBranch);
+    validation.setFieldValue("shippingAddress", selectedBranch);
   };
 
   const handleStatusChange = (event) => {
-    if(event.target.value === 'published'){
+    if (event.target.value === "published") {
       setPublishModal(true);
     }
     setStatus(event.target.value);
@@ -124,14 +131,14 @@ const CreateOrder = (props) => {
     initialValues: {
       billingAddress: "",
       shippingAddress: "",
-      poNumber: "",
+      purchaseOrderNumber: "",
       deliveryDate: "",
       selectedItems: [],
     },
     validationSchema: Yup.object({
       billingAddress: Yup.string().required("Please Select Billing Address"),
       shippingAddress: Yup.string().required("Please Select Shipping Address"),
-      poNumber: Yup.string().required("Please Enter PO Number"),
+      purchaseOrderNumber: Yup.string().required("Please Enter PO Number"),
       deliveryDate: Yup.string().required("Please Enter Delivery Date"),
       selectedItems: Yup.array().min(1, "Please select at least one item"),
     }),
@@ -159,43 +166,46 @@ const CreateOrder = (props) => {
   const handleItemSelect = (item, variant) => {
     const taxName = item.taxes.map((tax) => tax.name).join(", ");
     const newItem = {
-      id: item._id,
+      itemId: item._id,
       zohoItemId: item.zohoItemId,
-      title: item.title,
-      name: item.title,
-      description: item.description,
-      type: item.itemType,
-      unit: item.itemUnit,
+      itemName: item.title,
+      itemDescription: item.description,
+      itemType: item.itemType,
+      itemUnit: item.itemUnit,
       hsnCode: item.hsnCode,
       taxPreference: item.taxPreference,
       category: item.category.name,
-      price: variant.price,
-      qty: 1,
+      unitPrice: variant.price,
+      quantity: 1,
       gst: taxName,
-      variant: variant,
-      taxes: item.taxes,
+      variantId: variant._id,
+      taxes: item.taxes.map((tax) => ({
+        taxId: tax._id,
+        taxName: tax.name,
+        taxPercentage: tax.rate,
+      })),
     };
 
     if (
       !selectedItems.some(
         (selectedItem) =>
-          selectedItem.id === newItem.id &&
-          selectedItem.variant._id === variant._id
+          selectedItem.itemId === newItem.itemId &&
+          selectedItem.variantId === variant._id
       )
     ) {
       setSelectedItems([...selectedItems, newItem]);
       setSelectedQuantities({
         ...selectedQuantities,
-        [`${newItem.id}-${variant._id}`]: 1,
+        [`${item._id}-${variant._id}`]: 1,
       });
-      setSelectedVariants({ ...selectedVariants, [newItem.id]: variant._id });
+      setSelectedVariants({ ...selectedVariants, [item._id]: variant._id });
     }
     setShowRowData(false);
   };
 
   const handleItemDelete = (itemId, variantId) => {
     const updatedItems = selectedItems.filter(
-      (item) => item.id !== itemId || item.variant._id !== variantId
+      (item) => item.itemId !== itemId || item.variantId !== variantId
     );
     setSelectedItems(updatedItems);
     const updatedQuantities = { ...selectedQuantities };
@@ -227,24 +237,26 @@ const CreateOrder = (props) => {
     }
 
     return selectedItems.map((item) => (
-      <tbody key={`${item.id}-${item.variant._id}`}>
+      <tbody key={`${item.itemId}-${item.variantId}`}>
         <tr>
-          <td style={{ whiteSpace: "nowrap" }}>{item.title}</td>
+          <td style={{ whiteSpace: "nowrap" }}>{item.itemName}</td>
           <td>{item.hsnCode}</td>
           <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
           <td style={{ whiteSpace: "nowrap" }}>
-            {formatNumberWithCommasAndDecimal(item.price)}
+            {formatNumberWithCommasAndDecimal(item.unitPrice)}
           </td>
           <td>
             <Input
               type="number"
               min="1"
-              value={selectedQuantities[`${item.id}-${item.variant._id}`] || 1}
+              value={
+                selectedQuantities[`${item.itemId}-${item.variantId}`] || 1
+              }
               onChange={(e) => {
                 const quantity = parseInt(e.target.value, 10);
                 setSelectedQuantities({
                   ...selectedQuantities,
-                  [`${item.id}-${item.variant._id}`]: quantity,
+                  [`${item.itemId}-${item.variantId}`]: quantity,
                 });
                 updateTotals();
               }}
@@ -252,15 +264,15 @@ const CreateOrder = (props) => {
           </td>
           <td style={{ whiteSpace: "nowrap" }}>
             {formatNumberWithCommasAndDecimal(
-              item.price *
-                (selectedQuantities[`${item.id}-${item.variant._id}`] || 1)
+              item.unitPrice *
+              (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
             )}
           </td>
           <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
           <td>
             <Delete
               style={{ cursor: "pointer" }}
-              onClick={() => handleItemDelete(item.id, item.variant._id)}
+              onClick={() => handleItemDelete(item.itemId, item.variantId)}
             />
           </td>
         </tr>
@@ -274,13 +286,12 @@ const CreateOrder = (props) => {
 
     selectedItems.forEach((item) => {
       const quantity =
-        selectedQuantities[`${item.id}-${item.variant._id}`] || 1;
-      const itemTotal = item.variant.price * quantity;
+        selectedQuantities[`${item.itemId}-${item.variantId}`] || 1;
+      const itemTotal = item.unitPrice * quantity;
       subTotal += itemTotal;
-      console.log('item', item)
       // Check if item.taxes is defined and not empty
       if (item.gst) {
-        const gstRate = item.taxes[0].rate
+        const gstRate = item.taxes[0].rate || item.taxes[0].taxPercentage;
         gstTotal += (itemTotal * gstRate) / 100;
       }
     });
@@ -293,6 +304,48 @@ const CreateOrder = (props) => {
   useEffect(() => {
     updateTotals();
   }, [selectedItems, selectedQuantities]);
+
+  useEffect(() => {
+    id && rowData && getPurchaseOrderDetails(id);
+
+    return () => {
+      setPurchaseOrderNumber('');
+      setPurchaseOrder(null);
+      setBillingAddress('');
+      setShippingAddress('');
+      setSelectedItems([]);
+    }
+  }, [id, rowData]);
+
+  const getPurchaseOrderDetails = async (id) => {
+    const response = await getPurchaseOrderDetailsReq(id);
+    const purchaseOrder = response?.purchaseOrder;
+
+    setPurchaseOrder(purchaseOrder);
+    setPurchaseOrderNumber(purchaseOrder.purchaseOrderNumber);
+    setBillingAddress(purchaseOrder.billing.branchId);
+    setShippingAddress(purchaseOrder.shipping.branchId);
+
+    let items = purchaseOrder.items;
+    items.forEach(item => {
+      item.category = rowData.find(data => data._id === item.itemId)?.category.name
+      item.gst = item.taxes.map((tax) => tax.taxName).join(", ");
+      item.taxes = item.taxes.map(({ _id, ...rest }) => rest)
+    })
+
+    setDate(formatDate(purchaseOrder.deliveryDate));
+    setSelectedItems(items);
+  };
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
 
   useEffect(() => {
     props.setBreadcrumbItems("Create Purchase Order", breadcrumbItems);
@@ -317,7 +370,7 @@ const CreateOrder = (props) => {
     // if (!validationErrors.shippingAddress) {
     //   setShippingAddressError("");
     // }
-    // if (!validationErrors.poNumber) {
+    // if (!validationErrors.purchaseOrderNumber) {
     //   setPoNumberError("");
     // }
     // if (!validationErrors.deliveryDate) {
@@ -334,8 +387,8 @@ const CreateOrder = (props) => {
     //     setShippingAddressError(validationErrors.shippingAddress);
     //   }
 
-    //   if (validationErrors.poNumber) {
-    //     setPoNumberError(validationErrors.poNumber);
+    //   if (validationErrors.purchaseOrderNumber) {
+    //     setPoNumberError(validationErrors.purchaseOrderNumber);
     //   }
 
     //   if (validationErrors.deliveryDate) {
@@ -348,40 +401,31 @@ const CreateOrder = (props) => {
     if (selectedItems.length > 0) {
       async function handlePurchaseOrderCreation() {
         try {
-          const response = await createPurchaseOrderReq(body);
-          console.log(response?.payload?.purchaseOrder?._id);
-          redirectToPurchaseDetails(response?.payload?.purchaseOrder?._id);
+          const response = id ? await updatePurchaseOrderReq(body) : await createPurchaseOrderReq(body);
+          const _id = id ? response?.payload?.updatedPurchaseOrder?._id : response?.payload?.purchaseOrder?._id
+          redirectToPurchaseDetails(_id);
         } catch (error) {
-          console.error('Failed to create purchase order:', error);
+          console.error("Failed to create purchase order:", error);
         }
       }
       // validation.handleSubmit();
-      const formattedDate = date.split('-').reverse().join('-');
+      const formattedDate = date.split("-").reverse().join("-");
+
       const body = {
-        purchaseOrderNumber: poNumber,
+        purchaseOrderNumber: purchaseOrderNumber,
         agreementId: agreementId,
         status: status,
         deliveryDate: formattedDate,
-        billingBranchId: billingId,
-        shippingBranchId: shippingId,
-        items: selectedItems.map((item) => ({
-            itemId: item.id,
-            zohoItemId: item.zohoItemId,
-            variantId: item.variant._id,
-            unitPrice: item.price,
-            quantity: selectedQuantities[`${item.id}-${item.variant._id}`],
-            itemName: item.name,
-            itemDescription: item.description,
-            itemType: item.type,
-            itemUnit: item.unit,
-            hsnCode: item.hsnCode,
-            taxPreference: item.taxPreference,
-            taxes: item.taxes.map((tax) => ({
-              taxId: tax._id,
-              taxName: tax.name,
-              taxPercentage: tax.rate,
-            })),
-          })),
+        billingBranchId: billingAddress,
+        shippingBranchId: shippingAddress,
+        items: selectedItems.map(({ category, gst, _id, ...rest }) => ({
+          ...rest,
+          quantity: selectedQuantities[`${rest.itemId}-${rest.variantId}`] || rest.quantity
+        })),
+      };
+
+      if (id) {
+        body.purchaseOrderId = id;
       }
 
       handlePurchaseOrderCreation();
@@ -393,8 +437,8 @@ const CreateOrder = (props) => {
   };
 
   const handleClickPO = () => {
-    if (!poNumber.startsWith("PO ")) {
-      setPoNumber("PO ");
+    if (!purchaseOrderNumber.startsWith("PO ")) {
+      setPurchaseOrderNumber("PO ");
     }
   };
 
@@ -402,15 +446,15 @@ const CreateOrder = (props) => {
     let value = e.target.value;
 
     if (value === "PO ") {
-      setPoNumber(value);
+      setPurchaseOrderNumber(value);
     } else if (value.length <= 2 && !value.startsWith("PO")) {
-      setPoNumber("PO ");
+      setPurchaseOrderNumber("PO ");
     } else if (!value.startsWith("PO")) {
-      setPoNumber("PO " + value);
+      setPurchaseOrderNumber("PO " + value);
     } else {
-      setPoNumber(value);
+      setPurchaseOrderNumber(value);
     }
-    validation.setFieldValue("poNumber", poNumber);
+    validation.setFieldValue("purchaseOrderNumber", purchaseOrderNumber);
   };
 
   const handleChangeDate = (e) => {
@@ -527,7 +571,10 @@ const CreateOrder = (props) => {
           }}
         >
           <Modal size="m" isOpen={publishModal}>
-            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus}/>
+            <PublishConfirm
+              setPublishModal={setPublishModal}
+              setStatus={setStatus}
+            />
           </Modal>
           <select
             className="form-select focus-width"
@@ -544,7 +591,7 @@ const CreateOrder = (props) => {
             onClick={onCreatePurchaseOrderClick}
             isLoading={isButtonLoading}
           >
-            Save
+            {id ? 'Update' : 'Save'}
           </StyledButton>
         </div>
       </div>
@@ -574,7 +621,7 @@ const CreateOrder = (props) => {
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">{poNumber}</span>
+              <span className="purchase-order-no">{purchaseOrderNumber}</span>
             </div>
           </div>
         </CardBody>
@@ -600,7 +647,9 @@ const CreateOrder = (props) => {
                           onBlur={validation.handleBlur}
                           value={billingAddress}
                         >
-                          <option>Select Billing Address</option>
+                          <option value="" disabled>
+                            Select Billing Address
+                          </option>
                           {branchList.map((branch) => (
                             <option key={branch._id} value={branch._id}>
                               {branch.name}
@@ -614,7 +663,11 @@ const CreateOrder = (props) => {
                         )}
                         <div className="mt-2">
                           <p />
-                          {billingAddress}
+                          {
+                            branchList.find(
+                              (branch) => branch._id === billingAddress
+                            )?.address
+                          }
                         </div>
                       </div>
                     </Col>
@@ -632,7 +685,9 @@ const CreateOrder = (props) => {
                           onBlur={validation.handleBlur}
                           value={shippingAddress}
                         >
-                          <option>Select Shipping Address</option>
+                          <option value="" disabled>
+                            Select Shipping Address
+                          </option>
                           {branchList.map((branch) => (
                             <option key={branch._id} value={branch._id}>
                               {branch.name}
@@ -646,7 +701,11 @@ const CreateOrder = (props) => {
                         )}
                         <div className="mt-2">
                           <p />
-                          {shippingAddress}
+                          {
+                            branchList.find(
+                              (branch) => branch._id === shippingAddress
+                            )?.address
+                          }
                         </div>
                       </div>
                     </Col>
@@ -664,9 +723,9 @@ const CreateOrder = (props) => {
                       <Label for="Po Number">Po Number</Label>
                       <Input
                         type="text"
-                        name="poNumber"
-                        id="poNumber"
-                        value={poNumber}
+                        name="purchaseOrderNumber"
+                        id="purchaseOrderNumber"
+                        value={purchaseOrderNumber}
                         placeholder="PO BLR/#123"
                         onClick={handleClickPO}
                         onChange={handleChangePO}
@@ -722,6 +781,7 @@ const CreateOrder = (props) => {
                           className="form-control m-1"
                           value={searchQuery}
                           onChange={handleSearchQuery}
+                          autoComplete="off"
                         />
                       </Col>
                     </Row>

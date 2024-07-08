@@ -134,6 +134,8 @@ const userRoutes = [
   { path: "/purchase-orders", component: <ViewPurchaseOrder /> },
   { path: "/ongoing-orders", component: <Allorders /> },
   { path: "/create-order", component: <Createorder /> },
+  { path: "/purchase-orders/:id/edit", component: <Createorder /> },
+  { path: "/purchase-orders/:id", component: <PurchaseOrderDetails /> },
   { path: "/client/:id", component: <ViewClient /> },
   { path: "/invoices", component: <AllInvoices /> },
   { path: "/payments", component: <AllPayments /> },
@@ -146,7 +148,6 @@ const userRoutes = [
   { path: "/view-estimate/:id", component: <ViewEstimate /> },
   { path: "/agreement-items", component: <AgreementItemsListing /> },
   { path: "/view-agreement-item/:id", component: <AgreementItemView /> },
-  { path: "/purchase-order-details/:id", component: <PurchaseOrderDetails /> },
   // // this route should be at the end of all other routes
   {
     path: "/",

@@ -5,8 +5,8 @@ import { Row, Col, Card, CardBody, Button, Input, Modal } from "reactstrap";
 import { connect, useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 // import {AgGridReact} from 'ag-grid-react';
-import "ag-grid-community/styles//ag-grid.css";
-import "ag-grid-community/styles//ag-theme-quartz.css";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
 import { changePreloader } from "../../store/actions";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 /*.dropdown-toggle::after {
