@@ -7,8 +7,8 @@ import { setBreadcrumbItems } from "../../store/actions";
 import { ToastContainer } from "react-toastify";
 
 import { AgGridReact } from "ag-grid-react";
-import "ag-grid-community/styles//ag-grid.css";
-import "ag-grid-community/styles//ag-theme-quartz.css";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
 import { getOrderDetailsReq } from "../../service/orderService";
 import OrderTrackingRenderer from "./OrderTrackingRenderer";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";

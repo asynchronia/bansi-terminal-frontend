@@ -3,8 +3,8 @@ import { Row, Col, Card, CardBody, CardTitle, Button, Input, Modal } from "react
 import { connect } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles//ag-grid.css';
-import 'ag-grid-community/styles//ag-theme-quartz.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { ToastContainer } from "react-toastify";
 import {indianNumberWords,formatNumberWithCommasAndDecimal} from "../Invoices/invoiceUtil";

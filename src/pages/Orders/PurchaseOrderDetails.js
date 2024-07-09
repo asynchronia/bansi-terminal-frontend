@@ -4,10 +4,11 @@ import { ToastContainer } from "react-toastify";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import StyledButton from "../../components/Common/StyledButton";
 import { ReactComponent as CorrectSign } from "../../assets/images/svg/correct-sign.svg";
+import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.svg";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { connect } from "react-redux";
-import { getPurchaseOrderDetailsReq, purchaseOrderStatusChangeReq } from "../../service/purchaseService";
-import { useParams } from "react-router-dom";
+import { convertToSalesOrderReq, getPurchaseOrderDetailsReq, purchaseOrderStatusChangeReq } from "../../service/purchaseService";
+import { Link, useParams } from "react-router-dom";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 import ApproveConfirm from "../../components/CustomComponents/ApproveConfirm";
 import OrderStatusRenderer from "./OrderStatusRenderer";
@@ -25,7 +26,6 @@ const PurchaseOrderDetails = (props) => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("published");
 
-
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Purchase Order", link: "#" },
@@ -40,30 +40,52 @@ const PurchaseOrderDetails = (props) => {
       "status": status
     };
     setIsButtonLoading(true);
-    try {
-      const response = await purchaseOrderStatusChangeReq(body);
-    } catch (error) {
-      if (error.response && error.response.status === 400) {
-        console.error('Bad Request:', error);
-        // Handle the 400 error here, e.g., show an error message to the user
-      } else {
-        console.error('Failed to change purchase order status:', error);
+    if (status === 'accepted') {
+      try {
+        const response = await convertToSalesOrderReq({ purchaseOrderId: body.purchaseOrderId });
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          console.error('Bad Request:', error);
+          // Handle the 400 error here, e.g., show an error message to the user
+        } else {
+          console.error('Failed to convert to sales order', error);
+        }
+      } finally {
+        setIsButtonLoading(false);
+        setStatus(status);
       }
-    } finally {
-      setIsButtonLoading(false);
-      setStatus(status);
+    } else {
+      try {
+        const response = await purchaseOrderStatusChangeReq(body);
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          console.error('Bad Request:', error);
+          // Handle the 400 error here, e.g., show an error message to the user
+        } else {
+          console.error('Failed to change purchase order status:', error);
+        }
+      } finally {
+        setIsButtonLoading(false);
+        setStatus(status);
+      }
     }
   }
 
   const submitPurchaseOrder = () => {
+    setSelectedStatus('sent');
     setApproveModal(true);
-    //setSelectedStatus('sent');
+  }
+
+  const rejectPurchaseOrder = () => {
+    setSelectedStatus('rejected');
+    setApproveModal(true);
+    console.log("PURCHASE ORDER REJECTED")
   }
 
   const acceptPurchaseOrder = () => {
     //setSelectedStatus('accepted')
     handlePurchaseOrderStatusChange('accepted');
-    setStatus('accepted');
+    //setStatus('accepted');
     //setSelectedStatus('accepted');
     //TODO: The handlePurchaseOrderStatusChange(); is taking the old value of selectedStatus
     //TODO: ADD BUTTON LOADER, IN THE BACKEND ADD ZOHO SYNC API CALL
@@ -133,25 +155,31 @@ const PurchaseOrderDetails = (props) => {
             top: -50,
             right: 10,
             display: "flex",
+            alignItems: 'center',
+            gap: '1rem'
           }}
         >
           <Modal size="m" isOpen={publishModal}>
             <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
           </Modal>
           <Modal size="m" isOpen={approveModal}>
-            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} />
+            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
           </Modal>
           {
-            status === 'draft' ? (<select
-              className="form-select focus-width"
-              name="status"
-              disabled={isDisabled}
-              value={status} // Bind status state to select element
-              onChange={handleStatusChange} // Update status on change
-            >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-            </select>)
+            status === 'draft' ? (
+              <>
+                <select
+                  className="form-select focus-width"
+                  name="status"
+                  disabled={isDisabled}
+                  value={status} // Bind status state to select element
+                  onChange={handleStatusChange} // Update status on change
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+                <Link to='edit' className="w-md btn btn-primary">Edit</Link>
+              </>)
               : OrderStatusRenderer({ value: status })
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}
@@ -167,6 +195,19 @@ const PurchaseOrderDetails = (props) => {
               >
                 <CorrectSign className="me-1" />
                 Approve
+              </StyledButton>
+            )}
+          </RequireUserType>
+          <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+            {status === 'published' && (
+              <StyledButton
+                color={"danger"}
+                className={"w-md mx-2"}
+                isLoading={isButtonLoading}
+                onClick={rejectPurchaseOrder}
+              >
+                <Delete className="me-1" />
+                Reject
               </StyledButton>
             )}
           </RequireUserType>
@@ -283,8 +324,7 @@ const PurchaseOrderDetails = (props) => {
                   {itemsData && itemsData.map((item, index) => (
                     <Row key={index} className="mb-4">
                       <Col xl="4">
-                        <span>{item.itemName}</span>
-                        <br />
+                        <h6 className="m-0">{item.itemName}</h6>
                         <span>{item.itemDescription}</span>
                       </Col>
                       <Col xl="3">
