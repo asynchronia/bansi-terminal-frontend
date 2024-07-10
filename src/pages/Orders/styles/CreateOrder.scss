@@ -10,18 +10,19 @@
 
 .details {
   flex: 1;
-  margin-left: 20px;
+  margin: 1rem;
 }
 
 
 
 .purchase-order  {
-  font-size: 24px;
+  font-size: 1rem;
 }
 
 .purchase-order-no  {
   float:right;
-  font-size: 18px;
+  font-size: 1.125rem;
+  font-weight: 500;
 }
 
 .vertical-line {
