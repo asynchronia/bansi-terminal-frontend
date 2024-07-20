@@ -236,10 +236,16 @@ export async function getUserById(body) {
   });
 }
 
-export async function getUserRole() {
+export async function getUserRole(isAdmin) {
+  let url;
+  if (isAdmin) {
+    url = `${baseUrl}${API_URL.getUserRole}/admin`;
+  } else {
+    url = `${baseUrl}${API_URL.getUserRole}`;
+  }
   return new Promise((resolve) => {
     axios
-      .get(`${baseUrl}${API_URL.getUserRole}`, { headers: getHeaders() })
+      .get(url, { headers: getHeaders() })
       .then((res) => {
         resolve(res.data);
         return res.data;
