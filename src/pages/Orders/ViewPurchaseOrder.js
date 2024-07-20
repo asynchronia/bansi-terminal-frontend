@@ -257,7 +257,7 @@ const ViewPurchaseOrder = (props) => {
                 <div
                   className="ag-theme-quartz"
                   style={{
-                    height: '500px',
+                    height: '550px',
                     width: '100%'
                   }}
                 >

@@ -53,7 +53,7 @@ const AllOrders = (props) => {
       page: page,
       limit: paginationPageSize,
     }
-    if(searchValue) {
+    if (searchValue) {
       body.search_text = searchValue;
     }
     getListOfRowData(body);
@@ -158,55 +158,55 @@ const AllOrders = (props) => {
   const columnDefs = [
     {
       headerName: "Order Date", field: "date",
-      headerCheckboxSelection: true, checkboxSelection: true, suppressMenu: true,
+      headerCheckboxSelection: true, suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      width: 150, sortable: false
+      sortable: false
     },
     {
-      headerName: "Order No.", field: "salesorder_id", suppressMenu: true,
+      headerName: "Order No.", field: "salesorder_id", suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      width: 200, sortable: false
+      sortable: false
     },
     {
-      headerName: "Client", field: "customer_name", suppressMenu: true,
+      headerName: "Client", field: "customer_name", suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      width: 200, sortable: false
+      sortable: false
     },
     {
-      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true,
+      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      width: 120, sortable: false
+      sortable: false
     },
     {
-      headerName: "Total Amount", field: "total", suppressMenu: true,
+      headerName: "Total Amount", field: "total", suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
-      width: 130, sortable: false
+      sortable: false
     },
     {
-      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer, suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Invoice",
-      width: 80, sortable: false
+      sortable: false
     },
     {
-      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer, suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Payment",
-      width: 100, sortable: false
+      sortable: false
     },
     {
-      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer, suppressMenu: true, suppressMovable: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Shipment",
-      width: 100, sortable: false
+      sortable: false
 
     },
     {
@@ -218,8 +218,7 @@ const AllOrders = (props) => {
         handleEditClick: handleEditClick,
         handleViewClick: handleViewClick,
       }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
-      width: 90
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Actions"
     }
   ]
   const notify = (type, message) => {
@@ -258,7 +257,7 @@ const AllOrders = (props) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by sales order number or customer name..."
+                          placeholder="Search by Order number or Client"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
@@ -274,16 +273,17 @@ const AllOrders = (props) => {
                 >
                   <AgGridReact
                     ref={gridRef}
-                    suppressRowClickSelection={true}
+                    defaultColDef={{ resizable: false }}
                     columnDefs={columnDefs}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
-                    rowSelection="multiple"
                     reactiveCustomComponents
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}>
+                    onPaginationChanged={onPaginationChanged}
+                    onGridReady={() => gridRef.current.api.sizeColumnsToFit()}
+                  >
                   </AgGridReact>
                 </div>
               </CardBody>
