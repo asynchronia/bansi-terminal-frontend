@@ -111,15 +111,13 @@ export async function updateClientStatus(body) {
 }
 
 export async function createClient(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
-      .post(`${baseUrl}${API_URL.createClient}`, body, {
-        headers: getHeaders(),
-      })
-      .then((res) => {
-        resolve(res.data);
-        return res.data;
-      });
+      .post(`${baseUrl}${API_URL.createClient}`, body, { headers: getHeaders() })
+      .then(response => response.json())
+      .then(data => resolve(data))
+      .catch(error => reject(error));
+
   });
 }
 

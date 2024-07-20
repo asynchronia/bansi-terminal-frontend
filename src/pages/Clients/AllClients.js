@@ -23,7 +23,7 @@ import ClientActionField from "./ClientActionField";
 import { changePreloader } from "../../store/actions";
 
 import { ReactComponent as Import } from "../../assets/images/svg/import-button.svg";
-import { ReactComponent as Add } from "../../assets/images/svg/add-button.svg";
+import { Add } from "@mui/icons-material";
 
 const AllClients = (props) => {
   document.title = "Clients";
@@ -48,22 +48,21 @@ const AllClients = (props) => {
   const columnDefs = [
     {
       headerName: "Name",
-      field: "name",
+      field: "name", flex: 1,
       headerCheckboxSelection: true,
-      checkboxSelection: true,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       comparator: () => false,
     },
     {
       headerName: "Status",
-      field: "status",
+      field: "status", width: 100,
       sortable: false,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
-      headerName: "Primary Email",
+      headerName: "Primary Email", flex: 1,
       field: "email",
       sortable: false,
       suppressMenu: true,
@@ -71,7 +70,7 @@ const AllClients = (props) => {
     },
     {
       headerName: "Type",
-      field: "clientType",
+      field: "clientType", width: 100,
       suppressMenu: true,
       comparator: () => false,
       floatingFilterComponentParams: { suppressFilterButton: true },
@@ -86,7 +85,7 @@ const AllClients = (props) => {
 
     {
       headerName: "Action",
-      field: "action",
+      field: "action", width: 100,
       cellClass: "actions-button-cell",
       cellRenderer: ClientActionField,
       cellRendererParams: {
@@ -166,20 +165,20 @@ const AllClients = (props) => {
         limit: paginationPageSize,
         ...(status
           ? {
-              filter: {
-                status: status.toLowerCase(),
-              },
-            }
+            filter: {
+              status: status.toLowerCase(),
+            },
+          }
           : {}),
         ...(searchValue
           ? {
-              search: searchValue,
-            }
+            search: searchValue,
+          }
           : {}),
         ...(sortData
           ? {
-              sort: sortData,
-            }
+            sort: sortData,
+          }
           : {}),
       });
 
@@ -254,7 +253,7 @@ const AllClients = (props) => {
                     color="primary"
                     onClick={redirectToCreateClient}
                   >
-                    <Add style={{ marginRight: "5px" }} />
+                    <Add />
                     Add New Client
                   </Button>
                   <Button
@@ -305,12 +304,11 @@ const AllClients = (props) => {
                 >
                   <AgGridReact
                     ref={gridRef}
-                    suppressRowClickSelection={true}
                     columnDefs={columnDefs}
+                    defaultColDef={{ resizable: false, suppressMovable: true }}
                     pagination
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
-                    rowSelection="multiple"
                     reactiveCustomComponents
                     rowData={rowData}
                     onPaginationChanged={onPaginationChanged}

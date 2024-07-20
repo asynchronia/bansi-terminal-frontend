@@ -45,8 +45,12 @@
   height: 239px;
 }
 .dz-message {
-  text-align: center;
-  padding: 30px;
+    text-align: center;
+    height: 80px;
+    width: 80px;
+    line-height: 80px;
+    margin: 0 auto;
+    cursor: pointer;
 }
 // kanban board
 .react-kanban-column {

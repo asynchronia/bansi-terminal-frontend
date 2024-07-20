@@ -268,7 +268,6 @@ const ViewPurchaseOrder = (props) => {
                     pagination={true}
                     paginationPageSize={10}
                     paginationPageSizeSelector={[10, 25, 50]}
-                    rowSelection="multiple"
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
                     quickFilterText={inputValue}

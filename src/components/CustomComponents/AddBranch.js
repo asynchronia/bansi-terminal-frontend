@@ -1,14 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Card, CardBody, Col, Input, Label, Row } from "reactstrap";
+import { Card, CardBody, Col, Input, Label, Row, FormGroup } from "reactstrap";
 import { getWarehouseListReq } from "../../service/branchService";
 
-const AddBranch = ({ edit, setEdit, validation }) => {
+const AddBranch = ({ edit = false, setEdit, validation }) => {
   const [warehouseList, setWarehouseList] = useState([]);
 
   const searchAllWareHouses = async () => {
     try {
-     const response= await getWarehouseListReq();
+      const response = await getWarehouseListReq();
       setWarehouseList(response?.payload?.warehouses);
     } catch (error) {
       console.log(error);
@@ -22,19 +22,19 @@ const AddBranch = ({ edit, setEdit, validation }) => {
   return (
     <Card>
       <CardBody>
-        <h4 className="card-title">Add Branch</h4>
-        <Row className="mt-4">
+        {edit && <h4>Edit Branch</h4>}
+        <Row>
           <Col>
-            <div>
-              <label className="item-name">Branch Name</label>
-              <input
+            <FormGroup>
+              <Label className="col-form-label">Branch Name</Label>
+              <Input
                 className="form-control"
                 type="text"
                 placeholder="Enter Branch Name"
                 onChange={validation.handleChange}
                 onBlur={validation.handleBlur}
                 value={validation?.values?.primaryBranch?.name || ""}
-                name="primaryBranch.name" 
+                name="primaryBranch.name"
                 invalid={
                   validation?.touched?.primaryBranch &&
                   validation?.touched?.primaryBranch?.name &&
@@ -43,17 +43,17 @@ const AddBranch = ({ edit, setEdit, validation }) => {
                 }
               />
               {validation?.touched?.primaryBranch &&
-              validation?.touched?.primaryBranch?.name &&
-              validation?.errors?.primaryBranch &&
-              validation?.errors?.primaryBranch?.name ? (
+                validation?.touched?.primaryBranch?.name &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.name ? (
                 <p style={{ color: "red" }}>
                   {validation.errors?.primaryBranch?.name}
                 </p>
               ) : null}
-            </div>
+            </FormGroup>
           </Col>
           <Col>
-            <div>
+            <FormGroup>
               <label className="col-form-label">Associated Warehouse</label>
               <select
                 name="primaryBranch.associatedWarehouse"
@@ -69,81 +69,77 @@ const AddBranch = ({ edit, setEdit, validation }) => {
                   validation?.errors?.primaryBranch?.associatedWarehouse
                 }
               >
-                <option>Select Associated Warehouse</option>
+                <option value="" disabled>Select Associated Warehouse</option>
                 {warehouseList.map((e) => (
                   <option value={e._id}>{e.name}</option>
                 ))}
               </select>
               {validation?.touched?.primaryBranch &&
-              validation?.touched?.primaryBranch?.associatedWarehouse &&
-              validation?.errors?.primaryBranch &&
-              validation?.errors?.primaryBranch?.associatedWarehouse ? (
+                validation?.touched?.primaryBranch?.associatedWarehouse &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.associatedWarehouse ? (
                 <p style={{ color: "red" }}>
                   {validation?.errors?.primaryBranch?.associatedWarehouse}
                 </p>
               ) : null}
-            </div>
+            </FormGroup>
           </Col>
         </Row>
-        <Row>
-          <div className="mt-3">
-            <label className="item-name">Branch Contact Number</label>
-            <input
-              name="primaryBranch.contact"
-              id="contact"
-              className="form-control"
-              type="text"
-              placeholder="Enter Branch Contact Number"
-              onChange={validation.handleChange}
-              onBlur={validation.handleBlur}
-              value={validation?.values?.primaryBranch?.contact || ""}
-              invalid={
-                validation?.touched?.primaryBranch &&
-                validation?.touched?.primaryBranch?.contact &&
-                validation?.errors?.primaryBranch &&
-                validation?.errors?.primaryBranch?.contact
-              }
-            />
-            {validation?.touched?.primaryBranch &&
+        <FormGroup>
+          <label className="item-name">Branch Contact Number</label>
+          <Input
+            name="primaryBranch.contact"
+            id="contact"
+            className="form-control"
+            type="text"
+            placeholder="Enter Branch Contact Number"
+            onChange={validation.handleChange}
+            onBlur={validation.handleBlur}
+            value={validation?.values?.primaryBranch?.contact || ""}
+            invalid={
+              validation?.touched?.primaryBranch &&
+              validation?.touched?.primaryBranch?.contact &&
+              validation?.errors?.primaryBranch &&
+              validation?.errors?.primaryBranch?.contact
+            }
+          />
+          {validation?.touched?.primaryBranch &&
             validation?.touched?.primaryBranch?.contact &&
             validation?.errors?.primaryBranch &&
             validation?.errors?.primaryBranch?.contact ? (
-              <p style={{ color: "red" }}>
-                {validation?.errors?.primaryBranch?.contact}
-              </p>
-            ) : null}
-          </div>
-        </Row>
-        <Row>
-          <div className="mt-3">
-            <Label>Branch Address</Label>
-            <Input
-              type="textarea"
-              id="address"
-              name="primaryBranch.address" 
-              rows="3"
-              placeholder="Enter Branch Address"
-              onChange={validation.handleChange}
-              onBlur={validation.handleBlur}
-              value={validation.values.primaryBranch?.address || ""}
-              invalid={
-                validation.touched?.primaryBranch &&
-                validation.touched?.primaryBranch?.address &&
-                validation.errors?.primaryBranch &&
-                validation.errors?.primaryBranch?.address
-              }
-            />
-            <span className="badgecount badge badge-success"></span>
-            {validation.touched?.primaryBranch &&
+            <p style={{ color: "red" }}>
+              {validation?.errors?.primaryBranch?.contact}
+            </p>
+          ) : null}
+        </FormGroup>
+        <FormGroup>
+          <Label>Branch Address</Label>
+          <Input
+            type="textarea"
+            id="address"
+            name="primaryBranch.address"
+            rows="3"
+            placeholder="Enter Branch Address"
+            onChange={validation.handleChange}
+            onBlur={validation.handleBlur}
+            value={validation.values.primaryBranch?.address || ""}
+            invalid={
+              validation.touched?.primaryBranch &&
+              validation.touched?.primaryBranch?.address &&
+              validation.errors?.primaryBranch &&
+              validation.errors?.primaryBranch?.address
+            }
+          />
+          <span className="badgecount badge badge-success"></span>
+          {validation.touched?.primaryBranch &&
             validation.touched?.primaryBranch?.address &&
             validation.errors?.primaryBranch &&
             validation.errors?.primaryBranch?.address ? (
-              <p style={{ color: "red" }}>
-                {validation.errors?.primaryBranch?.address}
-              </p>
-            ) : null}
-          </div>
-        </Row>
+            <p style={{ color: "red" }}>
+              {validation.errors?.primaryBranch?.address}
+            </p>
+          ) : null}
+        </FormGroup>
       </CardBody>
     </Card>
   );

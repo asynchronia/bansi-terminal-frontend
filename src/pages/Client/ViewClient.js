@@ -247,6 +247,7 @@ const ViewClient = (props) => {
   };
 
   const handleSubmitBranch = async (data, editId) => {
+    debugger
     if (editId) {
       const { clientId, ...restData } = data;
       const body = { ...restData, id: editId };

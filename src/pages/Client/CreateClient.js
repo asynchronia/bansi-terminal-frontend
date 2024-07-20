@@ -49,7 +49,7 @@ const CreateClient = (props) => {
     }
   };
 
-  
+
 
   const validation = useFormik({
     enableReinitialize: true,
@@ -84,14 +84,15 @@ const CreateClient = (props) => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please Enter Client Name"),
-      contact: Yup.string().required("Please Enter Valid Contact Number"),
-      email: Yup.string().required("Please Enter Client Email"),
+      contact: Yup.string()
+        .matches(/^\d+$/, 'Contact number must only contain digits')
+        .length(10, 'Contact number must be exactly 10 digits')
+        .required('Contact number is required'),
+      email: Yup.string().email("Please Enter Valid Email").required("Please Enter Client Email"),
       gstin: Yup.string().required("Please Enter GST Number"),
       pan: Yup.string().required("Please Enter PAN Number"),
       bankAccountName: Yup.string().required("Please EnterBank Account Name"),
-      bankAccountNumber: Yup.string().required(
-        "Please Enter Back Account Number"
-      ),
+      bankAccountNumber: Yup.string().required("Please Enter Back Account Number"),
       ifscCode: Yup.string().required("Please Enter IFSC Code"),
       primaryBranch: Yup.object().shape({
         name: Yup.string().required("Please Enter Branch Name"),
@@ -101,9 +102,12 @@ const CreateClient = (props) => {
       primaryUser: Yup.object().shape({
         firstName: Yup.string().required("Please Enter First Name"),
         lastName: Yup.string().required("Please Enter Last Name"),
-        email: Yup.string().required("Please Enter Email Id"),
+        email: Yup.string().email("Please Enter Valid Email").required("Please Enter Email Id"),
         password: Yup.string().required("Please Enter Password"),
-        contact: Yup.string().required("Please Enter Valid Contact Number"),
+        contact: Yup.string()
+          .matches(/^\d+$/, 'Contact number must only contain digits')
+          .length(10, 'Contact number must be exactly 10 digits')
+          .required('Contact number is required'),
         gender: Yup.string().required("Please Enter Gender"),
       }),
     }),
@@ -142,10 +146,10 @@ const CreateClient = (props) => {
   console.log(validation.errors)
 
   useEffect(() => {
-    props.setBreadcrumbItems("CreateItems", breadcrumbItems);
+    props.setBreadcrumbItems("Add New Client", breadcrumbItems);
   });
   return (
-    <Form className="form-horizontal mt-4">
+    <Form className="form-horizontal mt-4" autoComplete="off">
       <div style={{ position: "relative" }}>
         <ToastContainer position="top-center" theme="colored" />
         <div
@@ -231,7 +235,7 @@ const CreateClient = (props) => {
                         type="text"
                         placeholder="Enter Item Name"
                       />
-                      { validation.touched.name && validation.errors.name ? (
+                      {validation.touched.name && validation.errors.name ? (
                         <p style={{ color: "red" }}>{validation.errors.name}</p>
                       ) : null}
                     </div>
@@ -255,8 +259,8 @@ const CreateClient = (props) => {
                         }
                         placeholder="Enter Item Name"
                       />
-                      { validation.touched.contact &&
-                          validation.errors.contact ? (
+                      {validation.touched.contact &&
+                        validation.errors.contact ? (
                         <p style={{ color: "red" }}>
                           {validation.errors.contact}
                         </p>
@@ -279,7 +283,7 @@ const CreateClient = (props) => {
                         }
                         placeholder="Enter Item Name"
                       />
-                      {validation.touched.email && validation.errors.email? (
+                      {validation.touched.email && validation.errors.email ? (
                         <p style={{ color: "red" }}>
                           {validation.errors.email}
                         </p>
@@ -307,7 +311,7 @@ const CreateClient = (props) => {
                       <option value="individual">Individual</option>
                     </select>
                     {validation.touched.clientType &&
-                        validation.errors.clientType? (
+                      validation.errors.clientType ? (
                       <p style={{ color: "red" }}>
                         {validation.errors.clientType}
                       </p>
@@ -338,8 +342,8 @@ const CreateClient = (props) => {
                     }
                     placeholder="Enter Account Number"
                   />
-                  { validation.touched.bankAccountNumber &&
-                      validation.errors.bankAccountNumber ? (
+                  {validation.touched.bankAccountNumber &&
+                    validation.errors.bankAccountNumber ? (
                     <p style={{ color: "red" }}>
                       {validation.errors.bankAccountNumber}
                     </p>
@@ -361,8 +365,8 @@ const CreateClient = (props) => {
                       validation.errors.bankAccountName
                     }
                   />
-                  { validation.touched.bankAccountName &&
-                      validation.errors.bankAccountName ? (
+                  {validation.touched.bankAccountName &&
+                    validation.errors.bankAccountName ? (
                     <p style={{ color: "red" }}>
                       {validation.errors.bankAccountName}
                     </p>
@@ -383,7 +387,7 @@ const CreateClient = (props) => {
                       validation.touched.ifscCode && validation.errors.ifscCode
                     }
                   />
-                  { validation.touched.ifscCode && validation.errors.ifscCode ? (
+                  {validation.touched.ifscCode && validation.errors.ifscCode ? (
                     <p style={{ color: "red" }}>{validation.errors.ifscCode}</p>
                   ) : null}
                 </div>
@@ -419,7 +423,7 @@ const CreateClient = (props) => {
                       validation.touched.gstin && validation.errors.gstin
                     }
                   />
-                  { validation.touched.gstin && validation.errors.gstin? (
+                  {validation.touched.gstin && validation.errors.gstin ? (
                     <p style={{ color: "red" }}>{validation.errors.gstin}</p>
                   ) : null}
                 </div>
