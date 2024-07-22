@@ -320,7 +320,12 @@ const CreateClient = (props) => {
                 </Row>
               </CardBody>
             </Card>
-            <AddBranch validation={validation} />
+            <Card>
+              <CardBody>
+                <h4 className="card-title">Branch Details</h4>
+                <AddBranch validation={validation} />
+              </CardBody>
+            </Card>
           </Col>
           <Col xs="4">
             <Card>

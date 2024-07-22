@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { setBreadcrumbItems } from "../../store/actions";
 import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
+import { setBreadcrumbItems } from "../../store/actions";
 
-import Img404 from "../../assets/images/Img404.png";
+import { DriveFileRenameOutline } from "@mui/icons-material";
+import { CircularProgress } from "@mui/material";
+import "jspdf-autotable";
+import { ToastContainer, toast } from "react-toastify";
 import {
   Button,
   Card,
@@ -13,29 +16,24 @@ import {
   Modal,
   Row,
 } from "reactstrap";
-import { Avatar, CircularProgress } from "@mui/material";
+import Img404 from "../../assets/images/Img404.png";
+import AddBranch from "../../components/CustomComponents/AddBranch";
 import Agreement from "../../components/CustomComponents/Agreement";
 import AgreementTable from "../../components/CustomComponents/AgreementTable";
-import { ToastContainer, toast } from "react-toastify";
+import BranchData from "../../components/CustomComponents/BranchData";
+import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
+import UserData from "../../components/CustomComponents/UserData";
+import { signinReq } from "../../service/authService";
+import { createBranchReq, updateBranchReq } from "../../service/branchService";
 import {
   createAgreementReq,
   getAgreementReq,
   getClientWithIdReq,
 } from "../../service/clientService";
-import AddBranch from "../../components/CustomComponents/AddBranch";
-import BranchData from "../../components/CustomComponents/BranchData";
-import UserData from "../../components/CustomComponents/UserData";
-import { createBranchReq, updateBranchReq } from "../../service/branchService";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
-import { signinReq } from "../../service/authService";
 import { getTaxesReq } from "../../service/itemService";
-import { updateUserReq } from "../../service/usersService";
-import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
 import { updateClientStatusReq } from "../../service/statusService";
-import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
+import { updateUserReq } from "../../service/usersService";
 import ENV from "../../utility/env";
-
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
   const [agreementData, setAgreementData] = useState([]);
@@ -416,7 +414,7 @@ const ViewClient = (props) => {
         style={{
           position: "absolute",
           top: -50,
-          right: 10,
+          right: 0,
           display: "flex",
         }}
       >
@@ -429,43 +427,39 @@ const ViewClient = (props) => {
           <option value="active">Published</option>
           <option value="inactive">Draft</option>
         </select>
-        <button type="submit" className="btn btn-primary w-xl mx-3">
-          <Edit style={{ marginRight: "5px", fill: "white" }} />Edit
+        <button type="submit" className="btn btn-primary w-sm mx-1">
+          <DriveFileRenameOutline fontSize="small" />Edit
         </button>
       </div>
       <Row>
         <Col xs="8">
-          <Card style={{ border: "2px solid #0053FF" }}>
-            <CardBody>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <h4 className="card-title">Agreement</h4>
+          <Card>
+            <CardHeader>
+              <div className="d-flex align-items-center justify-content-between">
+                <h6 className="m-0">Agreement</h6>
                 {!agreementAvailable.loading && agreementAvailable.value ? (
-                  <div style={{ display: "flex", gap: "20px" }}>
-                    <Button
-                      className="btn btn-primary w-xl mb-1"
-                      onClick={downloadPDF}
-                    >
+                  <div className="d-flex gap-2">
+                    <Button color="primary" size="sm"
+                      onClick={downloadPDF}>
                       <i className="mdi mdi-download mx-2"></i>
                       Download PDF
                     </Button>
-                    <Button
-                      onClick={() => {
-                        handleModalToggle("agreement");
-                      }}
-                      className="btn-primary"
-                    >
+                    <Button color="primary" size="sm"
+                      onClick={() => { handleModalToggle("agreement"); }}>
                       <i className="mdi mdi-book-edit mx-2"></i>
                       Rework Agreement
                     </Button>
                   </div>
                 ) : null}
               </div>
+            </CardHeader>
+            <CardBody>
 
               {agreementAvailable.loading ? (
                 <CircularProgress style={{ marginLeft: "50%" }} />
               ) : !agreementAvailable.value ? (
                 <div>
-                  <CardHeader className="mt-3">
+                  <CardHeader>
                     <Row>
                       <Col>Product name</Col>
                       <Col>SKU</Col>
@@ -505,7 +499,7 @@ const ViewClient = (props) => {
                   </div>
                 </div>
               ) : (
-                <div style={{ height: "450px", overflowY: "scroll" }}>
+                <div style={{ maxHeight: "450px", overflow: "auto" }}>
                   <AgreementTable
                     editable={false}
                     agreementData={agreementData}
@@ -578,14 +572,10 @@ const ViewClient = (props) => {
         </Col>
         <Col xs="4">
           <Card>
+            <CardHeader tag="h6">Client Details</CardHeader>
             <CardBody>
-              <h4 className="card-title">Client Details</h4>
-              <hr></hr>
-              <div className="mt-3" style={{ display: "flex", gap: "20px" }}>
-                <Avatar variant="rounded" sx={{ bgcolor: "#0053FF" }}>
-                  {clientData?.name?.match(/\b\w/g)?.join("") || "UN"}
-                </Avatar>
-                <h4 className="my-auto">{clientData?.name}</h4>
+              <div className="d-flex">
+                <h5 className="my-auto">{clientData?.name}</h5>
               </div>
 
               <div className="mt-3">
@@ -624,19 +614,16 @@ const ViewClient = (props) => {
             </CardBody>
           </Card>
           <Card>
+            <CardHeader tag="h6">Payment Details</CardHeader>
             <CardBody>
-              <h4 className="card-title">Payment Details</h4>
-              <hr></hr>
-              <div className="mt-3">
-                <Row>
-                  <Col xs="4">
-                    <p>Account Name:</p>
-                  </Col>
-                  <Col xs="8">
-                    <p>{clientData?.bankAccountName}</p>
-                  </Col>
-                </Row>
-              </div>
+              <Row>
+                <Col xs="4">
+                  <p>Account Name:</p>
+                </Col>
+                <Col xs="8">
+                  <p>{clientData?.bankAccountName}</p>
+                </Col>
+              </Row>
               <div>
                 <Row>
                   <Col xs="4">

@@ -102,7 +102,7 @@ const BranchData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%", overflowX: "scroll" }}>
+      <div style={{ maxHeight: 300, width: "100%", overflow: "auto" }}>
         <Table>
           <thead>
             <tr>
@@ -114,7 +114,7 @@ const BranchData = (props) => {
           <tbody>
             {branchData.length > 0 ? (
               branchData.map((branch) => (
-                <tr key={branch._id}>
+                <tr key={branch._id} style={{ verticalAlign: 'middle' }}>
                   <td>
                     {branch.Name}{" "}
                     <span>

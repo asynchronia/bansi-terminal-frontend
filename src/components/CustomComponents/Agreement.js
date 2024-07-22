@@ -325,7 +325,7 @@ const Agreement = (props) => {
             </div>
           ) : null}
         </div>
-        <div style={{ height: "400px", overflowY: "scroll" }}>
+        <div style={{ maxHeight: "400px", overflow: "auto" }}>
           <AgreementTable
             editable={true}
             agreementData={agreementData}
