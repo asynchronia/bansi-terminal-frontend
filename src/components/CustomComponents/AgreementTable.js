@@ -1,6 +1,8 @@
-import { Chip } from "@mui/material";
+import { Chip, IconButton, Tooltip } from "@mui/material";
 import React, { useRef } from "react";
 import { Button, CardHeader, Table } from "reactstrap";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { DeleteOutline } from "@mui/icons-material";
 
 const AgreementTable = (props) => {
   const {
@@ -110,13 +112,13 @@ const AgreementTable = (props) => {
               <td >{data?.tax}</td>
               {editable ? (
                 <td>
-                  <Button color="danger" size="sm" outline
-                    onClick={() => {
+                  <Tooltip title="Delete" arrow placement="right">
+                    <IconButton aria-label="delete" size="small" color="error" onClick={() => {
                       handleDeleteAgreement(data.id);
-                    }}
-                  >
-                    <i className="mdi mdi-18px mdi-delete"></i>
-                  </Button>
+                    }}>
+                      <DeleteOutline fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </td>
               ) : null}
             </tr>

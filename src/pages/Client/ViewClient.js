@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
 import { setBreadcrumbItems } from "../../store/actions";
 
-import { DriveFileRenameOutline } from "@mui/icons-material";
+import { Call, DriveFileRenameOutline, Email, Work } from "@mui/icons-material";
 import { CircularProgress } from "@mui/material";
 import "jspdf-autotable";
 import { ToastContainer, toast } from "react-toastify";
@@ -574,43 +574,10 @@ const ViewClient = (props) => {
           <Card>
             <CardHeader tag="h6">Client Details</CardHeader>
             <CardBody>
-              <div className="d-flex">
-                <h5 className="my-auto">{clientData?.name}</h5>
-              </div>
-
-              <div className="mt-3">
-                <Row>
-                  <Col xs="4">
-                    <p>Email:</p>
-                  </Col>
-                  <Col xs="8">
-                    <p>{clientData?.email}</p>
-                  </Col>
-                </Row>
-              </div>
-              <div>
-                <Row>
-                  <Col xs="4">
-                    {" "}
-                    <p>Contact:</p>
-                  </Col>
-                  <Col xs="8">
-                    <p>{clientData?.contact}</p>
-                  </Col>
-                </Row>
-              </div>
-              <div>
-                <Row>
-                  <Col xs="4">
-                    {" "}
-                    <p>Type:</p>
-                  </Col>
-                  <Col xs="8">
-                    {" "}
-                    <p>{clientData?.clientType}</p>
-                  </Col>
-                </Row>
-              </div>
+              <h5>{clientData?.name}</h5>
+              <p><Email color="primary" /> {clientData?.email}</p>
+              <p><Call color="primary" /> {clientData?.contact}</p>
+              <p><Work /> {clientData?.clientType}</p>
             </CardBody>
           </Card>
           <Card>
@@ -666,9 +633,9 @@ const ViewClient = (props) => {
               </div>
             </CardBody>
           </Card>
-        </Col>
-      </Row>
-    </div>
+        </Col >
+      </Row >
+    </div >
   );
 };
 
