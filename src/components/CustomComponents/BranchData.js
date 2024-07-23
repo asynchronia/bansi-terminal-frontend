@@ -40,10 +40,9 @@ const BranchData = (props) => {
         _id: item._id,
         Name: item.name,
         isPrimary: item.isPrimary,
-        AssociatedWarehouse: item.associatedWarehouse.code,
+        AssociatedWarehouse: item.associatedWarehouse?.code,
         Contact: item.contact,
       }));
-
       setBranchData(newArray);
     } catch (error) {}
   };
