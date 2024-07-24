@@ -62,6 +62,7 @@ const CreateClient = (props) => {
       logo: "",
       gstin: null,
       pan: null,
+      zohoCustomerId: "",
       bankAccountName: null,
       bankAccountNumber: null,
       ifscCode: null,
@@ -91,7 +92,8 @@ const CreateClient = (props) => {
       email: Yup.string().email("Please Enter Valid Email").required("Please Enter Client Email"),
       gstin: Yup.string().required("Please Enter GST Number"),
       pan: Yup.string().required("Please Enter PAN Number"),
-      bankAccountName: Yup.string().required("Please EnterBank Account Name"),
+      zohoCustomerId: Yup.string().required("Please Enter ZOHO Customer Id"),
+      bankAccountName: Yup.string().required("Please Enter Bank Account Name"),
       bankAccountNumber: Yup.string().required("Please Enter Back Account Number"),
       ifscCode: Yup.string().required("Please Enter IFSC Code"),
       primaryBranch: Yup.object().shape({
@@ -324,6 +326,34 @@ const CreateClient = (props) => {
               <CardBody>
                 <h4 className="card-title">Branch Details</h4>
                 <AddBranch validation={validation} />
+              </CardBody>
+            </Card>
+            <Card>
+              <CardBody>
+                <h4 className="card-title">Additional Details</h4>
+                <div className="mt-4">
+                  <label className="item-name">ZOHO Customer Id</label>
+                  <input
+                    name="zohoCustomerId"
+                    id="zohoCustomerId"
+                    className="form-control"
+                    type="text"
+                    onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.zohoCustomerId}
+                    invalid={
+                      validation.touched.zohoCustomerId &&
+                      validation.errors.zohoCustomerId
+                    }
+                    placeholder="Enter ZOHO Customer Id"
+                  />
+                  {validation.touched.zohoCustomerId &&
+                    validation.errors.zohoCustomerId ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.zohoCustomerId}
+                    </p>
+                  ) : null}
+                </div>
               </CardBody>
             </Card>
           </Col>
