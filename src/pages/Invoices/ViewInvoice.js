@@ -163,8 +163,8 @@ const ViewInvoice = (props) => {
     page: 1,
     limit: 200,
   };
-const getTargetElement = () => document.getElementById("invoice-container");
-const downloadPDF = () => generatePDF(getTargetElement, options);
+  const getTargetElement = () => document.getElementById("invoice-container");
+  const downloadPDF = () => generatePDF(getTargetElement, options);
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
     const responseObj = await getInvoiceReq(body, invoiceId.id);
@@ -368,57 +368,57 @@ const downloadPDF = () => generatePDF(getTargetElement, options);
       }
   }
   * */
-const getBaseDetails = () =>{
-  return(
-        <div id="invoice-details" class="invoice-details">
-          <div className="invoice-details-lhs">
-              <h3>
-                <br />
-                <span>Bansi Office Solutions Private Limited</span>
-              </h3>
-              <span className="invoice-addr">{"#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India"}</span>
-              <br />
-              GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
-              <br />
-              MSME No : UDYAM-KR-03-0065095
-              <br />
-              Web: www.willsmeet.com, Email:sales@willsmeet.com
-              <br />
+  const getBaseDetails = () => {
+    return (
+      <div id="invoice-details" class="invoice-details">
+        <div className="invoice-details-lhs">
+          <h3>
+            <br />
+            <span>Bansi Office Solutions Private Limited</span>
+          </h3>
+          <span className="invoice-addr">{"#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India"}</span>
+          <br />
+          GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
+          <br />
+          MSME No : UDYAM-KR-03-0065095
+          <br />
+          Web: www.willsmeet.com, Email:sales@willsmeet.com
+          <br />
         </div>
         <div className="invoice-details-rhs">
           {"TAX INVOICE"}
-          <br/>
+          <br />
           {responseObj ? "INVOICE " + responseObj.invoice_number : ""}
         </div>
       </div>
-  )
-}
-const getInvoiceTable = () =>{
- return( <>
-  <h5>{"Invoice Information"}</h5>
-  <div className="inv-table-div">
-    <table className="invoice-sub-table">
-      <tbody className="inv-tbody">
-      <tr className="invoice-tr-hdr">
-        {columnDefs.map(ele => <th>{ele.headerName}</th>)}
-      </tr>
-        {rowData.map(ele => 
-        <tr className="invoice-tr">
-          <td>{ele.description}</td>
-          <td>{ele.unit}</td>
-          <td>{ele.hsn_or_sac}</td>
-          <td>{ele.quantity}</td>
-          <td>{formatNumberWithCommasAndDecimal(ele.rate)}</td>
-          <td>{ele.cgst}</td>
-          <td>{formatNumberWithCommasAndDecimal(ele.cgst_tax)}</td>
-          <td>{ele.sgst}</td>
-          <td>{formatNumberWithCommasAndDecimal(ele.sgst_tax)}</td>
-          <td>{formatNumberWithCommasAndDecimal(ele.item_total)}</td>
-        </tr>)}</tbody>
-    </table>
-    </div>
-  </>);
-}
+    )
+  }
+  const getInvoiceTable = () => {
+    return (<>
+      <h5>{"Invoice Information"}</h5>
+      <div className="inv-table-div">
+        <table className="invoice-sub-table">
+          <tbody className="inv-tbody">
+            <tr className="invoice-tr-hdr">
+              {columnDefs.map(ele => <th>{ele.headerName}</th>)}
+            </tr>
+            {rowData.map(ele =>
+              <tr className="invoice-tr">
+                <td>{ele.description}</td>
+                <td>{ele.unit}</td>
+                <td>{ele.hsn_or_sac}</td>
+                <td>{ele.quantity}</td>
+                <td>{formatNumberWithCommasAndDecimal(ele.rate)}</td>
+                <td>{ele.cgst}</td>
+                <td>{formatNumberWithCommasAndDecimal(ele.cgst_tax)}</td>
+                <td>{ele.sgst}</td>
+                <td>{formatNumberWithCommasAndDecimal(ele.sgst_tax)}</td>
+                <td>{formatNumberWithCommasAndDecimal(ele.item_total)}</td>
+              </tr>)}</tbody>
+        </table>
+      </div>
+    </>);
+  }
   return (
     <React.Fragment>
       <div className="view-invoice" id="view-invoice">
@@ -432,62 +432,62 @@ const getInvoiceTable = () =>{
         >
           {responseObj && (
             <button
-            type="submit"
-            className="btn btn-outline-primary w-xl mx-3"
-            onClick={downloadPDF}
-          >
-            Download PDF
-          </button>
+              type="submit"
+              className="btn btn-outline-primary w-xl mx-3"
+              onClick={downloadPDF}
+            >
+              Download PDF
+            </button>
           )}
           <button type="submit" className="btn btn-primary w-xl mx-3">
             Send on Mail
           </button>
         </div>
-           
-              <Card>
+
+        <Card>
+          <CardBody>
+            <div class="card-content">
+              <div class="image-container">
+                <img
+                  src={require("../../assets/images/Willsmeet-Logo.png")}
+                  alt="Company Logo"
+                  class="card-image"
+                />
+              </div>
+              {getBaseDetails()}
+            </div>
+          </CardBody>
+        </Card>
+        <div id="invoice-container">
+          <Row>
+            <Col>
+              <Card className="col-style">
+                <CardBody>{responseObj && getInvoiceInfo()}</CardBody>
+              </Card>
+            </Col>
+            <Col>
+              <Card className="col-style">
                 <CardBody>
-                  <div class="card-content">
-                    <div class="image-container">
-                      <img
-                        src={require("../../assets/images/Willsmeet-Logo.png")}
-                        alt="Company Logo"
-                        class="card-image"
-                      />
-                    </div> 
-                    {getBaseDetails()}
-                  </div>
+                  {responseObj && getAddress("billing")}
+                  <br />
+                  {responseObj && getAddress("shipping")}
                 </CardBody>
               </Card>
-          <div id="invoice-container">
-              <Row>
-                <Col>
-                  <Card className="col-style">
-                    <CardBody>{responseObj && getInvoiceInfo()}</CardBody>
-                  </Card>
-                </Col>
-                <Col>
-                  <Card className="col-style">
-                    <CardBody>
-                      {responseObj && getAddress("billing")}
-                      <br />
-                      {responseObj && getAddress("shipping")}
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
-              <Row>
-                <Col className="col-12">
-                  <Card>
-                    <CardBody>
-                      <div
-                        className="ag-theme-quartz"
-                        style={{
-                          height: "320px",
-                          width: "100%",
-                        }}
-                      >
-                        {getInvoiceTable()}
-                      {/*} <AgGridReact
+            </Col>
+          </Row>
+          <Row>
+            <Col className="col-12">
+              <Card>
+                <CardBody>
+                  <div
+                    className="ag-theme-quartz"
+                    style={{
+                      height: "320px",
+                      width: "100%",
+                    }}
+                  >
+                    {getInvoiceTable()}
+                    {/*} <AgGridReact
                           ref={gridRef}
                           rowHeight={60}
                           suppressRowClickSelection={true}
@@ -499,33 +499,33 @@ const getInvoiceTable = () =>{
                           onGridReady={(event) => event.api.sizeColumnsToFit()}
                           rowData={rowData}
                       ></AgGridReact>*/}
-                      </div>
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Card className="col-style">
-                    <CardBody>{responseObj && getTermsSection()}</CardBody>
-                  </Card>
-                </Col>
-                <Col>
-                  <Card className="col-style">
-                    <CardBody>
-                      {responseObj && getInvoiceFinalDetails()}
-                      <div class="image-container-seal">
-                        <img
-                          src={require("../../assets/images/bansi-seal.png")}
-                          alt="Company Seal"
-                          class="card-image-seal"
-                        />
-                      </div>
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
-          </div>
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Card className="col-style">
+                <CardBody>{responseObj && getTermsSection()}</CardBody>
+              </Card>
+            </Col>
+            <Col>
+              <Card className="col-style">
+                <CardBody>
+                  {responseObj && getInvoiceFinalDetails()}
+                  <div class="image-container-seal">
+                    <img
+                      src={require("../../assets/images/bansi-seal.png")}
+                      alt="Company Seal"
+                      class="card-image-seal"
+                    />
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+        </div>
       </div>
     </React.Fragment>
   );

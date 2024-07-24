@@ -49,7 +49,7 @@ const CreateClient = (props) => {
     }
   };
 
-  
+
 
   const validation = useFormik({
     enableReinitialize: true,
@@ -62,6 +62,7 @@ const CreateClient = (props) => {
       logo: "",
       gstin: null,
       pan: null,
+      zohoCustomerId: "",
       bankAccountName: null,
       bankAccountNumber: null,
       ifscCode: null,
@@ -84,14 +85,16 @@ const CreateClient = (props) => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please Enter Client Name"),
-      contact: Yup.string().required("Please Enter Valid Contact Number"),
-      email: Yup.string().required("Please Enter Client Email"),
+      contact: Yup.string()
+        .matches(/^\d+$/, 'Contact number must only contain digits')
+        .length(10, 'Contact number must be exactly 10 digits')
+        .required('Contact number is required'),
+      email: Yup.string().email("Please Enter Valid Email").required("Please Enter Client Email"),
       gstin: Yup.string().required("Please Enter GST Number"),
       pan: Yup.string().required("Please Enter PAN Number"),
-      bankAccountName: Yup.string().required("Please EnterBank Account Name"),
-      bankAccountNumber: Yup.string().required(
-        "Please Enter Back Account Number"
-      ),
+      zohoCustomerId: Yup.string().required("Please Enter ZOHO Customer Id"),
+      bankAccountName: Yup.string().required("Please Enter Bank Account Name"),
+      bankAccountNumber: Yup.string().required("Please Enter Back Account Number"),
       ifscCode: Yup.string().required("Please Enter IFSC Code"),
       primaryBranch: Yup.object().shape({
         name: Yup.string().required("Please Enter Branch Name"),
@@ -101,9 +104,12 @@ const CreateClient = (props) => {
       primaryUser: Yup.object().shape({
         firstName: Yup.string().required("Please Enter First Name"),
         lastName: Yup.string().required("Please Enter Last Name"),
-        email: Yup.string().required("Please Enter Email Id"),
+        email: Yup.string().email("Please Enter Valid Email").required("Please Enter Email Id"),
         password: Yup.string().required("Please Enter Password"),
-        contact: Yup.string().required("Please Enter Valid Contact Number"),
+        contact: Yup.string()
+          .matches(/^\d+$/, 'Contact number must only contain digits')
+          .length(10, 'Contact number must be exactly 10 digits')
+          .required('Contact number is required'),
         gender: Yup.string().required("Please Enter Gender"),
       }),
     }),
@@ -142,10 +148,10 @@ const CreateClient = (props) => {
   console.log(validation.errors)
 
   useEffect(() => {
-    props.setBreadcrumbItems("CreateItems", breadcrumbItems);
+    props.setBreadcrumbItems("Add New Client", breadcrumbItems);
   });
   return (
-    <Form className="form-horizontal mt-4">
+    <Form className="form-horizontal mt-4" autoComplete="off">
       <div style={{ position: "relative" }}>
         <ToastContainer position="top-center" theme="colored" />
         <div
@@ -231,7 +237,7 @@ const CreateClient = (props) => {
                         type="text"
                         placeholder="Enter Item Name"
                       />
-                      { validation.touched.name && validation.errors.name ? (
+                      {validation.touched.name && validation.errors.name ? (
                         <p style={{ color: "red" }}>{validation.errors.name}</p>
                       ) : null}
                     </div>
@@ -255,8 +261,8 @@ const CreateClient = (props) => {
                         }
                         placeholder="Enter Item Name"
                       />
-                      { validation.touched.contact &&
-                          validation.errors.contact ? (
+                      {validation.touched.contact &&
+                        validation.errors.contact ? (
                         <p style={{ color: "red" }}>
                           {validation.errors.contact}
                         </p>
@@ -279,7 +285,7 @@ const CreateClient = (props) => {
                         }
                         placeholder="Enter Item Name"
                       />
-                      {validation.touched.email && validation.errors.email? (
+                      {validation.touched.email && validation.errors.email ? (
                         <p style={{ color: "red" }}>
                           {validation.errors.email}
                         </p>
@@ -307,7 +313,7 @@ const CreateClient = (props) => {
                       <option value="individual">Individual</option>
                     </select>
                     {validation.touched.clientType &&
-                        validation.errors.clientType? (
+                      validation.errors.clientType ? (
                       <p style={{ color: "red" }}>
                         {validation.errors.clientType}
                       </p>
@@ -316,7 +322,40 @@ const CreateClient = (props) => {
                 </Row>
               </CardBody>
             </Card>
-            <AddBranch validation={validation} />
+            <Card>
+              <CardBody>
+                <h4 className="card-title">Branch Details</h4>
+                <AddBranch validation={validation} />
+              </CardBody>
+            </Card>
+            <Card>
+              <CardBody>
+                <h4 className="card-title">Additional Details</h4>
+                <div className="mt-4">
+                  <label className="item-name">ZOHO Customer Id</label>
+                  <input
+                    name="zohoCustomerId"
+                    id="zohoCustomerId"
+                    className="form-control"
+                    type="text"
+                    onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.zohoCustomerId}
+                    invalid={
+                      validation.touched.zohoCustomerId &&
+                      validation.errors.zohoCustomerId
+                    }
+                    placeholder="Enter ZOHO Customer Id"
+                  />
+                  {validation.touched.zohoCustomerId &&
+                    validation.errors.zohoCustomerId ? (
+                    <p style={{ color: "red" }}>
+                      {validation.errors.zohoCustomerId}
+                    </p>
+                  ) : null}
+                </div>
+              </CardBody>
+            </Card>
           </Col>
           <Col xs="4">
             <Card>
@@ -338,8 +377,8 @@ const CreateClient = (props) => {
                     }
                     placeholder="Enter Account Number"
                   />
-                  { validation.touched.bankAccountNumber &&
-                      validation.errors.bankAccountNumber ? (
+                  {validation.touched.bankAccountNumber &&
+                    validation.errors.bankAccountNumber ? (
                     <p style={{ color: "red" }}>
                       {validation.errors.bankAccountNumber}
                     </p>
@@ -361,8 +400,8 @@ const CreateClient = (props) => {
                       validation.errors.bankAccountName
                     }
                   />
-                  { validation.touched.bankAccountName &&
-                      validation.errors.bankAccountName ? (
+                  {validation.touched.bankAccountName &&
+                    validation.errors.bankAccountName ? (
                     <p style={{ color: "red" }}>
                       {validation.errors.bankAccountName}
                     </p>
@@ -383,7 +422,7 @@ const CreateClient = (props) => {
                       validation.touched.ifscCode && validation.errors.ifscCode
                     }
                   />
-                  { validation.touched.ifscCode && validation.errors.ifscCode ? (
+                  {validation.touched.ifscCode && validation.errors.ifscCode ? (
                     <p style={{ color: "red" }}>{validation.errors.ifscCode}</p>
                   ) : null}
                 </div>
@@ -419,7 +458,7 @@ const CreateClient = (props) => {
                       validation.touched.gstin && validation.errors.gstin
                     }
                   />
-                  { validation.touched.gstin && validation.errors.gstin? (
+                  {validation.touched.gstin && validation.errors.gstin ? (
                     <p style={{ color: "red" }}>{validation.errors.gstin}</p>
                   ) : null}
                 </div>

@@ -1,18 +1,18 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import { Row, Col, Card, CardBody, Input } from "reactstrap"
-import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
+import { AgGridReact } from 'ag-grid-react';
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
-import DropdownMenuBtn from "./DropdownMenuBtn";
-import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import { Card, CardBody, Col, Input, Row } from "reactstrap";
 import { getOrdersReq } from "../../service/orderService";
-import OrderStatusRenderer from "./OrderStatusRenderer";
-import CircleRenderer from "./CircleRenderer";
 import { changePreloader } from "../../store/actions";
+import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
+import CircleRenderer from "./CircleRenderer";
+import DropdownMenuBtn from "./DropdownMenuBtn";
+import OrderStatusRenderer from "./OrderStatusRenderer";
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -47,13 +47,19 @@ const AllOrders = (props) => {
     redirectToViewPage(id);
   }
 
+  const onGridReady = useCallback((params) => {
+    gridRef.current.api.sizeColumnsToFit();
+    gridRef.current.api.autoSizeColumns(['order_status', 'invoiced_status', 'paid_status', 'shipped_status']);
+  }, []);
+
+
   useEffect(() => {
     props.setBreadcrumbItems('All Orders', breadcrumbItems);
     const body = {
       page: page,
       limit: paginationPageSize,
     }
-    if(searchValue) {
+    if (searchValue) {
       body.search_text = searchValue;
     }
     getListOfRowData(body);
@@ -158,59 +164,58 @@ const AllOrders = (props) => {
   const columnDefs = [
     {
       headerName: "Order Date", field: "date",
-      headerCheckboxSelection: true, checkboxSelection: true, suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      width: 150, sortable: false
+      sortable: false, width: 120
     },
     {
-      headerName: "Order No.", field: "salesorder_id", suppressMenu: true,
+      headerName: "Order No.", field: "salesorder_id", flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      width: 200, sortable: false
+      sortable: false, minWidth: 140
     },
     {
-      headerName: "Client", field: "customer_name", suppressMenu: true,
+      headerName: "Client", field: "customer_name", flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      width: 200, sortable: false
+      sortable: false, minWidth: 200
     },
     {
-      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer, suppressMenu: true,
+      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      width: 120, sortable: false
+      sortable: false
     },
     {
-      headerName: "Total Amount", field: "total", suppressMenu: true,
+      headerName: "Total Amount", field: "total", minWdth: 100,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
-      width: 130, sortable: false
+      sortable: false
     },
     {
-      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Invoice",
-      width: 80, sortable: false
+      sortable: false, width: 90
     },
     {
-      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Payment",
-      width: 100, sortable: false
+      sortable: false, width: 90
     },
     {
-      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer, suppressMenu: true,
+      headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Shipment",
-      width: 100, sortable: false
+      sortable: false, width: 100
 
     },
     {
-      headerName: "Action", field: "action", sortable: false,
+      headerName: "Action", field: "action", sortable: false, width: 100,
       cellClass: "actions-button-cell",
       cellRenderer: DropdownMenuBtn,
       cellRendererParams: {
@@ -218,8 +223,7 @@ const AllOrders = (props) => {
         handleEditClick: handleEditClick,
         handleViewClick: handleViewClick,
       }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
-      width: 90
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Actions"
     }
   ]
   const notify = (type, message) => {
@@ -258,7 +262,7 @@ const AllOrders = (props) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by sales order number or customer name..."
+                          placeholder="Search by Order number or Client"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
@@ -274,16 +278,16 @@ const AllOrders = (props) => {
                 >
                   <AgGridReact
                     ref={gridRef}
-                    suppressRowClickSelection={true}
+                    defaultColDef={{ resizable: false, suppressMovable: true }}
                     columnDefs={columnDefs}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
-                    rowSelection="multiple"
-                    reactiveCustomComponents
-                    autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}>
+                    onPaginationChanged={onPaginationChanged}
+
+                    onGridReady={onGridReady}
+                  >
                   </AgGridReact>
                 </div>
               </CardBody>

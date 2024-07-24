@@ -1,6 +1,8 @@
-import { Chip } from "@mui/material";
+import { Chip, IconButton, Tooltip } from "@mui/material";
 import React, { useRef } from "react";
-import { CardHeader, Table } from "reactstrap";
+import { Button, CardHeader, Table } from "reactstrap";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { DeleteOutline } from "@mui/icons-material";
 
 const AgreementTable = (props) => {
   const {
@@ -67,61 +69,60 @@ const AgreementTable = (props) => {
 
 
   return (
-    <Table className="mt-3">
+    <Table>
       <thead>
         <tr>
           <th>Product Name</th>
           <th>SKU</th>
-          <th>Cost</th>
+          <th style={{ width: '20%' }}>Cost</th>
           <th>Tax Bracket</th>
+          {editable && <th>Action</th>}
         </tr>
       </thead>
       <tbody id="agreementBody">
         {displayTableData?.length > 0
           ? displayTableData.map((data) => (
-              <tr key={data.id}>
-                <td className="pt-4" style={{ display: "flex", flexDirection: "column" }}>
-                  <p>{data.title}</p>
-                  <div style={{display:'flex', gap:'3px'}}>
-                  {data.type==='variable'? 
-                  data.attributes.map((attribute, index) => (
-                    <Chip size="small" key={index} label={`${attribute.name}: ${attribute.value}`} />
-                  )):null
+            <tr key={data.id} style={{ verticalAlign: 'middle' }}>
+              <td>
+                <span>{data.title}</span>
+                <div style={{ display: 'flex', gap: '3px' }}>
+                  {data.type === 'variable' ?
+                    data.attributes.map((attribute, index) => (
+                      <Chip size="small" key={index} label={`${attribute.name}: ${attribute.value}`} />
+                    )) : null
                   }
-                  </div>
-                </td>
-                <td className="pt-4">{data.sku}</td>
+                </div>
+              </td>
+              <td >{data.sku}</td>
 
-                {editable ? (
-                  <td>
-                    <input
-                      type="text"
-                      value={data?.sellingPrice || ""}
-                      className="form-control"
-                      onChange={(event) => {
-                        handleSellingPrice(event, data.id, data.itemId);
-                      }}
-                    />
-                  </td>
-                ) : (
-                  <td className="pt-4">₹{`${data?.sellingPrice}/per ${data.unit}` || ""}</td>
-                )}
-                <td className="pt-4">{data?.tax}</td>
-                {editable ? (
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-primary waves-effect waves-light"
-                      onClick={() => {
-                        handleDeleteAgreement(data.id);
-                      }}
-                    >
-                      <i className="mdi mdi-18px mdi-delete"></i>
-                    </button>
-                  </td>
-                ) : null}
-              </tr>
-            ))
+              {editable ? (
+                <td>
+                  <input
+                    type="text"
+                    value={data?.sellingPrice || ""}
+                    className="form-control"
+                    onChange={(event) => {
+                      handleSellingPrice(event, data.id, data.itemId);
+                    }}
+                  />
+                </td>
+              ) : (
+                <td >₹{`${data?.sellingPrice}/per ${data.unit}` || ""}</td>
+              )}
+              <td >{data?.tax}</td>
+              {editable ? (
+                <td>
+                  <Tooltip title="Delete" arrow placement="right">
+                    <IconButton aria-label="delete" size="small" color="error" onClick={() => {
+                      handleDeleteAgreement(data.id);
+                    }}>
+                      <DeleteOutline fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </td>
+              ) : null}
+            </tr>
+          ))
           : null}
       </tbody>
     </Table>

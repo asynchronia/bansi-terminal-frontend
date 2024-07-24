@@ -258,7 +258,7 @@ const ViewPurchaseOrder = (props) => {
                 <div
                   className="ag-theme-quartz"
                   style={{
-                    height: '500px',
+                    height: '550px',
                     width: '100%'
                   }}
                 >
@@ -269,7 +269,6 @@ const ViewPurchaseOrder = (props) => {
                     pagination={true}
                     paginationPageSize={10}
                     paginationPageSizeSelector={[10, 25, 50]}
-                    rowSelection="multiple"
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
                     quickFilterText={inputValue}
