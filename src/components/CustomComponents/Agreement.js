@@ -7,6 +7,7 @@ import { Chip, CircularProgress, TableHead } from "@mui/material";
 import { getUploadUrlReq } from "../../service/fileService";
 import axios from "axios";
 import StyledButton from "../Common/StyledButton";
+import { debounce } from 'lodash';
 
 const Agreement = (props) => {
   const {
@@ -96,16 +97,18 @@ const Agreement = (props) => {
     }
   };
 
+  const debouncedFetchResults = useCallback(debounce((searchQuery) => {
+    searchQuery.search !== '' && getListOfRowData(searchQuery);
+  }, 500), []);
+
   const handleSearchQuery = (event) => {
-    if (event.key === "Enter") {
-      let data = {
-        search: event.target.value,
-        limit: 10,
-      };
-      setShowRowData(true);
-      setLoadedData(true);
-      getListOfRowData(data);
-    }
+    let data = {
+      search: event.target.value,
+      limit: 10,
+    };
+    setShowRowData(true);
+    setLoadedData(true);
+    debouncedFetchResults(data);
   };
 
   const getListOfRowData = async (data) => {
@@ -193,9 +196,8 @@ const Agreement = (props) => {
                 name="searchQuery"
                 placeholder="Search Item"
                 className="form-control mt-3"
-                onKeyDown={(event) => {
-                  handleSearchQuery(event);
-                }}
+                autoComplete="off"
+                onChange={handleSearchQuery}
               />
             </Col>
             <Col xs="3" className="mt-3">
@@ -227,12 +229,10 @@ const Agreement = (props) => {
             <div
               className="form-control"
               style={{
-                textAlign: "center",
                 position: "absolute",
                 zIndex: 2,
-                width: "750px",
                 height: "500px",
-                overflowY: "scroll",
+                overflow: "auto",
               }}
             >
               <Row
@@ -280,7 +280,7 @@ const Agreement = (props) => {
                                 item.title
                               );
                             }}
-                            className="py-3"
+                            className="py-2"
                             style={{
                               borderBottom: "1px solid #f4f4f4",
                               cursor: "pointer",
@@ -288,7 +288,7 @@ const Agreement = (props) => {
                             key={variant._id}
                           >
                             <Col>
-                              <p>{item.title}</p>
+                              <p className="m-0">{item.title}</p>
                               <div sx={{ display: "flex", gap: "3px" }}>
                                 {variant.attributes
                                   ? variant?.attributes?.map((attribute) => (
