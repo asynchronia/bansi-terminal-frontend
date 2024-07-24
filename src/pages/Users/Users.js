@@ -65,7 +65,7 @@ const Users = (props) => {
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Users", link: "#" },
-    { title: "Add User", link: "#" },
+    /* { title: "Add User", link: "#" } */,
   ];
 
   const getUsersData = useCallback(async (body) => {
@@ -78,7 +78,7 @@ const Users = (props) => {
 
 
   const rolesData = useCallback(async (body) => {
-    const response = await getUserRoleListReq(usersData.role);
+    const response = await getUserRoleListReq(true);
     if (response && response.payload) {
       setSelectedRole(
         response?.payload?.roles.map((item, i) => (
@@ -136,7 +136,8 @@ const Users = (props) => {
       <ToastContainer position="top-center" theme="colored" />
       <Form className="form-horizontal mt-4" onSubmit={handleSubmit}>
         <Row>
-          <Col xl="4">
+          {/* TODO: Add admin users form */}
+          {/* <Col xl="4">
             <Card>
               <CardBody>
                 <h4 className="card-title">Add User</h4>
@@ -235,7 +236,7 @@ const Users = (props) => {
                 </Row>
               </CardBody>
             </Card>
-          </Col>
+          </Col> */}
 
           <Col xl="8">{renderUserCards()}</Col>
         </Row>

@@ -13,7 +13,8 @@ import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 import ApproveConfirm from "../../components/CustomComponents/ApproveConfirm";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import RequireUserType from "../../routes/middleware/requireUserType";
-import { USER_TYPES_ENUM } from "../../utility/constants";
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
+import RequirePermission from "../../routes/middleware/requirePermission";
 import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 
 const PurchaseOrderDetails = (props) => {
@@ -226,30 +227,34 @@ const PurchaseOrderDetails = (props) => {
             // </Typography>)
           }
           <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
-            {status === 'published' && (
-              <StyledButton
-                color={"success"}
-                className={"w-md mx-2"}
-                isLoading={isButtonLoading}
-                onClick={submitPurchaseOrder}
-              >
-                <CorrectSign className="me-1" />
-                Approve
-              </StyledButton>
-            )}
+            <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+              {status === 'published' && (
+                <StyledButton
+                  color={"success"}
+                  className={"w-md mx-2"}
+                  isLoading={isButtonLoading}
+                  onClick={submitPurchaseOrder}
+                >
+                  <CorrectSign className="me-1" />
+                  Approve
+                </StyledButton>
+              )}
+            </RequirePermission>
           </RequireUserType>
           <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
-            {status === 'published' && (
-              <StyledButton
-                color={"danger"}
-                className={"w-md mx-2"}
-                isLoading={isButtonLoading}
-                onClick={rejectPurchaseOrder}
-              >
-                <Delete className="me-1" />
-                Reject
-              </StyledButton>
-            )}
+            <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+              {status === 'published' && (
+                  <StyledButton
+                    color={"danger"}
+                    className={"w-md mx-2"}
+                    isLoading={isButtonLoading}
+                    onClick={rejectPurchaseOrder}
+                  >
+                    <Delete className="me-1" />
+                    Reject
+                  </StyledButton>
+                )}
+            </RequirePermission>
           </RequireUserType>
           <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
             {status === 'sent' && (
