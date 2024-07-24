@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { setBreadcrumbItems } from "../../store/actions";
 
 import { Call, DriveFileRenameOutline, Email, Work } from "@mui/icons-material";
-import { CircularProgress } from "@mui/material";
+import { Avatar, CircularProgress } from "@mui/material";
 import "jspdf-autotable";
 import { ToastContainer, toast } from "react-toastify";
 import {
@@ -369,8 +369,12 @@ const ViewClient = (props) => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
   }, [breadcrumbItems]);
 
-  console.log(agreementData, "agreementData")
-  console.log(additionalData, "additionalData")
+  function extractInitials(input) {
+    // Match the first character of each word
+    const matches = input?.match(/\b\w/g) || [];
+    // Combine the matches and limit the result to 2 characters
+    return matches.join('').substring(0, 2);
+  }
 
   return (
     <div style={{ position: "relative" }}>
@@ -483,18 +487,14 @@ const ViewClient = (props) => {
                     ></img>
                     <label className="text-label">No Agreement found</label>
                     <div className="mt-1">
-                      <button
-                        type="button"
-                        className="btn btn-primary waves-effect waves-light "
+                      <Button color="primary"
                         onClick={() => {
                           setOpenModal({ ...openModal, agreement: true });
                         }}
                       >
                         <i className=" mdi mdi-18px mdi-plus"></i>
-                        <label className="card-title mx-1">
-                          Create New Agreement
-                        </label>
-                      </button>
+                        Create New Agreement
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -574,10 +574,15 @@ const ViewClient = (props) => {
           <Card>
             <CardHeader tag="h6">Client Details</CardHeader>
             <CardBody>
-              <h5>{clientData?.name}</h5>
-              <p><Email color="primary" /> {clientData?.email}</p>
-              <p><Call color="primary" /> {clientData?.contact}</p>
-              <p><Work /> {clientData?.clientType}</p>
+              <div className="d-flex gap-2 align-items-center">
+                <Avatar variant="rounded" sx={{ bgcolor: "#0053FF" }}>
+                  {extractInitials(clientData?.name) || "UN"}
+                </Avatar>
+                <h5 className="m-0">{clientData?.name}</h5>
+              </div>
+              <p className="my-1"><Email color="primary" /> {clientData?.email}</p>
+              <p className="my-1"><Call color="primary" /> {clientData?.contact}</p>
+              <p className="my-1"><Work /> {clientData?.clientType}</p>
             </CardBody>
           </Card>
           <Card>

@@ -3,7 +3,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Button, Form, Modal, ModalBody, ModalFooter, ModalHeader, Table } from "reactstrap";
+import { Button, Form, Modal, ModalBody, ModalHeader, Table } from "reactstrap";
 import * as Yup from "yup";
 import { getBranchListReq } from "../../service/branchService";
 import ActionComponent from "./ActionComponent";
@@ -81,24 +81,18 @@ const BranchData = (props) => {
               return false;
             }}
           >
-            <ModalHeader closeButton>
-              Add Branch
-            </ModalHeader>
+            <div class="modal-header">
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <h5 className="modal-title">Add Branch</h5>
+                <div className="d-flex gap-1">
+                  <Button color="primary" outline onClick={() => { setOpenModal({ ...openModal, branch: false }) }}>Close</Button>
+                  <Button color="primary" type="submit" >Save</Button>
+                </div>
+              </div>
+            </div>
             <ModalBody>
               <AddBranch validation={validation} />
             </ModalBody>
-            <ModalFooter>
-              <Button
-                color="primary"
-                outline
-                onClick={() => {
-                  setOpenModal({ ...openModal, branch: false });
-                }}
-              >
-                Close
-              </Button>
-              <Button color="primary" type="submit" >Save</Button>
-            </ModalFooter>
           </Form>
         </div>
       </Modal>
@@ -108,7 +102,7 @@ const BranchData = (props) => {
             <tr>
               <th>Name</th>
               <th>Associated Warehouse</th>
-              <th>Contact</th>
+              <th colSpan={2}>Contact</th>
             </tr>
           </thead>
           <tbody>
