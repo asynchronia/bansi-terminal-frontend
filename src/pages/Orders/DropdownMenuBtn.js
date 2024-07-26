@@ -19,7 +19,7 @@ const DropdownMenuBtn = (props) => {
 
   const items = [
     { label: 'View Order', onClick: onViewClick },
-    { label: 'Delete Order', onClick: onDeleteOrder }
+    // { label: 'Delete Order', onClick: onDeleteOrder }
   ]
 
   return (

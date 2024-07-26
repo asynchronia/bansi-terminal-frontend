@@ -13,7 +13,9 @@ import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 import ApproveConfirm from "../../components/CustomComponents/ApproveConfirm";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import RequireUserType from "../../routes/middleware/requireUserType";
-import { USER_TYPES_ENUM } from "../../utility/constants";
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
+import RequirePermission from "../../routes/middleware/requirePermission";
+import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -145,6 +147,45 @@ const PurchaseOrderDetails = (props) => {
     }
   }, []);
 
+  const options: Options = {
+    filename: "invoice.pdf",
+    method: "save",
+    // default is Resolution.MEDIUM = 3, which should be enough, higher values
+    // increases the image quality but also the size of the PDF, so be careful
+    // using values higher than 10 when having multiple pages generated, it
+    // might cause the page to crash or hang.
+    resolution: Resolution.MEDIUM,
+    page: {
+      // margin is in MM, default is Margin.NONE = 0
+      margin: Margin.MEDIUM,
+      // default is 'A4'
+      format: "A4",
+      // default is 'portrait'
+      orientation: "portrait",
+    },
+    canvas: {
+      // default is 'image/jpeg' for better size performance
+      mimeType: "image/jpeg",
+      qualityRatio: 1,
+    },
+    // Customize any value passed to the jsPDF instance and html2canvas
+    // function. You probably will not need this and things can break,
+    // so use with caution.
+    overrides: {
+      // see https://artskydj.github.io/jsPDF/docs/jsPDF.html for more options
+      pdf: {
+        compress: true,
+      },
+      // see https://html2canvas.hertzen.com/configuration for more options
+      canvas: {
+        useCORS: true,
+      },
+    },
+  };
+
+  const getTargetElement = () => document.getElementById("invoice-container");
+  const downloadPDF = () => generatePDF(getTargetElement, options);
+
   return (
     <>
       <div style={{ position: "relative" }}>
@@ -186,30 +227,34 @@ const PurchaseOrderDetails = (props) => {
             // </Typography>)
           }
           <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
-            {status === 'published' && (
-              <StyledButton
-                color={"success"}
-                className={"w-md mx-2"}
-                isLoading={isButtonLoading}
-                onClick={submitPurchaseOrder}
-              >
-                <CorrectSign className="me-1" />
-                Approve
-              </StyledButton>
-            )}
+            <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+              {status === 'published' && (
+                <StyledButton
+                  color={"success"}
+                  className={"w-md mx-2"}
+                  isLoading={isButtonLoading}
+                  onClick={submitPurchaseOrder}
+                >
+                  <CorrectSign className="me-1" />
+                  Approve
+                </StyledButton>
+              )}
+            </RequirePermission>
           </RequireUserType>
           <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
-            {status === 'published' && (
-              <StyledButton
-                color={"danger"}
-                className={"w-md mx-2"}
-                isLoading={isButtonLoading}
-                onClick={rejectPurchaseOrder}
-              >
-                <Delete className="me-1" />
-                Reject
-              </StyledButton>
-            )}
+            <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+              {status === 'published' && (
+                  <StyledButton
+                    color={"danger"}
+                    className={"w-md mx-2"}
+                    isLoading={isButtonLoading}
+                    onClick={rejectPurchaseOrder}
+                  >
+                    <Delete className="me-1" />
+                    Reject
+                  </StyledButton>
+                )}
+            </RequirePermission>
           </RequireUserType>
           <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
             {status === 'sent' && (
@@ -237,24 +282,16 @@ const PurchaseOrderDetails = (props) => {
               />
             </div>
             <div className="details">
-              <h3>
-                <br />
-                <span>Bansi Office Solutions Private Limited</span>
-              </h3>
-              #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,
-              Bangalore Karnataka 560102, India
-              <br />
-              GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
-              <br />
-              MSME No : UDYAM-KR-03-0065095
-              <br />
-              Web: www.willsmeet.com, Email:sales@willsmeet.com
-              <br />
+              <h3 className="fw-bolder">Bansi Office Solutions Private Limited</h3>
+              <p className="m-0">#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India</p>
+              <p className="m-0">GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142</p>
+              <p className="m-0">MSME No : UDYAM-KR-03-0065095</p>
+              <p className="m-0">Web: www.willsmeet.com, Email:sales@willsmeet.com</p>
             </div>
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">{ }</span>
+              <span className="purchase-order-no">{orderInfo.purchaseOrderNumber}</span>
             </div>
           </div>
         </CardBody>
@@ -267,24 +304,12 @@ const PurchaseOrderDetails = (props) => {
             <Col xl="7">
               <Card>
                 <CardBody>
-                  <Row className="mb-4">
+                  <Row className="py-2 border-bottom">
                     <Col>Order Date</Col>
                     <Col>{new Date(orderInfo?.createdAt).toLocaleDateString()}</Col>
                   </Row>
-                  <Row className="mb-4">
+                  <Row className="py-2 border-bottom">
                     <Col>Payment Terms</Col>
-                    <Col></Col>
-                  </Row>
-                  <Row className="mb-4">
-                    <Col>Delivery Method</Col>
-                    <Col></Col>
-                  </Row>
-                  <Row className="mb-4">
-                    <Col>PO NO</Col>
-                    <Col></Col>
-                  </Row>
-                  <Row className="mb-4">
-                    <Col>Acknowledgement Uploaded</Col>
                     <Col></Col>
                   </Row>
                 </CardBody>
@@ -292,14 +317,14 @@ const PurchaseOrderDetails = (props) => {
             </Col>
             <Col xl="5">
               <Card>
-                <CardBody className="d-flex flex-column">
-                  <div style={{ flex: 1 }}>
-                    <h4 className="card-title">Billing Address</h4>
-                    <p>{orderInfo.billing?.address}</p>
+                <CardBody className="d-flex flex-column gap-2">
+                  <div style={{ flex: 1 }} className="border-bottom">
+                    <p className="fw-lighter m-0">Billing Address</p>
+                    <h5 className="fw-medium text-uppercase m-0">{orderInfo.billing?.address}</h5>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <h4 className="card-title">Shipping Address</h4>
-                    <p>{orderInfo.shipping?.address}</p>
+                    <p className="fw-lighter m-0">Shipping Address</p>
+                    <h5 className="fw-medium text-uppercase m-0">{orderInfo.shipping?.address}</h5>
                   </div>
                 </CardBody>
               </Card>
@@ -315,24 +340,24 @@ const PurchaseOrderDetails = (props) => {
                   >
                     <h4 className="card-title mt-1">Sales Information</h4>
                   </div>
-                  <Row className="mb-4">
+                  <Row className="py-2 border-bottom">
                     <Col xl="4">Item & Description</Col>
                     <Col xl="3">Rate</Col>
                     <Col xl="3">Ordered</Col>
                     <Col xl="2">Amount</Col>
                   </Row>
                   {itemsData && itemsData.map((item, index) => (
-                    <Row key={index} className="mb-4">
+                    <Row key={index} className="py-2 border-bottom align-items-center">
                       <Col xl="4">
                         <h6 className="m-0">{item.itemName}</h6>
                         <span>{item.itemDescription}</span>
                       </Col>
                       <Col xl="3">
-                        <h6>{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
+                        <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
                       </Col>
                       <Col xl="3">{item.quantity} Nos</Col>
                       <Col xl="2">
-                        <h6>{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
+                        <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
                       </Col>
                     </Row>
                   ))}

@@ -32,12 +32,14 @@ const OrderStatusRenderer = ({ value }) => {
       label = "Rejected";
       break;
     default:
-      return "";
+      color = "secondary";
+      label = value
+      break;
   }
 
   return (
     <div style={{ textAlign: 'center' }}>
-      <Chip color={color} className={classname} label={label} variant="outlined" />
+      <Chip size='small' color={color} className={classname} label={label} variant="outlined" />
     </div>
   );
 }

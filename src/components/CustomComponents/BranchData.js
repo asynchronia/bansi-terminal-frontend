@@ -1,29 +1,16 @@
-import { useFormik } from "formik";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Form,
-  Modal,
-  Row,
-  TabContent,
-  Table,
-} from "reactstrap";
-import { getBranchListReq } from "../../service/branchService";
-import { AgGridReact } from "ag-grid-react"; // AG Grid Component
+import { Chip } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import AddBranch from "./AddBranch";
+import { useFormik } from "formik";
+import React, { useEffect, useState } from "react";
+import { Button, Form, Modal, ModalBody, ModalHeader, Table } from "reactstrap";
 import * as Yup from "yup";
-import { Chip, TableHead } from "@mui/material";
+import { getBranchListReq } from "../../service/branchService";
 import ActionComponent from "./ActionComponent";
+import AddBranch from "./AddBranch";
 
 const BranchData = (props) => {
-  const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
-    props;
+  const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } = props;
 
   const [branchData, setBranchData] = useState([]);
   const [edit, setEdit] = useState(null);
@@ -40,12 +27,11 @@ const BranchData = (props) => {
         _id: item._id,
         Name: item.name,
         isPrimary: item.isPrimary,
-        AssociatedWarehouse: item.associatedWarehouse.code,
+        AssociatedWarehouse: item.associatedWarehouse?.code,
         Contact: item.contact,
       }));
-
       setBranchData(newArray);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   useEffect(() => {
@@ -87,67 +73,41 @@ const BranchData = (props) => {
       >
         <div>
           <Form
-            className="form-horizontal mt-4"
+            autoComplete="off"
             onSubmit={(e) => {
               e.preventDefault();
               validation.handleSubmit();
               return false;
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "15px 15px 0px",
-              }}
-            >
-              <h4 className="card-title mt-2">Add Branch</h4>
-              <Row>
-                <Col>
-                  <Button
-                    type="button"
-                    outline
-                    color="danger"
-                    className="waves-effect waves-light"
-                    onClick={() => {
-                      setOpenModal({ ...openModal, branch: false });
-                    }}
-                  >
-                    Close
-                  </Button>
-                </Col>
-                <Col>
-                  {" "}
-                  <button
-                    type="submit"
-                    className="btn btn-primary waves-effect waves-light "
-                    onClick={() => {
-                      //   handleSubmitAgreement();
-                      setOpenModal({ ...openModal, branch: false });
-                    }}
-                  >
-                    Save
-                  </button>
-                </Col>
-              </Row>
+            <div class="modal-header">
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <h5 className="modal-title">Add Branch</h5>
+                <div className="d-flex gap-1">
+                  <Button color="primary" outline onClick={() => { setOpenModal({ ...openModal, branch: false }) }}>Close</Button>
+                  <Button color="primary" type="submit" >Save</Button>
+                </div>
+              </div>
             </div>
-            <AddBranch validation={validation} />
+            <ModalBody>
+              <AddBranch validation={validation} />
+            </ModalBody>
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%", overflowX: "scroll" }}>
+      <div style={{ maxHeight: 300, width: "100%", overflow: "auto" }}>
         <Table>
           <thead>
             <tr>
               <th>Name</th>
               <th>Associated Warehouse</th>
-              <th>Contact</th>
+              <th colSpan={2}>Contact</th>
             </tr>
           </thead>
           <tbody>
             {branchData.length > 0 ? (
               branchData.map((branch) => (
-                <tr key={branch._id}>
+                <tr key={branch._id} style={{ verticalAlign: 'middle' }}>
                   <td>
                     {branch.Name}{" "}
                     <span>

@@ -31,21 +31,6 @@ const UserData = (props) => {
   const [edit, setEdit] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  const getRoleName = (roleId) => {
-    if (roleId === "65b4e43b671d73cc3c1bbf8c") {
-      return "Super Admin";
-    } else if (roleId === "65b4e43b671d73cc3c1bbf8d") {
-      return "Admin";
-    } else if (roleId === "65b4e43b671d73cc3c1bbf8e") {
-      return "Client Admin";
-    } else if (roleId === "65b4e43b671d73cc3c1bbf8f") {
-      return "Client Manager";
-    } else if (roleId === "65b4e43b671d73cc3c1bbf90") {
-      return "Client User";
-    } else {
-      return "User";
-    }
-  };
   const getUserData = async () => {
     try {
       const response = await getClientUsersReq({
@@ -56,7 +41,7 @@ const UserData = (props) => {
       const newArray = array.map((item) => ({
         _id: item._id,
         UserName: item.firstName + " " + item.lastName,
-        UserRole: getRoleName(item.role),
+        UserRole: item.role.title,
         Contact: item.contact,
         associatedBranches: item.associatedBranches,
       }));
@@ -193,14 +178,14 @@ const UserData = (props) => {
           </Form>
         </div>
       </Modal>
-      <div style={{ maxHeight: 309, width: "100%", overflowX: "scroll" }}>
+      <div style={{ maxHeight: 300, width: "100%", overflow: "auto" }}>
         <Table>
           <thead>
             <tr>
               <th>Name</th>
               <th>Role</th>
               <th>Contact</th>
-              <th>Associated Branches</th>
+              <th colSpan={2}>Associated Branches</th>
             </tr>
           </thead>
           <tbody>

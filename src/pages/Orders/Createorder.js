@@ -9,6 +9,7 @@ import {
   Label,
   Table,
   Modal,
+  ModalHeader,
 } from "reactstrap";
 import { CircularProgress, TableBody } from "@mui/material";
 import { ToastContainer } from "react-toastify";
@@ -238,7 +239,7 @@ const CreateOrder = (props) => {
 
     return selectedItems.map((item) => (
       <tbody key={`${item.itemId}-${item.variantId}`}>
-        <tr>
+        <tr style={{ verticalAlign: 'middle' }}>
           <td style={{ whiteSpace: "nowrap" }}>{item.itemName}</td>
           <td>{item.hsnCode}</td>
           <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
@@ -570,7 +571,7 @@ const CreateOrder = (props) => {
             display: "flex",
           }}
         >
-          <Modal size="m" isOpen={publishModal}>
+          <Modal isOpen={publishModal} centered={true}>
             <PublishConfirm
               setPublishModal={setPublishModal}
               setStatus={setStatus}
@@ -606,17 +607,11 @@ const CreateOrder = (props) => {
               />
             </div>
             <div className="details">
-              <h3>
-                <br />
-                <span>Bansi Office Solutions Private Limited</span>
-              </h3>
-              #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,
-              Bangalore Karnataka 560102, India
-              <br />
-              GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
-              <br />
-              MSME No : UDYAM-KR-03-0065095
-              <br /> Web: www.willsmeet.com, Email:sales@willsmeet.com
+              <h3 className="fw-bolder">Bansi Office Solutions Private Limited</h3>
+              <p className="m-0">#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India</p>
+              <p className="m-0">GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142</p>
+              <p className="m-0">MSME No : UDYAM-KR-03-0065095</p>
+              <p className="m-0">Web: www.willsmeet.com, Email:sales@willsmeet.com</p>
             </div>
             <div>
               <span className="purchase-order">Purchase Order</span>
@@ -635,10 +630,10 @@ const CreateOrder = (props) => {
                 <CardBody>
                   <h4 className="card-title">Billing & Shipping</h4>
                   <hr />
-                  <Row>
-                    <Col xl="5">
+                  <div class="d-flex">
+                    <div class="p-2 flex-grow-1">
                       <div>
-                        <label className="col-form-label">Billing</label>
+                        <label className="col-form-label">Billing Address</label>
                         <select
                           name="billingAddress"
                           id="billingAddress"
@@ -661,55 +656,50 @@ const CreateOrder = (props) => {
                             {billingAddressError}
                           </span>
                         )}
-                        <div className="mt-2">
-                          <p />
+                        <h5 className="my-3">
                           {
                             branchList.find(
                               (branch) => branch._id === billingAddress
                             )?.address
                           }
-                        </div>
-                      </div>
-                    </Col>
-                    <Col xl="1">
-                      <div className="vertical-line"></div>
-                    </Col>
-                    <Col xl="5">
-                      <div>
-                        <label className="col-form-label">Shipping</label>
-                        <select
-                          name="shippingAddress"
-                          id="shippingAddress"
-                          className="form-select focus-width"
-                          onChange={handleShippingChange}
-                          onBlur={validation.handleBlur}
-                          value={shippingAddress}
-                        >
-                          <option value="" disabled>
-                            Select Shipping Address
+                        </h5>
+                      </div></div>
+                    <div class="p-2">
+                      <div class="vr h-100"></div>
+                    </div>
+                    <div class="p-2 flex-grow-1"><div>
+                      <label className="col-form-label">Shipping</label>
+                      <select
+                        name="shippingAddress"
+                        id="shippingAddress"
+                        className="form-select focus-width"
+                        onChange={handleShippingChange}
+                        onBlur={validation.handleBlur}
+                        value={shippingAddress}
+                      >
+                        <option value="" disabled>
+                          Select Shipping Address
+                        </option>
+                        {branchList.map((branch) => (
+                          <option key={branch._id} value={branch._id}>
+                            {branch.name}
                           </option>
-                          {branchList.map((branch) => (
-                            <option key={branch._id} value={branch._id}>
-                              {branch.name}
-                            </option>
-                          ))}
-                        </select>
-                        {shippingAddressError && (
-                          <span style={{ color: "red" }}>
-                            {shippingAddressError}
-                          </span>
-                        )}
-                        <div className="mt-2">
-                          <p />
-                          {
-                            branchList.find(
-                              (branch) => branch._id === shippingAddress
-                            )?.address
-                          }
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
+                        ))}
+                      </select>
+                      {shippingAddressError && (
+                        <span style={{ color: "red" }}>
+                          {shippingAddressError}
+                        </span>
+                      )}
+                      <h5 className="my-3">
+                        {
+                          branchList.find(
+                            (branch) => branch._id === shippingAddress
+                          )?.address
+                        }
+                      </h5>
+                    </div></div>
+                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -816,13 +806,7 @@ const CreateOrder = (props) => {
                       </div>
                     )}
                   </div>
-                  <Row
-                    className="mt-1"
-                    style={{
-                      width: "auto",
-                      fontWeight: "bold",
-                    }}
-                  >
+                  <Row className="mt-1 table-responsive fw-bold">
                     <Table hover>
                       <thead>
                         <tr>

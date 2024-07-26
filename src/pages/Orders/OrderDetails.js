@@ -1,19 +1,22 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Row, Col, Card, CardBody } from "reactstrap";
-import { useParams } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
-import { setBreadcrumbItems } from "../../store/actions";
+import { useParams } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Card, CardBody, Col, Row } from "reactstrap";
+import { setBreadcrumbItems } from "../../store/actions";
 
-import { AgGridReact } from "ag-grid-react";
+import { ArrowForward } from '@mui/icons-material';
+import { Chip } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import { AgGridReact } from "ag-grid-react";
+import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 import { getOrderDetailsReq } from "../../service/orderService";
-import OrderTrackingRenderer from "./OrderTrackingRenderer";
-import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import { changePreloader } from "../../store/actions";
-import {ReactComponent as Edit} from "../../assets/images/svg/edit-button.svg";
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
+import OrderTrackingRenderer from "./OrderTrackingRenderer";
+
 
 const OrderDetails = (props) => {
   let dispatch = useDispatch();
@@ -56,6 +59,30 @@ const OrderDetails = (props) => {
     return combinedQuantity;
   }
 
+  const AddressComponent = ({ address_ }) => {
+    const
+      {
+        address = '',
+        street2 = '',
+        city = '',
+        state = '',
+        zip = '',
+        country = ''
+      } = address_ || {};
+
+    return (
+      <div className="fw-medium text-uppercase">
+        {address && <span>{address}, </span>}
+        {street2 && <span>{street2}, </span>}
+        <br />
+        {city && <span>{city}, </span>}
+        {state && <span>{state}, </span>}
+        {zip && <span>{zip}, </span>}
+        {country && <span>{country}</span>}
+      </div>
+    );
+  };
+
   const columnDefs = [
     {
       headerName: "Item & description",
@@ -64,8 +91,8 @@ const OrderDetails = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
-      headerName: "Ordered",
-      field: "item_order",
+      headerName: "Quantity",
+      field: "quantity",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -88,7 +115,7 @@ const OrderDetails = (props) => {
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
-      formatNumberWithCommasAndDecimal(params.value),
+        formatNumberWithCommasAndDecimal(params.value),
     },
     {
       headerName: "Discount",
@@ -190,7 +217,7 @@ const OrderDetails = (props) => {
             position: "absolute",
             top: -50,
             right: 10,
-            display: "flex",
+            display: "none",
           }}
         >
           <select className="form-select focus-width" name="status">
@@ -198,7 +225,7 @@ const OrderDetails = (props) => {
             <option value="draft">Draft</option>
           </select>
           <button type="submit" className="btn btn-primary w-xl mx-3">
-          <Edit style={{ marginRight: "5px", fill: "white" }} />
+            <Edit style={{ marginRight: "5px", fill: "white" }} />
             Edit
           </button>
         </div>
@@ -209,57 +236,37 @@ const OrderDetails = (props) => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                paddingBottom: 0
               }}
             >
               <div>
                 <h1 className="secondary">Sales Order</h1>
                 <h6>Sales Order #{orderData?.salesorder_number}</h6>
               </div>
-              <button type="submit" className="btn btn-primary w-md mr-3">
-                Draft
-              </button>
+              <Chip label='Draft' />
             </CardBody>
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "space-evenly",
-                margin: "5px 40px 30px 30px",
-              }}
-            >
+            <div className="d-flex justify-content-between align-items-center m-4">
               <OrderTrackingRenderer
                 label={"Initiated"}
                 date={orderData?.date}
                 color={orderData?.date ? "rgb(209 247 209)" : "#D3D3D3"}
                 isCheck={orderData?.date ? true : false}
               />
-              <div
-                style={{ margin: "7px", marginLeft: "-15px", fontSize: "25px" }}
-              >
-                ---
-              </div>
+              <ArrowForward className="m-2" />
               <OrderTrackingRenderer
                 label={"Approved"}
                 date={"12-11-2023"}
                 color={orderData?.date ? "rgb(209 247 209)" : "#D3D3D3"}
                 isCheck={orderData?.date ? true : false}
               />
-              <div
-                style={{ margin: "7px", marginLeft: "-15px", fontSize: "25px" }}
-              >
-                ---
-              </div>
+              <ArrowForward className="m-2" />
               <OrderTrackingRenderer
                 label={"Proceed"}
                 date={"15-11-2023"}
                 color={orderData?.date ? "rgb(209 247 209)" : "#D3D3D3"}
                 isCheck={orderData?.date ? true : false}
               />
-              <div
-                style={{ margin: "7px", marginLeft: "-15px", fontSize: "25px" }}
-              >
-                ---
-              </div>
+              <ArrowForward className="m-2" />
               <OrderTrackingRenderer
                 label={"Delivery"}
                 date={"24-11-2023"}
@@ -281,90 +288,68 @@ const OrderDetails = (props) => {
             <Col xs="6" className="d-flex">
               <Card className="w-100">
                 <CardBody>
-                  {orderData?.date && <div className="mt-3">
+                  {orderData?.date &&
                     <Row>
                       <Col xs="6">
-                        <p>Order Date</p>
+                        <span>Order Date</span>
                       </Col>
                       <Col xs="6">
-                        <p>{orderData?.date}</p>
+                        <span>{orderData?.date}</span>
                       </Col>
-                    <hr/>
-                    </Row>
-                  </div>}
-                  {orderData?.payment_terms && <div>
+                      <hr />
+                    </Row>}
+                  <Row>
+                    <Col xs="6">
+                      <span>Payment Terms</span>
+                    </Col>
+                    <Col xs="6">
+                      <span>{orderData?.payment_terms}</span>
+                    </Col>
+                    <hr />
+                  </Row>
+                  <Row>
+                    <Col xs="6">
+                      <span>Delivery Method</span>
+                    </Col>
+                    <Col xs="6">
+                      <span>{orderData?.delivery_method}</span>
+                    </Col>
+                    <hr />
+                  </Row>
+                  {orderData?.sales_channel_formatted &&
                     <Row>
                       <Col xs="6">
-                        {" "}
-                        <p>Payment Terms</p>
+                        <span>PO Number</span>
                       </Col>
                       <Col xs="6">
-                        <p>{orderData?.payment_terms}</p>
+                        <span>{orderData?.sales_channel_formatted}</span>
                       </Col>
-                    <hr/>
-                    </Row>
-                  </div>}
-                  {orderData?.delivery_method && <div>
+                      <hr />
+                    </Row>}
+                  {orderData?.created_by_name &&
                     <Row>
                       <Col xs="6">
-                        {" "}
-                        <p>Delivery Method</p>
+                        <span>Created By</span>
                       </Col>
                       <Col xs="6">
-                        {" "}
-                        <p>{orderData?.delivery_method}</p>
+                        <span>{orderData?.created_by_name}</span>
                       </Col>
-                    <hr/>
-                    </Row>
-                  </div>}
-                  {orderData?.sales_channel_formatted && <div>
-                    <Row>
-                      <Col xs="6">
-                        {" "}
-                        <p>
-                          <span>PO Number</span>
-                        </p>
-                      </Col>
-                      <Col xs="6">
-                        {" "}
-                        <p>{orderData?.sales_channel_formatted}</p>
-                      </Col>
-                    <hr/>
-                    </Row>
-                  </div>}
-                  {orderData?.created_by_name && <div>
-                    <Row>
-                      <Col xs="6">
-                        {" "}
-                        <p>
-                          <span>Created By</span>
-                        </p>
-                      </Col>
-                      <Col xs="6">
-                        {" "}
-                        <p>{orderData?.created_by_name}</p>
-                      </Col>
-                    <hr/>
-                    </Row>
-                  </div>}
+                      <hr />
+                    </Row>}
                   {orderData?.custom_field_hash?.cf_acknowledgement_uploaded && <div>
                     <Row>
                       <Col xs="6">
-                        {" "}
-                        <p>
-                          <span>Acknowledgement Uploaded</span>
-                        </p>
+                        <span>Acknowledgement Uploaded</span>
                       </Col>
                       <Col xs="6">
-                        {" "}
-                        <p>
+                        <span>
                           {
                             orderData?.custom_field_hash
                               ?.cf_acknowledgement_uploaded
                           }
-                        </p>
+                        </span>
                       </Col>
-                    <hr/>
+                      <hr />
                     </Row>
                   </div>}
                 </CardBody>
@@ -379,43 +364,7 @@ const OrderDetails = (props) => {
                     </Row>
                     <Row>
                       <div className="details">
-                        {orderData?.billing_address?.address && (
-                          <>
-                            {orderData.billing_address.address}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.billing_address?.street2 && (
-                          <>
-                            {orderData.billing_address.street2}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.billing_address?.city && (
-                          <>
-                            {orderData.billing_address.city}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.billing_address?.state && (
-                          <>
-                            {orderData.billing_address.state}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.billing_address?.zip && (
-                          <>
-                            {orderData.billing_address.zip}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.billing_address?.country && (
-                          <>
-                            {orderData.billing_address.country}
-                            <br />
-                          </>
-                        )}
-                        <br />
+                        <AddressComponent address_={orderData?.billing_address} />
                       </div>
                     </Row>
                     <Row>
@@ -424,42 +373,7 @@ const OrderDetails = (props) => {
                     </Row>
                     <Row>
                       <div className="details">
-                        {orderData?.shipping_address?.address && (
-                          <>
-                            {orderData.shipping_address.address}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.shipping_address?.street2 && (
-                          <>
-                            {orderData.shipping_address.street2}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.shipping_address?.city && (
-                          <>
-                            {orderData.shipping_address.city}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.shipping_address?.state && (
-                          <>
-                            {orderData.shipping_address.state}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.shipping_address?.zip && (
-                          <>
-                            {orderData.shipping_address.zip}
-                            <br />
-                          </>
-                        )}
-                        {orderData?.shipping_address?.country && (
-                          <>
-                            {orderData.shipping_address.country}
-                            <br />
-                          </>
-                        )}
+                        <AddressComponent address_={orderData?.shipping_address} />
                       </div>
                     </Row>
                   </div>
@@ -470,11 +384,11 @@ const OrderDetails = (props) => {
           <Card>
             <CardBody>
               <h4 className="card-title">Sales Information</h4>
-              <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
+              <div className="my-2" style={{ display: "flex", gap: "20px" }}>
                 <div
                   className="ag-theme-quartz"
                   style={{
-                    height: "250px",
+                    height: "200px",
                     width: "100%",
                   }}
                 >
@@ -482,6 +396,7 @@ const OrderDetails = (props) => {
                     ref={gridRef}
                     suppressRowClickSelection={true}
                     columnDefs={columnDefs}
+                    defaultColDef={{ resizable: false, suppressMovable: true, sortable: true }}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
@@ -493,64 +408,32 @@ const OrderDetails = (props) => {
                   ></AgGridReact>
                 </div>
               </div>
-              <div
-                className="content-above-table"
-                style={{ textAlign: "right", marginRight: "15.3em" }}
-              >
-                <div className="details ">
-                  <h4
-                    className="secondary"
-                    style={{
-                      fontSize: "15px",
-                      fontWeight: "bold",
-                      margin: "20px -12px",
-                    }}
-                  >
-                    Sub Total :{" "}
-                    <h4 style={{ fontSize: "15px", margin: "-18px -95px" }}>
-                      {formatNumberWithCommasAndDecimal(totalItemTotal)}
+              <div class="row">
+                <div class="col-8"></div>
+                <div class="col-4">
+                  <div className="d-flex justify-content-between align-items-center gap-6 border-bottom p-2">
+                    <h4 className="m-0">
+                      <span>Sub Total:</span><br />
+                      <span className="fw-normal h6">Total Quantity {rowCount}</span>
                     </h4>
-                  </h4>
-                  <p className="secondary" style={{ margin: "-20px -32px" }}>
-                    Total Quantity {rowCount}
-                  </p>
-                  <br />
-                  <h4
-                    className="secondary"
-                    style={{ fontSize: "15px", margin: "20px 18px" }}
-                  >
-                    CGST :{" "}
-                    <h4 style={{ fontSize: "15px", margin: "-18px -125px" }}>
-                      {formatNumberWithCommasAndDecimal(totalCGST)}
-                    </h4>
-                  </h4>
-                  <br />
-                  <h4
-                    className="secondary"
-                    style={{ fontSize: "15px", margin: "10px 21px" }}
-                  >
-                    SGST :{" "}
-                    <h4 style={{ fontSize: "15px", margin: "-18px -128px" }}>
-                      {formatNumberWithCommasAndDecimal(totalSGST)}
-                    </h4>
-                  </h4>
-                  <br />
-                  <hr style={{ width: "117%" }} />
-                  <h4
-                    className="secondary"
-                    style={{
-                      fontSize: "15px",
-                      fontWeight: "bold",
-                      margin: "20px 21px",
-                    }}
-                  >
-                    Total :{" "}
-                    <h4 style={{ fontSize: "15px", margin: "-18px -128px" }}>
-                      {formatNumberWithCommasAndDecimal(Math.round(
-                        (totalItemTotal + totalCGST + totalSGST) * 100
-                      ) / 100)}
-                    </h4>
-                  </h4>
+                    <h4 className="m-0">{formatNumberWithCommasAndDecimal(totalItemTotal)}</h4>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center gap-6 border-bottom p-2">
+                    <h4 className="m-0">CGST:</h4>
+                    <h4 className="m-0">{formatNumberWithCommasAndDecimal(totalCGST)}</h4>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center gap-6 border-bottom p-2">
+                    <h4 className="m-0">SGST:</h4>
+                    <h4 className="m-0">{formatNumberWithCommasAndDecimal(totalSGST)}</h4>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center gap-6 border-bottom p-2">
+                    <h4 className="m-0">Total:</h4>
+                    <h4 className="m-0">{formatNumberWithCommasAndDecimal(Math.round((totalItemTotal + totalCGST + totalSGST) * 100) / 100)}</h4>
+                  </div>
+
                 </div>
               </div>
             </CardBody>
