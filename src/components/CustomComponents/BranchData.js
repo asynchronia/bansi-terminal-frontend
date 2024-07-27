@@ -32,7 +32,6 @@ const BranchData = (props) => {
         AssociatedWarehouse: item.associatedWarehouse?.code,
         Contact: item.contact,
       }));
-
       setBranchData(newArray);
       setLoading(false);
     } catch (error) {

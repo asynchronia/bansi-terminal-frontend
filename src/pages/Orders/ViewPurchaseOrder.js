@@ -75,6 +75,7 @@ const ViewPurchaseOrder = (props) => {
 
       const newData = response.purchaseOrders.map(order => ({
         order_id: order._id,
+        order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : "-",
         client_name: order.clientId.name,
         createdAt: formatDate(order.createdAt),
         total: order.items.reduce((total, item) => total + (item.unitPrice * item.quantity), 0),
@@ -171,7 +172,7 @@ const ViewPurchaseOrder = (props) => {
 
   const columnDefs = [
     {
-      headerName: "Order No.", field: "order_id", suppressMenu: true,
+      headerName: "Order No.", field: "order_number", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
       sortable: true, flex: 1

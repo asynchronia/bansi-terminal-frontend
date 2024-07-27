@@ -26,6 +26,8 @@ import {
   toggleLeftmenu,
   changeSidebarType,
 } from "../../store/actions"
+import RequireUserType from '../../routes/middleware/requireUserType'
+import { USER_TYPES_ENUM } from '../../utility/constants'
 
 const Header = props => {
   const [search, setsearch] = useState(false)
@@ -109,6 +111,7 @@ const Header = props => {
                 isOpen={createmenu}
                 toggle={() => setCreateMenu(!createmenu)}
                 className="d-inline-block"
+                disabled
               >
 
                 <div className="dropdown dropdown-topbar pt-3 mt-1 d-inline-block">
@@ -117,7 +120,9 @@ const Header = props => {
                     className="btn btn-light"
                     tag="button"
                   >
-                    All Warehouses <i className="mdi mdi-chevron-down"></i>
+                    <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>All Branches</RequireUserType>
+                    <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>All Warehouses</RequireUserType>
+                    <i className="mdi mdi-chevron-down"></i>
                   </DropdownToggle>
 
                   <DropdownMenu className="dropdown-menu-end">
