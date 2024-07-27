@@ -10,6 +10,7 @@ import {
   Table,
   Modal,
   ModalHeader,
+  CardHeader,
 } from "reactstrap";
 import { CircularProgress, TableBody } from "@mui/material";
 import { ToastContainer } from "react-toastify";
@@ -31,6 +32,7 @@ import {
   updatePurchaseOrderReq,
 } from "../../service/purchaseService";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
+import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 
 const CreateOrder = (props) => {
   let { id } = useParams();
@@ -221,63 +223,53 @@ const CreateOrder = (props) => {
   const renderSelectedItems = () => {
     if (!selectedItems || selectedItems.length === 0) {
       return (
-        <Row className="form-text-lg" style={{ marginLeft: "-0.5rem" }}>
-          <Col className="text-center">
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <p style={{ alignItems: "center" }}>No items Added.</p>
-            </div>
-          </Col>
-        </Row>
+        <tr>
+          <td colSpan={8}>
+            <p className="m-2 text-center">No items Added.</p>
+          </td>
+        </tr>
       );
     }
 
     return selectedItems.map((item) => (
-      <tbody key={`${item.itemId}-${item.variantId}`}>
-        <tr style={{ verticalAlign: 'middle' }}>
-          <td style={{ whiteSpace: "nowrap" }}>{item.itemName}</td>
-          <td>{item.hsnCode}</td>
-          <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
-          <td style={{ whiteSpace: "nowrap" }}>
-            {formatNumberWithCommasAndDecimal(item.unitPrice)}
-          </td>
-          <td>
-            <Input
-              type="number"
-              min="1"
-              value={
-                selectedQuantities[`${item.itemId}-${item.variantId}`] || 1
-              }
-              onChange={(e) => {
-                const quantity = parseInt(e.target.value, 10);
-                setSelectedQuantities({
-                  ...selectedQuantities,
-                  [`${item.itemId}-${item.variantId}`]: quantity,
-                });
-                updateTotals();
-              }}
-            />
-          </td>
-          <td style={{ whiteSpace: "nowrap" }}>
-            {formatNumberWithCommasAndDecimal(
-              item.unitPrice *
-              (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
-            )}
-          </td>
-          <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
-          <td>
-            <Delete
-              style={{ cursor: "pointer" }}
-              onClick={() => handleItemDelete(item.itemId, item.variantId)}
-            />
-          </td>
-        </tr>
-      </tbody>
+      <tr key={`${item.itemId}-${item.variantId}`} style={{ verticalAlign: 'middle' }}>
+        <td>{item.itemName}</td>
+        <td>{item.hsnCode}</td>
+        <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
+        <td style={{ whiteSpace: "nowrap" }}>
+          {formatNumberWithCommasAndDecimal(item.unitPrice)}
+        </td>
+        <td style={{ width: '10%' }}>
+          <Input
+            type="number"
+            min="1"
+            value={
+              selectedQuantities[`${item.itemId}-${item.variantId}`] || 1
+            }
+            onChange={(e) => {
+              const quantity = parseInt(e.target.value, 10);
+              setSelectedQuantities({
+                ...selectedQuantities,
+                [`${item.itemId}-${item.variantId}`]: quantity,
+              });
+              updateTotals();
+            }}
+          />
+        </td>
+        <td style={{ whiteSpace: "nowrap" }}>
+          {formatNumberWithCommasAndDecimal(
+            item.unitPrice *
+            (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
+          )}
+        </td>
+        <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
+        <td>
+          <Delete
+            style={{ cursor: "pointer" }}
+            onClick={() => handleItemDelete(item.itemId, item.variantId)}
+          />
+        </td>
+      </tr>
     ));
   };
 
@@ -363,6 +355,7 @@ const CreateOrder = (props) => {
     validation.handleSubmit();
 
     const validationErrors = validation.errors;
+    debugger
 
     // Clearing individual error states if corresponding fields are valid
     // if (!validationErrors.billingAddress) {
@@ -508,59 +501,9 @@ const CreateOrder = (props) => {
     }
   }, [date]);
 
-  const renderRowData = () => {
-    if (!loadedData) {
-      return (
-        <Row>
-          <Col></Col>
-          <Col>
-            <CircularProgress />
-          </Col>
-          <Col></Col>
-        </Row>
-      );
-    }
-
-    if (!filteredRowData || filteredRowData.length === 0) {
-      return (
-        <Row>
-          <p className="form-text-lg text-center">No items found.</p>
-        </Row>
-      );
-    }
-
-    return filteredRowData.map((item) =>
-      item.variants.map((variant) => (
-        <Row
-          key={variant._id}
-          className="row-clickable"
-          onClick={() => {
-            handleItemSelect(item, variant);
-            setSearchQuery("");
-          }}
-          style={{
-            borderBottom: "1px solid #f4f4f4",
-            cursor: "pointer",
-          }}
-        >
-          <Table hover size="sm">
-            <TableBody>
-              <tr>
-                <td>{item.title}</td>
-                <td>{item.hsnCode}</td>
-                <td>{item.category.name}</td>
-                <td>{formatNumberWithCommasAndDecimal(variant.price)}</td>
-                <td>{item.taxes.map((tax) => tax.name).join(", ")}</td>
-              </tr>
-            </TableBody>
-          </Table>
-        </Row>
-      ))
-    );
-  };
-
   return (
     <>
+
       <div style={{ position: "relative" }}>
         <ToastContainer position="top-center" theme="colored" />
         <div
@@ -627,9 +570,8 @@ const CreateOrder = (props) => {
           <Row className="equal-height-cards">
             <Col xl="8">
               <Card>
+                <CardHeader>Billing & Shipping</CardHeader>
                 <CardBody>
-                  <h4 className="card-title">Billing & Shipping</h4>
-                  <hr />
                   <div class="d-flex">
                     <div class="p-2 flex-grow-1">
                       <div>
@@ -705,11 +647,10 @@ const CreateOrder = (props) => {
             </Col>
             <Col xl="4">
               <Card>
+                <CardHeader>Order Info</CardHeader>
                 <CardBody>
                   <Row>
                     <div>
-                      <h4 className="card-title">Order Info</h4>
-                      <hr />
                       <Label for="Po Number">Po Number</Label>
                       <Input
                         type="text"
@@ -755,11 +696,11 @@ const CreateOrder = (props) => {
           <Row>
             <Col xl="8">
               <Card className="mt-3" style={{ height: "100%" }}>
+                <CardHeader>Order Details</CardHeader>
                 <CardBody>
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <h4 className="card-title mt-1">Order Details</h4>
                   </div>
                   <div>
                     <Row>
@@ -780,34 +721,59 @@ const CreateOrder = (props) => {
                       <div
                         className="form-control"
                         style={{
-                          textAlign: "center",
                           position: "absolute",
                           zIndex: 4,
                           width: "750px",
                           overflowY: "auto",
                         }}
                       >
-                        <Row
-                          className="mt-3"
-                          style={{ width: "750px", fontWeight: "bold" }}
-                        >
-                          <Table>
-                            <thead>
+                        <Table hover striped>
+                          <thead>
+                            <tr>
                               <th>Item Title</th>
                               <th>HSN Code</th>
                               <th>Category</th>
                               <th>Cost</th>
                               <th>GST</th>
-                            </thead>
-                          </Table>
-                        </Row>
-                        <hr />
-                        {renderRowData()}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {!loadedData && <tr>
+                              <td colSpan={5} className="form-text-lg text-center">
+                                <CircularProgress /></td>
+                            </tr>
+                            }
+                            {filteredRowData.map((item) =>
+                              item.variants.map((variant) => (
+                                <tr key={variant._id}
+                                  className="row-clickable cursor-pointer"
+                                  onClick={() => {
+                                    handleItemSelect(item, variant);
+                                    setSearchQuery("");
+                                  }}>
+                                  <td>{item.title}</td>
+                                  <td>{item.hsnCode}</td>
+                                  <td>{item.category.name}</td>
+                                  <td>{formatNumberWithCommasAndDecimal(variant.price)}</td>
+                                  <td>{item.taxes.map((tax) => tax.name).join(", ")}</td>
+                                </tr>
+                              ))
+                            )}
+                            {(!filteredRowData || filteredRowData.length === 0) &&
+                              (
+                                <tr>
+                                  <td colSpan={5} className="form-text-lg text-center">
+                                    No items found.</td>
+                                </tr>
+                              )
+                            }
+                          </tbody>
+                        </Table>
                       </div>
                     )}
                   </div>
-                  <Row className="mt-1 table-responsive fw-bold">
-                    <Table hover>
+                  <Row className="mt-1 table-responsive fw-medium">
+                    <Table hover striped>
                       <thead>
                         <tr>
                           <th>Item Name</th>
@@ -820,7 +786,9 @@ const CreateOrder = (props) => {
                           <th></th>
                         </tr>
                       </thead>
-                      {renderSelectedItems()}
+                      <tbody>
+                        {renderSelectedItems()}
+                      </tbody>
                     </Table>
                   </Row>
                 </CardBody>
@@ -828,9 +796,8 @@ const CreateOrder = (props) => {
             </Col>
             <Col xl="4">
               <Card className="mt-3">
+                <CardHeader>Order Info</CardHeader>
                 <CardBody style={{ display: "flex", flexDirection: "column" }}>
-                  <h4 className="card-title">Order Info</h4>
-                  <hr />
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <h5
                       className="mb-0"

@@ -9,6 +9,7 @@ import {
   Form,
   Modal,
   Row,
+  Spinner,
   Table,
 } from "reactstrap";
 import { getClientUsersReq } from "../../service/usersService";
@@ -28,6 +29,7 @@ const UserData = (props) => {
 
   const gridRef = useRef();
   const [userData, setUserData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
 
@@ -48,6 +50,7 @@ const UserData = (props) => {
   };
   const getUserData = async () => {
     try {
+      setLoading(true);
       const response = await getClientUsersReq({
         clientId: clientId,
       });
@@ -62,8 +65,10 @@ const UserData = (props) => {
       }));
 
       setUserData(newArray);
+      setLoading(false);
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
   };
 
@@ -204,51 +209,60 @@ const UserData = (props) => {
             </tr>
           </thead>
           <tbody>
-            {userData.length > 0 ? (
-              userData.map((user) => (
-                <tr key={user._id}>
-                  <td>{user.UserName}</td>
-                  <td>{user.UserRole}</td>
-                  <td>{user.Contact}</td>
-                  <td style={{ width: "min-content" }}>
-                    {
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "3px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {user.associatedBranches.map((branch, index) => (
-                          <Chip
-                            size="small"
-                            key={index}
-                            label={`${branch.address}`}
-                          />
-                        ))}
-                      </div>
-                    }
-                  </td>
-                  <td>
-                    <ActionComponent
-                      openModal={openModal}
-                      setOpenModal={setOpenModal}
-                      type={"user"}
-                      data={user}
-                      clientId={clientId}
-                      validation={validation}
-                      setEdit={setEdit}
-                    />
-                  </td>
-                </tr>
-              ))
-            ) : (
+            {loading ?
               <tr>
-                <td></td>
-                <td style={{ textAlign: "center" }}>No Rows to Show</td>
-                <td></td>
-              </tr>
-            )}
+                <td colSpan={4} style={{ textAlign: "center" }}>
+                  <Spinner />
+                  <h5 className="m-2">Loading...</h5>
+                </td>
+              </tr> :
+              <>
+                {userData.length > 0 ? (
+                  userData.map((user) => (
+                    <tr key={user._id}>
+                      <td>{user.UserName}</td>
+                      <td>{user.UserRole}</td>
+                      <td>{user.Contact}</td>
+                      <td style={{ width: "min-content" }}>
+                        {
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "3px",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            {user.associatedBranches.map((branch, index) => (
+                              <Chip
+                                size="small"
+                                key={index}
+                                label={`${branch.address}`}
+                              />
+                            ))}
+                          </div>
+                        }
+                      </td>
+                      <td>
+                        <ActionComponent
+                          openModal={openModal}
+                          setOpenModal={setOpenModal}
+                          type={"user"}
+                          data={user}
+                          clientId={clientId}
+                          validation={validation}
+                          setEdit={setEdit}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td></td>
+                    <td style={{ textAlign: "center" }}>No Rows to Show</td>
+                    <td></td>
+                  </tr>
+                )}
+              </>}
           </tbody>
         </Table>
       </div>

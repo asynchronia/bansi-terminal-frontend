@@ -14,7 +14,7 @@ import {
   CardHeader,
   Col,
   Modal,
-  Row,
+  Row
 } from "reactstrap";
 import Img404 from "../../assets/images/Img404.png";
 import AddBranch from "../../components/CustomComponents/AddBranch";
@@ -25,11 +25,7 @@ import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
 import UserData from "../../components/CustomComponents/UserData";
 import { signinReq } from "../../service/authService";
 import { createBranchReq, updateBranchReq } from "../../service/branchService";
-import {
-  createAgreementReq,
-  getAgreementReq,
-  getClientWithIdReq,
-} from "../../service/clientService";
+import { createAgreementReq, getAgreementReq, getClientWithIdReq } from "../../service/clientService";
 import { getTaxesReq } from "../../service/itemService";
 import { updateClientStatusReq } from "../../service/statusService";
 import { updateUserReq } from "../../service/usersService";

@@ -1,5 +1,6 @@
+import { Info } from "@mui/icons-material";
 import React from "react";
-import { Card, CardBody } from "reactstrap";
+import { Button, ModalBody } from "reactstrap";
 
 const ApproveConfirm = ({ setApproveModal, handlePurchaseOrderStatusChange, status }) => {
   console.log(`APPROVE CONFIRM MODAL CALLED WITH SET STATUS VALUE: ${status}`);
@@ -11,30 +12,27 @@ const ApproveConfirm = ({ setApproveModal, handlePurchaseOrderStatusChange, stat
     "rejected": "Reject",
   }
   return (
-    <Card>
-      <CardBody>
-        <h3 className="text-center mt-3">{`Are You sure you Want to ${statusToTextMap[status]}?`}</h3>
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <button
-            onClick={() => {
-              setApproveModal(false);
-              handlePurchaseOrderStatusChange(status);
-            }}
-            className="btn btn-secondary mx-3 mt-3 w-lg"
-          >
-            Yes
-          </button>
-          <button
-          className="btn btn-primary mx-3 mt-3 w-lg"
-            onClick={() => {
-              setApproveModal(false);
-            }}
-          >
-            No
-          </button>
-        </div>
-      </CardBody>
-    </Card>
+    <ModalBody className="text-center">
+      <Info color="primary" />
+      <h5 className="my-3">{`Are You sure you Want to ${statusToTextMap[status]}?`}</h5>
+      <div className="d-flex justify-content-center gap-1 my-2">
+        <Button color="primary" block
+          onClick={() => {
+            setApproveModal(false);
+            handlePurchaseOrderStatusChange(status);
+          }}
+        >
+          Yes
+        </Button>
+        <Button outline color="primary" block
+          onClick={() => {
+            setApproveModal(false);
+          }}
+        >
+          No
+        </Button>
+      </div>
+    </ModalBody>
   );
 };
 

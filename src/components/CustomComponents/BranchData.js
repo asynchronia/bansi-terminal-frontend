@@ -3,7 +3,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Button, Form, Modal, ModalBody, ModalHeader, Table } from "reactstrap";
+import { Button, Form, Modal, ModalBody, ModalHeader, Spinner, Table } from "reactstrap";
 import * as Yup from "yup";
 import { getBranchListReq } from "../../service/branchService";
 import ActionComponent from "./ActionComponent";
@@ -13,10 +13,12 @@ const BranchData = (props) => {
   const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } = props;
 
   const [branchData, setBranchData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(null);
 
   const getBranchData = async () => {
     try {
+      setLoading(true);
       const response = await getBranchListReq({
         clientId: clientId,
         page: 1,
@@ -27,12 +29,16 @@ const BranchData = (props) => {
         _id: item._id,
         Name: item.name,
         isPrimary: item.isPrimary,
-        AssociatedWarehouse: item.associatedWarehouse.code,
+        AssociatedWarehouse: item.associatedWarehouse?.code,
         Contact: item.contact,
       }));
 
       setBranchData(newArray);
-    } catch (error) { }
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -106,40 +112,47 @@ const BranchData = (props) => {
             </tr>
           </thead>
           <tbody>
-            {branchData.length > 0 ? (
-              branchData.map((branch) => (
-                <tr key={branch._id} style={{ verticalAlign: 'middle' }}>
-                  <td>
-                    {branch.Name}{" "}
-                    <span>
-                      {" "}
-                      {branch.isPrimary ? (
-                        <Chip className="mx-1" size="sm" label="Primary" />
-                      ) : null}
-                    </span>
-                  </td>
-                  <td>{branch.AssociatedWarehouse}</td>
-                  <td>{branch.Contact}</td>
-                  <td>
-                    <ActionComponent
-                      openModal={openModal}
-                      setOpenModal={setOpenModal}
-                      type={"branch"}
-                      data={branch}
-                      clientId={clientId}
-                      validation={validation}
-                      setEdit={setEdit}
-                    />
-                  </td>
-                </tr>
-              ))
-            ) : (
+            {loading ?
               <tr>
-                <td></td>
-                <td style={{ textAlign: "center" }}>No Rows to Show</td>
-                <td></td>
-              </tr>
-            )}
+                <td colSpan={4} style={{ textAlign: "center" }}>
+                  <Spinner />
+                  <h5 className="m-2">Loading...</h5>
+                </td>
+              </tr> :
+              <>{
+                branchData.length > 0 ? (
+                  branchData.map((branch) => (
+                    <tr key={branch._id} style={{ verticalAlign: 'middle' }}>
+                      <td>
+                        {branch.Name}{" "}
+                        <span>
+                          {" "}
+                          {branch.isPrimary ? (
+                            <Chip className="mx-1" size="sm" label="Primary" />
+                          ) : null}
+                        </span>
+                      </td>
+                      <td>{branch.AssociatedWarehouse}</td>
+                      <td>{branch.Contact}</td>
+                      <td>
+                        <ActionComponent
+                          openModal={openModal}
+                          setOpenModal={setOpenModal}
+                          type={"branch"}
+                          data={branch}
+                          clientId={clientId}
+                          validation={validation}
+                          setEdit={setEdit}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: "center" }}>No Rows to Show</td>
+                  </tr>
+                )
+              }</>}
           </tbody>
         </Table>
       </div>
