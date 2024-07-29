@@ -230,8 +230,11 @@ const ViewClient = (props) => {
       let values = {
         clientId: id,
         items: [...agreementData],
-        document: additionalData.url,
       };
+
+      if (additionalData.url) {
+        values.document = additionalData.url
+      }
 
       const response = await createAgreementReq(values);
       if (response.success === true) {
