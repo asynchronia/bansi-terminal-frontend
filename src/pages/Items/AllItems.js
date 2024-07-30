@@ -248,7 +248,7 @@ const AllItems = (props) => {
 
   let bodyObject = {
     page: 1,
-    limit: 200,
+    limit: 500,
   };
 
   const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
@@ -284,6 +284,7 @@ const AllItems = (props) => {
     const response = await getItemsReq(body);
 
     response.map((val, id) => {
+      console.log("Item ", val.title, val.category._id, val.category.name);
       val.category = val.category.name;
       val.salePrice = val.variant.sellingPrice;
     });
@@ -337,14 +338,15 @@ const AllItems = (props) => {
     }
   }, [delaySearch]);
 
-  useEffect(() => {
+  //TODO: Pagination size fix
+/*   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
     if (paginationPageSize && paginationPageSize !== undefined) {
       let bodyObjectWithCategory = { ...bodyObject };
       bodyObjectWithCategory.limit = paginationPageSize;
       getListOfRowData(bodyObjectWithCategory);
     }
-  }, [paginationPageSize]);
+  }, [paginationPageSize]); */
 
   const handleChange = (e) => {
     setCategory(e.target.value);
