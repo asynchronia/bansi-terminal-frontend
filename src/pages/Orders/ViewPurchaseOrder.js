@@ -266,12 +266,11 @@ const ViewPurchaseOrder = (props) => {
                     suppressRowClickSelection={true}
                     columnDefs={columnDefs}
                     pagination={true}
-                    paginationPageSize={10}
-                    paginationPageSizeSelector={[10, 25, 50]}
+                    paginationAutoPageSize={true}
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
                     quickFilterText={inputValue}
-                  // onPaginationChanged={onPaginationChanged}
+                    onPaginationChanged={onPaginationChanged}
                   >
                   </AgGridReact>
                 </div>

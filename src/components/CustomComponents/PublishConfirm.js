@@ -3,8 +3,8 @@ import { Button, ModalBody } from "reactstrap";
 
 const PublishConfirm = ({ setPublishModal, setStatus }) => {
   return (
-    <ModalBody>
-      <h4 className="text-center my-4">Are You sure you Want to Publish?</h4>
+    <ModalBody className="p-4">
+      <h4 className="text-center mb-4">Are You sure you Want to Publish?</h4>
       <div className="d-flex justify-content-center gap-2">
         <Button color="primary" block
           onClick={() => {

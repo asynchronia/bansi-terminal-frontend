@@ -13,7 +13,7 @@ import {
   CardHeader,
 } from "reactstrap";
 import { CircularProgress, TableBody } from "@mui/material";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { changePreloader } from "../../store/actions";
 import "./styles/CreateOrder.scss";
@@ -33,6 +33,8 @@ import {
 } from "../../service/purchaseService";
 import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
 import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
+
+import { isEmpty } from 'lodash'
 
 const CreateOrder = (props) => {
   let { id } = useParams();
@@ -57,7 +59,7 @@ const CreateOrder = (props) => {
   const [total, setTotal] = useState(0);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
-  const [date, setDate] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
   const [shippingAddressError, setShippingAddressError] = useState("");
   const [billingAddressError, setBillingAddressError] = useState("");
   const [validDate, setValidDate] = useState();
@@ -66,6 +68,14 @@ const CreateOrder = (props) => {
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
+
+  const [minDate, setMinDate] = useState(() => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
+    const day = String(today.getDate()).padStart(2, '0'); // Add leading zero if needed
+    return `${year}-${month}-${day}`;
+  });
 
   const [purchaseOrder, setPurchaseOrder] = useState(null);
 
@@ -146,6 +156,7 @@ const CreateOrder = (props) => {
       selectedItems: Yup.array().min(1, "Please select at least one item"),
     }),
     onSubmit: (values) => {
+      debugger
       redirectToPurchaseDetails();
     },
   });
@@ -232,20 +243,21 @@ const CreateOrder = (props) => {
     }
 
     return selectedItems.map((item) => (
-      <tr key={`${item.itemId}-${item.variantId}`} style={{ verticalAlign: 'middle' }}>
+      <tr
+        key={`${item.itemId}-${item.variantId}`}
+        style={{ verticalAlign: "middle" }}
+      >
         <td>{item.itemName}</td>
         <td>{item.hsnCode}</td>
         <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
         <td style={{ whiteSpace: "nowrap" }}>
           {formatNumberWithCommasAndDecimal(item.unitPrice)}
         </td>
-        <td style={{ width: '10%' }}>
+        <td style={{ width: "10%" }}>
           <Input
             type="number"
             min="1"
-            value={
-              selectedQuantities[`${item.itemId}-${item.variantId}`] || 1
-            }
+            value={selectedQuantities[`${item.itemId}-${item.variantId}`] || 1}
             onChange={(e) => {
               const quantity = parseInt(e.target.value, 10);
               setSelectedQuantities({
@@ -302,12 +314,12 @@ const CreateOrder = (props) => {
     id && rowData && getPurchaseOrderDetails(id);
 
     return () => {
-      setPurchaseOrderNumber('');
+      setPurchaseOrderNumber("");
       setPurchaseOrder(null);
-      setBillingAddress('');
-      setShippingAddress('');
+      setBillingAddress("");
+      setShippingAddress("");
       setSelectedItems([]);
-    }
+    };
   }, [id, rowData]);
 
   const getPurchaseOrderDetails = async (id) => {
@@ -320,24 +332,26 @@ const CreateOrder = (props) => {
     setShippingAddress(purchaseOrder.shipping.branchId);
 
     let items = purchaseOrder.items;
-    items.forEach(item => {
-      item.category = rowData.find(data => data._id === item.itemId)?.category.name
+    items.forEach((item) => {
+      item.category = rowData.find(
+        (data) => data._id === item.itemId
+      )?.category.name;
       item.gst = item.taxes.map((tax) => tax.taxName).join(", ");
-      item.taxes = item.taxes.map(({ _id, ...rest }) => rest)
-    })
+      item.taxes = item.taxes.map(({ _id, ...rest }) => rest);
+    });
 
-    setDate(formatDate(purchaseOrder.deliveryDate));
+    setDeliveryDate(formatDate(purchaseOrder.deliveryDate));
     setSelectedItems(items);
   };
 
   function formatDate(dateStr) {
     const date = new Date(dateStr);
 
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
     const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`;
+    return `${year}-${month}-${day}`;
   }
 
   useEffect(() => {
@@ -350,71 +364,59 @@ const CreateOrder = (props) => {
   }, [props, breadcrumbItems, getBranchData]);
 
   const onCreatePurchaseOrderClick = (e) => {
-    setIsButtonLoading(true);
-    e.preventDefault();
-    validation.handleSubmit();
 
-    const validationErrors = validation.errors;
-    debugger
+    if (isEmpty(purchaseOrderNumber)) {
+      console.log('-----------------------')
+      validation.setFieldError('purchaseOrderNumber')
+    }
+    console.log(validation.errors);
 
-    // Clearing individual error states if corresponding fields are valid
-    // if (!validationErrors.billingAddress) {
-    //   setBillingAddressError("");
-    // }
-    // if (!validationErrors.shippingAddress) {
-    //   setShippingAddressError("");
-    // }
-    // if (!validationErrors.purchaseOrderNumber) {
-    //   setPoNumberError("");
-    // }
-    // if (!validationErrors.deliveryDate) {
-    //   setDeliveryDateError("");
-    // }
 
-    // if (Object.keys(validationErrors).length > 0) {
-    //   // Handling validation errors
-    //   if (validationErrors.billingAddress) {
-    //     setBillingAddressError(validationErrors.billingAddress);
-    //   }
+    if (selectedItems.length === 0) {
+      toast.error("Please select at least 1 item!", {
+        position: "top-center",
+        theme: "light",
+      });
+      return;
+    } else {
+      setIsButtonLoading(true);
+      e.preventDefault();
 
-    //   if (validationErrors.shippingAddress) {
-    //     setShippingAddressError(validationErrors.shippingAddress);
-    //   }
-
-    //   if (validationErrors.purchaseOrderNumber) {
-    //     setPoNumberError(validationErrors.purchaseOrderNumber);
-    //   }
-
-    //   if (validationErrors.deliveryDate) {
-    //     setDeliveryDateError(validationErrors.deliveryDate);
-    //   }
-
-    //   return;
-    // }
-    // If all validations pass, proceed with further logic
-    if (selectedItems.length > 0) {
       async function handlePurchaseOrderCreation() {
         try {
-          const response = id ? await updatePurchaseOrderReq(body) : await createPurchaseOrderReq(body);
-          const _id = id ? response?.payload?.updatedPurchaseOrder?._id : response?.payload?.purchaseOrder?._id
-          redirectToPurchaseDetails(_id);
+          const response = id
+            ? await updatePurchaseOrderReq(body)
+            : await createPurchaseOrderReq(body);
+          const _id = id
+            ? response?.payload?.updatedPurchaseOrder?._id
+            : response?.payload?.purchaseOrder?._id;
+          setTimeout(() => {
+            redirectToPurchaseDetails(_id);
+          }, 1000)
+          toast.success(id ? 'Purchase Order Created Successfully' : 'Purchase Order Updated Successfully', {
+            position: "top-center",
+            theme: "light",
+          });
         } catch (error) {
-          console.error("Failed to create purchase order:", error);
+          toast.error(error.response.data.message, {
+            position: "top-center",
+            theme: "light",
+          });
+        } finally {
+          setIsButtonLoading(false);
         }
       }
       // validation.handleSubmit();
-      const formattedDate = date.split("-").reverse().join("-");
 
       const body = {
-        purchaseOrderNumber: purchaseOrderNumber,
-        agreementId: agreementId,
-        status: status,
-        deliveryDate: formattedDate,
+        purchaseOrderNumber, agreementId, status, deliveryDate,
         billingBranchId: billingAddress,
         shippingBranchId: shippingAddress,
         items: selectedItems.map(({ category, gst, _id, ...rest }) => ({
           ...rest,
-          quantity: selectedQuantities[`${rest.itemId}-${rest.variantId}`] || rest.quantity
+          quantity:
+            selectedQuantities[`${rest.itemId}-${rest.variantId}`] ||
+            rest.quantity,
         })),
       };
 
@@ -423,11 +425,8 @@ const CreateOrder = (props) => {
       }
 
       handlePurchaseOrderCreation();
-    } else {
-      alert("Please select at least 1 item!");
+      return false;
     }
-    setIsButtonLoading(false);
-    return false;
   };
 
   const handleClickPO = () => {
@@ -451,61 +450,23 @@ const CreateOrder = (props) => {
     validation.setFieldValue("purchaseOrderNumber", purchaseOrderNumber);
   };
 
-  const handleChangeDate = (e) => {
-    let input = e.target.value.replace(/\D/g, "");
+  const handleChangeDate = (event) => {
 
-    if (e.nativeEvent.inputType === "deleteContentBackward") {
-      const lastHyphenIndex = date.lastIndexOf("-");
-      if (lastHyphenIndex !== -1) {
-        input = input.slice(0, lastHyphenIndex - 1);
-      } else {
-        input = input.slice(0, -1);
-      }
-    } else {
-      input = input.slice(0, 8);
+    const selectedDate = new Date(event.target.value);
+    const today = new Date(minDate);
 
-      if (input.length >= 2 && input.charAt(2) !== "-") {
-        input = input.slice(0, 2) + "-" + input.slice(2);
-      }
-      if (input.length >= 5 && input.charAt(5) !== "-") {
-        input = input.slice(0, 5) + "-" + input.slice(5);
-      }
+    // Check if the selected date is before today
+    if (selectedDate < today) {
+      // Reset to today's date
+      event.target.value = minDate;
     }
-
-    setDate(input);
-    validation.setFieldValue("deliveryDate", date);
-    // if (input.length === 10) {
-    //   const [day, month, year] = input.split("-").map(Number);
-
-    //   if (month < 1 || month > 12) {
-    //     setError("Invalid month");
-    //   } else if (day < 1 || day > 31) {
-    //     setError("Invalid day");
-    //   } else {
-    //     setError("");
-    //   }
-    // } else {
-    //   setError("");
-    // }
-  };
-
-  useEffect(() => {
-    // regex for DD-MM-YYYY
-    const regexddmmyyyy =
-      /^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$/;
-
-    if (regexddmmyyyy.test(date)) {
-      setValidDate(true);
-    } else {
-      setValidDate(false);
-    }
-  }, [date]);
+    setDeliveryDate(event.target.value);
+  }
 
   return (
     <>
-
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
+        {/* <ToastContainer position="top-center" theme="colored" /> */}
         <div
           style={{
             position: "absolute",
@@ -514,7 +475,7 @@ const CreateOrder = (props) => {
             display: "flex",
           }}
         >
-          <Modal isOpen={publishModal} centered={true}>
+          <Modal size="sm" isOpen={publishModal} centered={true}>
             <PublishConfirm
               setPublishModal={setPublishModal}
               setStatus={setStatus}
@@ -535,7 +496,7 @@ const CreateOrder = (props) => {
             onClick={onCreatePurchaseOrderClick}
             isLoading={isButtonLoading}
           >
-            {id ? 'Update' : 'Save'}
+            {id ? "Update" : "Save"}
           </StyledButton>
         </div>
       </div>
@@ -550,11 +511,20 @@ const CreateOrder = (props) => {
               />
             </div>
             <div className="details">
-              <h3 className="fw-bolder">Bansi Office Solutions Private Limited</h3>
-              <p className="m-0">#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India</p>
-              <p className="m-0">GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142</p>
+              <h3 className="fw-bolder">
+                Bansi Office Solutions Private Limited
+              </h3>
+              <p className="m-0">
+                #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,
+                Bangalore Karnataka 560102, India
+              </p>
+              <p className="m-0">
+                GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
+              </p>
               <p className="m-0">MSME No : UDYAM-KR-03-0065095</p>
-              <p className="m-0">Web: www.willsmeet.com, Email:sales@willsmeet.com</p>
+              <p className="m-0">
+                Web: www.willsmeet.com, Email:sales@willsmeet.com
+              </p>
             </div>
             <div>
               <span className="purchase-order">Purchase Order</span>
@@ -573,9 +543,11 @@ const CreateOrder = (props) => {
                 <CardHeader>Billing & Shipping</CardHeader>
                 <CardBody>
                   <div class="d-flex">
-                    <div class="p-2 flex-grow-1">
+                    <div class="p-2" style={{ width: '49%' }}>
                       <div>
-                        <label className="col-form-label">Billing Address</label>
+                        <label className="col-form-label">
+                          Billing Address
+                        </label>
                         <select
                           name="billingAddress"
                           id="billingAddress"
@@ -605,42 +577,45 @@ const CreateOrder = (props) => {
                             )?.address
                           }
                         </h5>
-                      </div></div>
+                      </div>
+                    </div>
                     <div class="p-2">
                       <div class="vr h-100"></div>
                     </div>
-                    <div class="p-2 flex-grow-1"><div>
-                      <label className="col-form-label">Shipping</label>
-                      <select
-                        name="shippingAddress"
-                        id="shippingAddress"
-                        className="form-select focus-width"
-                        onChange={handleShippingChange}
-                        onBlur={validation.handleBlur}
-                        value={shippingAddress}
-                      >
-                        <option value="" disabled>
-                          Select Shipping Address
-                        </option>
-                        {branchList.map((branch) => (
-                          <option key={branch._id} value={branch._id}>
-                            {branch.name}
+                    <div class="p-2" style={{ width: '49%' }}>
+                      <div>
+                        <label className="col-form-label">Shipping</label>
+                        <select
+                          name="shippingAddress"
+                          id="shippingAddress"
+                          className="form-select focus-width"
+                          onChange={handleShippingChange}
+                          onBlur={validation.handleBlur}
+                          value={shippingAddress}
+                        >
+                          <option value="" disabled>
+                            Select Shipping Address
                           </option>
-                        ))}
-                      </select>
-                      {shippingAddressError && (
-                        <span style={{ color: "red" }}>
-                          {shippingAddressError}
-                        </span>
-                      )}
-                      <h5 className="my-3">
-                        {
-                          branchList.find(
-                            (branch) => branch._id === shippingAddress
-                          )?.address
-                        }
-                      </h5>
-                    </div></div>
+                          {branchList.map((branch) => (
+                            <option key={branch._id} value={branch._id}>
+                              {branch.name}
+                            </option>
+                          ))}
+                        </select>
+                        {shippingAddressError && (
+                          <span style={{ color: "red" }}>
+                            {shippingAddressError}
+                          </span>
+                        )}
+                        <h5 className="my-3">
+                          {
+                            branchList.find(
+                              (branch) => branch._id === shippingAddress
+                            )?.address
+                          }
+                        </h5>
+                      </div>
+                    </div>
                   </div>
                 </CardBody>
               </Card>
@@ -671,11 +646,13 @@ const CreateOrder = (props) => {
                     <div className="mt-3 mb-0">
                       <Label for="deliveryDate">Expected Delivery Date</Label>
                       <Input
-                        type="text"
+                        type="date"
                         name="deliveryDate"
                         id="deliveryDate"
                         placeholder="dd-mm-yyyy"
-                        value={date}
+                        value={deliveryDate}
+                        min={minDate}
+                        onClick={(e) => e.target.showPicker()}
                         onChange={handleChangeDate}
                         onBlur={validation.handleBlur}
                       />
@@ -684,9 +661,6 @@ const CreateOrder = (props) => {
                           {deliveryDateError}
                         </span>
                       )}
-                      {date.length === 10 && !validDate ? (
-                        <p className="text-danger">Invalid Date!</p>
-                      ) : null}
                     </div>
                   </Row>
                 </CardBody>
@@ -700,8 +674,7 @@ const CreateOrder = (props) => {
                 <CardBody>
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                  </div>
+                  ></div>
                   <div>
                     <Row>
                       <Col xl="12">
@@ -738,35 +711,53 @@ const CreateOrder = (props) => {
                             </tr>
                           </thead>
                           <tbody>
-                            {!loadedData && <tr>
-                              <td colSpan={5} className="form-text-lg text-center">
-                                <CircularProgress /></td>
-                            </tr>
-                            }
+                            {!loadedData && (
+                              <tr>
+                                <td
+                                  colSpan={5}
+                                  className="form-text-lg text-center"
+                                >
+                                  <CircularProgress />
+                                </td>
+                              </tr>
+                            )}
                             {filteredRowData.map((item) =>
                               item.variants.map((variant) => (
-                                <tr key={variant._id}
+                                <tr
+                                  key={variant._id}
                                   className="row-clickable cursor-pointer"
                                   onClick={() => {
                                     handleItemSelect(item, variant);
                                     setSearchQuery("");
-                                  }}>
+                                  }}
+                                >
                                   <td>{item.title}</td>
                                   <td>{item.hsnCode}</td>
                                   <td>{item.category.name}</td>
-                                  <td>{formatNumberWithCommasAndDecimal(variant.price)}</td>
-                                  <td>{item.taxes.map((tax) => tax.name).join(", ")}</td>
+                                  <td>
+                                    {formatNumberWithCommasAndDecimal(
+                                      variant.price
+                                    )}
+                                  </td>
+                                  <td>
+                                    {item.taxes
+                                      .map((tax) => tax.name)
+                                      .join(", ")}
+                                  </td>
                                 </tr>
                               ))
                             )}
-                            {(!filteredRowData || filteredRowData.length === 0) &&
-                              (
+                            {(!filteredRowData ||
+                              filteredRowData.length === 0) && (
                                 <tr>
-                                  <td colSpan={5} className="form-text-lg text-center">
-                                    No items found.</td>
+                                  <td
+                                    colSpan={5}
+                                    className="form-text-lg text-center"
+                                  >
+                                    No items found.
+                                  </td>
                                 </tr>
-                              )
-                            }
+                              )}
                           </tbody>
                         </Table>
                       </div>
@@ -786,9 +777,7 @@ const CreateOrder = (props) => {
                           <th></th>
                         </tr>
                       </thead>
-                      <tbody>
-                        {renderSelectedItems()}
-                      </tbody>
+                      <tbody>{renderSelectedItems()}</tbody>
                     </Table>
                   </Row>
                 </CardBody>

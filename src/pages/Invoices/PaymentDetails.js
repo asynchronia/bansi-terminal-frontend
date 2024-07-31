@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Row, Col, Card, CardBody } from "reactstrap";
+import { Row, Col, Card, CardBody, Table } from "reactstrap";
 import { useParams } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { connect, useDispatch } from "react-redux";
@@ -167,16 +167,8 @@ const PaymentDetails = (props) => {
             display: "flex",
           }}
         >
-          <button
-            type="submit"
-            className="btn btn-outline-primary w-xl mx-3"
-            onClick={downloadPDF}
-          >
-            Download PDF
-          </button>
-          <button type="submit" className="btn btn-primary w-xl mx-3">
-            Send on Mail
-          </button>
+          <button type="submit" className="btn btn-outline-primary w-xl" onClick={downloadPDF}>Download PDF</button>
+          <button type="submit" className="btn btn-primary w-xl mx-3 d-none">Send on Mail</button>
         </div>
         <Col id="payment-container">
           <Card>
@@ -191,7 +183,6 @@ const PaymentDetails = (props) => {
                 </div>
                 <div class="details">
                   <h3>
-                    <br />
                     <span>Bansi Office Solutions Private Limited</span>
                   </h3>
                   #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,
@@ -212,55 +203,26 @@ const PaymentDetails = (props) => {
             <Col xs="9" className="d-flex">
               <Card className="w-100">
                 <CardBody>
-                  <div className="mt-3">
-                    <Row>
-                      <Col xs="6">
-                        <p>Payment Date</p>
-                      </Col>
-                      <Col xs="6">
-                        <p>{paymentData?.date}</p>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div>
-                    <Row>
-                      <Col xs="6">
-                        {" "}
-                        <p>Reference Number</p>
-                      </Col>
-                      <Col xs="6">
-                        <p>{paymentData?.reference_number}</p>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div>
-                    <Row>
-                      <Col xs="6">
-                        {" "}
-                        <p>Payment Mode</p>
-                      </Col>
-                      <Col xs="6">
-                        {" "}
-                        <p>{paymentData?.payment_mode}</p>
-                      </Col>
-                    </Row>
-                  </div>
-                  <div>
-                    <Row>
-                      <Col xs="6">
-                        {" "}
-                        <p>
-                          <span>Amount Received In Words</span>
-                        </p>
-                      </Col>
-                      <Col xs="6">
-                        {" "}
-                        <p>
-                          <span> {indianNumberWords(amountReceived)}</span>
-                        </p>
-                      </Col>
-                    </Row>
-                  </div>
+                  <Table>
+                    <tbody>
+                      <tr>
+                        <td>Payment Date</td>
+                        <td>{paymentData?.date}</td>
+                      </tr>
+                      <tr>
+                        <td>Reference Number</td>
+                        <td>{paymentData?.reference_number}</td>
+                      </tr>
+                      <tr>
+                        <td>Payment Mode</td>
+                        <td>{paymentData?.payment_mode}</td>
+                      </tr>
+                      <tr>
+                        <td>Amount Received In Words</td>
+                        <td>{indianNumberWords(amountReceived)}</td>
+                      </tr>
+                    </tbody>
+                  </Table>
                 </CardBody>
               </Card>
             </Col>

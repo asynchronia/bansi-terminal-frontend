@@ -77,7 +77,7 @@ const Login = props => {
 
   return (
     <div className='d-flex justify-content-center align-items-center vh-100'>
-      <Card>
+      <Card className='m-0' style={{ width: 450 }}>
         <CardBody className="pt-0">
           <h3 className="text-center mt-5 mb-4">
             <Link to="/" className="d-block auth-logo">

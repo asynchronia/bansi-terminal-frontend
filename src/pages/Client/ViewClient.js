@@ -33,6 +33,7 @@ import ENV from "../../utility/env";
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
   const [agreementData, setAgreementData] = useState([]);
+
   const [displayTableData, setDisplayTableData] = useState([]);
   const [agreementAvailable, setAgreementAvailable] = useState({
     loading: true,
@@ -53,8 +54,9 @@ const ViewClient = (props) => {
     user: false,
   });
   const [additionalData, setAdditionalData] = useState({
-    url: "",
+    url: "/document/url",
     validity: "",
+    paymentTerms: 0
   });
 
   const notify = (type, message) => {
@@ -151,6 +153,8 @@ const ViewClient = (props) => {
       setAdditionalData((prevData) => ({
         ...prevData,
         url: res.payload.document,
+        validity: formatDate(res.payload.validity),
+        paymentTerms: res.payload.paymentTerms
       }));
     } catch (error) {
       if (error === 404) {
@@ -160,6 +164,16 @@ const ViewClient = (props) => {
       }
     }
   };
+
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const year = date.getFullYear();
+
+    return `${year}-${month}-${day}`;
+  }
 
   const handleAddToAgreement = (itemId, variantId, price) => {
     const itemIndex = agreementData.findIndex((item) => item.item === itemId);
@@ -227,6 +241,8 @@ const ViewClient = (props) => {
         clientId: id,
         items: [...agreementData],
         document: additionalData.url,
+        validity: additionalData.validity,
+        paymentTerms: additionalData.paymentTerms
       };
 
       const response = await createAgreementReq(values);
@@ -389,9 +405,10 @@ const ViewClient = (props) => {
           setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
           setAgreementData={setAgreementData}
+          additionalData={additionalData}
+          setAdditionalData={setAdditionalData}
           openModal={openModal}
           setOpenModal={setOpenModal}
-          setAdditionalData={setAdditionalData}
         />
       </Modal>
       <Modal>

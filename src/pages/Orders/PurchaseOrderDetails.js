@@ -180,14 +180,14 @@ const PurchaseOrderDetails = (props) => {
       <div style={{ position: "relative" }}>
         <ToastContainer position="top-center" theme="colored" />
         <div
-          className="d-flex align-items-center gap-1"
+          className="d-flex align-items-center gap-2"
           style={{
             position: "absolute",
             top: -50,
             right: 10,
           }}
         >
-          <Modal size="sm" isOpen={publishModal}>
+          <Modal size="sm" isOpen={publishModal} centered={true}>
             <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
           </Modal>
           <Modal size="sm" isOpen={approveModal}>
@@ -211,11 +211,7 @@ const PurchaseOrderDetails = (props) => {
               :
               <>
                 {OrderStatusRenderer({ value: status })}
-                <Tooltip title="Print" placement="top">
-                  <IconButton aria-label="print" onClick={downloadPDF}>
-                    <Print fontSize="small" color="primary" />
-                  </IconButton>
-                </Tooltip>
+                <Button color="primary" outline onClick={downloadPDF}>Download PDF</Button>
               </>
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}
