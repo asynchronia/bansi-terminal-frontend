@@ -245,6 +245,10 @@ const ViewClient = (props) => {
         paymentTerms: additionalData.paymentTerms
       };
 
+      if (additionalData.url) {
+        values.document = additionalData.url
+      }
+
       const response = await createAgreementReq(values);
       if (response.success === true) {
         notify("Success", response.message);

@@ -256,7 +256,7 @@ const AllClients = (props) => {
                     <Add />
                     Add New Client
                   </Button>
-                  <Button
+                  {/* TODO <Button
                     style={{
                       color: "black",
                       backgroundColor: "#bfd8f7",
@@ -265,7 +265,7 @@ const AllClients = (props) => {
                   >
                     <Import style={{ marginRight: "5px" }} />
                     Import Customers
-                  </Button>
+                  </Button> */}
                   <div className="button-right-section">
                     <div class="input-group">
                       <div className="search-box position-relative">
