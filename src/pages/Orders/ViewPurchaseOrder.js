@@ -173,39 +173,38 @@ const ViewPurchaseOrder = (props) => {
   const columnDefs = [
     {
       headerName: "Order No.", field: "order_number", suppressMenu: true,
-      headerCheckboxSelection: true, checkboxSelection: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: true
+      sortable: true, flex: 1
     },
     {
       headerName: "Order Date", field: "createdAt", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: true
+      sortable: true, width: 150
     },
     {
       headerName: "Client", field: "client_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: true
+      sortable: true, flex: 1
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) + " /-",
-      sortable: true
+      sortable: true, width: 150
     },
     {
       headerName: "Order Status", field: "order_status", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status", cellRenderer: OrderStatusRenderer,
-      sortable: true
+      sortable: true, width: 150
     },
     {
-      headerName: "Action", field: "action", sortable: false,
+      headerName: "Action", field: "action", sortable: false, width: 100,
       cellClass: "actions-button-cell",
       cellRenderer: DropdownMenuBtn,
       cellRendererParams: {
@@ -267,12 +266,11 @@ const ViewPurchaseOrder = (props) => {
                     suppressRowClickSelection={true}
                     columnDefs={columnDefs}
                     pagination={true}
-                    paginationPageSize={10}
-                    paginationPageSizeSelector={[10, 25, 50]}
+                    paginationAutoPageSize={true}
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
                     quickFilterText={inputValue}
-                  // onPaginationChanged={onPaginationChanged}
+                    onPaginationChanged={onPaginationChanged}
                   >
                   </AgGridReact>
                 </div>

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import CustomDropdown from "./CustomDropdown";
 
-import "./styles/ActionComponent.scss";
+import { Modal } from "reactstrap";
 import { getBranchByIdReq } from "../../service/branchService";
 import { getUserByIdReq } from "../../service/usersService";
-import { Modal } from "reactstrap";
 import DeleteConfirm from "./DeleteConfirm";
+import "./styles/ActionComponent.scss";
 const ActionComponent = (props) => {
   const { setEdit, type, data, clientId, validation, openModal, setOpenModal } =
     props;
@@ -83,21 +83,20 @@ const ActionComponent = (props) => {
     setDeleteModal(true);
   };
 
-
   return (
     <>
-    <Modal size="m" isOpen={deleteModal}>
-    <DeleteConfirm setDeleteModal={setDeleteModal}/>
-    </Modal>
-    <CustomDropdown
-      isOpen={menu}
-      direction={"bottom"}
-      toggle={() => setMenu(!menu)}
-      items={[
-        { label: "Edit", onClick: onEditClick },
-        { label: "Delete", onClick: onDeleteClick },
-      ]}
-    />
+      <Modal size="m" isOpen={deleteModal}>
+        <DeleteConfirm setDeleteModal={setDeleteModal} />
+      </Modal>
+      <CustomDropdown
+        isOpen={menu}
+        direction={"bottom"}
+        toggle={() => setMenu(!menu)}
+        items={[
+          { label: "Edit", onClick: onEditClick },
+          // { label: "Delete", onClick: onDeleteClick },
+        ]}
+      />
     </>
   );
 };

@@ -8,6 +8,7 @@ import { getUploadUrlReq } from "../../service/fileService";
 import axios from "axios";
 import StyledButton from "../Common/StyledButton";
 import { debounce } from 'lodash';
+import { toast } from "react-toastify";
 
 const Agreement = (props) => {
   const {
@@ -15,11 +16,12 @@ const Agreement = (props) => {
     handleSubmitAgreement,
     agreementData,
     setAgreementData,
+    additionalData,
+    setAdditionalData,
     displayTableData,
     setDisplayTableData,
     openModal,
-    setOpenModal,
-    setAdditionalData,
+    setOpenModal
   } = props;
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
@@ -179,8 +181,15 @@ const Agreement = (props) => {
                 type="button"
                 className="btn btn-primary waves-effect waves-light "
                 onClick={() => {
-                  handleSubmitAgreement();
-                  setOpenModal({ ...openModal, agreement: false });
+                  if (!additionalData.validity) {
+                    toast.error('Please enter validity');
+                  } else if (!additionalData.paymentTerms) {
+                    toast.error('Please enter Payment Terms');
+                  }
+                  else {
+                    handleSubmitAgreement();
+                    setOpenModal({ ...openModal, agreement: false });
+                  }
                 }}
               >
                 Save
@@ -190,6 +199,40 @@ const Agreement = (props) => {
         </div>
         <div>
           <Row className="mt-3">
+            <Col xs="6">
+              <label>Validity</label>
+              <input
+                id="validity"
+                type="date"
+                name="validity"
+                placeholder="Validity"
+                className="form-control"
+                autoComplete="off"
+                value={additionalData.validity}
+                onChange={e => setAdditionalData((prevData) => ({
+                  ...prevData,
+                  validity: e.target.value
+                }))}
+              />
+            </Col>
+            <Col xs="6">
+              <label>Payment Terms</label>
+              <input
+                id="paymentTerms"
+                type="number"
+                name="paymentTerms"
+                placeholder="Payment Terms"
+                className="form-control"
+                autoComplete="off"
+                value={additionalData.paymentTerms}
+                maxLength={3}
+                onChange={e => setAdditionalData((prevData) => ({
+                  ...prevData,
+                  paymentTerms: e.target.value
+                }))}
+              />
+            </Col>
+
             <Col xs="9">
               <input
                 id="searchQuery"

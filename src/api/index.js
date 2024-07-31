@@ -1,5 +1,4 @@
 import axios from "axios";
-import { get, reject } from "lodash";
 
 const baseUrl = process.env.API_BASE_URL || "http://localhost:3000";
 
@@ -114,8 +113,10 @@ export async function createClient(body) {
   return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.createClient}`, body, { headers: getHeaders() })
-      .then(response => response.json())
-      .then(data => resolve(data))
+      .then(res => {
+        resolve(res.data);
+        return res.data;
+      })
       .catch(error => reject(error));
 
   });
@@ -302,7 +303,7 @@ export async function getPurchaseOrderDetails(id, body) {
 }
 
 export async function createPurchaseOrder(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.createPurchaseOrder}`, body, {
         headers: getHeaders(),
@@ -310,12 +311,14 @@ export async function createPurchaseOrder(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+        reject(error);
       });
   });
 }
 
 export async function updatePurchaseOrder(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.updatePurchaseOrder}`, body, {
         headers: getHeaders(),
@@ -323,6 +326,8 @@ export async function updatePurchaseOrder(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+        reject(error);
       });
   });
 }
