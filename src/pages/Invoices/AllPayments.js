@@ -56,15 +56,13 @@ const AllPayments = (props) => {
     {
       headerName: "Invoice Date",
       field: "date",
-      headerCheckboxSelection: true,
-      checkboxSelection: true,
       cellRenderer: (props) => {
         let date = new Date(props.value);
         return <>{date.toDateString()}</>;
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 160,sortable:false
+      sortable: false
 
     },
     {
@@ -72,35 +70,35 @@ const AllPayments = (props) => {
       field: "payment_number",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 120,sortable:false
+      width: 120, sortable: false
     },
     {
       headerName: "Type",
       field: "payment_type",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 140,sortable:false
+      width: 140, sortable: false
     },
     {
       headerName: "Client",
       field: "customer_name",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 220,sortable:false
+      flex: 1, sortable: false
     },
     {
       headerName: "Invoice#",
       field: "invoice_numbers",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 180,sortable:false
+      flex: 1, sortable: false
     },
     {
       headerName: "Payment Mode",
       field: "payment_mode",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width : 130,sortable:false
+      width: 130, sortable: false
     },
     {
       headerName: "Amount Paid",
@@ -109,7 +107,7 @@ const AllPayments = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
-      width : 120,sortable:false
+      flex: 1, sortable: false
 
     },
     {
@@ -123,7 +121,7 @@ const AllPayments = (props) => {
       cellRendererParams: {
         handleViewClick: handleViewClick,
       },
-      width : 90
+      width: 100
 
     },
   ];
@@ -332,13 +330,10 @@ const AllPayments = (props) => {
                 >
                   <AgGridReact
                     ref={gridRef}
-                    rowHeight={60}
-                    suppressRowClickSelection={true}
                     columnDefs={columnDefs}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
-                    rowSelection="multiple"
                     reactiveCustomComponents
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}

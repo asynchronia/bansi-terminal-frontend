@@ -22,6 +22,7 @@ const CreateClient = (props) => {
 
   const [selectedFiles, setselectedFiles] = useState([]);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+
   const notify = (type, message, id) => {
     if (type === "Error") {
       toast.error(message, {
@@ -29,6 +30,10 @@ const CreateClient = (props) => {
         theme: "colored",
       });
     } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      });
       let path = `/client/${id}`;
       navigate(path);
     }
@@ -63,6 +68,7 @@ const CreateClient = (props) => {
       gstin: null,
       pan: null,
       zohoCustomerId: "",
+      poPrefix: "",
       bankAccountName: null,
       bankAccountNumber: null,
       ifscCode: null,
@@ -145,7 +151,6 @@ const CreateClient = (props) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
-  console.log(validation.errors)
 
   useEffect(() => {
     props.setBreadcrumbItems("Add New Client", breadcrumbItems);
@@ -331,29 +336,54 @@ const CreateClient = (props) => {
             <Card>
               <CardBody>
                 <h4 className="card-title">Additional Details</h4>
-                <div className="mt-4">
-                  <label className="item-name">ZOHO Customer Id</label>
-                  <input
-                    name="zohoCustomerId"
-                    id="zohoCustomerId"
-                    className="form-control"
-                    type="text"
-                    onChange={validation.handleChange}
-                    onBlur={validation.handleBlur}
-                    value={validation.values.zohoCustomerId}
-                    invalid={
-                      validation.touched.zohoCustomerId &&
-                      validation.errors.zohoCustomerId
-                    }
-                    placeholder="Enter ZOHO Customer Id"
-                  />
-                  {validation.touched.zohoCustomerId &&
-                    validation.errors.zohoCustomerId ? (
-                    <p style={{ color: "red" }}>
-                      {validation.errors.zohoCustomerId}
-                    </p>
-                  ) : null}
-                </div>
+                <Row className="mt-4">
+                  <Col>
+                    <label className="item-name">ZOHO Customer Id</label>
+                    <input
+                      name="zohoCustomerId"
+                      id="zohoCustomerId"
+                      className="form-control"
+                      type="text"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      value={validation.values.zohoCustomerId}
+                      invalid={
+                        validation.touched.zohoCustomerId &&
+                        validation.errors.zohoCustomerId
+                      }
+                      placeholder="Enter ZOHO Customer Id"
+                    />
+                    {validation.touched.zohoCustomerId &&
+                      validation.errors.zohoCustomerId ? (
+                      <p style={{ color: "red" }}>
+                        {validation.errors.zohoCustomerId}
+                      </p>
+                    ) : null}
+                  </Col>
+                  <Col>
+                    <label className="item-name">PO Prefix</label>
+                    <input
+                      name="poPrefix"
+                      id="poPrefix"
+                      className="form-control"
+                      type="text"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      value={validation.values.poPrefix}
+                      invalid={
+                        validation.touched.poPrefix &&
+                        validation.errors.poPrefix
+                      }
+                      placeholder="Enter PO Prefix"
+                    />
+                    {validation.touched.poPrefix &&
+                      validation.errors.poPrefix ? (
+                      <p style={{ color: "red" }}>
+                        {validation.errors.poPrefix}
+                      </p>
+                    ) : null}
+                  </Col>
+                </Row>
               </CardBody>
             </Card>
           </Col>

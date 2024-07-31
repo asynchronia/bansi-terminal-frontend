@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Row, Col, Card, CardBody, Modal } from "reactstrap";
+import { Row, Col, Card, CardBody, Modal, Button, CardHeader } from "reactstrap";
 import { ToastContainer } from "react-toastify";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import StyledButton from "../../components/Common/StyledButton";
@@ -16,6 +16,8 @@ import RequireUserType from "../../routes/middleware/requireUserType";
 import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
 import RequirePermission from "../../routes/middleware/requirePermission";
 import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
+import { Cancel, CheckCircle, Print } from "@mui/icons-material";
+import { IconButton, Tooltip } from "@mui/material";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -147,43 +149,30 @@ const PurchaseOrderDetails = (props) => {
     }
   }, []);
 
-  const options: Options = {
-    filename: "invoice.pdf",
+  const options = {
+    filename: "Purchase Order.pdf",
     method: "save",
-    // default is Resolution.MEDIUM = 3, which should be enough, higher values
-    // increases the image quality but also the size of the PDF, so be careful
-    // using values higher than 10 when having multiple pages generated, it
-    // might cause the page to crash or hang.
-    resolution: Resolution.MEDIUM,
+    resolution: Resolution.HIGH,
     page: {
-      // margin is in MM, default is Margin.NONE = 0
       margin: Margin.MEDIUM,
-      // default is 'A4'
       format: "A4",
-      // default is 'portrait'
       orientation: "portrait",
     },
     canvas: {
-      // default is 'image/jpeg' for better size performance
       mimeType: "image/jpeg",
       qualityRatio: 1,
     },
-    // Customize any value passed to the jsPDF instance and html2canvas
-    // function. You probably will not need this and things can break,
-    // so use with caution.
     overrides: {
-      // see https://artskydj.github.io/jsPDF/docs/jsPDF.html for more options
       pdf: {
         compress: true,
       },
-      // see https://html2canvas.hertzen.com/configuration for more options
       canvas: {
         useCORS: true,
       },
     },
   };
 
-  const getTargetElement = () => document.getElementById("invoice-container");
+  const getTargetElement = () => document.getElementById("print-container");
   const downloadPDF = () => generatePDF(getTargetElement, options);
 
   return (
@@ -191,19 +180,17 @@ const PurchaseOrderDetails = (props) => {
       <div style={{ position: "relative" }}>
         <ToastContainer position="top-center" theme="colored" />
         <div
+          className="d-flex align-items-center gap-2"
           style={{
             position: "absolute",
             top: -50,
             right: 10,
-            display: "flex",
-            alignItems: 'center',
-            gap: '1rem'
           }}
         >
-          <Modal size="m" isOpen={publishModal}>
+          <Modal size="sm" isOpen={publishModal} centered={true}>
             <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
           </Modal>
-          <Modal size="m" isOpen={approveModal}>
+          <Modal size="sm" isOpen={approveModal}>
             <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
           </Modal>
           {
@@ -221,7 +208,11 @@ const PurchaseOrderDetails = (props) => {
                 </select>
                 <Link to='edit' className="w-md btn btn-primary">Edit</Link>
               </>)
-              : OrderStatusRenderer({ value: status })
+              :
+              <>
+                {OrderStatusRenderer({ value: status })}
+                <Button color="primary" outline onClick={downloadPDF}>Download PDF</Button>
+              </>
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}
             // </Typography>)
@@ -235,7 +226,7 @@ const PurchaseOrderDetails = (props) => {
                   isLoading={isButtonLoading}
                   onClick={submitPurchaseOrder}
                 >
-                  <CorrectSign className="me-1" />
+                  <CheckCircle className="me-1" />
                   Approve
                 </StyledButton>
               )}
@@ -244,23 +235,23 @@ const PurchaseOrderDetails = (props) => {
           <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
             <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
               {status === 'published' && (
-                  <StyledButton
-                    color={"danger"}
-                    className={"w-md mx-2"}
-                    isLoading={isButtonLoading}
-                    onClick={rejectPurchaseOrder}
-                  >
-                    <Delete className="me-1" />
-                    Reject
-                  </StyledButton>
-                )}
+                <StyledButton
+                  color={"danger"}
+                  className={"w-md mx-2"}
+                  isLoading={isButtonLoading}
+                  onClick={rejectPurchaseOrder}
+                >
+                  <Cancel className="me-1" />
+                  Reject
+                </StyledButton>
+              )}
             </RequirePermission>
           </RequireUserType>
           <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
             {status === 'sent' && (
               <StyledButton
                 color={"success"}
-                className={"w-md mx-2"}
+                className={"w-md"}
                 isLoading={isButtonLoading}
                 onClick={acceptPurchaseOrder}
               >
@@ -270,148 +261,144 @@ const PurchaseOrderDetails = (props) => {
             )}
           </RequireUserType>
         </div>
-      </div>
-      <Card>
-        <CardBody>
-          <div className="card-content">
-            <div className="image-container">
-              <img
-                src={require("../../assets/images/Willsmeet-Logo.png")}
-                alt="Company Logo"
-                className="card-image"
-              />
+      </div >
+      <div id='print-container'>
+        <Card>
+          <CardBody>
+            <div className="card-content">
+              <div className="image-container">
+                <img
+                  src={require("../../assets/images/Willsmeet-Logo.png")}
+                  alt="Company Logo"
+                  className="card-image"
+                />
+              </div>
+              <div className="details">
+                <h3 className="fw-bolder">Bansi Office Solutions Private Limited</h3>
+                <p className="m-0">#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India</p>
+                <p className="m-0">GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142</p>
+                <p className="m-0">MSME No : UDYAM-KR-03-0065095</p>
+                <p className="m-0">Web: www.willsmeet.com, Email:sales@willsmeet.com</p>
+              </div>
+              <div>
+                <span className="purchase-order">Purchase Order</span>
+                <br />
+                <span className="purchase-order-no">{orderInfo.purchaseOrderNumber}</span>
+              </div>
             </div>
-            <div className="details">
-              <h3 className="fw-bolder">Bansi Office Solutions Private Limited</h3>
-              <p className="m-0">#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India</p>
-              <p className="m-0">GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142</p>
-              <p className="m-0">MSME No : UDYAM-KR-03-0065095</p>
-              <p className="m-0">Web: www.willsmeet.com, Email:sales@willsmeet.com</p>
-            </div>
-            <div>
-              <span className="purchase-order">Purchase Order</span>
-              <br />
-              <span className="purchase-order-no">{orderInfo.purchaseOrderNumber}</span>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
 
-      <Row className="mb-3">
-        <div style={{ position: "relative" }}>
-          <ToastContainer position="top-center" theme="colored" />
-          <Row className="equal-height-cards">
-            <Col xl="7">
-              <Card>
-                <CardBody>
-                  <Row className="py-2 border-bottom">
-                    <Col>Order Date</Col>
-                    <Col>{new Date(orderInfo?.createdAt).toLocaleDateString()}</Col>
-                  </Row>
-                  <Row className="py-2 border-bottom">
-                    <Col>Payment Terms</Col>
-                    <Col></Col>
-                  </Row>
-                </CardBody>
-              </Card>
-            </Col>
-            <Col xl="5">
-              <Card>
-                <CardBody className="d-flex flex-column gap-2">
-                  <div style={{ flex: 1 }} className="border-bottom">
-                    <p className="fw-lighter m-0">Billing Address</p>
-                    <h5 className="fw-medium text-uppercase m-0">{orderInfo.billing?.address}</h5>
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <p className="fw-lighter m-0">Shipping Address</p>
-                    <h5 className="fw-medium text-uppercase m-0">{orderInfo.shipping?.address}</h5>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-          <Row>
-            <Col xl="8">
-              <Card className="mt-3" style={{ height: "100%" }}>
-                <CardBody>
-                  <div
-                    className="mb-3"
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <h4 className="card-title mt-1">Sales Information</h4>
-                  </div>
-                  <Row className="py-2 border-bottom">
-                    <Col xl="4">Item & Description</Col>
-                    <Col xl="3">Rate</Col>
-                    <Col xl="3">Ordered</Col>
-                    <Col xl="2">Amount</Col>
-                  </Row>
-                  {itemsData && itemsData.map((item, index) => (
-                    <Row key={index} className="py-2 border-bottom align-items-center">
-                      <Col xl="4">
-                        <h6 className="m-0">{item.itemName}</h6>
-                        <span>{item.itemDescription}</span>
-                      </Col>
-                      <Col xl="3">
-                        <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
-                      </Col>
-                      <Col xl="3">{item.quantity} Nos</Col>
-                      <Col xl="2">
-                        <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
-                      </Col>
+        <Row className="mb-3">
+          <div style={{ position: "relative" }}>
+            <ToastContainer position="top-center" theme="colored" />
+            <Row className="equal-height-cards">
+              <Col xl="7">
+                <Card>
+                  <CardBody>
+                    <Row className="py-2 border-bottom">
+                      <Col>Order Date</Col>
+                      <Col>{new Date(orderInfo?.createdAt).toLocaleDateString()}</Col>
                     </Row>
-                  ))}
-                </CardBody>
-              </Card>
-            </Col>
-            <Col xl="4">
-              <Card className="mt-3">
-                <CardBody style={{ display: "flex", flexDirection: "column" }}>
-                  <h4 className="card-title">Order Info</h4>
-                  <hr />
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <h5
-                      className="mb-0"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>Sub Total :</span>
-                      <span>{formatNumberWithCommasAndDecimal(orderInfo.subTotal)}</span>
-                    </h5>
-                    <div style={{ fontSize: "0.7rem" }}>
-                      Total Quantity: {orderInfo.totalQuantity}
+                    <Row className="py-2 border-bottom">
+                      <Col>Payment Terms</Col>
+                      <Col></Col>
+                    </Row>
+                  </CardBody>
+                </Card>
+              </Col>
+              <Col xl="5">
+                <Card>
+                  <CardBody className="d-flex flex-column gap-2">
+                    <div style={{ flex: 1 }} className="border-bottom">
+                      <p className="fw-lighter m-0">Billing Address</p>
+                      <h5 className="fw-medium text-uppercase m-0">{orderInfo.billing?.address}</h5>
                     </div>
-                    <hr />
-                    <h5
-                      className="mb-0"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>GST :</span>
-                      <span>{formatNumberWithCommasAndDecimal(orderInfo.gstTotal)}</span>
-                    </h5>
-                    <hr />
-                    <h5
-                      className="mb-0"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>Total :</span>
-                      <span>{formatNumberWithCommasAndDecimal(orderInfo.total)}</span>
-                    </h5>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-        </div>
-      </Row>
+                    <div style={{ flex: 1 }}>
+                      <p className="fw-lighter m-0">Shipping Address</p>
+                      <h5 className="fw-medium text-uppercase m-0">{orderInfo.shipping?.address}</h5>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+            <Row>
+              <Col xl="8">
+                <Card className="mt-3" style={{ height: "100%" }}>
+                  <CardHeader>Sales Information</CardHeader>
+                  <CardBody>
+                    <Row className="py-2 border-bottom">
+                      <Col xl="4">Item & Description</Col>
+                      <Col xl="3">Rate</Col>
+                      <Col xl="3">Ordered</Col>
+                      <Col xl="2">Amount</Col>
+                    </Row>
+                    {itemsData && itemsData.map((item, index) => (
+                      <Row key={index} className="py-2 border-bottom align-items-center">
+                        <Col xl="4">
+                          <h6 className="m-0">{item.itemName}</h6>
+                          <span>{item.itemDescription}</span>
+                        </Col>
+                        <Col xl="3">
+                          <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
+                        </Col>
+                        <Col xl="3">{item.quantity} Nos</Col>
+                        <Col xl="2">
+                          <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
+                        </Col>
+                      </Row>
+                    ))}
+                  </CardBody>
+                </Card>
+              </Col>
+              <Col xl="4">
+                <Card className="mt-3">
+                  <CardHeader>Order Info</CardHeader>
+                  <CardBody style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <h5
+                        className="mb-0"
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>Sub Total :</span>
+                        <span>{formatNumberWithCommasAndDecimal(orderInfo.subTotal)}</span>
+                      </h5>
+                      <div style={{ fontSize: "0.7rem" }}>
+                        Total Quantity: {orderInfo.totalQuantity}
+                      </div>
+                      <hr />
+                      <h5
+                        className="mb-0"
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>GST :</span>
+                        <span>{formatNumberWithCommasAndDecimal(orderInfo.gstTotal)}</span>
+                      </h5>
+                      <hr />
+                      <h5
+                        className="mb-0"
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>Total :</span>
+                        <span>{formatNumberWithCommasAndDecimal(orderInfo.total)}</span>
+                      </h5>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        </Row>
+      </div>
     </>
   );
 };

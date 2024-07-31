@@ -179,16 +179,16 @@ const AllOrders = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: false, minWidth: 200
+      sortable: false, minWidth: 180
     },
     {
-      headerName: "Order Status", field: "order_status", cellRenderer: OrderStatusRenderer,
+      headerName: "Status", field: "order_status", cellRenderer: OrderStatusRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      sortable: false
+      sortable: false, width: 90
     },
     {
-      headerName: "Total Amount", field: "total", minWdth: 100,
+      headerName: "Amount", field: "total", width: 100,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
