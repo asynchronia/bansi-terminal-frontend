@@ -79,7 +79,7 @@ const AddCategory = (props) => {
       if (categoryData.id && categoryData.id !== null) {
         body.parentCategoryId = categoryData.id;
       }
-      // handleSubmit(body, resetForm);
+      handleSubmit(body, resetForm);
       console.log(body);
     },
   });
