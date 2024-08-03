@@ -49,7 +49,6 @@ const AllClients = (props) => {
     {
       headerName: "Name",
       field: "name", flex: 1,
-      headerCheckboxSelection: true,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       comparator: () => false,
@@ -135,7 +134,8 @@ const AllClients = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Clients", breadcrumbItems);
-    if (status && status !== undefined && status !== "") {
+    console.log(status);
+    if (status && status !== undefined) {
       getListOfRowData("status");
     }
   }, [status]);
@@ -267,7 +267,7 @@ const AllClients = (props) => {
                     Import Customers
                   </Button> */}
                   <div className="button-right-section">
-                    <div class="input-group">
+                    <div className="input-group">
                       <div className="search-box position-relative">
                         <Input
                           type="text"
