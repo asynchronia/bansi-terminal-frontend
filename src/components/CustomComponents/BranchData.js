@@ -5,44 +5,31 @@ import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Button, Form, Modal, ModalBody, ModalHeader, Spinner, Table } from "reactstrap";
 import * as Yup from "yup";
-import { getBranchListReq } from "../../service/branchService";
+import { getWarehouseListReq } from "../../service/branchService";
+
 import ActionComponent from "./ActionComponent";
 import AddBranch from "./AddBranch";
 
 const BranchData = (props) => {
-  const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } = props;
+  const { branchData, loading, handleSubmit, clientId, openModal, setOpenModal, handleToggle } = props;
 
-  const [branchData, setBranchData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(null);
 
-  const getBranchData = async () => {
+  const [warehouseList, setWarehouseList] = useState([]);
+
+  const searchAllWareHouses = async () => {
     try {
-      setLoading(true);
-      const response = await getBranchListReq({
-        clientId: clientId,
-        page: 1,
-        limit: 5,
-      });
-      let array = response?.payload?.branches;
-      const newArray = array.map((item) => ({
-        _id: item._id,
-        Name: item.name,
-        isPrimary: item.isPrimary,
-        AssociatedWarehouse: item.associatedWarehouse?.code,
-        Contact: item.contact,
-      }));
-      setBranchData(newArray);
-      setLoading(false);
+      const response = await getWarehouseListReq();
+      setWarehouseList(response?.payload?.warehouses);
     } catch (error) {
-      console.error(error);
-      setLoading(false);
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    getBranchData();
+    searchAllWareHouses();
   }, []);
+
 
   //For creating new Branch need Formik for validation schema
   const validation = useFormik({
@@ -51,7 +38,7 @@ const BranchData = (props) => {
       primaryBranch: {
         name: null,
         address: null,
-        associatedWarehouse: "65f4b5d66959ec3852a37e60",
+        associatedWarehouse: null,
         contact: null,
       },
     },
@@ -59,11 +46,19 @@ const BranchData = (props) => {
       primaryBranch: Yup.object().shape({
         name: Yup.string().required("Please Enter Branch Name"),
         address: Yup.string().required("Please Enter Branch Address"),
+        associatedWarehouse: Yup.string().required("Please Select Associated Warehouse"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
       }),
     }),
     onSubmit: (values) => {
-      const newBranch = { ...values.primaryBranch, clientId: clientId };
+      const code = warehouseList.find(e => e._id === values.primaryBranch.associatedWarehouse)?.code
+      const newBranch = {
+        ...values.primaryBranch,
+        clientId,
+      };
+      if (!edit) {
+        newBranch.code = code
+      }
       handleSubmit(newBranch, edit);
     },
   });
@@ -83,7 +78,6 @@ const BranchData = (props) => {
             onSubmit={(e) => {
               e.preventDefault();
               validation.handleSubmit();
-              return false;
             }}
           >
             <div class="modal-header">
@@ -96,7 +90,7 @@ const BranchData = (props) => {
               </div>
             </div>
             <ModalBody>
-              <AddBranch validation={validation} />
+              <AddBranch validation={validation} warehouseList={warehouseList} />
             </ModalBody>
           </Form>
         </div>

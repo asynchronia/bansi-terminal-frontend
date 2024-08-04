@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import { createClientReq } from "../../service/clientService";
 import { useNavigate } from "react-router-dom";
 import StyledButton from "../../components/Common/StyledButton";
+import { getWarehouseListReq } from "../../service/branchService";
 
 const CreateClient = (props) => {
   const navigate = useNavigate();
@@ -22,6 +23,20 @@ const CreateClient = (props) => {
 
   const [selectedFiles, setselectedFiles] = useState([]);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [warehouseList, setWarehouseList] = useState([]);
+
+  const searchAllWareHouses = async () => {
+    try {
+      const response = await getWarehouseListReq();
+      setWarehouseList(response?.payload?.warehouses);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    searchAllWareHouses();
+  }, []);
 
   const notify = (type, message, id) => {
     if (type === "Error") {
@@ -330,7 +345,7 @@ const CreateClient = (props) => {
             <Card>
               <CardBody>
                 <h4 className="card-title">Branch Details</h4>
-                <AddBranch validation={validation} />
+                <AddBranch validation={validation} warehouseList={warehouseList} />
               </CardBody>
             </Card>
             <Card>
