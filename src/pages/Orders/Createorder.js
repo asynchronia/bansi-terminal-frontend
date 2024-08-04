@@ -422,14 +422,14 @@ const CreateOrder = (props) => {
 
   const handleClickPO = () => {
     const purchaseOrderNumber = formik.values.purchaseOrderNumber;
-    if (!purchaseOrderNumber.startsWith("PO ")) {
-      formik.setFieldValue("purchaseOrderNumber", "PO ");
+    if (!purchaseOrderNumber.startsWith("PO")) {
+      formik.setFieldValue("purchaseOrderNumber", "PO");
     }
   };
 
   const handleChangePO = (e) => {
     let value = e.target.value;
-    let purchaseOrderNumber = !value.startsWith("PO") ? `PO ${value}` : value;
+    let purchaseOrderNumber = !value.startsWith("PO") ? `PO${value}` : value;
     formik.setFieldValue("purchaseOrderNumber", purchaseOrderNumber);
   };
 
@@ -570,7 +570,7 @@ const CreateOrder = (props) => {
                         name="purchaseOrderNumber"
                         id="purchaseOrderNumber"
                         value={formik.values.purchaseOrderNumber}
-                        placeholder="PO BLR/#123"
+                        placeholder="PO/BLR/#123"
                         onChange={handleChangePO}
                         onClick={handleClickPO}
                         onBlur={formik.handleBlur}
