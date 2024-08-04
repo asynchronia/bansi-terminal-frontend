@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { useParams } from "react-router-dom";
-import { setBreadcrumbItems } from "../../store/actions";
-
 import { Call, DriveFileRenameOutline, Email, Work } from "@mui/icons-material";
 import { Avatar, CircularProgress } from "@mui/material";
 import "jspdf-autotable";
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import {
   Button,
@@ -24,21 +22,26 @@ import BranchData from "../../components/CustomComponents/BranchData";
 import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
 import UserData from "../../components/CustomComponents/UserData";
 import { signinReq } from "../../service/authService";
-import { createBranchReq, updateBranchReq } from "../../service/branchService";
+import { createBranchReq, getBranchListReq, updateBranchReq } from "../../service/branchService";
 import { createAgreementReq, getAgreementReq, getClientWithIdReq } from "../../service/clientService";
 import { getTaxesReq } from "../../service/itemService";
 import { updateClientStatusReq } from "../../service/statusService";
-import { updateUserReq } from "../../service/usersService";
+import { getClientUsersReq, updateUserReq } from "../../service/usersService";
+import { setBreadcrumbItems } from "../../store/actions";
+
 import ENV from "../../utility/env";
 const ViewClient = (props) => {
   const [clientData, setClientData] = useState({});
   const [agreementData, setAgreementData] = useState([]);
 
+  const [branchData, setBranchData] = useState([]);
+  const [loadingBranch, setLoadingBranch] = useState(false);
+
+  const [userData, setUserData] = useState([]);
+  const [loadingUser, setLoadingUser] = useState(false);
+
   const [displayTableData, setDisplayTableData] = useState([]);
-  const [agreementAvailable, setAgreementAvailable] = useState({
-    loading: true,
-    value: false,
-  });
+  const [agreementAvailable, setAgreementAvailable] = useState({ loading: true, value: false, });
 
   const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
@@ -49,32 +52,12 @@ const ViewClient = (props) => {
   });
   const { id } = useParams();
 
-  const [seletedData, setSelectedData] = useState({
-    branch: true,
-    user: false,
-  });
+  const [seletedData, setSelectedData] = useState({ branch: true, user: false, });
   const [additionalData, setAdditionalData] = useState({
     url: "/document/url",
     validity: "",
     paymentTerms: 0
   });
-
-  const notify = (type, message) => {
-    if (type === "Error") {
-      toast.error(message, {
-        position: "top-center",
-        theme: "colored",
-      });
-    } else {
-      toast.success(message, {
-        position: "top-center",
-        theme: "colored",
-      });
-      setTimeout(() => {
-        window.location.reload();
-      }, [5000]);
-    }
-  };
 
   const searchAllTaxes = async (part) => {
     try {
@@ -225,13 +208,14 @@ const ViewClient = (props) => {
       };
 
       const response = await updateClientStatusReq(values);
-      if (response.success === true) {
-        notify("Success", response.message);
+      searchClient(id);
+      if (response.success) {
+        toast.success(response.message);
       } else {
-        notify("Error", response.message);
+        toast.error(response.message);
       }
     } catch (error) {
-      notify("Error", error.message);
+      toast.error(error.message);
     }
   };
 
@@ -251,68 +235,61 @@ const ViewClient = (props) => {
 
       const response = await createAgreementReq(values);
       if (response.success === true) {
-        notify("Success", response.message);
+        toast.success(response.message);
+        getAgreement(id);
       } else {
-        notify("Error", response.message);
+        toast.error(response.message);
       }
     } catch (error) {
-      notify("Error", error.message);
+      toast.error(error.message);
+    }
+  };
+
+  const handleResponse = (response) => {
+    if (response.success) {
+      toast.success(response.message);
+    } else {
+      toast.error(response.message);
     }
   };
 
   const handleSubmitBranch = async (data, editId) => {
-    debugger
-    if (editId) {
-      const { clientId, ...restData } = data;
-      const body = { ...restData, id: editId };
-      try {
-        const response = await updateBranchReq(body);
-        if (response.success === true) {
-          notify("Success", response.message);
-        } else {
-          notify("Error", response.message);
-        }
-      } catch (error) {
-        notify("Error", error.message);
+    try {
+      let response;
+      if (editId) {
+        const { clientId, ...restData } = data;
+        const body = { ...restData, id: editId };
+        response = await updateBranchReq(body);
+      } else {
+        response = await createBranchReq(data);
       }
-    } else {
-      try {
-        const response = await createBranchReq(data);
-        if (response.success === true) {
-          notify("Success", response.message);
-        } else {
-          notify("Error", response.message);
-        }
-      } catch (error) {
-        notify("Error", error.message);
+      handleResponse(response);
+      if (response.success) {
+        getBranchData();
+        handleModalToggle("branch");
       }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
+
   const handleSubmitUser = async (data, editId) => {
-    if (editId) {
-      const { clientId, ...restData } = data;
-      const body = { ...restData, id: editId };
-      try {
-        const response = await updateUserReq(body);
-        if (response.success === true) {
-          notify("Success", response.message);
-        } else {
-          notify("Error", response.message);
-        }
-      } catch (error) {
-        notify("Error", error.message);
+    try {
+      let response;
+      if (editId) {
+        const { clientId, ...restData } = data;
+        const body = { ...restData, id: editId };
+        response = await updateUserReq(body);
+      } else {
+        response = await signinReq(data);
       }
-    } else {
-      try {
-        const response = await signinReq(data);
-        if (response.success === true) {
-          notify("Success", response.message);
-        } else {
-          notify("Error", response.message);
-        }
-      } catch (error) {
-        notify("Error", error.message);
+      handleResponse(response);
+      if (response.success) {
+        getUserData();
+        handleModalToggle("user");
       }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -336,7 +313,57 @@ const ViewClient = (props) => {
     searchClient(id);
     getAgreement(id);
     searchAllTaxes();
+    getBranchData();
+    getUserData();
   }, []);
+
+  const getBranchData = async () => {
+    try {
+      setLoadingBranch(true);
+      const response = await getBranchListReq({
+        clientId: id,
+        page: 1,
+        limit: 5,
+      });
+      let array = response?.payload?.branches;
+      const newArray = array.map((item) => ({
+        _id: item._id,
+        Name: item.name,
+        isPrimary: item.isPrimary,
+        AssociatedWarehouse: item.associatedWarehouse?.code,
+        Contact: item.contact,
+      }));
+      setBranchData(newArray);
+      setLoadingBranch(false);
+    } catch (error) {
+      console.error(error);
+      setLoadingBranch(false);
+    }
+  };
+
+  const getUserData = async () => {
+    try {
+      setLoadingUser(true);
+      const response = await getClientUsersReq({
+        clientId: id,
+      });
+      let array = response?.payload;
+
+      const newArray = array.map((item) => ({
+        _id: item._id,
+        UserName: item.firstName + " " + item.lastName,
+        UserRole: item.role.title,
+        Contact: item.contact,
+        associatedBranches: item.associatedBranches,
+      }));
+
+      setUserData(newArray);
+      setLoadingUser(false);
+    } catch (error) {
+      console.log(error);
+      setLoadingUser(false);
+    }
+  };
 
   const searchClient = async (id) => {
     try {
@@ -415,10 +442,12 @@ const ViewClient = (props) => {
           setOpenModal={setOpenModal}
         />
       </Modal>
-      <Modal>
+      {/* <Modal >
         <AddBranch />
-      </Modal>
+      </Modal> */}
       <Modal
+        size="sm"
+        centered
         isOpen={openModal.status}
         toggle={() => {
           handleModalToggle("status");
@@ -569,6 +598,8 @@ const ViewClient = (props) => {
               </div>
               {seletedData.branch ? (
                 <BranchData
+                  branchData={branchData}
+                  loading={loadingBranch}
                   handleSubmit={handleSubmitBranch}
                   clientId={id}
                   openModal={openModal}
@@ -577,6 +608,8 @@ const ViewClient = (props) => {
                 />
               ) : (
                 <UserData
+                  userData={userData}
+                  loading={loadingUser}
                   handleSubmit={handleSubmitUser}
                   clientId={id}
                   openModal={openModal}

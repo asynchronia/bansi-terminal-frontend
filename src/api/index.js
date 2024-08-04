@@ -372,7 +372,7 @@ export async function getBranchById(body) {
 }
 
 export async function updateBranch(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.updateBranch}`, body, {
         headers: getHeaders(),
@@ -380,7 +380,9 @@ export async function updateBranch(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
-      });
+      }).catch((error) => {
+        reject(error);
+      });;
   });
 }
 

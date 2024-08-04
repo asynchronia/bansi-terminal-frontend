@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useState, useRef } from "react";
-import { Button, Card, CardBody, Col, Row, Table } from "reactstrap";
+import { Button, Card, CardBody, Col, Row, Table, ModalBody, ModalHeader } from "reactstrap";
 import { searchItemReq } from "../../service/itemService";
 import { v4 as uuidv4 } from "uuid";
 import AgreementTable from "./AgreementTable";
-import { Chip, CircularProgress, TableHead } from "@mui/material";
+import { Chip, CircularProgress, IconButton, TableHead } from "@mui/material";
 import { getUploadUrlReq } from "../../service/fileService";
 import axios from "axios";
 import StyledButton from "../Common/StyledButton";
 import { debounce } from 'lodash';
 import { toast } from "react-toastify";
+import { Close } from "@mui/icons-material";
 
 const Agreement = (props) => {
   const {
@@ -100,14 +101,15 @@ const Agreement = (props) => {
   };
 
   const debouncedFetchResults = useCallback(debounce((searchQuery) => {
-    searchQuery.search !== '' && getListOfRowData(searchQuery);
+    getListOfRowData(searchQuery);
   }, 500), []);
 
   const handleSearchQuery = (event) => {
     let data = {
-      search: event.target.value,
       limit: 10,
+      search: event.target.value || 'a'
     };
+
     setShowRowData(true);
     setLoadedData(true);
     debouncedFetchResults(data);
@@ -157,48 +159,56 @@ const Agreement = (props) => {
   };
 
   return (
-    <Card>
-      <CardBody>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <h4 className="card-title mt-2">Items</h4>
-          <Row>
-            <Col>
-              <Button
-                type="button"
-                outline
-                color="danger"
-                className="waves-effect waves-light"
-                onClick={() => {
-                  setOpenModal({ ...openModal, agreement: false });
-                }}
-              >
-                Close
-              </Button>
-            </Col>
-            <Col>
-              {" "}
-              <button
-                type="button"
-                className="btn btn-primary waves-effect waves-light "
-                onClick={() => {
-                  if (!additionalData.validity) {
-                    toast.error('Please enter validity');
-                  } else if (!additionalData.paymentTerms) {
-                    toast.error('Please enter Payment Terms');
+    <>
+      <div class="modal-header">
+        <div className="d-flex justify-content-between align-items-center w-100">
+          <h5 className="modal-title">Items</h5>
+          <div className="d-flex gap-1">
+            <Button
+              outline
+              color="danger"
+              className="waves-effect waves-light"
+              onClick={() => {
+                setOpenModal({ ...openModal, agreement: false });
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              className="btn btn-primary waves-effect waves-light "
+              onClick={() => {
+                let isCostError = false;
+                for (let i = 0; i < displayTableData.length; i++) {
+                  const sellingPrice = displayTableData[i].sellingPrice;
+                  if (!sellingPrice) {
+                    isCostError = true;
+                    toast.error(`Please enter Cost for ${displayTableData[i].title}`);
+                  } else if (typeof Number(sellingPrice) !== 'number') {
+                    isCostError = true;
+                    toast.error(`Please enter valid Cost for ${displayTableData[i].title}`);
                   }
-                  else {
+                }
+                if (!additionalData.validity) {
+                  toast.error('Please enter validity');
+                } else if (!additionalData.paymentTerms) {
+                  toast.error('Please enter Payment Terms');
+                }
+                else {
+                  if (!isCostError) {
                     handleSubmitAgreement();
                     setOpenModal({ ...openModal, agreement: false });
                   }
-                }}
-              >
-                Save
-              </button>
-            </Col>
-          </Row>
+                }
+              }}
+            >
+              Save
+            </Button>
+          </div>
         </div>
+      </div>
+      <ModalBody>
         <div>
-          <Row className="mt-3">
+          <Row>
             <Col xs="6">
               <label>Validity</label>
               <input
@@ -278,6 +288,7 @@ const Agreement = (props) => {
                 overflow: "auto",
               }}
             >
+              <IconButton className="float-end"><Close onClick={() => setShowRowData(false)} /></IconButton>
               <Row
                 className="mt-3"
                 style={{ width: "750px", fontWeight: "bold" }}
@@ -377,8 +388,8 @@ const Agreement = (props) => {
             setDisplayTableData={setDisplayTableData}
           />
         </div>
-      </CardBody>
-    </Card>
+      </ModalBody>
+    </>
   );
 };
 

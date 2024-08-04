@@ -1,65 +1,30 @@
 import { useFormik } from "formik";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
   Form,
   Modal,
-  Row,
+  ModalBody,
   Spinner,
-  Table,
+  Table
 } from "reactstrap";
-import { getClientUsersReq } from "../../service/usersService";
-import { AgGridReact } from "ag-grid-react"; // AG Grid Component
+
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import ActionComponent from "./ActionComponent";
 
+import { Chip } from "@mui/material";
 import * as Yup from "yup";
 import AddUser from "./AddUser";
-import { Chip } from "@mui/material";
 // import { getBranchListReq, getUserRoleReq } from "../../service/branchService";
 
 const UserData = (props) => {
-  const { handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
+  const { userData, loading, handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
     props;
 
   const gridRef = useRef();
-  const [userData, setUserData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [edit, setEdit] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
-
-  const getUserData = async () => {
-    try {
-      setLoading(true);
-      const response = await getClientUsersReq({
-        clientId: clientId,
-      });
-      let array = response?.payload;
-
-      const newArray = array.map((item) => ({
-        _id: item._id,
-        UserName: item.firstName + " " + item.lastName,
-        UserRole: item.role.title,
-        Contact: item.contact,
-        associatedBranches: item.associatedBranches,
-      }));
-
-      setUserData(newArray);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getUserData();
-  }, []);
 
   const [colDefs, setColDefs] = useState([
     { field: "UserName" },
@@ -129,57 +94,53 @@ const UserData = (props) => {
       >
         <div>
           <Form
-            className="form-horizontal mt-4"
+            className="form-horizontal"
             onSubmit={(e) => {
               e.preventDefault();
               validation.handleSubmit();
               return false;
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "15px 15px 0px",
-              }}
-            >
-              <h4 className="card-title mt-2">Add User</h4>
-              <Row>
-                <Col>
+            <div class="modal-header">
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <h5 className="modal-title">{edit ? 'Edit' : 'Add'} User</h5>
+                <div className="d-flex gap-1">
                   <Button
                     type="button"
                     outline
                     color="danger"
                     className="waves-effect waves-light"
                     onClick={() => {
+                      validation.resetForm();
                       setOpenModal({ ...openModal, user: false });
                     }}
                   >
                     Close
                   </Button>
-                </Col>
-                <Col>
-                  {" "}
-                  <button
+                  <Button
                     type="submit"
                     className="btn btn-primary waves-effect waves-light "
                     onClick={() => {
                       //   handleSubmitAgreement();
-                      setOpenModal({ ...openModal, user: false });
+                      // setOpenModal({ ...openModal, user: false });
                     }}
                   >
                     Save
-                  </button>
-                </Col>
-              </Row>
+                  </Button>
+                </div>
+              </div>
             </div>
-            <AddUser
-              selectedItems={selectedItems}
-              setSelectedItems={setSelectedItems}
-              clientId={clientId}
-              modal={openModal.user}
-              validation={validation}
-            />
+
+
+            <ModalBody>
+              <AddUser
+                selectedItems={selectedItems}
+                setSelectedItems={setSelectedItems}
+                clientId={clientId}
+                modal={openModal.user}
+                validation={validation}
+              />
+            </ModalBody>
           </Form>
         </div>
       </Modal>
