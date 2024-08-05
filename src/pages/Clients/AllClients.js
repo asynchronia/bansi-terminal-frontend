@@ -109,6 +109,8 @@ const AllClients = (props) => {
   const [status, setStatus] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState(null);
+  const [searchInputValue, setSearchInputValue] = useState(null);
+  const timerRef = useRef(null);
 
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [sortData, setSortData] = useState(null);
@@ -163,7 +165,7 @@ const AllClients = (props) => {
       const response = await getClientsReq({
         page,
         limit: paginationPageSize,
-        ...(status
+        ...(status && status !== "Select Status"
           ? {
             filter: {
               status: status.toLowerCase(),
@@ -214,14 +216,21 @@ const AllClients = (props) => {
   );
 
   const handleChange = (e) => {
+    console.log("Status value", e.target.value);
     setRowData([]);
     setPage(1);
     setStatus(e.target.value);
   };
   const handleInputChange = (e) => {
-    setRowData([]);
-    setPage(1);
-    setSearchValue(e.target.value?.trim());
+    setSearchInputValue(e.target.value?.trim());
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setRowData([]);
+      setPage(1);
+      setSearchValue(e.target.value?.trim());
+    }, 1000);
   };
 
   const handleSortChange = (e) => {
@@ -271,7 +280,7 @@ const AllClients = (props) => {
                       <div className="search-box position-relative">
                         <Input
                           type="text"
-                          value={searchValue}
+                          value={searchInputValue}
                           onChange={handleInputChange}
                           className="form-control rounded border"
                           placeholder="Search..."
@@ -286,8 +295,8 @@ const AllClients = (props) => {
                       value={status}
                       className="form-select focus-width"
                     >
-                      <option value="" selected>
-                        {"Status"}
+                      <option value="Select Status" selected>
+                        {"Select Status"}
                       </option>
                       {allStatuses.map((ele) => (
                         <option value={ele}>{ele}</option>
