@@ -138,3 +138,6 @@ div.table-responsive
   > div[class^="col-"]:last-child {
   padding-right: 0;
 }
+.ag-paging-page-size {
+  display: none !important;
+}
