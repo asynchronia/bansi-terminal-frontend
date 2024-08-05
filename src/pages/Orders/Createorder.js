@@ -57,12 +57,13 @@ const CreateOrder = (props) => {
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
+  const [poPrefix, setPoPrefix] = useState("PO");
 
   const [minDate, setMinDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
-    const day = String(today.getDate()).padStart(2, '0'); // Add leading zero if needed
+    const day = String(today.getDate() + 1).padStart(2, '0'); // Add leading zero if needed
     return `${year}-${month}-${day}`;
   });
 
@@ -422,15 +423,18 @@ const CreateOrder = (props) => {
 
   const handleClickPO = () => {
     const purchaseOrderNumber = formik.values.purchaseOrderNumber;
-    if (!purchaseOrderNumber.startsWith("PO")) {
-      formik.setFieldValue("purchaseOrderNumber", "PO");
+    if (!purchaseOrderNumber) {
+      formik.setFieldValue("purchaseOrderNumber", poPrefix);
     }
   };
 
   const handleChangePO = (e) => {
     let value = e.target.value;
-    let purchaseOrderNumber = !value.startsWith("PO") ? `PO${value}` : value;
-    formik.setFieldValue("purchaseOrderNumber", purchaseOrderNumber);
+    if (value.length < poPrefix.length) {
+      formik.setFieldValue("purchaseOrderNumber", poPrefix);
+    } else {
+      formik.setFieldValue("purchaseOrderNumber", value);
+    }
   };
 
   return (
