@@ -1,40 +1,38 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { CircularProgress } from "@mui/material";
+import { useFormik } from "formik";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import {
-  Row,
-  Col,
   Card,
   CardBody,
+  CardHeader,
+  Col,
   Input,
   Label,
-  Table,
   Modal,
-  ModalHeader,
-  CardHeader,
+  Row,
+  Table
 } from "reactstrap";
-import { CircularProgress, TableBody } from "@mui/material";
-import { ToastContainer, toast } from "react-toastify";
-import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
-import { changePreloader } from "../../store/actions";
-import "./styles/CreateOrder.scss";
-import "./styles/CreateOrderCard.scss";
-import { getClientBranchListReq } from "../../service/branchService";
-import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
-import { getAgreementItemsReq } from "../../service/itemService";
-import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.svg";
-import StyledButton from "../../components/Common/StyledButton";
-import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import StyledButton from "../../components/Common/StyledButton";
+import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
+import { getClientBranchListReq } from "../../service/branchService";
+import { getAgreementItemsReq } from "../../service/itemService";
 import {
   createPurchaseOrderReq,
   getPurchaseOrderDetailsReq,
   updatePurchaseOrderReq,
 } from "../../service/purchaseService";
-import PublishConfirm from "../../components/CustomComponents/PublishConfirm";
-import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
+import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
+import { changePreloader } from "../../store/actions";
+import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
+import "./styles/CreateOrder.scss";
+import "./styles/CreateOrderCard.scss";
 
-import { isEmpty } from 'lodash'
+import { HighlightOff } from "@mui/icons-material";
+import Hero from "../../components/Common/Hero";
 
 const CreateOrder = (props) => {
   let { id } = useParams();
@@ -44,8 +42,6 @@ const CreateOrder = (props) => {
   const dispatch = useDispatch();
   const [branchList, setBranchList] = useState([]);
   const effectCalled = useRef(false);
-  const [billingAddress, setBillingAddress] = useState("");
-  const [shippingAddress, setShippingAddress] = useState("");
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
   const [loadedData, setLoadedData] = useState(false);
@@ -58,22 +54,16 @@ const CreateOrder = (props) => {
   const [gstTotal, setGstTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [shippingAddressError, setShippingAddressError] = useState("");
-  const [billingAddressError, setBillingAddressError] = useState("");
-  const [validDate, setValidDate] = useState();
-  const [deliveryDateError, setDeliveryDateError] = useState("");
-  const [poNumberError, setPoNumberError] = useState("");
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
+  const [poPrefix, setPoPrefix] = useState("PO");
 
   const [minDate, setMinDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
-    const day = String(today.getDate()).padStart(2, '0'); // Add leading zero if needed
+    const day = String(today.getDate() + 1).padStart(2, '0'); // Add leading zero if needed
     return `${year}-${month}-${day}`;
   });
 
@@ -120,18 +110,6 @@ const CreateOrder = (props) => {
     dispatch(changePreloader(false));
   }, [dispatch]);
 
-  const handleBillingChange = (event) => {
-    const selectedBranch = event.target.value;
-    setBillingAddress(selectedBranch);
-    validation.setFieldValue("billingAddress", selectedBranch);
-  };
-
-  const handleShippingChange = (event) => {
-    const selectedBranch = event.target.value;
-    setShippingAddress(selectedBranch);
-    validation.setFieldValue("shippingAddress", selectedBranch);
-  };
-
   const handleStatusChange = (event) => {
     if (event.target.value === "published") {
       setPublishModal(true);
@@ -139,25 +117,34 @@ const CreateOrder = (props) => {
     setStatus(event.target.value);
   };
 
-  const validation = useFormik({
-    enableReinitialize: true,
+  const handleChangeDate = (event) => {
+
+    const selectedDate = new Date(event.target.value);
+    const today = new Date(minDate);
+
+    // Check if the selected date is before today
+    if (selectedDate < today) {
+      // Reset to today's date
+      event.target.value = minDate;
+    }
+    formik.setFieldValue('deliveryDate', event.target.value);
+  }
+
+  const formik = useFormik({
     initialValues: {
-      billingAddress: "",
-      shippingAddress: "",
-      purchaseOrderNumber: "",
-      deliveryDate: "",
-      selectedItems: [],
+      billingAddress: '',
+      shippingAddress: '',
+      purchaseOrderNumber: '',
+      deliveryDate: '',
     },
     validationSchema: Yup.object({
       billingAddress: Yup.string().required("Please Select Billing Address"),
       shippingAddress: Yup.string().required("Please Select Shipping Address"),
-      purchaseOrderNumber: Yup.string().required("Please Enter PO Number"),
+      purchaseOrderNumber: Yup.string().required("Please Enter Purchase Order Number"),
       deliveryDate: Yup.string().required("Please Enter Delivery Date"),
-      selectedItems: Yup.array().min(1, "Please select at least one item"),
     }),
-    onSubmit: (values) => {
-      debugger
-      redirectToPurchaseDetails();
+    onSubmit: values => {
+      saveOrUpdatePurchaseOrder(values);
     },
   });
 
@@ -218,6 +205,7 @@ const CreateOrder = (props) => {
   };
 
   const handleItemDelete = (itemId, variantId) => {
+    debugger
     const updatedItems = selectedItems.filter(
       (item) => item.itemId !== itemId || item.variantId !== variantId
     );
@@ -276,7 +264,7 @@ const CreateOrder = (props) => {
         </td>
         <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
         <td>
-          <Delete
+          <HighlightOff color="error"
             style={{ cursor: "pointer" }}
             onClick={() => handleItemDelete(item.itemId, item.variantId)}
           />
@@ -314,10 +302,8 @@ const CreateOrder = (props) => {
     id && rowData && getPurchaseOrderDetails(id);
 
     return () => {
-      setPurchaseOrderNumber("");
+      formik.resetForm();
       setPurchaseOrder(null);
-      setBillingAddress("");
-      setShippingAddress("");
       setSelectedItems([]);
     };
   }, [id, rowData]);
@@ -327,9 +313,13 @@ const CreateOrder = (props) => {
     const purchaseOrder = response?.purchaseOrder;
 
     setPurchaseOrder(purchaseOrder);
-    setPurchaseOrderNumber(purchaseOrder.purchaseOrderNumber);
-    setBillingAddress(purchaseOrder.billing.branchId);
-    setShippingAddress(purchaseOrder.shipping.branchId);
+
+    formik.setValues({
+      billingAddress: purchaseOrder.billing.branchId,
+      shippingAddress: purchaseOrder.shipping.branchId,
+      purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+      deliveryDate: formatDate(purchaseOrder.deliveryDate)
+    })
 
     let items = purchaseOrder.items;
     items.forEach((item) => {
@@ -340,7 +330,13 @@ const CreateOrder = (props) => {
       item.taxes = item.taxes.map(({ _id, ...rest }) => rest);
     });
 
-    setDeliveryDate(formatDate(purchaseOrder.deliveryDate));
+    const result = items.reduce((acc, item) => {
+      const key = `${item.itemId}-${item.variantId}`;
+      acc[key] = item.quantity;
+      return acc;
+    }, {});
+
+    setSelectedQuantities(result)
     setSelectedItems(items);
   };
 
@@ -363,14 +359,7 @@ const CreateOrder = (props) => {
     }
   }, [props, breadcrumbItems, getBranchData]);
 
-  const onCreatePurchaseOrderClick = (e) => {
-
-    if (isEmpty(purchaseOrderNumber)) {
-      console.log('-----------------------')
-      validation.setFieldError('purchaseOrderNumber')
-    }
-    console.log(validation.errors);
-
+  const saveOrUpdatePurchaseOrder = (values) => {
 
     if (selectedItems.length === 0) {
       toast.error("Please select at least 1 item!", {
@@ -380,7 +369,7 @@ const CreateOrder = (props) => {
       return;
     } else {
       setIsButtonLoading(true);
-      e.preventDefault();
+      // e.preventDefault();
 
       async function handlePurchaseOrderCreation() {
         try {
@@ -393,7 +382,7 @@ const CreateOrder = (props) => {
           setTimeout(() => {
             redirectToPurchaseDetails(_id);
           }, 1000)
-          toast.success(id ? 'Purchase Order Created Successfully' : 'Purchase Order Updated Successfully', {
+          toast.success(id ? 'Purchase Order Updated Successfully' : 'Purchase Order Created Successfully', {
             position: "top-center",
             theme: "light",
           });
@@ -407,9 +396,12 @@ const CreateOrder = (props) => {
         }
       }
       // validation.handleSubmit();
-
+      const { purchaseOrderNumber, deliveryDate, billingAddress, shippingAddress } = values
       const body = {
-        purchaseOrderNumber, agreementId, status, deliveryDate,
+        purchaseOrderNumber,
+        agreementId,
+        status,
+        deliveryDate,
         billingBranchId: billingAddress,
         shippingBranchId: shippingAddress,
         items: selectedItems.map(({ category, gst, _id, ...rest }) => ({
@@ -430,41 +422,23 @@ const CreateOrder = (props) => {
   };
 
   const handleClickPO = () => {
-    if (!purchaseOrderNumber.startsWith("PO ")) {
-      setPurchaseOrderNumber("PO ");
+    const purchaseOrderNumber = formik.values.purchaseOrderNumber;
+    if (!purchaseOrderNumber) {
+      formik.setFieldValue("purchaseOrderNumber", poPrefix);
     }
   };
 
   const handleChangePO = (e) => {
     let value = e.target.value;
-
-    if (value === "PO ") {
-      setPurchaseOrderNumber(value);
-    } else if (value.length <= 2 && !value.startsWith("PO")) {
-      setPurchaseOrderNumber("PO ");
-    } else if (!value.startsWith("PO")) {
-      setPurchaseOrderNumber("PO " + value);
+    if (value.length < poPrefix.length) {
+      formik.setFieldValue("purchaseOrderNumber", poPrefix);
     } else {
-      setPurchaseOrderNumber(value);
+      formik.setFieldValue("purchaseOrderNumber", value);
     }
-    validation.setFieldValue("purchaseOrderNumber", purchaseOrderNumber);
   };
 
-  const handleChangeDate = (event) => {
-
-    const selectedDate = new Date(event.target.value);
-    const today = new Date(minDate);
-
-    // Check if the selected date is before today
-    if (selectedDate < today) {
-      // Reset to today's date
-      event.target.value = minDate;
-    }
-    setDeliveryDate(event.target.value);
-  }
-
   return (
-    <>
+    <form onSubmit={formik.handleSubmit} autoComplete="off">
       <div style={{ position: "relative" }}>
         {/* <ToastContainer position="top-center" theme="colored" /> */}
         <div
@@ -492,8 +466,8 @@ const CreateOrder = (props) => {
           </select>
           <StyledButton
             color={"primary"}
+            type="submit"
             className={"w-md mx-2"}
-            onClick={onCreatePurchaseOrderClick}
             isLoading={isButtonLoading}
           >
             {id ? "Update" : "Save"}
@@ -503,33 +477,11 @@ const CreateOrder = (props) => {
       <Card>
         <CardBody>
           <div className="card-content">
-            <div className="image-container">
-              <img
-                src={require("../../assets/images/Willsmeet-Logo.png")}
-                alt="Company Logo"
-                className="card-image"
-              />
-            </div>
-            <div className="details">
-              <h3 className="fw-bolder">
-                Bansi Office Solutions Private Limited
-              </h3>
-              <p className="m-0">
-                #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,
-                Bangalore Karnataka 560102, India
-              </p>
-              <p className="m-0">
-                GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
-              </p>
-              <p className="m-0">MSME No : UDYAM-KR-03-0065095</p>
-              <p className="m-0">
-                Web: www.willsmeet.com, Email:sales@willsmeet.com
-              </p>
-            </div>
+            <Hero />
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">{purchaseOrderNumber}</span>
+              <span className="purchase-order-no">{formik.values.purchaseOrderNumber}</span>
             </div>
           </div>
         </CardBody>
@@ -551,10 +503,11 @@ const CreateOrder = (props) => {
                         <select
                           name="billingAddress"
                           id="billingAddress"
+                          value={formik.values.billingAddress}
+                          placeholder="Please Select Billing Address"
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="form-select focus-width"
-                          onChange={handleBillingChange}
-                          onBlur={validation.handleBlur}
-                          value={billingAddress}
                         >
                           <option value="" disabled>
                             Select Billing Address
@@ -565,17 +518,11 @@ const CreateOrder = (props) => {
                             </option>
                           ))}
                         </select>
-                        {billingAddressError && (
-                          <span style={{ color: "red" }}>
-                            {billingAddressError}
-                          </span>
-                        )}
+                        {formik.touched.billingAddress && formik.errors.billingAddress ? (
+                          <div className="text-danger">{formik.errors.billingAddress}</div>
+                        ) : null}
                         <h5 className="my-3">
-                          {
-                            branchList.find(
-                              (branch) => branch._id === billingAddress
-                            )?.address
-                          }
+                          {branchList.find((branch) => branch._id === formik.values.billingAddress)?.address}
                         </h5>
                       </div>
                     </div>
@@ -588,10 +535,11 @@ const CreateOrder = (props) => {
                         <select
                           name="shippingAddress"
                           id="shippingAddress"
+                          value={formik.values.shippingAddress}
+                          placeholder="Please Select Shipping Address"
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="form-select focus-width"
-                          onChange={handleShippingChange}
-                          onBlur={validation.handleBlur}
-                          value={shippingAddress}
                         >
                           <option value="" disabled>
                             Select Shipping Address
@@ -602,17 +550,11 @@ const CreateOrder = (props) => {
                             </option>
                           ))}
                         </select>
-                        {shippingAddressError && (
-                          <span style={{ color: "red" }}>
-                            {shippingAddressError}
-                          </span>
-                        )}
+                        {formik.touched.shippingAddress && formik.errors.shippingAddress ? (
+                          <div className="text-danger">{formik.errors.shippingAddress}</div>
+                        ) : null}
                         <h5 className="my-3">
-                          {
-                            branchList.find(
-                              (branch) => branch._id === shippingAddress
-                            )?.address
-                          }
+                          {branchList.find((branch) => branch._id === formik.values.shippingAddress)?.address}
                         </h5>
                       </div>
                     </div>
@@ -626,41 +568,39 @@ const CreateOrder = (props) => {
                 <CardBody>
                   <Row>
                     <div>
-                      <Label for="Po Number">Po Number</Label>
+                      <Label htmlFor="purchaseOrderNumber">Purchase Order Number</Label>
                       <Input
                         type="text"
                         name="purchaseOrderNumber"
                         id="purchaseOrderNumber"
-                        value={purchaseOrderNumber}
-                        placeholder="PO BLR/#123"
-                        onClick={handleClickPO}
+                        value={formik.values.purchaseOrderNumber}
+                        placeholder="PO/BLR/#123"
                         onChange={handleChangePO}
-                        onBlur={validation.handleBlur}
+                        onClick={handleClickPO}
+                        onBlur={formik.handleBlur}
                       />
-                      {poNumberError && (
-                        <span style={{ color: "red" }}>{poNumberError}</span>
-                      )}
+                      {formik.touched.purchaseOrderNumber && formik.errors.purchaseOrderNumber ? (
+                        <div className="text-danger">{formik.errors.purchaseOrderNumber}</div>
+                      ) : null}
                     </div>
                   </Row>
                   <Row>
                     <div className="mt-3 mb-0">
-                      <Label for="deliveryDate">Expected Delivery Date</Label>
+                      <Label htmlFor="deliveryDate">Expected Delivery Date</Label>
                       <Input
                         type="date"
                         name="deliveryDate"
                         id="deliveryDate"
                         placeholder="dd-mm-yyyy"
-                        value={deliveryDate}
+                        value={formik.values.deliveryDate}
                         min={minDate}
                         onClick={(e) => e.target.showPicker()}
                         onChange={handleChangeDate}
-                        onBlur={validation.handleBlur}
+                        onBlur={formik.handleBlur}
                       />
-                      {deliveryDateError && (
-                        <span style={{ color: "red" }}>
-                          {deliveryDateError}
-                        </span>
-                      )}
+                      {formik.touched.deliveryDate && formik.errors.deliveryDate ? (
+                        <div className="text-danger">{formik.errors.deliveryDate}</div>
+                      ) : null}
                     </div>
                   </Row>
                 </CardBody>
@@ -830,7 +770,7 @@ const CreateOrder = (props) => {
           </Row>
         </div>
       </Row>
-    </>
+    </form>
   );
 };
 

@@ -1,23 +1,7 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Card, CardBody, Col, Input, Label, Row, FormGroup } from "reactstrap";
-import { getWarehouseListReq } from "../../service/branchService";
+import { Col, FormGroup, Input, Label, Row } from "reactstrap";
 
-const AddBranch = ({ edit = false, setEdit, validation }) => {
-  const [warehouseList, setWarehouseList] = useState([]);
-
-  const searchAllWareHouses = async () => {
-    try {
-      const response = await getWarehouseListReq();
-      setWarehouseList(response?.payload?.warehouses);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    searchAllWareHouses();
-  }, []);
+const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) => {
 
   return (
     <>

@@ -17,6 +17,7 @@ import {
 } from "./invoiceUtil";
 
 import { changePreloader } from "../../store/actions";
+import Hero from "../../components/Common/Hero";
 
 const options: Options = {
   filename: "payment.pdf",
@@ -174,27 +175,7 @@ const PaymentDetails = (props) => {
           <Card>
             <CardBody>
               <div class="card-content">
-                <div class="image-container">
-                  <img
-                    src={require("../../assets/images/Willsmeet-Logo.png")}
-                    alt="Company Logo"
-                    class="card-image"
-                  />
-                </div>
-                <div class="details">
-                  <h3>
-                    <span>Bansi Office Solutions Private Limited</span>
-                  </h3>
-                  #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,
-                  Bangalore Karnataka 560102, India
-                  <br />
-                  GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
-                  <br />
-                  MSME No : UDYAM-KR-03-0065095
-                  <br />
-                  Web: www.willsmeet.com, Email:sales@willsmeet.com
-                  <br />
-                </div>
+                <Hero />
               </div>
             </CardBody>
           </Card>

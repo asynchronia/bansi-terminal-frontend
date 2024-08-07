@@ -30,7 +30,6 @@ import { ReactComponent as Add } from "../../assets/images/svg/add-button.svg";
 const AllItems = (props) => {
   document.title = "All Items";
   let navigate = useNavigate();
-  const effectCalled = useRef(false);
   const redirectToCreateItem = () => {
     let path = "/create-item";
     navigate(path);
@@ -41,6 +40,33 @@ const AllItems = (props) => {
     id: null,
     show: false,
   });
+
+  const [bodyData, setBodyData] = useState({
+    page: 1,
+    limit: 500,
+    search: "",
+    filter: {
+      category: null,
+    }
+  });
+
+  const timerRef = useRef(null);
+
+  function bodyDataRefine(bodyData) {
+    const value = {
+      page: bodyData.page,
+      limit: bodyData.limit,
+    };
+    if (bodyData.search) {
+      value.search = bodyData.search;
+    }
+    if (bodyData.filter?.category) {
+      value.filter = {
+        category: bodyData.filter.category,
+      };
+    }
+    return value;
+  }
 
   const redirectToEditPage = (id) => {
     let path = `/edit-item/${id}`;
@@ -106,125 +132,73 @@ const AllItems = (props) => {
   };
 
   const columnDefs = [
-      {
-        headerName: "Item Name",
-        field: "title",
-        headerCheckboxSelection: true,
-        checkboxSelection: true,
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
+    {
+      headerName: "Item Name",
+      field: "title",
+      headerCheckboxSelection: true,
+      checkboxSelection: true,
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Type",
+      field: "itemType",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "HSN Code",
+      field: "hsnCode",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Sale Price",
+      field: "salePrice",
+      sortable: false,
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      valueFormatter: (params) =>
+        formatNumberWithCommasAndDecimal(params.value),
+    },
+    {
+      headerName: "Created On",
+      field: "createdAt",
+      cellRenderer: (props) => {
+        let date = new Date(props.value);
+        return <>{date.toDateString()}</>;
       },
-      {
-        headerName: "Type",
-        field: "itemType",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Category",
+      field: "category",
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Action",
+      field: "action",
+      sortable: false,
+      cellClass: "actions-button-cell",
+      cellRenderer: DropdownMenuBtn,
+      cellRendererParams: {
+        deleteItem: onDeleteItem,
+        handleResponse: handleDeleteResponse,
+        handleEditClick: handleEditClick,
+        handleViewClick: handleViewClick,
       },
-      {
-        headerName: "HSN Code",
-        field: "hsnCode",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Status",
-        field: "status",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Sale Price",
-        field: "salePrice",
-        sortable: false,
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-        valueFormatter: (params) =>
-          formatNumberWithCommasAndDecimal(params.value),
-      },
-      {
-        headerName: "Created On",
-        field: "createdAt",
-        cellRenderer: (props) => {
-          let date = new Date(props.value);
-          return <>{date.toDateString()}</>;
-        },
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Category",
-        field: "category",
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-      {
-        headerName: "Action",
-        field: "action",
-        sortable: false,
-        cellClass: "actions-button-cell",
-        cellRenderer: DropdownMenuBtn,
-        cellRendererParams: {
-          deleteItem: onDeleteItem,
-          handleResponse: handleDeleteResponse,
-          handleEditClick: handleEditClick,
-          handleViewClick: handleViewClick,
-        },
-        suppressMenu: true,
-        floatingFilterComponentParams: { suppressFilterButton: true },
-      },
-    ],
-    agRowData = [
-      {
-        itemName: "Byju's",
-        type: "Variable",
-        status: "published",
-        hsnCode: "ABU-123888",
-        category: "electronics",
-        salePrice: "500",
-        gst: "18%",
-        created: "13 march 2010",
-      },
-      {
-        itemName: "Byju's",
-        type: "Variable",
-        status: "published",
-        hsnCode: "ABU-123888",
-        category: "electronics",
-        salePrice: "500",
-        gst: "18%",
-        created: "13 march 2010",
-      },
-      {
-        itemName: "Byju's",
-        type: "Variable",
-        status: "published",
-        hsnCode: "ABU-123888",
-        category: "electronics",
-        salePrice: "500",
-        gst: "18%",
-        created: "13 march 2010",
-      },
-      {
-        itemName: "Byju's",
-        type: "Variable",
-        status: "published",
-        hsnCode: "ABU-123888",
-        category: "electronics",
-        salePrice: "500",
-        gst: "18%",
-        created: "13 march 2010",
-      },
-      {
-        itemName: "Byju's",
-        type: "Variable",
-        status: "published",
-        hsnCode: "ABU-123888",
-        category: "electronics",
-        salePrice: "500",
-        gst: "18%",
-        created: "13 march 2010",
-      },
-    ];
+      suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+  ]
   const autoSizeStrategy = {
     type: "fitGridWidth",
   };
@@ -236,22 +210,14 @@ const AllItems = (props) => {
   const paginationPageSizeSelector = [25, 50, 100];
 
   const [allCategories, setAllCategories] = useState([]);
-  const [category, setCategory] = useState("");
   const [rowData, setRowData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
-  const [delaySearch, setDelaySearch] = useState("");
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
 
-  let bodyObject = {
-    page: 1,
-    limit: 500,
-  };
-
-  const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
   const tog_standard = () => {
     setmodal_standard(!modal_standard);
     removeBodyCss();
@@ -284,12 +250,10 @@ const AllItems = (props) => {
     const response = await getItemsReq(body);
 
     response.map((val, id) => {
-      console.log("Item ", val.title, val.category._id, val.category.name);
       val.category = val.category.name;
       val.salePrice = val.variant.sellingPrice;
     });
     setRowData(response);
-    setBodyObjectReq(body);
     dispatch(changePreloader(false));
   });
 
@@ -302,66 +266,34 @@ const AllItems = (props) => {
   useEffect(() => {
     getCategories();
     props.setBreadcrumbItems("All Items", breadcrumbItems);
-    if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
-      getCategories();
-      effectCalled.current = true;
-    }
   }, []);
 
   useEffect(() => {
-    props.setBreadcrumbItems("All Items", breadcrumbItems);
-    if (
-      categoryData.id &&
-      categoryData.id !== undefined &&
-      categoryData.id !== null
-    ) {
-      let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.filter = {};
-      bodyObjectWithCategory.filter.category = categoryData.id;
-      getListOfRowData(bodyObjectWithCategory);
-    } else {
-      let bodyObjectWithCategory = { ...bodyObjectReq };
-      delete bodyObjectWithCategory["filter"];
-      getListOfRowData(bodyObjectWithCategory);
-    }
-  }, [categoryData.id]);
+    getListOfRowData(bodyDataRefine(bodyData));
+  }, [bodyData]);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("All Items", breadcrumbItems);
-    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.search = delaySearch;
-      getListOfRowData(bodyObjectWithCategory);
-    } else {
-      getListOfRowData(bodyObject);
-    }
-  }, [delaySearch]);
+  //TODO: Pagination size dropdown fix
+  /*   useEffect(() => {
+      props.setBreadcrumbItems("All Items", breadcrumbItems);
+      if (paginationPageSize && paginationPageSize !== undefined) {
+        let bodyObjectWithCategory = { ...bodyObject };
+        bodyObjectWithCategory.limit = paginationPageSize;
+        getListOfRowData(bodyObjectWithCategory);
+      }
+    }, [paginationPageSize]); */
 
-  //TODO: Pagination size fix
-/*   useEffect(() => {
-    props.setBreadcrumbItems("All Items", breadcrumbItems);
-    if (paginationPageSize && paginationPageSize !== undefined) {
-      let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.limit = paginationPageSize;
-      getListOfRowData(bodyObjectWithCategory);
-    }
-  }, [paginationPageSize]); */
-
-  const handleChange = (e) => {
-    setCategory(e.target.value);
-  };
   const handleInputChange = (e) => {
     setSearchValue(e.target.value);
-
-    const delay = 2000;
-
-    const timerId = setTimeout(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
       console.log("Executing code after delay");
-      setDelaySearch(e.target.value);
-    }, delay);
-
-    return () => clearTimeout(timerId);
+      setBodyData((prevBodyData) => ({
+        ...prevBodyData,
+        search: e.target.value,
+      }));
+    }, 2000);
   };
 
   // useEffect(() => {
@@ -486,7 +418,6 @@ const onGridReady = useCallback((params) => {
                             ...categoryData,
                             show: !categoryData.show,
                           });
-                          setCategory(categoryData.id);
                         }}
                         className="form-select focus-width"
                       >
@@ -507,6 +438,7 @@ const onGridReady = useCallback((params) => {
                             levelTwo={true}
                             categories={allCategories}
                             setCategoryData={setCategoryData}
+                            setBodyData={setBodyData}
                           />
                         </div>
                       ) : null}

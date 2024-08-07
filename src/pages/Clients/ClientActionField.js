@@ -13,7 +13,7 @@ const CientActionField = (props) => {
   return (
     <CustomDropdown
       isOpen={menu}
-      direction={'bottom'}
+      direction={'down'}
       toggle={() => setMenu(!menu)}
       items={[
         { label: 'View Client', onClick: onViewClick },
