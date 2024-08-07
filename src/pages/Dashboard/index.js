@@ -17,7 +17,7 @@ import { setBreadcrumbItems } from "../../store/actions";
 
 const Dashboard = (props) => {
 
-  document.title = "Bansi Terminal";
+  document.title = "Willsmeet Portal";
 
 
   const breadcrumbItems = [
