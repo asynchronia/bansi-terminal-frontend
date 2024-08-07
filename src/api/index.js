@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = process.env.API_BASE_URL || "http://157.173.222.56:3000";
+const baseUrl = process.env.API_BASE_URL || "https://api.opsportal-willsmeet.com";
 
 const API_URL = {
   createItem: "/api/items/create",
