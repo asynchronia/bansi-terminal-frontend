@@ -57,7 +57,7 @@ const AgreementItemsListing = (props) => {
     { title: "Agreement Items", link: "#" },
   ];
   const gridRef = useRef();
-  
+
   const handleViewClick = (data) => {
     redirectToViewPage(data);
   };
@@ -284,7 +284,7 @@ const AgreementItemsListing = (props) => {
                         </div>
                       ) : null}
                     </div>
-                    <div class="input-group">
+                    <div className="input-group">
                       <div className="search-box position-relative">
                         <Input
                           type="text"

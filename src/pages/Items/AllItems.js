@@ -443,7 +443,7 @@ const onGridReady = useCallback((params) => {
                         </div>
                       ) : null}
                     </div>
-                    <div class="input-group">
+                    <div className="input-group">
                       <div className="search-box position-relative">
                         <Input
                           type="text"
@@ -460,9 +460,9 @@ const onGridReady = useCallback((params) => {
                           value={searchValue}
                           onChange={handleInputChange}
                         />
-                          <span class="input-group-append">
-                              <button class="btn btn-outline-secondary bg-white border-start-0 border ms-n5" type="button">
-                                  <i class="fa fa-search"></i>
+                          <span className="input-group-append">
+                              <button className="btn btn-outline-secondary bg-white border-start-0 border ms-n5" type="button">
+                                  <i className="fa fa-search"></i>
                               </button>
                         </span> */}
                     </div>

@@ -370,7 +370,7 @@ const ViewInvoice = (props) => {
   * */
   const getBaseDetails = () => {
     return (
-      <div id="invoice-details" class="invoice-details">
+      <div id="invoice-details" className="invoice-details">
         <div className="invoice-details-lhs">
           <h3>
             <br />
@@ -446,12 +446,12 @@ const ViewInvoice = (props) => {
 
         <Card>
           <CardBody>
-            <div class="card-content">
-              <div class="image-container">
+            <div className="card-content">
+              <div className="image-container">
                 <img
                   src={require("../../assets/images/Willsmeet-Logo.png")}
                   alt="Company Logo"
-                  class="card-image"
+                  className="card-image"
                 />
               </div>
               {getBaseDetails()}
@@ -514,11 +514,11 @@ const ViewInvoice = (props) => {
               <Card className="col-style">
                 <CardBody>
                   {responseObj && getInvoiceFinalDetails()}
-                  <div class="image-container-seal">
+                  <div className="image-container-seal">
                     <img
                       src={require("../../assets/images/bansi-seal.png")}
                       alt="Company Seal"
-                      class="card-image-seal"
+                      className="card-image-seal"
                     />
                   </div>
                 </CardBody>

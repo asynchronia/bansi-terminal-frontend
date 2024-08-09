@@ -87,19 +87,19 @@ const PaymentDetails = (props) => {
     {
       headerName: "Invoice No.",
       field: "invoice_number",
-      suppressMenu: true,
+      suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
       headerName: "Invoice Date",
       field: "date",
-      suppressMenu: true,
+      suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
       headerName: "Invoice Amount",
       field: "total",
-      suppressMenu: true,
+      suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -107,7 +107,7 @@ const PaymentDetails = (props) => {
     {
       headerName: "Payment Amount",
       field: "total",
-      suppressMenu: true,
+      suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -174,14 +174,14 @@ const PaymentDetails = (props) => {
         <Col id="payment-container">
           <Card>
             <CardBody>
-              <div class="card-content">
+              <div className="card-content">
                 <Hero />
               </div>
             </CardBody>
           </Card>
           <Row className="d-flex align-items-stretch">
             {/* First Card */}
-            <Col xs="9" className="d-flex">
+            <Col xs="9">
               <Card className="w-100">
                 <CardBody>
                   <Table>
@@ -209,29 +209,23 @@ const PaymentDetails = (props) => {
             </Col>
 
             {/* Second Card */}
-            <Col xs="3" className="d-flex justify-content-center">
-              <Card className="w-100 justify-content-center bg-success">
-                <CardBody className="text-center">
-                  <div className="mt-3">
-                    <Row>
-                      <Col xs="12" className="text-white">
-                        <p>
-                          <span>
-                            <h4>Amount Received</h4>
-                          </span>
-                        </p>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col xs="12">
-                        <p className="text-white" style={{ fontSize: "28px" }}>
-                          {formatNumberWithCommasAndDecimal(amountReceived)}
-                        </p>
-                      </Col>
-                    </Row>
-                  </div>
-                </CardBody>
-              </Card>
+            <Col xs="3" className="col-3 justify-content-center bg-success card">
+              <CardBody className="d-flex align-items-center">
+                <div className="mt-3">
+                  <Row>
+                    <Col xs="12" className="text-white">
+                      <h4>Amount Received</h4>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xs="12">
+                      <p className="text-white" style={{ fontSize: "24px", fontWeight: 'bold' }}>
+                        {formatNumberWithCommasAndDecimal(amountReceived)}
+                      </p>
+                    </Col>
+                  </Row>
+                </div>
+              </CardBody>
             </Col>
           </Row>
 
@@ -267,20 +261,18 @@ const PaymentDetails = (props) => {
               <h4 className="card-title">Payment For</h4>
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
                 <div
-                  // className="ag-theme-quartz"
-                  style={{
-                    height: "250px",
-                    width: "100%",
-                  }}
+                  className="ag-theme-quartz"
+                  style={{ width: "100%" }}
                 >
                   <AgGridReact
                     ref={gridRef}
+                    domLayout="autoHeight"
                     suppressRowClickSelection={true}
+                    defaultColDef={{ resizable: false, suppressMovable: true }}
                     columnDefs={columnDefs}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
-                    rowSelection="multiple"
                     reactiveCustomComponents
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={paymentData?.invoices}

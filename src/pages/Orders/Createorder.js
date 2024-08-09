@@ -490,8 +490,8 @@ const CreateOrder = (props) => {
               <Card>
                 <CardHeader>Billing & Shipping</CardHeader>
                 <CardBody>
-                  <div class="d-flex">
-                    <div class="p-2" style={{ width: '49%' }}>
+                  <div className="d-flex">
+                    <div className="p-2" style={{ width: '49%' }}>
                       <div>
                         <label className="col-form-label">
                           Billing Address
@@ -522,10 +522,10 @@ const CreateOrder = (props) => {
                         </h5>
                       </div>
                     </div>
-                    <div class="p-2">
-                      <div class="vr h-100"></div>
+                    <div className="p-2">
+                      <div className="vr h-100"></div>
                     </div>
-                    <div class="p-2" style={{ width: '49%' }}>
+                    <div className="p-2" style={{ width: '49%' }}>
                       <div>
                         <label className="col-form-label">Shipping</label>
                         <select

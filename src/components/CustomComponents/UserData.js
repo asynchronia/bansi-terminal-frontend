@@ -101,7 +101,7 @@ const UserData = (props) => {
               return false;
             }}
           >
-            <div class="modal-header">
+            <div className="modal-header">
               <div className="d-flex justify-content-between align-items-center w-100">
                 <h5 className="modal-title">{edit ? 'Edit' : 'Add'} User</h5>
                 <div className="d-flex gap-1">
