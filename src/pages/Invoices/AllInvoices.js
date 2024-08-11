@@ -9,7 +9,7 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { changePreloader } from "../../store/actions";
 import { formatNumberWithCommasAndDecimal } from "./invoiceUtil";
-
+import '../Orders/styles/AllOrders.scss';
 /*.dropdown-toggle::after {
   display: none !important; 
 }*/
@@ -82,9 +82,7 @@ const AllInvoices = (props) => {
   const columnDefs = [
     {
       headerName: "Invoice Date",
-      field: "date",
-      headerCheckboxSelection: true,
-      checkboxSelection: true,
+      field: "date", width: 140,
       cellRenderer: (props) => {
         let date = new Date(props.value);
         return <>{date.toDateString()}</>;
@@ -95,7 +93,7 @@ const AllInvoices = (props) => {
     {
       headerName: "Invoice No.",
       field: "invoice_number",
-      suppressMenu: true,
+      suppressMenu: true, width: 150,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
@@ -107,13 +105,13 @@ const AllInvoices = (props) => {
     {
       headerName: "Client",
       field: "customer_name",
-      suppressMenu: true,
+      suppressMenu: true, minWidth: 150, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
       headerName: "Status",
       field: "status",
-      width: 200,
+      width: 150,
       cellRenderer: (props) => {
         let due_date = new Date(props.data.due_date);
 
@@ -147,7 +145,7 @@ const AllInvoices = (props) => {
       headerName: "Total Amount",
       field: "total",
       sortable: false,
-      suppressMenu: true,
+      suppressMenu: true, width: 140,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -155,7 +153,7 @@ const AllInvoices = (props) => {
     {
       headerName: "Amount Due",
       field: "balance",
-      suppressMenu: true,
+      suppressMenu: true, width: 140,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -163,7 +161,7 @@ const AllInvoices = (props) => {
     {
       headerName: "Action",
       field: "action",
-      sortable: false,
+      sortable: false, width: 100,
       cellClass: "actions-button-cell",
       cellRenderer: InvoiceActionBtn,
       cellRendererParams: {
@@ -418,15 +416,14 @@ const onGridReady = useCallback((params) => {
                   <AgGridReact
                     ref={gridRef}
                     rowHeight={60}
-                    suppressRowClickSelection={true}
                     columnDefs={columnDefs}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}
-                    rowSelection="multiple"
                     reactiveCustomComponents
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
+                    defaultColDef={{ resizable: false, suppressMovable: true }}
                     onPaginationChanged={onPaginationChanged}
                   ></AgGridReact>
                 </div>
