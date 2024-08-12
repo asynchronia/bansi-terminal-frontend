@@ -1,5 +1,17 @@
-.ag-paging-row-summary-panel,
-.ag-paging-page-size,
-.ag-paging-description {
+.ag-paging-page-size {
+  display: none;
+}
+
+.ag-paging-row-summary-panel > span:nth-child(n + 4) {
+  display: none;
+}
+.ag-paging-description > span:nth-child(n + 3) {
+  display: none;
+}
+.ag-paging-page-summary-panel > div:last-child {
+  display: none;
+}
+
+.ag-paging-page-summary-panel > div:first-child {
   display: none;
 }
