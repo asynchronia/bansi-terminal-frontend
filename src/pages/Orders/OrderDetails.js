@@ -72,7 +72,7 @@ const OrderDetails = (props) => {
       <div>
         <Tooltip title={`Shipped ${quantity_shipped}`}>
           <IconButton size="small" aria-label="Shipped">
-            <StyledBadge badgeContent={quantity_shipped} color="primary">
+            <StyledBadge badgeContent={quantity_shipped} color="primary" showZero>
               <LocalShipping />
             </StyledBadge>
           </IconButton>
@@ -80,7 +80,7 @@ const OrderDetails = (props) => {
 
         <Tooltip title={`Packed ${quantity_packed}`}>
           <IconButton size="small" aria-label="Packed">
-            <StyledBadge badgeContent={quantity_packed} color="secondary">
+            <StyledBadge badgeContent={quantity_packed} color="secondary" showZero>
               <Inventory />
             </StyledBadge>
           </IconButton>
@@ -88,14 +88,11 @@ const OrderDetails = (props) => {
 
         <Tooltip title={`Invoiced ${quantity_packed}`}>
           <IconButton size="small" aria-label="Invoiced">
-            <StyledBadge badgeContent={quantity_packed} color="success">
+            <StyledBadge badgeContent={quantity_packed} color="success" showZero>
               <Receipt />
             </StyledBadge>
           </IconButton>
         </Tooltip>
-        {/* <Tooltip title="Shipped"><Badge pill color="primary" className="mx-1">{quantity_shipped}</Badge></Tooltip>
-        <Tooltip title="Packed"><Badge pill className="mx-1">{quantity_packed}</Badge></Tooltip>
-        <Tooltip title="Invoiced"><Badge pill color="success" className="mx-1">{quantity_invoiced}</Badge></Tooltip> */}
       </div>
     );
   }
