@@ -9,7 +9,7 @@ const CategoryList = (props) => {
   };
   const getListView = (it) => {
     return (
-      <ul class="nested">
+      <ul className="nested">
         {it?.children &&
           it.children.length > 0 &&
           it.children.map((itr, idx) => {
@@ -18,7 +18,7 @@ const CategoryList = (props) => {
                 {" "}
                 {itr?.children && itr.children.length > 0 ? (
                   <li>
-                    <span class="caret" onClick={openCaret}>
+                    <span className="caret" onClick={openCaret}>
                       <span className="category-block">{itr.name}</span>
                       <span>{itr.description}</span>
                     </span>
@@ -43,7 +43,7 @@ const CategoryList = (props) => {
           props.rowData.map((itr, idx) => {
             return itr?.children && itr.children.length > 0 ? (
               <li>
-                <span class="caret" onClick={openCaret}>
+                <span className="caret" onClick={openCaret}>
                   <span className="category-block">{itr.name}</span>
                   <span>{itr.description}</span>
                 </span>

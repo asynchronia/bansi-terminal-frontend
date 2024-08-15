@@ -1,64 +1,58 @@
-.view-invoice{
-    position: relative;
-    .col-style{
-        height: 95%;
-    }
-    .invoice-table{
-        border-collapse: separate;
-        border-spacing: 0 15px;
-    }
-    .label-col{
-        width: 200px;
-    }
-    .td-style{
-        border-bottom: #e0dcdc 1px solid;
-    }
-    .image-container {
-        flex: 0 0 auto; // Fix the width of the image container
-    }
-  
-    .card-image {
-      height: 100%; // Make the image take up the height of the card
-      width: 350px;
-    }
+.view-invoice {
+  position: relative;
+  .col-style {
+    height: 95%;
+  }
+  .invoice-table {
+    border-collapse: separate;
+    border-spacing: 0 15px;
+  }
+  .label-col {
+    width: 200px;
+  }
+  .td-style {
+    border-bottom: #e0dcdc 1px solid;
+  }
+  .image-container {
+    flex: 0 0 auto; // Fix the width of the image container
+  }
 
-    .image-container-seal{
-        display: inline-flex;
-        padding-left: 35%;
-        padding-top: 10%;
-    }
-    .card-image-seal {
-        height: 100%; // Make the image take up the height of the card
-        width: 200px;
-      }
-  .invoice-sub-table{
+  .image-container-seal {
+    display: inline-flex;
+    padding-left: 35%;
+    padding-top: 10%;
+  }
+  .card-image-seal {
+    height: 100%; // Make the image take up the height of the card
+    width: 200px;
+  }
+  .invoice-sub-table {
     table-layout: fixed;
     width: 100%;
-   .invoice-tr-hdr{
-        height: 45px;
-        background-color: #f5f5f5;
+    .invoice-tr-hdr {
+      height: 45px;
+      background-color: #f5f5f5;
     }
-    .invoice-tr{
-        height: 45px;
-        border-bottom: 1px solid #f5f5f5;
+    .invoice-tr {
+      height: 45px;
+      border-bottom: 1px solid #f5f5f5;
     }
   }
-  .invoice-details{
+  .invoice-details {
     display: inline-flex;
   }
-  .invoice-details-lhs{
+  .invoice-details-lhs {
     width: 450px;
     padding-top: 20px;
   }
-  .invoice-details-rhs{
+  .invoice-details-rhs {
     padding: 90px;
   }
-  .invoice-addr{
+  .invoice-addr {
     word-break: break-all;
   }
-  .inv-table-div{
+  .inv-table-div {
     height: 300px;
     overflow-y: auto;
   }
-  
 }

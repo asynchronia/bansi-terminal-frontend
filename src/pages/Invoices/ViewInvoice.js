@@ -26,6 +26,7 @@ import "./styles/datatables.scss";
 import "./styles/ViewInvoice.scss";
 
 import { changePreloader } from "../../store/actions";
+import Hero from "../../components/Common/Hero";
 
 const options: Options = {
   filename: "invoice.pdf",
@@ -204,10 +205,11 @@ const ViewInvoice = (props) => {
         : responseObj.billing_address;
     const type = flag === "shipping" ? " Shipping Address" : "Billing Address";
     const street1 = addr.street !== "" ? addr.street : "";
+
     return (
       <>
         <p>
-          {type}
+          <b>{type}</b>
           <br />
           {addr.attention ? (
             <>
@@ -229,7 +231,7 @@ const ViewInvoice = (props) => {
           ) : null}
           {addr.address}
           <br />
-          {addr.city + ":" + addr.zip + ", " + addr.state + ", " + addr.country}
+          {addr.city + ", " + addr.zip + ", " + addr.state + ", " + addr.country}
         </p>
       </>
     );
@@ -250,31 +252,33 @@ const ViewInvoice = (props) => {
     });
     return (
       <>
-        <table className="invoice-table">
-          <tr>
-            <td className="label-col td-style">{"Invoice Date"}</td>
-            <td className="td-style">{dateObj.toDateString()}</td>
-          </tr>
-          <tr>
-            <td className="label-col td-style">{"Order ID"}</td>
-            <td className="td-style">{responseObj.salesorder_number}</td>
-          </tr>
-          <tr>
-            <td className="label-col td-style">{"Place of supply"}</td>
-            <td className="td-style">{responseObj.place_of_supply}</td>
-          </tr>
-          {poNoVal !== undefined ? (
+        <table className="table table-bordered w-100">
+          <tbody>
             <tr>
-              <td className="label-col td-style">{"PO No"}</td>
-              <td className="td-style">{poNoVal}</td>
+              <th>Invoice Date</th>
+              <td>{dateObj.toDateString()}</td>
             </tr>
-          ) : null}
-          {poDate !== undefined ? (
             <tr>
-              <td className="label-col td-style">{"PO Date"}</td>
-              <td className="td-style">{poDate.toDateString()}</td>
+              <th>Order ID</th>
+              <td>{responseObj.salesorder_number}</td>
             </tr>
-          ) : null}
+            <tr>
+              <th>Place of supply</th>
+              <td>{responseObj.place_of_supply}</td>
+            </tr>
+            {poNoVal !== undefined ? (
+              <tr>
+                <td>{"PO No"}</td>
+                <td>{poNoVal}</td>
+              </tr>
+            ) : null}
+            {poDate !== undefined ? (
+              <tr>
+                <td>{"PO Date"}</td>
+                <td>{poDate.toDateString()}</td>
+              </tr>
+            ) : null}
+          </tbody>
         </table>
       </>
     );
@@ -292,27 +296,29 @@ const ViewInvoice = (props) => {
     });
     return (
       <>
-        <table className="invoice-table">
-          <tr>
-            <td className="label-col td-style">{"Sub Total"}</td>
-            <td className="td-style">
-              {formatNumberWithCommasAndDecimal(responseObj.sub_total)}
-            </td>
-          </tr>
-          <tr>
-            <td className="label-col td-style">{"Taxable Amount"}</td>
-            <td className="td-style">
-              {formatNumberWithCommasAndDecimal(responseObj.tax_total)}
-            </td>
-          </tr>
-          <tr>
-            <td className="label-col td-style">{"CGST"}</td>
-            <td className="td-style">{cgst}</td>
-          </tr>
-          <tr>
-            <td className="label-col td-style">{"SGST"}</td>
-            <td className="td-style">{sgst}</td>
-          </tr>
+        <table className="table table-bordered w-100">
+          <tbody>
+            <tr>
+              <th>{"Sub Total"}</th>
+              <td>
+                {formatNumberWithCommasAndDecimal(responseObj.sub_total)}
+              </td>
+            </tr>
+            <tr>
+              <th>{"Taxable Amount"}</th>
+              <td>
+                {formatNumberWithCommasAndDecimal(responseObj.tax_total)}
+              </td>
+            </tr>
+            <tr>
+              <th>{"CGST"}</th>
+              <td>{cgst}</td>
+            </tr>
+            <tr>
+              <th>{"SGST"}</th>
+              <td>{sgst}</td>
+            </tr>
+          </tbody>
         </table>
       </>
     );
@@ -368,31 +374,7 @@ const ViewInvoice = (props) => {
       }
   }
   * */
-  const getBaseDetails = () => {
-    return (
-      <div id="invoice-details" class="invoice-details">
-        <div className="invoice-details-lhs">
-          <h3>
-            <br />
-            <span>Bansi Office Solutions Private Limited</span>
-          </h3>
-          <span className="invoice-addr">{"#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India"}</span>
-          <br />
-          GSTIN: 29AAJCB1807A1Z3 CIN:U74999KA2020PTC137142
-          <br />
-          MSME No : UDYAM-KR-03-0065095
-          <br />
-          Web: www.willsmeet.com, Email:sales@willsmeet.com
-          <br />
-        </div>
-        <div className="invoice-details-rhs">
-          {"TAX INVOICE"}
-          <br />
-          {responseObj ? "INVOICE " + responseObj.invoice_number : ""}
-        </div>
-      </div>
-    )
-  }
+
   const getInvoiceTable = () => {
     return (<>
       <h5>{"Invoice Information"}</h5>
@@ -426,36 +408,35 @@ const ViewInvoice = (props) => {
           style={{
             position: "absolute",
             top: -50,
-            right: 10,
+            right: 0,
             display: "flex",
           }}
         >
           {responseObj && (
             <button
               type="submit"
-              className="btn btn-outline-primary w-xl mx-3"
+              className="btn btn-outline-primary w-xl"
               onClick={downloadPDF}
             >
               Download PDF
             </button>
           )}
-          <button type="submit" className="btn btn-primary w-xl mx-3">
+          <button type="submit" className="btn btn-primary w-xl mx-3 d-none">
             Send on Mail
           </button>
         </div>
 
         <Card>
           <CardBody>
-            <div class="card-content">
-              <div class="image-container">
-                <img
-                  src={require("../../assets/images/Willsmeet-Logo.png")}
-                  alt="Company Logo"
-                  class="card-image"
-                />
+            <div className="card-content">
+              <Hero />
+              <div className="invoice-details-rhs">
+                {"TAX INVOICE"}
+                <br />
+                {responseObj ? "INVOICE " + responseObj.invoice_number : ""}
               </div>
-              {getBaseDetails()}
             </div>
+
           </CardBody>
         </Card>
         <div id="invoice-container">
@@ -514,11 +495,11 @@ const ViewInvoice = (props) => {
               <Card className="col-style">
                 <CardBody>
                   {responseObj && getInvoiceFinalDetails()}
-                  <div class="image-container-seal">
+                  <div className="text-center">
                     <img
                       src={require("../../assets/images/bansi-seal.png")}
                       alt="Company Seal"
-                      class="card-image-seal"
+                      className="card-image-seal"
                     />
                   </div>
                 </CardBody>
