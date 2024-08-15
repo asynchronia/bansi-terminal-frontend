@@ -80,7 +80,7 @@ const BranchData = (props) => {
               validation.handleSubmit();
             }}
           >
-            <div class="modal-header">
+            <div className="modal-header">
               <div className="d-flex justify-content-between align-items-center w-100">
                 <h5 className="modal-title">Add Branch</h5>
                 <div className="d-flex gap-1">

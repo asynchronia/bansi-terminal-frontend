@@ -6,8 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { setBreadcrumbItems } from "../../store/actions";
 
-import { ArrowForward } from '@mui/icons-material';
-import { Chip } from "@mui/material";
+import { ArrowForward, DeleteOutline, Inventory, LocalShipping, MailOutline, Receipt } from '@mui/icons-material';
+import { Badge, Chip, IconButton, Tooltip } from "@mui/material";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridReact } from "ag-grid-react";
@@ -17,6 +17,18 @@ import { changePreloader } from "../../store/actions";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import OrderTrackingRenderer from "./OrderTrackingRenderer";
 
+import { styled } from '@mui/material/styles';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  '& .MuiBadge-badge': {
+    right: -3,
+    top: 13,
+    border: `2px solid ${theme.palette.background.paper}`,
+    padding: '0 4px',
+  },
+}));
 
 const OrderDetails = (props) => {
   let dispatch = useDispatch();
@@ -56,7 +68,33 @@ const OrderDetails = (props) => {
     const combinedQuantity = `Shipped ${quantity_shipped} \n Packed ${quantity_packed} \n Invoiced ${quantity_invoiced}`;
 
     // Return the combined quantity as the cell value
-    return combinedQuantity;
+    return (
+      <div>
+        <Tooltip title={`Shipped ${quantity_shipped}`}>
+          <IconButton size="small" aria-label="Shipped">
+            <StyledBadge badgeContent={quantity_shipped} color="primary" showZero>
+              <LocalShipping />
+            </StyledBadge>
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title={`Packed ${quantity_packed}`}>
+          <IconButton size="small" aria-label="Packed">
+            <StyledBadge badgeContent={quantity_packed} color="secondary" showZero>
+              <Inventory />
+            </StyledBadge>
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title={`Invoiced ${quantity_packed}`}>
+          <IconButton size="small" aria-label="Invoiced">
+            <StyledBadge badgeContent={quantity_packed} color="success" showZero>
+              <Receipt />
+            </StyledBadge>
+          </IconButton>
+        </Tooltip>
+      </div>
+    );
   }
 
   const AddressComponent = ({ address_ }) => {
@@ -87,32 +125,32 @@ const OrderDetails = (props) => {
     {
       headerName: "Item & description",
       field: "description",
-      suppressMenu: true,
+      suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
       headerName: "Quantity",
       field: "quantity",
-      suppressMenu: true,
+      suppressMenu: true, width: 100,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
       headerName: "Warehouse Name",
       field: "warehouse_name",
-      suppressMenu: true,
+      suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
     {
       headerName: "Status",
       field: "total",
-      suppressMenu: true,
+      suppressMenu: true, width: 150,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      cellRenderer: OrderDetailsRenderer,
+      cellRenderer: OrderDetailsRenderer
     },
     {
       headerName: "Rate",
       field: "rate",
-      suppressMenu: true,
+      suppressMenu: true, width: 120,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -120,7 +158,7 @@ const OrderDetails = (props) => {
     {
       headerName: "Discount",
       field: "discount",
-      suppressMenu: true,
+      suppressMenu: true, width: 120,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -128,7 +166,7 @@ const OrderDetails = (props) => {
     {
       headerName: "Amount",
       field: "item_total",
-      suppressMenu: true,
+      suppressMenu: true, width: 120,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -408,9 +446,9 @@ const OrderDetails = (props) => {
                   ></AgGridReact>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-8"></div>
-                <div class="col-4">
+              <div className="row">
+                <div className="col-8"></div>
+                <div className="col-4">
                   <div className="d-flex justify-content-between align-items-center gap-6 border-bottom p-2">
                     <h4 className="m-0">
                       <span>Sub Total:</span><br />

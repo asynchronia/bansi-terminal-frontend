@@ -13,6 +13,7 @@ import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import CircleRenderer from "./CircleRenderer";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
+import './styles/AllOrders.scss'
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -166,7 +167,7 @@ const AllOrders = (props) => {
       headerName: "Order Date", field: "date",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: false, width: 120
+      sortable: false, width: 110
     },
     {
       headerName: "Order No.", field: "salesorder_id", flex: 1,
@@ -251,7 +252,7 @@ const AllOrders = (props) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative">
+                      <div className="search-box position-relative" style={{ width: '20rem' }}>
                         <Input
                           type="text"
                           value={inputValue}
@@ -281,11 +282,10 @@ const AllOrders = (props) => {
                     defaultColDef={{ resizable: false, suppressMovable: true }}
                     columnDefs={columnDefs}
                     pagination={pagination}
-                    paginationPageSize={paginationPageSize}
-                    paginationPageSizeSelector={paginationPageSizeSelector}
+                    paginationPageSize={20}
+                    paginationPageSizeSelector={false}
                     rowData={rowData}
                     onPaginationChanged={onPaginationChanged}
-
                     onGridReady={onGridReady}
                   >
                   </AgGridReact>

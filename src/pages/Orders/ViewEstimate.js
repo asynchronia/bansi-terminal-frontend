@@ -246,7 +246,7 @@ const ViewEstimate = (props) => {
           <Col>
             <Card>
               <CardBody>
-                <div class="card-content">
+                <div className="card-content">
                   <Hero />
                 </div>
               </CardBody>
@@ -313,8 +313,8 @@ const ViewEstimate = (props) => {
               <CardBody>
 
                 {responseObj && getEstimateFinalDetails()}
-                <div class="image-container-seal">
-                  <img src={require('../../assets/images/bansi-seal.png')} alt="Company Seal" class="card-image-seal" />
+                <div className="image-container-seal">
+                  <img src={require('../../assets/images/bansi-seal.png')} alt="Company Seal" className="card-image-seal" />
                 </div>
               </CardBody>
             </Card>
