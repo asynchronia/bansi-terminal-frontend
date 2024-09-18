@@ -49,6 +49,7 @@ const API_URL = {
   getPurchaseOrderDetails: "/api/purchaseorders",
   purchaseOrderStatusChange: "/api/purchaseorders/status",
   convertToSalesOrder: "/api/orders/convert-to-sales-order",
+  getUserProfile: "/api/users/profile",
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -112,13 +113,14 @@ export async function updateClientStatus(body) {
 export async function createClient(body) {
   return new Promise((resolve, reject) => {
     axios
-      .post(`${baseUrl}${API_URL.createClient}`, body, { headers: getHeaders() })
-      .then(res => {
+      .post(`${baseUrl}${API_URL.createClient}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
         resolve(res.data);
         return res.data;
       })
-      .catch(error => reject(error));
-
+      .catch((error) => reject(error));
   });
 }
 
@@ -243,12 +245,10 @@ export async function getUserRole(isAdmin) {
     url = `${baseUrl}${API_URL.getUserRole}`;
   }
   return new Promise((resolve) => {
-    axios
-      .get(url, { headers: getHeaders() })
-      .then((res) => {
-        resolve(res.data);
-        return res.data;
-      });
+    axios.get(url, { headers: getHeaders() }).then((res) => {
+      resolve(res.data);
+      return res.data;
+    });
   });
 }
 
@@ -294,7 +294,9 @@ export async function getPurchaseOrderList() {
 export async function getPurchaseOrderDetails(id, body) {
   return new Promise((resolve) => {
     axios
-      .get(`${baseUrl}${API_URL.getPurchaseOrderDetails}/${id}`, { headers: getHeaders() })
+      .get(`${baseUrl}${API_URL.getPurchaseOrderDetails}/${id}`, {
+        headers: getHeaders(),
+      })
       .then((res) => {
         resolve(res.data);
         return res.data;
@@ -311,7 +313,8 @@ export async function createPurchaseOrder(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
-      }).catch((error) => {
+      })
+      .catch((error) => {
         reject(error);
       });
   });
@@ -326,7 +329,8 @@ export async function updatePurchaseOrder(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
-      }).catch((error) => {
+      })
+      .catch((error) => {
         reject(error);
       });
   });
@@ -380,9 +384,10 @@ export async function updateBranch(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
-      }).catch((error) => {
+      })
+      .catch((error) => {
         reject(error);
-      });;
+      });
   });
 }
 
@@ -706,6 +711,19 @@ export async function getUploadUrl() {
   return new Promise((resolve) => {
     axios
       .get(`${baseUrl}${API_URL.getUploadUrl}`, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function getUserProfile() {
+  return new Promise((resolve) => {
+    axios
+      .get(`${baseUrl}${API_URL.getUserProfile}`, {
         headers: getHeaders(),
       })
       .then((res) => {
