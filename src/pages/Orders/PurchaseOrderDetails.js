@@ -101,7 +101,6 @@ const PurchaseOrderDetails = (props) => {
     if (newStatus === 'published') {
       setPublishModal(true);
     }
-    setStatus(newStatus);
   };
 
   const getPurchaseOrderDetails = async () => {
@@ -189,7 +188,7 @@ const PurchaseOrderDetails = (props) => {
           }}
         >
           <Modal size="sm" isOpen={publishModal} centered={true}>
-            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
+            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} id={id} />
           </Modal>
           <Modal size="sm" isOpen={approveModal}>
             <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
