@@ -1,24 +1,27 @@
-import PropTypes from "prop-types"
-import React, { useCallback, useEffect, useRef } from "react"
+import PropTypes from "prop-types";
+import React, { useCallback, useEffect, useRef } from "react";
 
 // //Import Scrollbar
-import SimpleBar from "simplebar-react"
+import SimpleBar from "simplebar-react";
 
 // MetisMenu
-import MetisMenu from "metismenujs"
-import withRouter from "../../components/Common/withRouter"
-import { Link } from "react-router-dom"
+import MetisMenu from "metismenujs";
+import withRouter from "../../components/Common/withRouter";
+import { Link } from "react-router-dom";
 
 //i18n
 //import { withTranslation } from "react-i18next"
 
 import APP_ENV from "../../utility/env";
-import RequirePermission from "../../routes/middleware/requirePermission"
-import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants"
-import RequireUserType from "../../routes/middleware/requireUserType"
+import RequirePermission from "../../routes/middleware/requirePermission";
+import {
+  MODULES_ENUM,
+  PERMISSIONS_ENUM,
+  USER_TYPES_ENUM,
+} from "../../utility/constants";
+import RequireUserType from "../../routes/middleware/requireUserType";
 
-
-const SidebarContent = props => {
+const SidebarContent = (props) => {
   const ref = useRef();
   const activateParentDropdown = useCallback((item) => {
     item.classList.add("active");
@@ -103,7 +106,6 @@ const SidebarContent = props => {
   };
 
   const activeMenu = useCallback(() => {
-
     const pathName = process.env.PUBLIC_URL + props.router.location.pathname;
     let matchingMenuItem = null;
     const ul = document.getElementById("side-menu");
@@ -121,7 +123,6 @@ const SidebarContent = props => {
     }
   }, [props.router.location.pathname, activateParentDropdown]);
 
-
   useEffect(() => {
     ref.current.recalculate();
     document.body.setAttribute("data-sidebar", "dark");
@@ -132,7 +133,7 @@ const SidebarContent = props => {
   }, []);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     activeMenu();
   }, [activeMenu]);
 
@@ -149,12 +150,17 @@ const SidebarContent = props => {
     <React.Fragment>
       <SimpleBar style={{ maxHeight: "100%" }} ref={ref}>
         <div id="sidebar-menu" data-sidebar="dark">
-          <ul className="metismenu list-unstyled mm-show mm-active" id="side-menu">
+          <ul
+            className="metismenu list-unstyled mm-show mm-active"
+            id="side-menu"
+          >
             {/* <li className="menu-title">{("Main")} </li> */}
             <li>
               <Link to="/dashboard" className="waves-effect">
                 <i className="mdi mdi-view-dashboard"></i>
-                <span className="badge rounded-pill bg-primary float-end">2</span>
+                <span className="badge rounded-pill bg-primary float-end">
+                  2
+                </span>
                 <span>Dashboard</span>
               </Link>
             </li>
@@ -173,13 +179,19 @@ const SidebarContent = props => {
                     <i className="mdi mdi-email-outline"></i>
                     <span>Items</span>
                   </Link>
-                  <ul className="sub-menu" >
-                    <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.READ}>
+                  <ul className="sub-menu">
+                    <RequirePermission
+                      module={MODULES_ENUM.ITEMS}
+                      permission={PERMISSIONS_ENUM.READ}
+                    >
                       <li>
                         <Link to="/items">All Items</Link>
                       </li>
                     </RequirePermission>
-                    <RequirePermission module={MODULES_ENUM.ITEMS} permission={PERMISSIONS_ENUM.CREATE}>
+                    <RequirePermission
+                      module={MODULES_ENUM.ITEMS}
+                      permission={PERMISSIONS_ENUM.CREATE}
+                    >
                       <li>
                         <Link to="/create-item">Create Item</Link>
                       </li>
@@ -206,12 +218,10 @@ const SidebarContent = props => {
                 <i className="mdi mdi-cart-outline"></i>
                 <span>Purchase Order</span>
               </Link>
-              <ul className="sub-menu" >
+              <ul className="sub-menu">
                 <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
                   <li>
-                    <li>
-                      <Link to="/create-order">Create Order</Link>
-                    </li>
+                    <Link to="/create-order">Create Order</Link>
                   </li>
                 </RequireUserType>
                 <li>
@@ -233,10 +243,10 @@ const SidebarContent = props => {
             </li>
             <li>
               <Link to="/#" className="has-arrow waves-effect">
-                <i className="mdi mdi-receipt" ></i>
+                <i className="mdi mdi-receipt"></i>
                 <span>Invoices</span>
               </Link>
-              <ul className="sub-menu" >
+              <ul className="sub-menu">
                 <li>
                   <Link to="/invoices">All Invoices</Link>
                 </li>
@@ -263,12 +273,12 @@ const SidebarContent = props => {
         </div>
       </SimpleBar>
     </React.Fragment>
-  )
-}
+  );
+};
 
 SidebarContent.propTypes = {
   location: PropTypes.object,
   t: PropTypes.any,
-}
+};
 
-export default withRouter(SidebarContent)
+export default withRouter(SidebarContent);

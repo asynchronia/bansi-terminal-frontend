@@ -53,6 +53,7 @@ import AgreementItemsListing from "../pages/Items/AgreementItemsListing";
 import AgreementItemView from "../pages/Items/AgreementItemView";
 import ViewPurchaseOrder from "../pages/Orders/ViewPurchaseOrder";
 import PurchaseOrderDetails from "../pages/Orders/PurchaseOrderDetails";
+import UserProfile from "../pages/Users/Profile";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -161,8 +162,8 @@ const userRoutes = [
   // { path: "/chat", component: <Chat /> },
   // { path: "/kanbanboard", component: <Kanban /> },
 
-  // // // //profile
-  // { path: "/profile", component: <UserProfile /> },
+  // // //profile
+  { path: "/profile", component: <UserProfile /> },
 
   // // //Email
   // { path: "/email-inbox", component: <EmailInbox /> },
