@@ -13,7 +13,7 @@ import {
   Label,
   Modal,
   Row,
-  Table
+  Table,
 } from "reactstrap";
 import * as Yup from "yup";
 import StyledButton from "../../components/Common/StyledButton";
@@ -62,8 +62,8 @@ const CreateOrder = (props) => {
   const [minDate, setMinDate] = useState(() => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading zero if needed
-    const day = String(today.getDate() + 1).padStart(2, '0'); // Add leading zero if needed
+    const month = String(today.getMonth() + 1).padStart(2, "0"); // Add leading zero if needed
+    const day = String(today.getDate() + 1).padStart(2, "0"); // Add leading zero if needed
     return `${year}-${month}-${day}`;
   });
 
@@ -118,7 +118,6 @@ const CreateOrder = (props) => {
   };
 
   const handleChangeDate = (event) => {
-
     const selectedDate = new Date(event.target.value);
     const today = new Date(minDate);
 
@@ -127,23 +126,25 @@ const CreateOrder = (props) => {
       // Reset to today's date
       event.target.value = minDate;
     }
-    formik.setFieldValue('deliveryDate', event.target.value);
-  }
+    formik.setFieldValue("deliveryDate", event.target.value);
+  };
 
   const formik = useFormik({
     initialValues: {
-      billingAddress: '',
-      shippingAddress: '',
-      purchaseOrderNumber: '',
-      deliveryDate: '',
+      billingAddress: "",
+      shippingAddress: "",
+      purchaseOrderNumber: "",
+      deliveryDate: "",
     },
     validationSchema: Yup.object({
       billingAddress: Yup.string().required("Please Select Billing Address"),
       shippingAddress: Yup.string().required("Please Select Shipping Address"),
-      purchaseOrderNumber: Yup.string().required("Please Enter Purchase Order Number"),
+      purchaseOrderNumber: Yup.string().required(
+        "Please Enter Purchase Order Number"
+      ),
       deliveryDate: Yup.string().required("Please Enter Delivery Date"),
     }),
-    onSubmit: values => {
+    onSubmit: (values) => {
       saveOrUpdatePurchaseOrder(values);
     },
   });
@@ -205,7 +206,7 @@ const CreateOrder = (props) => {
   };
 
   const handleItemDelete = (itemId, variantId) => {
-    debugger
+    debugger;
     const updatedItems = selectedItems.filter(
       (item) => item.itemId !== itemId || item.variantId !== variantId
     );
@@ -259,12 +260,13 @@ const CreateOrder = (props) => {
         <td style={{ whiteSpace: "nowrap" }}>
           {formatNumberWithCommasAndDecimal(
             item.unitPrice *
-            (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
+              (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
           )}
         </td>
         <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
         <td>
-          <HighlightOff color="error"
+          <HighlightOff
+            color="error"
             style={{ cursor: "pointer" }}
             onClick={() => handleItemDelete(item.itemId, item.variantId)}
           />
@@ -318,8 +320,8 @@ const CreateOrder = (props) => {
       billingAddress: purchaseOrder.billing.branchId,
       shippingAddress: purchaseOrder.shipping.branchId,
       purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
-      deliveryDate: formatDate(purchaseOrder.deliveryDate)
-    })
+      deliveryDate: formatDate(purchaseOrder.deliveryDate),
+    });
 
     let items = purchaseOrder.items;
     items.forEach((item) => {
@@ -336,7 +338,7 @@ const CreateOrder = (props) => {
       return acc;
     }, {});
 
-    setSelectedQuantities(result)
+    setSelectedQuantities(result);
     setSelectedItems(items);
   };
 
@@ -360,7 +362,6 @@ const CreateOrder = (props) => {
   }, [props, breadcrumbItems, getBranchData]);
 
   const saveOrUpdatePurchaseOrder = (values) => {
-
     if (selectedItems.length === 0) {
       toast.error("Please select at least 1 item!", {
         position: "top-center",
@@ -381,11 +382,16 @@ const CreateOrder = (props) => {
             : response?.payload?.purchaseOrder?._id;
           setTimeout(() => {
             redirectToPurchaseDetails(_id);
-          }, 1000)
-          toast.success(id ? 'Purchase Order Updated Successfully' : 'Purchase Order Created Successfully', {
-            position: "top-center",
-            theme: "light",
-          });
+          }, 1000);
+          toast.success(
+            id
+              ? "Purchase Order Updated Successfully"
+              : "Purchase Order Created Successfully",
+            {
+              position: "top-center",
+              theme: "light",
+            }
+          );
         } catch (error) {
           toast.error(error.response.data.message, {
             position: "top-center",
@@ -396,7 +402,12 @@ const CreateOrder = (props) => {
         }
       }
       // validation.handleSubmit();
-      const { purchaseOrderNumber, deliveryDate, billingAddress, shippingAddress } = values
+      const {
+        purchaseOrderNumber,
+        deliveryDate,
+        billingAddress,
+        shippingAddress,
+      } = values;
       const body = {
         purchaseOrderNumber,
         agreementId,
@@ -481,7 +492,9 @@ const CreateOrder = (props) => {
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
-              <span className="purchase-order-no">{formik.values.purchaseOrderNumber}</span>
+              <span className="purchase-order-no">
+                {formik.values.purchaseOrderNumber}
+              </span>
             </div>
           </div>
         </CardBody>
@@ -495,7 +508,7 @@ const CreateOrder = (props) => {
                 <CardHeader>Billing & Shipping</CardHeader>
                 <CardBody>
                   <div className="d-flex">
-                    <div className="p-2" style={{ width: '49%' }}>
+                    <div className="p-2" style={{ width: "49%" }}>
                       <div>
                         <label className="col-form-label">
                           Billing Address
@@ -518,18 +531,26 @@ const CreateOrder = (props) => {
                             </option>
                           ))}
                         </select>
-                        {formik.touched.billingAddress && formik.errors.billingAddress ? (
-                          <div className="text-danger">{formik.errors.billingAddress}</div>
+                        {formik.touched.billingAddress &&
+                        formik.errors.billingAddress ? (
+                          <div className="text-danger">
+                            {formik.errors.billingAddress}
+                          </div>
                         ) : null}
                         <h5 className="my-3">
-                          {branchList.find((branch) => branch._id === formik.values.billingAddress)?.address}
+                          {
+                            branchList.find(
+                              (branch) =>
+                                branch._id === formik.values.billingAddress
+                            )?.address
+                          }
                         </h5>
                       </div>
                     </div>
                     <div className="p-2">
                       <div className="vr h-100"></div>
                     </div>
-                    <div className="p-2" style={{ width: '49%' }}>
+                    <div className="p-2" style={{ width: "49%" }}>
                       <div>
                         <label className="col-form-label">Shipping</label>
                         <select
@@ -550,11 +571,19 @@ const CreateOrder = (props) => {
                             </option>
                           ))}
                         </select>
-                        {formik.touched.shippingAddress && formik.errors.shippingAddress ? (
-                          <div className="text-danger">{formik.errors.shippingAddress}</div>
+                        {formik.touched.shippingAddress &&
+                        formik.errors.shippingAddress ? (
+                          <div className="text-danger">
+                            {formik.errors.shippingAddress}
+                          </div>
                         ) : null}
                         <h5 className="my-3">
-                          {branchList.find((branch) => branch._id === formik.values.shippingAddress)?.address}
+                          {
+                            branchList.find(
+                              (branch) =>
+                                branch._id === formik.values.shippingAddress
+                            )?.address
+                          }
                         </h5>
                       </div>
                     </div>
@@ -568,7 +597,9 @@ const CreateOrder = (props) => {
                 <CardBody>
                   <Row>
                     <div>
-                      <Label htmlFor="purchaseOrderNumber">Purchase Order Number</Label>
+                      <Label htmlFor="purchaseOrderNumber">
+                        Purchase Order Number
+                      </Label>
                       <Input
                         type="text"
                         name="purchaseOrderNumber"
@@ -579,14 +610,19 @@ const CreateOrder = (props) => {
                         onClick={handleClickPO}
                         onBlur={formik.handleBlur}
                       />
-                      {formik.touched.purchaseOrderNumber && formik.errors.purchaseOrderNumber ? (
-                        <div className="text-danger">{formik.errors.purchaseOrderNumber}</div>
+                      {formik.touched.purchaseOrderNumber &&
+                      formik.errors.purchaseOrderNumber ? (
+                        <div className="text-danger">
+                          {formik.errors.purchaseOrderNumber}
+                        </div>
                       ) : null}
                     </div>
                   </Row>
                   <Row>
                     <div className="mt-3 mb-0">
-                      <Label htmlFor="deliveryDate">Expected Delivery Date</Label>
+                      <Label htmlFor="deliveryDate">
+                        Expected Delivery Date
+                      </Label>
                       <Input
                         type="date"
                         name="deliveryDate"
@@ -598,8 +634,11 @@ const CreateOrder = (props) => {
                         onChange={handleChangeDate}
                         onBlur={formik.handleBlur}
                       />
-                      {formik.touched.deliveryDate && formik.errors.deliveryDate ? (
-                        <div className="text-danger">{formik.errors.deliveryDate}</div>
+                      {formik.touched.deliveryDate &&
+                      formik.errors.deliveryDate ? (
+                        <div className="text-danger">
+                          {formik.errors.deliveryDate}
+                        </div>
                       ) : null}
                     </div>
                   </Row>
@@ -689,15 +728,15 @@ const CreateOrder = (props) => {
                             )}
                             {(!filteredRowData ||
                               filteredRowData.length === 0) && (
-                                <tr>
-                                  <td
-                                    colSpan={5}
-                                    className="form-text-lg text-center"
-                                  >
-                                    No items found.
-                                  </td>
-                                </tr>
-                              )}
+                              <tr>
+                                <td
+                                  colSpan={5}
+                                  className="form-text-lg text-center"
+                                >
+                                  No items found.
+                                </td>
+                              </tr>
+                            )}
                           </tbody>
                         </Table>
                       </div>
