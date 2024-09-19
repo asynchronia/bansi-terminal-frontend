@@ -111,9 +111,6 @@ const CreateOrder = (props) => {
   }, [dispatch]);
 
   const handleStatusChange = (event) => {
-    if (event.target.value === "published") {
-      setPublishModal(true);
-    }
     setStatus(event.target.value);
   };
 
@@ -464,6 +461,7 @@ const CreateOrder = (props) => {
             <PublishConfirm
               setPublishModal={setPublishModal}
               setStatus={setStatus}
+              id={id}
             />
           </Modal>
           <select
