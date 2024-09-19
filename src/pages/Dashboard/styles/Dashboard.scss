@@ -1,0 +1,33 @@
+.agreement-card {
+  background-color: #00dbff0f !important;
+  border: 2px dashed #0053ff !important;
+}
+
+.agreement-body {
+  display: flex !important;
+  flex-direction: column !important;
+  color: #6b6b6b !important;
+  gap: 1rem !important;
+}
+
+.agreement-btn {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 0.75rem !important;
+  padding: 0.75rem 0 !important;
+}
+
+.btn-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  color: white;
+  display: inline-block;
+}
+
+.list-grid {
+  height: 261px;
+  width: 100%;
+}
