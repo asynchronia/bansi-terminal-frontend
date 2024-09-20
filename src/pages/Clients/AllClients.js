@@ -49,6 +49,7 @@ const AllClients = (props) => {
     {
       headerName: "Name",
       field: "name", flex: 1,
+      tooltipField: "name",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       comparator: () => false,
@@ -63,6 +64,7 @@ const AllClients = (props) => {
     {
       headerName: "Primary Email", flex: 1,
       field: "email",
+      tooltipField: "email",
       sortable: false,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Input, Modal } from "reactstrap";
 
 import { connect, useDispatch } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -93,6 +93,7 @@ const AllInvoices = (props) => {
     {
       headerName: "Invoice No.",
       field: "invoice_number",
+      tooltipField: "invoice_number",
       suppressMenu: true, width: 150,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -105,6 +106,7 @@ const AllInvoices = (props) => {
     {
       headerName: "Client",
       field: "customer_name",
+      tooltipField: "customer_name",
       suppressMenu: true, minWidth: 150, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -323,7 +325,6 @@ const onGridReady = useCallback((params) => {
 */
   return (
     <React.Fragment>
-      <ToastContainer position="top-center" theme="colored" />
       <Modal
         isOpen={modal_standard}
         toggle={() => {

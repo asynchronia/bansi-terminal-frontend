@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Button, Input, Modal } from "reactstrap";
 
 import { connect, useDispatch } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 // import {AgGridReact} from 'ag-grid-react';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -135,6 +135,7 @@ const AllItems = (props) => {
     {
       headerName: "Item Name",
       field: "title",
+      tooltipField: 'title',
       headerCheckboxSelection: true,
       checkboxSelection: true,
       suppressMenu: true,
@@ -149,6 +150,7 @@ const AllItems = (props) => {
     {
       headerName: "HSN Code",
       field: "hsnCode",
+      tooltipField: "hsnCode",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -180,6 +182,7 @@ const AllItems = (props) => {
     {
       headerName: "Category",
       field: "category",
+      tooltipField: "category",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -331,7 +334,6 @@ const onGridReady = useCallback((params) => {
 */
   return (
     <React.Fragment>
-      <ToastContainer position="top-center" theme="colored" />
       <Modal
         isOpen={modal_standard}
         toggle={() => {

@@ -5,7 +5,7 @@ import { changePreloader } from "../../store/actions";
 
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { connect, useDispatch } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -82,6 +82,7 @@ const AllPayments = (props) => {
     {
       headerName: "Client",
       field: "customer_name",
+      tooltipField: "customer_name",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       flex: 1, sortable: false
@@ -89,6 +90,7 @@ const AllPayments = (props) => {
     {
       headerName: "Invoice#",
       field: "invoice_numbers",
+      tooltipField: "invoice_numbers",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       flex: 1, sortable: false
@@ -238,7 +240,6 @@ const AllPayments = (props) => {
 
   return (
     <React.Fragment>
-      <ToastContainer position="top-center" theme="colored" />
       <Modal
         isOpen={modal_standard}
         toggle={() => {

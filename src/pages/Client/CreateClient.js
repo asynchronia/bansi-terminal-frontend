@@ -5,7 +5,7 @@ import { Card, CardBody, Col, Form, Row } from "reactstrap";
 import Dropzone from "react-dropzone";
 import AddBranch from "../../components/CustomComponents/AddBranch";
 import AddUser from "../../components/CustomComponents/AddUser";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { createClientReq } from "../../service/clientService";
@@ -173,7 +173,6 @@ const CreateClient = (props) => {
   return (
     <Form className="form-horizontal mt-4" autoComplete="off">
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
         <div
           style={{
             position: "absolute",

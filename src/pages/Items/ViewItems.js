@@ -5,7 +5,6 @@ import { connect, useDispatch } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import { getItemByIdReq } from "../../service/itemService";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
@@ -151,7 +150,6 @@ const ViewItems = (props, { route, navigate }) => {
   return (
     <>
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
         <RequirePermission
           module={MODULES_ENUM.ITEMS}
           permission={PERMISSIONS_ENUM.UPDATE}

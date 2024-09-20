@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Card, CardBody, Modal, Button, CardHeader } from "reactstrap";
-import { ToastContainer } from "react-toastify";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import StyledButton from "../../components/Common/StyledButton";
 import { ReactComponent as CorrectSign } from "../../assets/images/svg/correct-sign.svg";
@@ -178,7 +177,6 @@ const PurchaseOrderDetails = (props) => {
   return (
     <>
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
         <div
           className="d-flex align-items-center gap-2"
           style={{
@@ -278,7 +276,6 @@ const PurchaseOrderDetails = (props) => {
 
         <Row className="mb-3">
           <div style={{ position: "relative" }}>
-            <ToastContainer position="top-center" theme="colored" />
             <Row className="equal-height-cards">
               <Col xl="7">
                 <Card>

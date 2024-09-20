@@ -4,7 +4,7 @@ import { AgGridReact } from 'ag-grid-react';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { Card, CardBody, Col, Input, Row } from "reactstrap";
 import { getPurchaseOrderListReq } from "../../service/purchaseService";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -232,7 +232,6 @@ const ViewPurchaseOrder = (props) => {
 
   return (
     <>
-      <ToastContainer position="top-center" theme="colored" />
       <div className="all-items">
         <Row>
           <Col className="col-12">
