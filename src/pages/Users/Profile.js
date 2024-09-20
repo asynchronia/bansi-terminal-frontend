@@ -4,10 +4,10 @@ import { Card, CardBody, CardHeader, Col, Input, Label, Row } from "reactstrap";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { connect } from "react-redux";
 import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import StyledButton from "../../components/Common/StyledButton";
 import { USER_GENDER_ENUM } from "../../utility/constants";
 import { getUserProfileReq } from "../../service/usersService";
+import './styles/Profile.scss'
 
 const UserProfile = (props) => {
   document.title = "Users";
@@ -70,22 +70,17 @@ const UserProfile = (props) => {
     <form onSubmit={formik.handleSubmit} autoComplete="off">
       <Row className="mb-3">
         <div>
-          <ToastContainer position="top-center" theme="colored" />
           <Row>
             <Col xl="7">
               <Card>
                 <CardHeader
-                  style={{
-                    fontSize: "16px",
-                    backgroundColor: "transparent",
-                    borderBottom: "1px solid lightgray",
-                  }}
+                  className="card-header"
                 >
                   User Profile
                 </CardHeader>
-                <CardBody style={{ color: "#6B6B6B" }}>
+                <CardBody className="gray-text">
                   <div className="d-flex mb-1">
-                    <div className="p-2" style={{ width: "49%" }}>
+                    <div className="p-2 width-49">
                       <Label htmlFor="firstName">First Name</Label>
                       <Input
                         type="text"
@@ -102,7 +97,7 @@ const UserProfile = (props) => {
                         </div>
                       ) : null}
                     </div>
-                    <div className="p-2" style={{ width: "49%" }}>
+                    <div className="p-2 width-49">
                       <Label htmlFor="lastName">Last Name</Label>
                       <Input
                         type="text"
@@ -121,7 +116,7 @@ const UserProfile = (props) => {
                     </div>
                   </div>
                   <div className="d-flex mb-3">
-                    <div className="p-2" style={{ width: "49%" }}>
+                    <div className="p-2 width-49">
                       <Label htmlFor="emailID">Email ID</Label>
                       <Input
                         type="text"
@@ -138,14 +133,13 @@ const UserProfile = (props) => {
                         </div>
                       ) : null}
                     </div>
-                    <div className="p-2" style={{ width: "49%" }}>
+                    <div className="p-2 width-49">
                       <Label htmlFor="gender">Gender</Label>
                       <select
-                        className="form-select focus-width"
+                        className="form-select focus-width capitalize"
                         name="gender"
                         value={formik.values.gender}
                         // onChange={handleGenderChange}
-                        style={{ textTransform: "capitalize" }}
                         disabled
                       >
                         <option value={USER_GENDER_ENUM.MALE}>
@@ -178,18 +172,12 @@ const UserProfile = (props) => {
             <Col xl="5">
               <Card>
                 <CardHeader
-                  style={{
-                    fontSize: "16px",
-                    backgroundColor: "transparent",
-                    borderBottom: "1px solid lightgray",
-                  }}
+                  className="card-header"
                 >
                   Roles & Permissions
                 </CardHeader>
                 <CardBody
-                  style={{
-                    color: "#6B6B6B",
-                  }}
+                className="gray-text"
                 >
                   <Label className="pt-2">Branch / Warehouse Access</Label>
                   <div className="d-flex gap-2 flex-wrap pb-2">
