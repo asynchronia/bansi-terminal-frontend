@@ -1,20 +1,27 @@
-import React from "react"
-import { Card, CardBody, Row , Col} from "reactstrap"
+import React from "react";
+import { Card, CardBody, Row, Col } from "reactstrap";
 
-const Miniwidget = props => {
+const Miniwidget = (props) => {
   return (
     <React.Fragment>
       <Row>
         {props.reports.map((report, key) => (
-          <Col xl={3} sm={6} key={key}>
-            <Card className="mini-stat bg-primary">
-              <CardBody className="card-body mini-stat-img">
-                <div className="mini-stat-icon">
-                  <i className={"float-end mdi mdi-" + report.iconClass}></i>
+          <Col sm={6} key={key}>
+            <Card className="mini-stat">
+              <CardBody className="card-body d-flex gap-4">
+                <div className="mini-stat-icon bg-primary">
+                  <i className={"float-start mdi mdi-chart-line"}></i>
                 </div>
-                <div className="text-white">
-                  <h6 className="text-uppercase mb-3 font-size-16 text-white">{report.title}</h6>
-                  <h2 className="mb-4 text-white">{report.total}</h2>
+                <div className="">
+                  <h2 className="mb-1 font-size-24">{report.total}</h2>
+                  <h6
+                    style={{
+                      color: "#6B6B6B",
+                    }}
+                    className="mb-1 font-size-12 "
+                  >
+                    {report.title}
+                  </h6>
                   {/* <span className={"badge bg-" + report.badgecolor}> {report.average} </span> <span className="ms-2">From previous period</span> */}
                 </div>
               </CardBody>
@@ -23,8 +30,7 @@ const Miniwidget = props => {
         ))}
       </Row>
     </React.Fragment>
-  )
+  );
+};
 
-}
-
-export default Miniwidget
+export default Miniwidget;
