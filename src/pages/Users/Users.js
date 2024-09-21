@@ -3,7 +3,7 @@ import { Row, Col, Card, CardBody, Form } from "reactstrap";
 import "react-toastify/dist/ReactToastify.css";
 import { connect } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getUserListReq } from "../../service/usersService";
@@ -133,7 +133,6 @@ const Users = (props) => {
 
   return (
     <div style={{ position: "relative" }}>
-      <ToastContainer position="top-center" theme="colored" />
       <Form className="form-horizontal mt-4" onSubmit={handleSubmit}>
         <Row>
           {/* TODO: Add admin users form */}

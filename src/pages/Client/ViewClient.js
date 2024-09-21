@@ -4,7 +4,7 @@ import "jspdf-autotable";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   Button,
   Card,
@@ -421,7 +421,6 @@ const ViewClient = (props) => {
 
   return (
     <div style={{ position: "relative" }}>
-      <ToastContainer position="top-center" theme="colored" />
       <Modal
         size="lg"
         isOpen={openModal.agreement}

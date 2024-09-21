@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   Card,
   CardBody,
@@ -448,7 +448,6 @@ const CreateOrder = (props) => {
   return (
     <form onSubmit={formik.handleSubmit} autoComplete="off">
       <div style={{ position: "relative" }}>
-        {/* <ToastContainer position="top-center" theme="colored" /> */}
         <div
           style={{
             position: "absolute",
@@ -499,7 +498,6 @@ const CreateOrder = (props) => {
       </Card>
       <Row className="mb-3">
         <div style={{ position: "relative" }}>
-          <ToastContainer position="top-center" theme="colored" />
           <Row className="equal-height-cards">
             <Col xl="8">
               <Card>

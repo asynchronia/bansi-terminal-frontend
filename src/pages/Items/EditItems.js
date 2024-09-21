@@ -22,7 +22,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import AllVariantRows from "../../components/CustomComponents/AllVariantRows";
 
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 // import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
@@ -499,7 +499,6 @@ const EditItems = (props) => {
           handleSubmitStatus={handleItemStatus}
         />
       </Modal>
-      <ToastContainer position="top-center" theme="colored" />
       <Form className="form-horizontal mt-4">
         <Row>
           <Col xl="4">

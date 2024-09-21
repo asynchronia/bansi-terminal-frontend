@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody } from "reactstrap";
 
 import { connect, useDispatch } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 // import {AgGridReact} from 'ag-grid-react';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -239,7 +239,6 @@ const AgreementItemsListing = (props) => {
 
   return (
     <React.Fragment>
-      <ToastContainer position="top-center" theme="colored" />
       <div className="all-items">
         <Row>
           <Col className="col-12">

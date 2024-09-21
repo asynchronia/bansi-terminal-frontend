@@ -51,6 +51,7 @@ const Expenses = (props) => {
     { 
         headerName: "Paid Through", 
         field: "paid_through_account_name", 
+        tooltipField: "paid_through_account_name", 
         sortable: false ,suppressMenu: true,
         tooltipValueGetter: (p) => p.value,headerTooltip: "Paid through",
         floatingFilterComponentParams: {suppressFilterButton:true} },

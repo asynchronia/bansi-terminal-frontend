@@ -24,7 +24,7 @@ import {
   getCategoriesReq,
   getTaxesReq,
 } from "../../service/itemService";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import Standard from "../../components/CustomComponents/Standard";
 import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 import { Box } from "@mui/material";
@@ -155,6 +155,7 @@ const CreateItems = (props) => {
       status: "published",
       images: [],
       variants: [],
+      zohoItemId: ""
     },
     validationSchema: Yup.object({
       title: Yup.string().required("Please Enter Item Name"),
@@ -163,6 +164,7 @@ const CreateItems = (props) => {
         .required("Please Select Category")
         .min(3, "Please Select Category"),
       itemType: Yup.string().required("Please Select Item Type"),
+      zohoItemId: Yup.number().typeError("Zoho Item Id must be a number").required("Please Enter Zoho Item Id").max(99999999999999999999999999999999, "Zoho Item Id cannot exceed 32 digit")
     }),
     onSubmit: (values) => {
       setIsButtonLoading(true);
@@ -223,6 +225,11 @@ const CreateItems = (props) => {
         values.images = [...selectedFiles];
         values.taxes = [...taxArr];
         values.category = categoryData.id;
+
+        // Remove description from the values if it's an empty string
+        if (values.description === "") {
+          delete values.description;
+        }
 
         handleItemCreation(values);
       }
@@ -305,12 +312,11 @@ const CreateItems = (props) => {
 
   return (
     <div style={{ position: "relative" }}>
-      <ToastContainer position="top-center" theme="colored" />
       <Form className="form-horizontal mt-4">
         <Row>
           <Col xl="4">
             <Card>
-              <CardBody style={{ height: "41rem" }}>
+              <CardBody style={{ height: "fit-content" }}>
                 <h4 className="card-title">Item Primary</h4>
 
                 <div>
@@ -391,9 +397,32 @@ const CreateItems = (props) => {
                       onChange={validation.handleChange}
                       value={validation.values.description}
                       onBlur={validation.handleBlur}
-                      rows="14"
+                      rows="12"
                       placeholder="Add a short description for the item"
                     />
+                    {validation.errors.description && validation.touched.description ? (
+                      <p style={{ color: "red" }}>{validation.errors.description}</p>
+                    ) : null}
+                    <span className="badgecount badge badge-success"></span>
+                  </div>
+                  <div className="mt-3">
+                    <Label>Zoho Item Id</Label>
+                    <input
+                      name="zohoItemId"
+                      id="zohoItemId"
+                      className="form-control"
+                      type="text"
+                      placeholder="Enter Zoho Item Id"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      value={validation.values.zohoItemId || ""}
+                      invalid={
+                        validation.touched.zohoItemId && validation.errors.zohoItemId
+                      }
+                    />
+                    {validation.errors.zohoItemId && validation.touched.zohoItemId ? (
+                      <p style={{ color: "red" }}>{validation.errors.zohoItemId}</p>
+                    ) : null}
                     <span className="badgecount badge badge-success"></span>
                   </div>
                 </div>

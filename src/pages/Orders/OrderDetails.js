@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardBody, Col, Row } from "reactstrap";
 import { setBreadcrumbItems } from "../../store/actions";
@@ -249,7 +248,6 @@ const OrderDetails = (props) => {
   return (
     <>
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
         <div
           style={{
             position: "absolute",
