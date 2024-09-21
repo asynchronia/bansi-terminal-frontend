@@ -30,6 +30,7 @@ const Dashboard = (props) => {
   const breadcrumbItems = [{ title: "Dashboard", link: "#" }];
 
   const [inputValue, setInputValue] = useState('');
+  const [clientId, setClientId] = useState('')
   const [rowData, setRowData] = useState([]);
   const [chipData, setChipData] = useState([
     {
@@ -49,6 +50,11 @@ const Dashboard = (props) => {
       total: 0,
     },
   ]);
+  const [agreementData, setAgreementData] = useState({
+    AgreementNumber: "",
+    validUntil: "",
+    paymentTerms: ""
+  })
 
   const redirectToViewPage = (id) => {
     let path = `/purchase-orders/${id}`;
@@ -96,13 +102,34 @@ const Dashboard = (props) => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const getMonthName = (monthIndex) => {
+    const months = [
+      'January', 'February', 'March', 'April',
+      'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December'
+    ];
+    return months[monthIndex];
+  }
+
+  const getOrdinal = (day) => {
+    if (day > 3 && day < 21) return `${day}th`;
+    switch (day % 10) {
+      case 1: return `${day}st`;
+      case 2: return `${day}nd`;
+      case 3: return `${day}rd`;
+      default: return `${day}th`;
+    }
+  }
+
+  const formatDate = (format, dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
     const month = date.getMonth();
     const year = date.getFullYear();
+    const monthName = getMonthName(date.getMonth());
+    const ordinalDay = getOrdinal(day);
 
-    return `${day}-${month}-${year}`;
+    return format === "DDMMYY" ? `${day}-${month}-${year}` : `${ordinalDay} ${monthName} ${year}`;
   };
 
   const columnDefs = [
@@ -197,15 +224,21 @@ const Dashboard = (props) => {
     }
   };
 
-  // const getAgreementData = async () => {
-  //   try {
-  //     const res = await getAgreement();
+  const getAgreementData = async (id) => {
+    try {
+      const data = {clientId: id}
+      const res = await getAgreement(data);
+      
+      setAgreementData({
+        AgreementNumber: res.payload._id        ,
+        validUntil: res.payload.validity,
+        paymentTerms: res.payload.paymentTerms
+      })
 
-  //     console.log(res);
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //   }
-  // };
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   const getPurchaseOrderListData = async () => {
     try {
@@ -216,10 +249,12 @@ const Dashboard = (props) => {
         return;
       }
 
+      setClientId(response.purchaseOrders[0]._id)
+
       const newData = response.purchaseOrders.map((order) => ({
         order_id: order._id,
         order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : '-',
-        createdAt: formatDate(order.createdAt),
+        createdAt: formatDate("DDMMYY", order.createdAt),
         total: order.items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
         order_status: order.status,
       }));
@@ -237,8 +272,12 @@ const Dashboard = (props) => {
   useEffect(() => {
     getPurchaseOrderListData();
     getPurchaseOrderStatusList();
-    // getAgreementData();
   }, []);
+
+  useEffect(() => {
+    getAgreementData(clientId);
+  }, [clientId]);
+
 
   return (
     <React.Fragment>
@@ -252,17 +291,24 @@ const Dashboard = (props) => {
             <CardBody className="agreement-body">
               <div>
                 <h6 className="font-size-12 mb-0">Agreement No.</h6>
-                <h2 className="mb-0 font-size-20 text-black">ESL-QMUM-98712</h2>
+                <h2 className="mb-0 font-size-20 text-black">{agreementData.AgreementNumber ? agreementData.AgreementNumber : "XXXXXXXXXXXXXXXX"}</h2>
               </div>
               <div>
                 <h6 className="font-size-12 mb-0">Term</h6>
-                <h2 className="mb-0 font-size-20 text-black">6 Months</h2>
+                <h2 className="mb-0 font-size-20 text-black">
+                  {agreementData.paymentTerms > 0 
+                  ? agreementData.paymentTerms <= 30
+                  ? `${agreementData.paymentTerms} ${agreementData.paymentTerms === 1 ? 'day' : 'days'}`
+                  : agreementData.paymentTerms <= 60
+                  ? `1 month`
+                  : `${Math.floor(agreementData.paymentTerms / 30)} months` : "0 days"}
+                </h2>
               </div>
               <div>
                 <h6 className="font-size-12 mb-0">Valid Until</h6>
-                <h2 className="mb-0 font-size-20 text-black">13th March, 2024</h2>
+                <h2 className="mb-0 font-size-20 text-black">{agreementData.validUntil ? formatDate("DayMMYY",agreementData.validUntil): "Day/MM/YYYY"}</h2>
               </div>
-              <StyledButton color={'primary'} type="submit" className={'w-md agreement-btn'}>
+              <StyledButton color={'primary'} type="submit" className={'w-md agreement-btn'} disabled={!agreementData.AgreementNumber || !agreementData.validUntil || !agreementData.paymentTerms}>
                 <i className={'btn-icon mdi mdi-download'}></i>
                 Download Agreement
               </StyledButton>
