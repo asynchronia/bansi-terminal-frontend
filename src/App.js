@@ -8,6 +8,7 @@ import Authmiddleware from "./routes/middleware/Authmiddleware"
 import "./assets/scss/theme.scss"
 
 import VerticalLayout from "./components/VerticalLayout/"
+import { ToastContainer } from 'react-toastify'
 
 const App = props => {
   function getLayout() {
@@ -41,6 +42,7 @@ const App = props => {
           />
         ))}
       </Routes>
+      <ToastContainer position="top-center" theme="colored" />
     </React.Fragment>
   );
 }

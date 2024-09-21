@@ -4,7 +4,7 @@ import { AgGridReact } from 'ag-grid-react';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { Card, CardBody, Col, Input, Row } from "reactstrap";
 import { getOrdersReq } from "../../service/orderService";
 import { changePreloader } from "../../store/actions";
@@ -177,6 +177,7 @@ const AllOrders = (props) => {
     },
     {
       headerName: "Client", field: "customer_name", flex: 1,
+      tooltipField: "customer_name",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
@@ -243,7 +244,6 @@ const AllOrders = (props) => {
 
   return (
     <>
-      <ToastContainer position="top-center" theme="colored" />
       <div className="all-items">
         <Row>
           <Col className="col-12">

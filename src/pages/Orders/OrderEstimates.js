@@ -55,12 +55,14 @@ const OrderEstimates = (props) => {
     { 
         headerName: "Estimate No.",
         field: "estimate_number",
+        tooltipField: "estimate_number",
         sortable: false ,
         suppressMenu: true,
         floatingFilterComponentParams: {suppressFilterButton:true}},
     { 
         headerName: "Client", 
         field: "customer_name", 
+        tooltipField: "customer_name", 
         sortable: false ,suppressMenu: true,
         tooltipValueGetter: (p) => p.value,headerTooltip: "Client",
         floatingFilterComponentParams: {suppressFilterButton:true} },

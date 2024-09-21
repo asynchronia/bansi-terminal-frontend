@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Row, Col, Card, CardBody, Table } from "reactstrap";
 import { useParams } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
 import { connect, useDispatch } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
-import { ToastContainer } from "react-toastify";
 import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
@@ -19,7 +17,7 @@ import {
 import { changePreloader } from "../../store/actions";
 import Hero from "../../components/Common/Hero";
 
-const options: Options = {
+const options = {
   filename: "payment.pdf",
   method: "save",
   // default is Resolution.MEDIUM = 3, which should be enough, higher values
@@ -159,7 +157,6 @@ const PaymentDetails = (props) => {
   return (
     <>
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
         <div
           style={{
             position: "absolute",
