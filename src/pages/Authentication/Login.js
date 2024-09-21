@@ -153,11 +153,11 @@ const Login = props => {
                   {/* <button className="btn btn-primary w-md waves-effect waves-light" type="submit">Log In</button> */}
                 </div>
               </Row>
-              {/* <Row className="form-group mb-0">
+              <Row className="form-group mb-0">
                 <div className="col-12 mt-4">
                   <Link to="/forgot-password" className="text-muted"><i className="mdi mdi-lock"></i> Forgot your password?</Link>
                 </div>
-              </Row> */}
+              </Row>
             </Form>
           </div>
         </CardBody>
