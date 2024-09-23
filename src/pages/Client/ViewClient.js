@@ -632,6 +632,14 @@ const ViewClient = (props) => {
               <p className="my-1"><Email color="primary" /> {clientData?.email}</p>
               <p className="my-1"><Call color="primary" /> {clientData?.contact}</p>
               <p className="my-1"><Work /> {clientData?.clientType}</p>
+              <div className="d-flex align-items-center gap-1">
+                <h6 className="m-0">Zoho Customer Id:</h6>
+                <p className="my-0">{clientData?.zohoCustomerId}</p>
+              </div>
+              <div className="d-flex align-items-center gap-1">
+                <h6 className="m-0">PO Prefix:</h6>
+                <p className="my-0">{clientData?.poPrefix}</p>
+              </div>
             </CardBody>
           </Card>
           <Card>

@@ -187,6 +187,11 @@ const ViewItems = (props, { route, navigate }) => {
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
                 {itemsData?.description}
               </div>
+              <hr></hr>
+              <h6 className="secondary">Zoho Item Id</h6>
+              <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
+                {itemsData?.zohoItemId}
+              </div>
             </CardBody>
           </Card>
           <Row>

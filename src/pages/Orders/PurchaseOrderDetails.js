@@ -185,10 +185,10 @@ const PurchaseOrderDetails = (props) => {
             right: 10,
           }}
         >
-          <Modal size="sm" isOpen={publishModal} centered={true}>
+          <Modal toggle={() => setPublishModal(!publishModal)} size="sm" isOpen={publishModal} centered={true}>
             <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} id={id} />
           </Modal>
-          <Modal size="sm" isOpen={approveModal}>
+          <Modal toggle={() => setApproveModal(!approveModal)} size="sm" isOpen={approveModal}>
             <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
           </Modal>
           {
