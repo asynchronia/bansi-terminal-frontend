@@ -50,6 +50,7 @@ const API_URL = {
   purchaseOrderStatusChange: "/api/purchaseorders/status",
   convertToSalesOrder: "/api/orders/convert-to-sales-order",
   getUserProfile: "/api/users/profile",
+  getPurchaseOrderStatusList: "/api/purchaseorders/list/status",
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -724,6 +725,19 @@ export async function getUserProfile() {
   return new Promise((resolve) => {
     axios
       .get(`${baseUrl}${API_URL.getUserProfile}`, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function getPurchaseOrderStatusList() {
+  return new Promise((resolve) => {
+    axios
+      .get(`${baseUrl}${API_URL.getPurchaseOrderStatusList}`, {
         headers: getHeaders(),
       })
       .then((res) => {
