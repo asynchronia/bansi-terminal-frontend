@@ -56,6 +56,7 @@ import PurchaseOrderDetails from "../pages/Orders/PurchaseOrderDetails";
 import UserProfile from "../pages/Users/Profile";
 import ForgotPassword from "../pages/Authentication/ForgotPassword";
 import ResetPassword from "../pages/Authentication/ResetPassword";
+import EditClient from "../pages/Client/EditClient";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -151,6 +152,7 @@ const userRoutes = [
   { path: "/view-estimate/:id", component: <ViewEstimate /> },
   { path: "/agreement-items", component: <AgreementItemsListing /> },
   { path: "/view-agreement-item/:id", component: <AgreementItemView /> },
+  { path: "/client/edit/:id", component: <EditClient /> },
   // // this route should be at the end of all other routes
   {
     path: "/",
