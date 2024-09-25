@@ -93,6 +93,7 @@ const CreateClient = (props) => {
         address: null,
         associatedWarehouse: "65f4b5d66959ec3852a37e60",
         contact: null,
+        code: null,
       },
       primaryUser: {
         firstName: null,
@@ -121,6 +122,7 @@ const CreateClient = (props) => {
         name: Yup.string().required("Please Enter Branch Name"),
         address: Yup.string().required("Please Enter Branch Address"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
+        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character")
       }),
       primaryUser: Yup.object().shape({
         firstName: Yup.string().required("Please Enter First Name"),
