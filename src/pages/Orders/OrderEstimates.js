@@ -13,6 +13,7 @@ import "./styles/datatables.scss";
 
 import { changePreloader } from "../../store/actions";
 import { getEstimatesReq } from "../../service/orderService";
+import DropdownMenuBtn from "./DropdownMenuBtn";
 
 const OrderEstimates = (props) => {
     document.title = "Estimates";
@@ -28,6 +29,10 @@ const OrderEstimates = (props) => {
         }, 400);
       };
 
+      
+  const handleViewClick = (id) => {
+    redirectToViewPage(id.estimate_id);
+  }
   const breadcrumbItems = [
 
     { title: "Dashboard", link: "/dashboard" },
@@ -77,8 +82,17 @@ const OrderEstimates = (props) => {
         floatingFilterComponentParams: {suppressFilterButton:true},
         tooltipValueGetter: (p) => p.value,headerTooltip: "Total Amount",
         valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
-      },
-    
+    },
+    {
+      headerName: "Action", field: "action", sortable: false, width: 100,
+      cellClass: "actions-button-cell",
+      cellRenderer: DropdownMenuBtn,
+      cellRendererParams: {
+        handleViewClick: handleViewClick,
+        label: 'View Estimate'
+      }, suppressMenu: true, floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
+    }
   ];
   
   //TODO to check for autoSizeStrategy
@@ -125,11 +139,11 @@ const OrderEstimates = (props) => {
     }
   }, []);
 
- const onRowClicked = (event) =>{
-    console.log(event.data);
-    //estimate_id
-    redirectToViewPage(event.data?.estimate_id);
- }
+//  const onRowClicked = (event) =>{
+//     console.log(event.data);
+//     //estimate_id
+//     redirectToViewPage(event.data?.estimate_id);
+//  }
 
   return (
     <React.Fragment>
@@ -158,7 +172,7 @@ const OrderEstimates = (props) => {
                     onPaginationChanged={onPaginationChanged}
                     sortingOrder={["desc", "asc"]}
                     autoSizeStrategy={autoSizeStrategy}
-                    onRowClicked={onRowClicked}
+                    // onRowClicked={onRowClicked}
                   >
                   </AgGridReact>
                 </div>

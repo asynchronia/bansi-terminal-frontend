@@ -175,24 +175,30 @@ const Dashboard = (props) => {
       sortable: true,
       width: 200,
     },
-    {
-      headerName: 'Action',
-      field: 'action',
-      sortable: false,
-      width: 100,
-      cellClass: 'actions-button-cell',
-      cellRenderer: DropdownMenuBtn,
-      cellRendererParams: {
-        handleResponse: handleDeleteResponse,
-        handleEditClick: handleEditClick,
-        handleViewClick: handleViewClick,
-      },
-      suppressMenu: true,
-      floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value,
-      headerTooltip: 'Actions',
-    },
+    // {
+    //   headerName: 'Action',
+    //   field: 'action',
+    //   sortable: false,
+    //   width: 100,
+    //   cellClass: 'actions-button-cell',
+    //   cellRenderer: DropdownMenuBtn,
+    //   cellRendererParams: {
+    //     handleResponse: handleDeleteResponse,
+    //     handleEditClick: handleEditClick,
+    //     handleViewClick: handleViewClick,
+    //   },
+    //   suppressMenu: true,
+    //   floatingFilterComponentParams: { suppressFilterButton: true },
+    //   tooltipValueGetter: (p) => p.value,
+    //   headerTooltip: 'Actions',
+    // },
   ];
+
+   const onRowClicked = (event) =>{
+    console.log(event.data);
+    // order_id
+    redirectToViewPage(event.data?.order_id);
+ }
 
   const getPurchaseOrderStatusList = async () => {
     try {
@@ -200,23 +206,28 @@ const Dashboard = (props) => {
 
       const { accepted, published, rejected, draft, sent } = res.purchaseOrderStatusList;
 
-      // Map the data to the chipData
+      const acceptedValue = Number(accepted) || 0;
+      const publishedValue = Number(published) || 0;
+      const draftValue = Number(draft) || 0;
+      const sentValue = Number(sent) || 0;
+      const totalOrders = acceptedValue + publishedValue + draftValue + sentValue
+
       setChipData([
         {
           title: 'Total Orders',
-          total: accepted + published + draft + sent, // Sum of accepted, published, draft, and sent
+          total: totalOrders, 
         },
         {
           title: 'Orders pending for approval',
-          total: published, // Published orders
+          total: publishedValue, 
         },
         {
           title: 'Approved Orders',
-          total: sent, // Sent orders
+          total: sentValue, 
         },
         {
           title: 'Ongoing Orders',
-          total: accepted, // Accepted orders
+          total: acceptedValue,
         },
       ]);
     } catch (error) {
@@ -318,7 +329,7 @@ const Dashboard = (props) => {
       </Row>
       <Row>
         <div className="ag-theme-quartz list-grid">
-          <AgGridReact suppressRowClickSelection={true} columnDefs={columnDefs} rowData={rowData} quickFilterText={inputValue}></AgGridReact>
+          <AgGridReact suppressRowClickSelection={true} columnDefs={columnDefs} rowData={rowData} quickFilterText={inputValue} onRowClicked={onRowClicked}></AgGridReact>
         </div>
         {/* <Col xl="3">
           <MonthlyEarnings />

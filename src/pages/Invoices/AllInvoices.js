@@ -391,7 +391,7 @@ const onGridReady = useCallback((params) => {
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
                     </div>
-                    <select
+                    {/* <select
                       onChange={handleChange}
                       id="customer"
                       name="customer"
@@ -404,7 +404,7 @@ const onGridReady = useCallback((params) => {
                       {allCustomers.map((e) => (
                         <option value={e}>{e}</option>
                       ))}
-                    </select>
+                    </select> */}
                   </div>
                 </div>
                 <div

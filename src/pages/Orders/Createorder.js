@@ -320,6 +320,8 @@ const CreateOrder = (props) => {
       deliveryDate: formatDate(purchaseOrder.deliveryDate),
     });
 
+    setPoPrefix(purchaseOrder.purchaseOrderNumber)
+
     let items = purchaseOrder.items;
     items.forEach((item) => {
       item.category = rowData.find(
@@ -354,6 +356,8 @@ const CreateOrder = (props) => {
     if (!effectCalled.current) {
       getBranchData();
       getListOfRowData();
+      // update PoPrefix value from users PoPrefix value here
+      // setPoPrefix("TEST")
       effectCalled.current = true;
     }
   }, [props, breadcrumbItems, getBranchData]);

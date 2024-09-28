@@ -98,9 +98,12 @@ const AgreementTable = (props) => {
               {editable ? (
                 <td>
                   <input
-                    type="text"
+                    type="number"
                     value={data?.sellingPrice || ""}
                     className="form-control"
+                    style={{
+                      borderColor: data.sellingPrice <= 0 || !data.sellingPrice ? 'red' : 'black'
+                    }}
                     onChange={(event) => {
                       handleSellingPrice(event, data.id, data.itemId);
                     }}

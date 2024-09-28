@@ -254,7 +254,7 @@ const AllItems = (props) => {
 
     response.map((val, id) => {
       val.category = val.category.name;
-      val.salePrice = val.variant.sellingPrice;
+      val.salePrice = val.variant?.sellingPrice || "-";
     });
     setRowData(response);
     dispatch(changePreloader(false));
@@ -399,7 +399,7 @@ const onGridReady = useCallback((params) => {
                       <Add style={{ marginRight: "5px" }} />
                       Create Item
                     </Button>
-                    <Button
+                    {/* <Button
                       style={{
                         color: "black",
                         backgroundColor: "#bfd8f7",
@@ -408,7 +408,7 @@ const onGridReady = useCallback((params) => {
                     >
                       <Import style={{ marginRight: "5px" }} />
                       Import Items
-                    </Button>
+                    </Button> */}
                   </RequirePermission>
                   <div className="button-right-section">
                     <div className="categoryDiv" ref={dropdownRef}>

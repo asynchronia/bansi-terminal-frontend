@@ -28,7 +28,7 @@ import "./styles/ViewInvoice.scss";
 import { changePreloader } from "../../store/actions";
 import Hero from "../../components/Common/Hero";
 
-const options: Options = {
+const options = {
   filename: "invoice.pdf",
   method: "save",
   // default is Resolution.MEDIUM = 3, which should be enough, higher values

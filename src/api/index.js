@@ -99,7 +99,7 @@ export async function updateItemStatus(body) {
 }
 
 export async function updateClientStatus(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.updateUserStatus}`, body, {
         headers: getHeaders(),
@@ -107,7 +107,8 @@ export async function updateClientStatus(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
-      });
+      })
+      .catch((error) => reject(error));
   });
 }
 
@@ -126,7 +127,7 @@ export async function createClient(body) {
 }
 
 export async function createAgreement(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.createAgreement}`, body, {
         headers: getHeaders(),
@@ -134,7 +135,7 @@ export async function createAgreement(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
-      });
+      }).catch((error) => reject(error));
   });
 }
 

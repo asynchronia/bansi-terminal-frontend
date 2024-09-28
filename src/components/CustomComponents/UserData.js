@@ -16,10 +16,11 @@ import ActionComponent from "./ActionComponent";
 import { Chip } from "@mui/material";
 import * as Yup from "yup";
 import AddUser from "./AddUser";
+import StyledButton from "../Common/StyledButton";
 // import { getBranchListReq, getUserRoleReq } from "../../service/branchService";
 
 const UserData = (props) => {
-  const { userData, loading, handleSubmit, clientId, openModal, setOpenModal, handleToggle } =
+  const { userData, loading, handleSubmit, clientId, openModal, setOpenModal, handleToggle, isButtonLoading } =
     props;
 
   const gridRef = useRef();
@@ -117,16 +118,17 @@ const UserData = (props) => {
                   >
                     Close
                   </Button>
-                  <Button
+                  <StyledButton
                     type="submit"
                     className="btn btn-primary waves-effect waves-light "
                     onClick={() => {
                       //   handleSubmitAgreement();
                       // setOpenModal({ ...openModal, user: false });
                     }}
+                    isLoading={isButtonLoading}
                   >
                     Save
-                  </Button>
+                  </StyledButton>
                 </div>
               </div>
             </div>
