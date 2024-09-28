@@ -343,6 +343,7 @@ const ViewClient = (props) => {
         isPrimary: item.isPrimary,
         AssociatedWarehouse: item.associatedWarehouse?.code,
         Contact: item.contact,
+        Code: item.code
       }));
       setBranchData(newArray);
       setLoadingBranch(false);
