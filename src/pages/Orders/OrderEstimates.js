@@ -126,9 +126,14 @@ const OrderEstimates = (props) => {
   
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-    const response = await getEstimatesReq(body);
-    setRowData(response.data);
-    dispatch(changePreloader(false));
+    try { 
+      const response = await getEstimatesReq(body);
+      setRowData(response.data);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
+    }
   });
 
   useEffect(() => {
