@@ -180,13 +180,17 @@ const UserData = (props) => {
                               flexWrap: "wrap",
                             }}
                           >
-                            {user.associatedBranches.map((branch, index) => (
+                            {user.associatedBranches.length > 0 ? user.associatedBranches.map((branch, index) => (
                               <Chip
                                 size="small"
                                 key={index}
-                                label={`${branch.address}`}
+                                label={`${branch.code ? branch.code : branch.name}`}
                               />
-                            ))}
+                            )) : (
+                              <p className="py-1 text-sm text-nowrap m-0 capitalize">
+                                No branch data
+                              </p>
+                            )}
                           </div>
                         }
                       </td>

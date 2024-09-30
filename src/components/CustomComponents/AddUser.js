@@ -38,9 +38,11 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
       let array = response?.payload?.branches;
       const newArray = array.map((obj) => ({
         _id: obj._id,
-        address: obj.address,
+        name: obj.name,
+        code: obj.code,
       }));
 
+      console.log(newArray)
       setBranchList(newArray);
     } catch (error) {
       console.log(error);
@@ -245,14 +247,14 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
                 renderValue={(selected) => (
                   <div>
                     {selected.map((value) => (
-                      <Chip className="mx-2" size="small" key={value._id} label={value.address} />
+                      <Chip className="mx-2" size="small" key={value._id} label={value.code ? value.code : value.name} />
                     ))}
                   </div>
                 )}
               >
                 {branchList.length>0? branchList.map((option) => (
                   <MenuItem key={option._id} value={option}>
-                    {option.address}
+                    {option.code ? option.code : option.name}
                   </MenuItem>
                 )):null}
               </Select>
