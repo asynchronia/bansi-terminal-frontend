@@ -320,8 +320,6 @@ const CreateOrder = (props) => {
       deliveryDate: formatDate(purchaseOrder.deliveryDate),
     });
 
-    setPoPrefix(purchaseOrder.purchaseOrderNumber)
-
     let items = purchaseOrder.items;
     items.forEach((item) => {
       item.category = rowData.find(
