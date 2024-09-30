@@ -110,7 +110,7 @@ const ViewEstimate = (props) => {
     });
     setResponseObj(responseObj);
     breadcrumbItems.push({ title: responseObj.estimate_number, link: "#" });
-    props.setBreadcrumbItems("estimate " + responseObj.estimate_number, breadcrumbItems);
+    props.setBreadcrumbItems("Estimate " + responseObj.estimate_number, breadcrumbItems);
     setRowData(rowData);
 
 
@@ -238,9 +238,9 @@ const ViewEstimate = (props) => {
             downloadFileName={"view-estimate-" + responseObj.estimate_id}
             rootElementId="view-estimate"
           />}
-          <button type="submit" className="btn btn-primary w-xl mx-3">
+          {/* <button type="submit" className="btn btn-primary w-xl mx-3">
             Send on Mail
-          </button>
+          </button> */}
         </div>
         <Row>
           <Col>

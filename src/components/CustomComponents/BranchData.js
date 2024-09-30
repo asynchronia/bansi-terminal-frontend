@@ -53,14 +53,10 @@ const BranchData = (props) => {
       }),
     }),
     onSubmit: (values) => {
-      // const code = warehouseList.find(e => e._id === values.primaryBranch.associatedWarehouse)?.code
       const newBranch = {
         ...values.primaryBranch,
         clientId,
       };
-      // if (!edit) {
-      //   newBranch.code = code
-      // }
       handleSubmit(newBranch, edit);
     },
   });

@@ -32,7 +32,7 @@ const PurchaseOrderDetails = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Purchase Order", link: "#" },
+    { title: "Purchase Order", link: "/purchase-orders" },
     { title: "Purchase Order", link: "#" },
   ];
 

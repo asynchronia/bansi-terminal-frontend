@@ -354,6 +354,8 @@ const CreateOrder = (props) => {
     if (!effectCalled.current) {
       getBranchData();
       getListOfRowData();
+      // update PoPrefix value from users PoPrefix value here
+      // setPoPrefix("TEST")
       effectCalled.current = true;
     }
   }, [props, breadcrumbItems, getBranchData]);

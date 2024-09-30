@@ -35,6 +35,7 @@ import {
 import StyledButton from "../../components/Common/StyledButton";
 import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
 import { updateItemStatusReq } from "../../service/statusService";
+import MultipleLayerSelect from "../../components/CustomComponents/MultipleLayerSelect";
 
 const EditItems = (props) => {
   const [itemsData, setItemsData] = useState({});
@@ -80,6 +81,7 @@ const EditItems = (props) => {
       setVariantData(res?.payload?.variants);
       setTaxArr(res?.payload?.item?.taxes[0]._id);
       setItemType(res?.payload?.item?.itemType);
+      setTypeValue(res?.payload?.item?.itemType);
       setOtherData({
         sku: res?.payload.variants[0]?.sku,
         inventory: res?.payload.variants[0]?.inventory,
@@ -137,6 +139,10 @@ const EditItems = (props) => {
         theme: "colored",
       });
     } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      })
       let path = `/view-item/${id}`;
       navigate(path);
     }
@@ -313,9 +319,8 @@ const EditItems = (props) => {
       } else {
         if (itemType === "variable") {
           const newData = variantData.map(
-            ({ _id, sku, attributes, costPrice, sellingPrice, inventory }) => ({
+            ({ _id, attributes, costPrice, sellingPrice, inventory }) => ({
               _id,
-              sku,
               attributes,
               costPrice,
               sellingPrice,
@@ -325,9 +330,10 @@ const EditItems = (props) => {
 
           values.variants = [...newData];
         } else if (itemType === "standard") {
-          values.variants = [{ ...otherData }];
+          const { sku, ...rest } = otherData;
+          values.variants = [{ ...rest }];
         } else {
-          const { inventory, ...rest } = otherData;
+          const { inventory, sku, ...rest } = otherData;
           values.variants = [{ ...rest }];
         }
 
@@ -335,7 +341,7 @@ const EditItems = (props) => {
         values.taxes = [taxArr];
         values.category = categoryData.id;
         values.deletedVariants = [...deletedVariant];
-
+        
         handleItemEdit(values);
       }
     },
@@ -445,6 +451,7 @@ const EditItems = (props) => {
 
   const handleTypeChange = (e) => {
     setTypeValue(e.target.value);
+    setItemType(e.target.value)
   };
   const handleModalToggle = (key) => {
     setOpenModal((prevState) => ({
@@ -480,13 +487,13 @@ const EditItems = (props) => {
   const handleStatusChange = (e) => {
     const { name, value } = e.target;
     validation.setFieldValue(name, value); 
-    setOpenModal({...openModal, status:true})
+    // setOpenModal({...openModal, status:true})
   };
 
 
   return (
     <div style={{ position: "relative" }}>
-      <Modal
+      {/* <Modal
         isOpen={openModal.status}
         toggle={() => {
           handleModalToggle("status");
@@ -498,7 +505,7 @@ const EditItems = (props) => {
           setOpenModal={setOpenModal}
           handleSubmitStatus={handleItemStatus}
         />
-      </Modal>
+      </Modal> */}
       <Form className="form-horizontal mt-4">
         <Row>
           <Col xl="4">
@@ -562,6 +569,15 @@ const EditItems = (props) => {
                     >
                       {categoryData.name}
                     </label>
+                    {categoryData.show ? (
+                      <div style={{position:'absolute', width:'90%', zIndex:2, background: "#f5f5f5",}}>
+                        <MultipleLayerSelect
+                          levelTwo={true}
+                          categories={allCategories}
+                          setCategoryData={setCategoryData}
+                        />
+                      </div>
+                    ) : null}
                   </div>
                   <div className="mt-3">
                     <Label>Item Short Description</Label>
@@ -608,8 +624,7 @@ const EditItems = (props) => {
                 onClick={onEditItemClick}
                 isLoading={isButtonLoading}
               >
-                <Edit style={{ marginRight: "5px", fill: "white" }} />
-                Edit
+                Update
               </StyledButton>
             </div>
             <Card>
@@ -748,7 +763,7 @@ const EditItems = (props) => {
                 <h4 className="card-title">Type</h4>
                 <div className="mb-1">
                   <select
-                  disabled={true}
+                    disabled={true}
                     name="itemType"
                     id="itemType"
                     value={typeValue}

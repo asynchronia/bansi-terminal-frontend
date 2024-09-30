@@ -306,7 +306,7 @@ const AllPayments = (props) => {
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
                     </div>
-                    <select
+                    {/* <select
                       onChange={handleChange}
                       id="customer"
                       name="customer"
@@ -319,7 +319,7 @@ const AllPayments = (props) => {
                       {allCustomers.map((e) => (
                         <option value={e}>{e}</option>
                       ))}
-                    </select>
+                    </select> */}
                   </div>
                 </div>
                 <div
