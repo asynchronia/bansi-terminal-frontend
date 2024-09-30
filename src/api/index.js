@@ -622,7 +622,7 @@ export async function searchItem(body) {
 }
 
 export async function getOrderList(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.getOrderList}`, body, {
         headers: getHeaders(),
@@ -630,6 +630,8 @@ export async function getOrderList(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+          reject(error)
       });
   });
 }

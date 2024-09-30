@@ -71,32 +71,38 @@ const AllOrders = (props) => {
       return;
     }
     dispatch(changePreloader(true));
-    // const body = {
-    //   page: page,
-    //   limit: paginationPageSize,
-    // }
 
-    // if(searchValue) {
-    //   body.search_text = searchValue;
-    // }
-    console.log('searchValue', searchValue);
-    console.log('body', body);
-    const response = await getOrdersReq(body);
+    try {
+      // const body = {
+      //   page: page,
+      //   limit: paginationPageSize,
+      // }
 
-    const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
-    let filledRows;
+      // if(searchValue) {
+      //   body.search_text = searchValue;
+      // }
+      console.log('searchValue', searchValue);
+      console.log('body', body);
+      const response = await getOrdersReq(body);
 
-    if (response.length < paginationPageSize) {
-      filledRows = [...response];
-    } else {
-      filledRows = [...response, ...emptyObjects];
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.length < paginationPageSize) {
+        filledRows = [...response];
+      } else {
+        filledRows = [...response, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+      setRowData(newData);
+
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
     }
-
-    const newData = [...rowData];
-    newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
-    setRowData(newData);
-
-    dispatch(changePreloader(false));
   }, [page, paginationPageSize, searchValue]);
 
   const redirectToEditPage = (id) => {
