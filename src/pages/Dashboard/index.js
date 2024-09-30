@@ -259,9 +259,6 @@ const Dashboard = (props) => {
         console.error('Unexpected response format:', response);
         return;
       }
-
-      setClientId(response.purchaseOrders[0]._id)
-
       const newData = response.purchaseOrders.map((order) => ({
         order_id: order._id,
         order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : '-',
@@ -278,6 +275,8 @@ const Dashboard = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems('Dashboard' , breadcrumbItems)
+    const user = JSON.parse(localStorage.getItem("user"))
+    setClientId(user.clientId)
   }, []);
 
   useEffect(() => {
