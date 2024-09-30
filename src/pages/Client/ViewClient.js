@@ -4,7 +4,7 @@ import "jspdf-autotable";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   Button,
   Card,
@@ -58,6 +58,7 @@ const ViewClient = (props) => {
     validity: "",
     paymentTerms: 0
   });
+  const [isButtonLoading, setIsButtonLoading] = useState(false)
 
   const searchAllTaxes = async (part) => {
     try {
@@ -207,20 +208,23 @@ const ViewClient = (props) => {
         status: clientData?.status,
       };
 
-      const response = await updateClientStatusReq(values);
+      const response = await updateClientStatusReq(values)
       searchClient(id);
       if (response.success) {
-        toast.success(response.message);
+        toast.success("Status updated successfully!");
       } else {
-        toast.error(response.message);
+        toast.error("Oops! Something went wrong.");
       }
+      setOpenModal(false)
     } catch (error) {
-      toast.error(error.message);
+      toast.error("Oops! Something went wrong.");
+      setOpenModal(false)
     }
   };
 
   const handleSubmitAgreement = async () => {
     try {
+      setIsButtonLoading(true)
       let values = {
         clientId: id,
         items: [...agreementData],
@@ -237,11 +241,14 @@ const ViewClient = (props) => {
       if (response.success === true) {
         toast.success(response.message);
         getAgreement(id);
+        setIsButtonLoading(false)
       } else {
         toast.error(response.message);
+        setIsButtonLoading(false)
       }
     } catch (error) {
       toast.error(error.message);
+      setIsButtonLoading(false)
     }
   };
 
@@ -275,13 +282,16 @@ const ViewClient = (props) => {
 
   const handleSubmitUser = async (data, editId) => {
     try {
+      setIsButtonLoading(true)
       let response;
       if (editId) {
         const { clientId, ...restData } = data;
         const body = { ...restData, id: editId };
         response = await updateUserReq(body);
+        setIsButtonLoading(false)
       } else {
         response = await signinReq(data);
+        setIsButtonLoading(false)
       }
       handleResponse(response);
       if (response.success) {
@@ -290,6 +300,7 @@ const ViewClient = (props) => {
       }
     } catch (error) {
       toast.error(error.message);
+      setIsButtonLoading(false)
     }
   };
 
@@ -332,6 +343,7 @@ const ViewClient = (props) => {
         isPrimary: item.isPrimary,
         AssociatedWarehouse: item.associatedWarehouse?.code,
         Contact: item.contact,
+        Code: item.code
       }));
       setBranchData(newArray);
       setLoadingBranch(false);
@@ -421,7 +433,6 @@ const ViewClient = (props) => {
 
   return (
     <div style={{ position: "relative" }}>
-      <ToastContainer position="top-center" theme="colored" />
       <Modal
         size="lg"
         isOpen={openModal.agreement}
@@ -440,6 +451,7 @@ const ViewClient = (props) => {
           setAdditionalData={setAdditionalData}
           openModal={openModal}
           setOpenModal={setOpenModal}
+          isButtonLoading={isButtonLoading}
         />
       </Modal>
       {/* <Modal >
@@ -615,6 +627,7 @@ const ViewClient = (props) => {
                   openModal={openModal}
                   setOpenModal={setOpenModal}
                   handleToggle={handleModalToggle}
+                  isButtonLoading={isButtonLoading}
                 />
               )}
             </CardBody>
@@ -633,6 +646,14 @@ const ViewClient = (props) => {
               <p className="my-1"><Email color="primary" /> {clientData?.email}</p>
               <p className="my-1"><Call color="primary" /> {clientData?.contact}</p>
               <p className="my-1"><Work /> {clientData?.clientType}</p>
+              <div className="d-flex align-items-center gap-1">
+                <h6 className="m-0">Zoho Customer Id:</h6>
+                <p className="my-0">{clientData?.zohoCustomerId}</p>
+              </div>
+              <div className="d-flex align-items-center gap-1">
+                <h6 className="m-0">PO Prefix:</h6>
+                <p className="my-0">{clientData?.poPrefix}</p>
+              </div>
             </CardBody>
           </Card>
           <Card>

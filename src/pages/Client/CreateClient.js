@@ -5,7 +5,7 @@ import { Card, CardBody, Col, Form, Row } from "reactstrap";
 import Dropzone from "react-dropzone";
 import AddBranch from "../../components/CustomComponents/AddBranch";
 import AddUser from "../../components/CustomComponents/AddUser";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { createClientReq } from "../../service/clientService";
@@ -93,6 +93,7 @@ const CreateClient = (props) => {
         address: null,
         associatedWarehouse: "65f4b5d66959ec3852a37e60",
         contact: null,
+        code: null,
       },
       primaryUser: {
         firstName: null,
@@ -121,6 +122,7 @@ const CreateClient = (props) => {
         name: Yup.string().required("Please Enter Branch Name"),
         address: Yup.string().required("Please Enter Branch Address"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
+        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character")
       }),
       primaryUser: Yup.object().shape({
         firstName: Yup.string().required("Please Enter First Name"),
@@ -173,7 +175,6 @@ const CreateClient = (props) => {
   return (
     <Form className="form-horizontal mt-4" autoComplete="off">
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
         <div
           style={{
             position: "absolute",

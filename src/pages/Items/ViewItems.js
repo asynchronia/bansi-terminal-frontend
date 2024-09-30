@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Row, Col, Card, CardBody } from "reactstrap";
+import { Row, Col, Card, CardBody, Modal } from "reactstrap";
 import "react-toastify/dist/ReactToastify.css";
 import { connect, useDispatch } from "react-redux";
 import { setBreadcrumbItems } from "../../store/actions";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import { getItemByIdReq } from "../../service/itemService";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
@@ -16,6 +15,9 @@ import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import RequirePermission from "../../routes/middleware/requirePermission";
 import { changePreloader } from "../../store/actions";
 import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
+import { updateItemStatusReq } from "../../service/statusService";
+import { toast } from "react-toastify";
+import StatusConfirm from "../../components/CustomComponents/StatusConfirm";
 
 const ViewItems = (props, { route, navigate }) => {
   let dispatch = useDispatch();
@@ -41,6 +43,11 @@ const ViewItems = (props, { route, navigate }) => {
     _id: id,
   };
 
+  const [status, setStatus] = useState("");
+  const [openModal, setOpenModal] = useState({
+    status: false,
+  });
+
   const redirectToEditPage = (id) => {
     let path = `/edit-item/${id}`;
     setTimeout(() => {
@@ -64,6 +71,7 @@ const ViewItems = (props, { route, navigate }) => {
     ) {
       const item = response.payload.item;
       setItemsData(item);
+      setStatus(item.status)
       const variants = Object.values(response.payload.variants);
       setVariantData(variants);
       if (item.taxes) {
@@ -122,6 +130,57 @@ const ViewItems = (props, { route, navigate }) => {
     },
   ];
 
+  const notify = (type, message) => {
+    if (type === "Error") {
+      toast.error(message, {
+        position: "top-center",
+        theme: "colored",
+      });
+    } else {
+      toast.success(message, {
+        position: "top-center",
+        theme: "colored",
+      });
+    }
+  };
+
+  const handleModalToggle = (key) => {
+    setOpenModal((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
+    setStatus(itemsData.status)
+  };
+
+  const handleItemStatus = async () => {
+    try {
+      let values ={
+        _id: id,
+        status: status
+    }
+
+      const response = await updateItemStatusReq(values);
+      console.log(response)
+      if (response.success === true) {
+        notify("Success", response.message);
+        itemsData.status  = status
+      } else {
+        notify("Error", response.message);
+        setStatus(itemsData.status)
+      }
+      setOpenModal({...openModal, status: false})
+    } catch (error) {
+      notify("Error", error.message);
+      setStatus(itemsData.status)
+      setOpenModal({...openModal, status: false})
+    }
+  };
+
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value)   
+    setOpenModal({...openModal, status:true})
+  };
+
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
@@ -151,7 +210,19 @@ const ViewItems = (props, { route, navigate }) => {
   return (
     <>
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
+        <Modal
+          isOpen={openModal.status}
+          toggle={() => {
+            handleModalToggle("status");
+          }}
+        >
+          <StatusConfirm
+            type={"Item"}
+            openModal={openModal}
+            setOpenModal={setOpenModal}
+            handleSubmitStatus={handleItemStatus}
+          />
+        </Modal>
         <RequirePermission
           module={MODULES_ENUM.ITEMS}
           permission={PERMISSIONS_ENUM.UPDATE}
@@ -164,8 +235,13 @@ const ViewItems = (props, { route, navigate }) => {
               display: "flex",
             }}
           >
-            <select value={itemsData?.status} className="form-select focus-width" name="status">
-              <option value="active">Published</option>
+            <select 
+              value={status} 
+              className="form-select focus-width" 
+              name="status"
+              onChange={handleStatusChange}
+            >
+              <option value="published">Published</option>
               <option value="draft">Draft</option>
             </select>
             <button
@@ -188,6 +264,11 @@ const ViewItems = (props, { route, navigate }) => {
               <h6 className="secondary">Description</h6>
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
                 {itemsData?.description}
+              </div>
+              <hr></hr>
+              <h6 className="secondary">Zoho Item Id</h6>
+              <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
+                {itemsData?.zohoItemId}
               </div>
             </CardBody>
           </Card>

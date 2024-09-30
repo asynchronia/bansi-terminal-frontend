@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Row, Col, Card, CardBody, Modal, Button, CardHeader } from "reactstrap";
-import { ToastContainer } from "react-toastify";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import StyledButton from "../../components/Common/StyledButton";
 import { ReactComponent as CorrectSign } from "../../assets/images/svg/correct-sign.svg";
@@ -33,7 +32,7 @@ const PurchaseOrderDetails = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Purchase Order", link: "#" },
+    { title: "Purchase Order", link: "/purchase-orders" },
     { title: "Purchase Order", link: "#" },
   ];
 
@@ -101,7 +100,6 @@ const PurchaseOrderDetails = (props) => {
     if (newStatus === 'published') {
       setPublishModal(true);
     }
-    setStatus(newStatus);
   };
 
   const getPurchaseOrderDetails = async () => {
@@ -179,7 +177,6 @@ const PurchaseOrderDetails = (props) => {
   return (
     <>
       <div style={{ position: "relative" }}>
-        <ToastContainer position="top-center" theme="colored" />
         <div
           className="d-flex align-items-center gap-2"
           style={{
@@ -188,10 +185,10 @@ const PurchaseOrderDetails = (props) => {
             right: 10,
           }}
         >
-          <Modal size="sm" isOpen={publishModal} centered={true}>
-            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} />
+          <Modal toggle={() => setPublishModal(!publishModal)} size="sm" isOpen={publishModal} centered={true}>
+            <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} id={id} />
           </Modal>
-          <Modal size="sm" isOpen={approveModal}>
+          <Modal toggle={() => setApproveModal(!approveModal)} size="sm" isOpen={approveModal}>
             <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
           </Modal>
           {
@@ -279,7 +276,6 @@ const PurchaseOrderDetails = (props) => {
 
         <Row className="mb-3">
           <div style={{ position: "relative" }}>
-            <ToastContainer position="top-center" theme="colored" />
             <Row className="equal-height-cards">
               <Col xl="7">
                 <Card>

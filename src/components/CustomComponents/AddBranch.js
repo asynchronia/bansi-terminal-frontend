@@ -68,33 +68,66 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
           </FormGroup>
         </Col>
       </Row>
-      <FormGroup>
-        <label className="item-name">Branch Contact Number</label>
-        <Input
-          name="primaryBranch.contact"
-          id="contact"
-          className="form-control"
-          type="text"
-          placeholder="Enter Branch Contact Number"
-          onChange={validation.handleChange}
-          onBlur={validation.handleBlur}
-          value={validation?.values?.primaryBranch?.contact || ""}
-          invalid={
-            validation?.touched?.primaryBranch &&
-            validation?.touched?.primaryBranch?.contact &&
-            validation?.errors?.primaryBranch &&
-            validation?.errors?.primaryBranch?.contact
-          }
-        />
-        {validation?.touched?.primaryBranch &&
-          validation?.touched?.primaryBranch?.contact &&
-          validation?.errors?.primaryBranch &&
-          validation?.errors?.primaryBranch?.contact ? (
-          <p style={{ color: "red" }}>
-            {validation?.errors?.primaryBranch?.contact}
-          </p>
-        ) : null}
-      </FormGroup>
+      <Row>
+        <Col>
+          <FormGroup>
+            <label className="item-name">Branch Contact Number</label>
+            <Input
+              name="primaryBranch.contact"
+              id="contact"
+              className="form-control"
+              type="text"
+              placeholder="Enter Branch Contact Number"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation?.values?.primaryBranch?.contact || ""}
+              invalid={
+                validation?.touched?.primaryBranch &&
+                validation?.touched?.primaryBranch?.contact &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.contact
+              }
+            />
+            {validation?.touched?.primaryBranch &&
+              validation?.touched?.primaryBranch?.contact &&
+              validation?.errors?.primaryBranch &&
+              validation?.errors?.primaryBranch?.contact ? (
+              <p style={{ color: "red" }}>
+                {validation?.errors?.primaryBranch?.contact}
+              </p>
+            ) : null}
+          </FormGroup>
+        </Col>
+        <Col>
+        <FormGroup>
+            <label className="item-name">Branch Code</label>
+            <Input
+              name="primaryBranch.code"
+              id="code"
+              className="form-control"
+              type="text"
+              placeholder="Enter Branch Code"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation?.values?.primaryBranch?.code || ""}
+              invalid={
+                validation?.touched?.primaryBranch &&
+                validation?.touched?.primaryBranch?.code &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.code
+              }
+            />
+            {validation?.touched?.primaryBranch &&
+              validation?.touched?.primaryBranch?.code &&
+              validation?.errors?.primaryBranch &&
+              validation?.errors?.primaryBranch?.code ? (
+              <p style={{ color: "red" }}>
+                {validation?.errors?.primaryBranch?.code}
+              </p>
+            ) : null}
+          </FormGroup>
+        </Col>
+      </Row>
       <FormGroup>
         <Label>Branch Address</Label>
         <Input

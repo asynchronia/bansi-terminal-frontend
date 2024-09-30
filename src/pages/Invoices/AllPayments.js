@@ -5,7 +5,7 @@ import { changePreloader } from "../../store/actions";
 
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { connect, useDispatch } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -82,6 +82,7 @@ const AllPayments = (props) => {
     {
       headerName: "Client",
       field: "customer_name",
+      tooltipField: "customer_name",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       flex: 1, sortable: false
@@ -89,6 +90,7 @@ const AllPayments = (props) => {
     {
       headerName: "Invoice#",
       field: "invoice_numbers",
+      tooltipField: "invoice_numbers",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       flex: 1, sortable: false
@@ -165,19 +167,24 @@ const AllPayments = (props) => {
 
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-    const response = await getPaymentReq(body);
-    let custList = new Set();
-    response.map((val, id) => {
-      custList.add(val.customer_name);
-    });
-    let custArr = [];
-    custList?.forEach((val, key, set) => {
-      custArr.push(val);
-    });
-    setAllCustomers([...custArr]);
-    setRowData(response);
-    setBodyObjectReq(body);
-    dispatch(changePreloader(false));
+    try {
+      const response = await getPaymentReq(body);
+      let custList = new Set();
+      response.map((val, id) => {
+        custList.add(val.customer_name);
+      });
+      let custArr = [];
+      custList?.forEach((val, key, set) => {
+        custArr.push(val);
+      });
+      setAllCustomers([...custArr]);
+      setRowData(response);
+      setBodyObjectReq(body);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
+    }
   });
 
   useEffect(() => {
@@ -206,7 +213,7 @@ const AllPayments = (props) => {
     props.setBreadcrumbItems("Payments", breadcrumbItems);
     if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
       let bodyObjectWithSearch = { ...bodyObject };
-      bodyObjectWithSearch.search = delaySearch;
+      bodyObjectWithSearch.search_text = delaySearch;
       getListOfRowData(bodyObjectWithSearch);
     } else {
       getListOfRowData(bodyObject);
@@ -238,7 +245,6 @@ const AllPayments = (props) => {
 
   return (
     <React.Fragment>
-      <ToastContainer position="top-center" theme="colored" />
       <Modal
         isOpen={modal_standard}
         toggle={() => {
@@ -300,12 +306,12 @@ const AllPayments = (props) => {
                           value={searchValue}
                           onChange={handleInputChange}
                           className="form-control rounded border"
-                          placeholder="Search..."
+                          placeholder="Search by Payment number or Client"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
                     </div>
-                    <select
+                    {/* <select
                       onChange={handleChange}
                       id="customer"
                       name="customer"
@@ -318,7 +324,7 @@ const AllPayments = (props) => {
                       {allCustomers.map((e) => (
                         <option value={e}>{e}</option>
                       ))}
-                    </select>
+                    </select> */}
                   </div>
                 </div>
                 <div

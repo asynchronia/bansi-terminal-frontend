@@ -51,6 +51,7 @@ const Expenses = (props) => {
     { 
         headerName: "Paid Through", 
         field: "paid_through_account_name", 
+        tooltipField: "paid_through_account_name", 
         sortable: false ,suppressMenu: true,
         tooltipValueGetter: (p) => p.value,headerTooltip: "Paid through",
         floatingFilterComponentParams: {suppressFilterButton:true} },
@@ -100,10 +101,15 @@ const Expenses = (props) => {
   
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-    const response = await getExpensesReq(body);
+    try {
+      const response = await getExpensesReq(body);
 
-    setRowData(response.data);
-    dispatch(changePreloader(false));
+      setRowData(response.data);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
+    }
   });
 
   useEffect(() => {

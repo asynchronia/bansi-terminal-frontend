@@ -15,7 +15,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { connect } from "react-redux";
 import "./styles/AddCategory.scss";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import {
   createCategoryReq,
@@ -145,7 +145,6 @@ const AddCategory = (props) => {
 
   return (
     <React.Fragment>
-      <ToastContainer position="top-center" theme="colored" />
       <Row>
         <Col md={5}>
           <Card>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Row, Col, Card, CardBody, Button, Input, Modal } from "reactstrap";
 
 import { connect, useDispatch } from "react-redux";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 // import {AgGridReact} from 'ag-grid-react';
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -135,6 +135,7 @@ const AllItems = (props) => {
     {
       headerName: "Item Name",
       field: "title",
+      tooltipField: 'title',
       headerCheckboxSelection: true,
       checkboxSelection: true,
       suppressMenu: true,
@@ -149,6 +150,7 @@ const AllItems = (props) => {
     {
       headerName: "HSN Code",
       field: "hsnCode",
+      tooltipField: "hsnCode",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -180,6 +182,7 @@ const AllItems = (props) => {
     {
       headerName: "Category",
       field: "category",
+      tooltipField: "category",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -251,7 +254,7 @@ const AllItems = (props) => {
 
     response.map((val, id) => {
       val.category = val.category.name;
-      val.salePrice = val.variant.sellingPrice;
+      val.salePrice = val.variant?.sellingPrice || "-";
     });
     setRowData(response);
     dispatch(changePreloader(false));
@@ -331,7 +334,6 @@ const onGridReady = useCallback((params) => {
 */
   return (
     <React.Fragment>
-      <ToastContainer position="top-center" theme="colored" />
       <Modal
         isOpen={modal_standard}
         toggle={() => {
@@ -397,7 +399,7 @@ const onGridReady = useCallback((params) => {
                       <Add style={{ marginRight: "5px" }} />
                       Create Item
                     </Button>
-                    <Button
+                    {/* <Button
                       style={{
                         color: "black",
                         backgroundColor: "#bfd8f7",
@@ -406,7 +408,7 @@ const onGridReady = useCallback((params) => {
                     >
                       <Import style={{ marginRight: "5px" }} />
                       Import Items
-                    </Button>
+                    </Button> */}
                   </RequirePermission>
                   <div className="button-right-section">
                     <div className="categoryDiv" ref={dropdownRef}>

@@ -53,6 +53,9 @@ import AgreementItemsListing from "../pages/Items/AgreementItemsListing";
 import AgreementItemView from "../pages/Items/AgreementItemView";
 import ViewPurchaseOrder from "../pages/Orders/ViewPurchaseOrder";
 import PurchaseOrderDetails from "../pages/Orders/PurchaseOrderDetails";
+import UserProfile from "../pages/Users/Profile";
+import ForgotPassword from "../pages/Authentication/ForgotPassword";
+import ResetPassword from "../pages/Authentication/ResetPassword";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -161,8 +164,8 @@ const userRoutes = [
   // { path: "/chat", component: <Chat /> },
   // { path: "/kanbanboard", component: <Kanban /> },
 
-  // // // //profile
-  // { path: "/profile", component: <UserProfile /> },
+  // // //profile
+  { path: "/profile", component: <UserProfile /> },
 
   // // //Email
   // { path: "/email-inbox", component: <EmailInbox /> },
@@ -235,7 +238,8 @@ const userRoutes = [
 const authRoutes = [
   // { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
-  // { path: "/forgot-password", component: <ForgetPwd /> },
+  { path: "/forgot-password", component: <ForgotPassword /> },
+  { path: "/reset-password", component: <ResetPassword /> },
   // { path: "/register", component: <Register /> },
 
   // { path: "/pages-404", component: <Pages404 /> },

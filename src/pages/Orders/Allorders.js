@@ -4,7 +4,7 @@ import { AgGridReact } from 'ag-grid-react';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { Card, CardBody, Col, Input, Row } from "reactstrap";
 import { getOrdersReq } from "../../service/orderService";
 import { changePreloader } from "../../store/actions";
@@ -71,32 +71,38 @@ const AllOrders = (props) => {
       return;
     }
     dispatch(changePreloader(true));
-    // const body = {
-    //   page: page,
-    //   limit: paginationPageSize,
-    // }
 
-    // if(searchValue) {
-    //   body.search_text = searchValue;
-    // }
-    console.log('searchValue', searchValue);
-    console.log('body', body);
-    const response = await getOrdersReq(body);
+    try {
+      // const body = {
+      //   page: page,
+      //   limit: paginationPageSize,
+      // }
 
-    const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
-    let filledRows;
+      // if(searchValue) {
+      //   body.search_text = searchValue;
+      // }
+      console.log('searchValue', searchValue);
+      console.log('body', body);
+      const response = await getOrdersReq(body);
 
-    if (response.length < paginationPageSize) {
-      filledRows = [...response];
-    } else {
-      filledRows = [...response, ...emptyObjects];
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.length < paginationPageSize) {
+        filledRows = [...response];
+      } else {
+        filledRows = [...response, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+      setRowData(newData);
+
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
     }
-
-    const newData = [...rowData];
-    newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
-    setRowData(newData);
-
-    dispatch(changePreloader(false));
   }, [page, paginationPageSize, searchValue]);
 
   const redirectToEditPage = (id) => {
@@ -177,6 +183,7 @@ const AllOrders = (props) => {
     },
     {
       headerName: "Client", field: "customer_name", flex: 1,
+      tooltipField: "customer_name",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
@@ -243,7 +250,6 @@ const AllOrders = (props) => {
 
   return (
     <>
-      <ToastContainer position="top-center" theme="colored" />
       <div className="all-items">
         <Row>
           <Col className="col-12">
