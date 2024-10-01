@@ -247,14 +247,14 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
                 renderValue={(selected) => (
                   <div>
                     {selected.map((value) => (
-                      <Chip className="mx-2" size="small" key={value._id} label={value.code ? value.code : value.name} />
+                      <Chip className="mx-2" size="small" key={value._id} label={value.address} />
                     ))}
                   </div>
                 )}
               >
                 {branchList.length>0? branchList.map((option) => (
                   <MenuItem key={option._id} value={option}>
-                    {option.code ? option.code : option.name}
+                    {option.address}
                   </MenuItem>
                 )):null}
               </Select>
