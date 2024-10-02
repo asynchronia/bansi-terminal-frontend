@@ -44,7 +44,7 @@ const OrderDetails = (props) => {
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "All Orders", link: "#" },
+    { title: "All Orders", link: "/ongoing-orders" },
     { title: "Order #" + orderData?.salesorder_number, link: "#" },
   ];
 

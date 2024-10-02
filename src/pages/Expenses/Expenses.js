@@ -12,11 +12,14 @@ import "./styles/datatables.scss";
 
 import { changePreloader } from "../../store/actions";
 import { getExpensesReq } from "../../service/expenseService";
+import DropdownMenuBtn from "../Orders/DropdownMenuBtn";
 
 const Expenses = (props) => {
-    document.title = "Estimates";
-    let dispatch = useDispatch();
-    const effectCalled = useRef(false);
+  document.title = "Estimates";
+  let dispatch = useDispatch();
+  let navigate = useNavigate();
+
+  const effectCalled = useRef(false);
 
   const breadcrumbItems = [
 
@@ -29,6 +32,19 @@ const Expenses = (props) => {
     "page": 1,
     "limit": 200
   };
+
+  const redirectToViewPage = (id) => {
+    let path = "/view-expense/" + id;
+    setTimeout(() => {
+      navigate(path, id);
+    }, 400);
+  };
+
+  const onClickView = (item) => {
+    redirectToViewPage(item.expense_id);
+  };
+
+  
   const columnDefs = [
     {
         headerName: "Order Date",
@@ -67,10 +83,21 @@ const Expenses = (props) => {
         tooltipValueGetter: (p) => p.value,headerTooltip: "Amount",
         valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
       },
-    
+      {
+        headerName: "Action",
+        field: "action",
+        sortable: false, width: 100,
+        cellClass: "actions-button-cell",
+        cellRenderer: DropdownMenuBtn,
+        cellRendererParams: {
+          handleViewClick: onClickView,
+          label: 'View Expense'
+        },
+        suppressMenu: true,
+        floatingFilterComponentParams: { suppressFilterButton: true },
+      },
   ];
   
-
   const autoSizeStrategy = {
     type: 'fitGridWidth'
   };
@@ -83,6 +110,9 @@ const Expenses = (props) => {
   const [paginationPageSize, setPaginationPageSize] = useState(25);
 
   const [page, setPage] = useState(1);
+
+  const [searchValue, setSearchValue] = useState('');
+  const [inputValue, setInputValue] = useState('');
 
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
@@ -120,7 +150,26 @@ const Expenses = (props) => {
     }
   }, []);
 
- 
+  useEffect(() => {
+    if (searchValue) {
+      bodyObject.search_text = searchValue;
+    } else {
+      delete bodyObject.search_text
+    }
+
+    getListOfRowData(bodyObject); 
+  }, [searchValue])
+
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+    setPage(1);
+    setRowData([]);
+  }
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  }
 
   return (
     <React.Fragment>
@@ -129,6 +178,27 @@ const Expenses = (props) => {
           <Col className="col-12">
             <Card>
               <CardBody>
+              <div className="button-section">
+                  <div className="button-right-section">
+                    <div className="invoice-search-box">
+                      <div className="search-box position-relative">
+                        <Input
+                          type="text"
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
+                          className="form-control rounded border"
+                          placeholder="Search by Reference number or Paid through"
+                        />
+                        <i className="mdi mdi-magnify search-icon"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div
                   className="ag-theme-quartz"
                   style={{

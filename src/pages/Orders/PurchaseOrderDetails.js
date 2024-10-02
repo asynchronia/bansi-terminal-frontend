@@ -18,6 +18,7 @@ import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 import { Cancel, CheckCircle, Print } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
 import Hero from "../../components/Common/Hero";
+import { toast } from "react-toastify";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -38,6 +39,15 @@ const PurchaseOrderDetails = (props) => {
 
   const effectCalled = useRef(false);
 
+  const statusToTextMap = {
+    "draft": "Draft",
+    "published": "Publish",
+    "sent": "Approve",
+    "accepted": "Accept",
+    "rejected": "Reject",
+    "declined": "Declined"
+  }
+
   async function handlePurchaseOrderStatusChange(status) {
     const body = {
       "purchaseOrderId": id,
@@ -47,30 +57,40 @@ const PurchaseOrderDetails = (props) => {
     if (status === 'accepted') {
       try {
         const response = await convertToSalesOrderReq({ purchaseOrderId: body.purchaseOrderId });
+        if(response.success){
+          toast.success("Purchase order Accepted")
+          setStatus(status);
+        }
       } catch (error) {
         if (error.response && error.response.status === 400) {
           console.error('Bad Request:', error);
+          toast.error("Something went wrong")
           // Handle the 400 error here, e.g., show an error message to the user
         } else {
           console.error('Failed to convert to sales order', error);
+          toast.error("Something went wrong")
         }
       } finally {
         setIsButtonLoading(false);
-        setStatus(status);
       }
     } else {
       try {
         const response = await purchaseOrderStatusChangeReq(body);
+        if(response.success){
+          toast.success(`Purchase Order ${statusToTextMap[status]}`)
+          setStatus(status);
+        }
       } catch (error) {
         if (error.response && error.response.status === 400) {
           console.error('Bad Request:', error);
+          toast.error("Something went wrong")
           // Handle the 400 error here, e.g., show an error message to the user
         } else {
           console.error('Failed to change purchase order status:', error);
+          toast.error("Something went wrong")
         }
       } finally {
         setIsButtonLoading(false);
-        setStatus(status);
       }
     }
   }
@@ -91,6 +111,15 @@ const PurchaseOrderDetails = (props) => {
     handlePurchaseOrderStatusChange('accepted');
     //setStatus('accepted');
     //setSelectedStatus('accepted');
+    //TODO: The handlePurchaseOrderStatusChange(); is taking the old value of selectedStatus
+    //TODO: ADD BUTTON LOADER, IN THE BACKEND ADD ZOHO SYNC API CALL
+  }
+
+  const declinePurchaseOrder = () => {
+    //setSelectedStatus('declined')
+    handlePurchaseOrderStatusChange('declined');
+    //setStatus('declined');
+    //setSelectedStatus('declined');
     //TODO: The handlePurchaseOrderStatusChange(); is taking the old value of selectedStatus
     //TODO: ADD BUTTON LOADER, IN THE BACKEND ADD ZOHO SYNC API CALL
   }
@@ -256,6 +285,19 @@ const PurchaseOrderDetails = (props) => {
                 <CorrectSign className="me-1" />
                 Accept
               </StyledButton>
+            )}
+          </RequireUserType>
+          <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+            {status === 'sent' && (
+              <StyledButton
+              color={"danger"}
+              className={"w-md mx-2"}
+              isLoading={isButtonLoading}
+              onClick={declinePurchaseOrder}
+            >
+              <Cancel className="me-1" />
+              Decline
+            </StyledButton>
             )}
           </RequireUserType>
         </div>
