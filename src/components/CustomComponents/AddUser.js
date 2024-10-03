@@ -38,9 +38,11 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
       let array = response?.payload?.branches;
       const newArray = array.map((obj) => ({
         _id: obj._id,
-        address: obj.address,
+        name: obj.name,
+        code: obj.code,
       }));
 
+      console.log(newArray)
       setBranchList(newArray);
     } catch (error) {
       console.log(error);

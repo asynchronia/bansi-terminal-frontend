@@ -47,7 +47,7 @@ const ActionComponent = (props) => {
       const userValues = response?.payload?.user;
 
       const associatedBranchIds = userValues.associatedBranches.map(
-        (branch) => ({ _id: branch._id, address: branch.address })
+        (branch) => ({ _id: branch._id, name: branch.name, code: branch.code })
       );
 
       validation.setValues((prevValues) => ({
