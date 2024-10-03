@@ -72,6 +72,7 @@ const PurchaseOrderDetails = (props) => {
         }
       } finally {
         setIsButtonLoading(false);
+        setApproveModal(false)
       }
     } else {
       try {
@@ -91,6 +92,7 @@ const PurchaseOrderDetails = (props) => {
         }
       } finally {
         setIsButtonLoading(false);
+        setApproveModal(false)
       }
     }
   }
@@ -107,8 +109,8 @@ const PurchaseOrderDetails = (props) => {
   }
 
   const acceptPurchaseOrder = () => {
-    //setSelectedStatus('accepted')
-    handlePurchaseOrderStatusChange('accepted');
+    setSelectedStatus('accepted')
+    setApproveModal(true);
     //setStatus('accepted');
     //setSelectedStatus('accepted');
     //TODO: The handlePurchaseOrderStatusChange(); is taking the old value of selectedStatus
@@ -116,12 +118,8 @@ const PurchaseOrderDetails = (props) => {
   }
 
   const declinePurchaseOrder = () => {
-    //setSelectedStatus('declined')
-    handlePurchaseOrderStatusChange('declined');
-    //setStatus('declined');
-    //setSelectedStatus('declined');
-    //TODO: The handlePurchaseOrderStatusChange(); is taking the old value of selectedStatus
-    //TODO: ADD BUTTON LOADER, IN THE BACKEND ADD ZOHO SYNC API CALL
+    setSelectedStatus('declined')
+    setApproveModal(true);
   }
 
   const handleStatusChange = (event) => {
@@ -214,11 +212,11 @@ const PurchaseOrderDetails = (props) => {
             right: 10,
           }}
         >
-          <Modal toggle={() => setPublishModal(!publishModal)} size="sm" isOpen={publishModal} centered={true}>
+          <Modal centered toggle={() => setPublishModal(!publishModal)} isOpen={publishModal}>
             <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} id={id} />
           </Modal>
-          <Modal toggle={() => setApproveModal(!approveModal)} size="sm" isOpen={approveModal}>
-            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
+          <Modal centered toggle={() => setApproveModal(!approveModal)} isOpen={approveModal}>
+            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} isButtonLoading={isButtonLoading} />
           </Modal>
           {
             status === 'draft' ? (
@@ -250,7 +248,6 @@ const PurchaseOrderDetails = (props) => {
                 <StyledButton
                   color={"success"}
                   className={"w-md mx-2"}
-                  isLoading={isButtonLoading}
                   onClick={submitPurchaseOrder}
                 >
                   <CheckCircle className="me-1" />
@@ -265,7 +262,6 @@ const PurchaseOrderDetails = (props) => {
                 <StyledButton
                   color={"danger"}
                   className={"w-md mx-2"}
-                  isLoading={isButtonLoading}
                   onClick={rejectPurchaseOrder}
                 >
                   <Cancel className="me-1" />
@@ -279,7 +275,6 @@ const PurchaseOrderDetails = (props) => {
               <StyledButton
                 color={"success"}
                 className={"w-md"}
-                isLoading={isButtonLoading}
                 onClick={acceptPurchaseOrder}
               >
                 <CorrectSign className="me-1" />
@@ -292,7 +287,6 @@ const PurchaseOrderDetails = (props) => {
               <StyledButton
               color={"danger"}
               className={"w-md mx-2"}
-              isLoading={isButtonLoading}
               onClick={declinePurchaseOrder}
             >
               <Cancel className="me-1" />

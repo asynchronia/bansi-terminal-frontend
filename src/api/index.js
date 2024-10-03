@@ -339,7 +339,7 @@ export async function updatePurchaseOrder(body) {
 }
 
 export async function purchaseOrderStatusChange(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.purchaseOrderStatusChange}`, body, {
         headers: getHeaders(),
@@ -347,12 +347,14 @@ export async function purchaseOrderStatusChange(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+        reject(error)
       });
   });
 }
 
 export async function convertToSalesOrder(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.convertToSalesOrder}`, body, {
         headers: getHeaders(),
@@ -360,6 +362,8 @@ export async function convertToSalesOrder(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+        reject(error)
       });
   });
 }
