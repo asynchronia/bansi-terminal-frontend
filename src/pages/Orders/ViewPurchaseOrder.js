@@ -28,8 +28,12 @@ const ViewPurchaseOrder = (props) => {
   const [rowData, setRowData] = useState([]);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [page, setPage] = useState(1);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState();
   const [inputValue, setInputValue] = useState('');
+  const body = {
+    page: page,
+    limit: paginationPageSize,
+  }
 
   // const redirectToViewPage = (id) => {
   //   console.log(id.order_id);
@@ -51,16 +55,22 @@ const ViewPurchaseOrder = (props) => {
   }
 
   useEffect(() => {
-    props.setBreadcrumbItems('All Orders', breadcrumbItems);
-    const body = {
-      page: page,
-      limit: paginationPageSize,
+    props.setBreadcrumbItems("Expenses", breadcrumbItems);
+    if (!effectCalled.current) {
+      getListOfRowData(body);
+      effectCalled.current = true;
     }
+  }, []);
+
+  useEffect(() => {
     if (searchValue) {
       body.search_text = searchValue;
+      getListOfRowData(body);
+    } else if(searchValue === "") {
+      delete body.search_text
+      getListOfRowData(body);
     }
-    getListOfRowData(body);
-  }, [page, paginationPageSize, searchValue]);
+  }, [searchValue])
 
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
@@ -245,6 +255,11 @@ const ViewPurchaseOrder = (props) => {
                           type="text"
                           value={inputValue}
                           onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
                           className="form-control rounded border"
                           placeholder="Search"
                         />

@@ -34,8 +34,12 @@ const AllOrders = (props) => {
   const [rowData, setRowData] = useState([]);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [page, setPage] = useState(1);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState();
   const [inputValue, setInputValue] = useState('');
+  const body = {
+    page: page,
+    limit: paginationPageSize,
+  }
 
   const redirectToViewPage = (id) => {
     let path = `/order/${id.salesorder_id}`;
@@ -56,15 +60,21 @@ const AllOrders = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems('All Orders', breadcrumbItems);
-    const body = {
-      page: page,
-      limit: paginationPageSize,
+    if (!effectCalled.current) {
+      getListOfRowData(body);
+      effectCalled.current = true;
     }
+  }, []);
+
+  useEffect(() => {
     if (searchValue) {
       body.search_text = searchValue;
+      getListOfRowData(body);
+    } else if(searchValue === "") {
+      delete body.search_text
+      getListOfRowData(body);
     }
-    getListOfRowData(body);
-  }, [page, paginationPageSize, searchValue]);
+  }, [searchValue])
 
   const getListOfRowData = useCallback(async (body) => {
     if (rowData[(page - 1) * paginationPageSize]) {

@@ -140,11 +140,11 @@ const AllPayments = (props) => {
   const [allCustomers, setAllCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState();
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
-  const [delaySearch, setDelaySearch] = useState("");
+  const [delaySearch, setDelaySearch] = useState();
 
   let bodyObject = {
     page: 1,
@@ -195,37 +195,36 @@ const AllPayments = (props) => {
     }
   }, []);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (customer && customer !== undefined && customer !== "") {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      bodyObjectWithFilter.filter = {};
-      bodyObjectWithFilter.filter.customer_name = customer;
-      getListOfRowData(bodyObjectWithFilter);
-    } else {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      delete bodyObjectWithFilter["filter"];
-      getListOfRowData(bodyObjectWithFilter);
-    }
-  }, [customer]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Payments", breadcrumbItems);
+  //   if (customer && customer !== undefined && customer !== "") {
+  //     let bodyObjectWithFilter = { ...bodyObjectReq };
+  //     bodyObjectWithFilter.filter = {};
+  //     bodyObjectWithFilter.filter.customer_name = customer;
+  //     getListOfRowData(bodyObjectWithFilter);
+  //   } else {
+  //     let bodyObjectWithFilter = { ...bodyObjectReq };
+  //     delete bodyObjectWithFilter["filter"];
+  //     getListOfRowData(bodyObjectWithFilter);
+  //   }
+  // }, [customer]);
 
   useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
     if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
       let bodyObjectWithSearch = { ...bodyObject };
       bodyObjectWithSearch.search_text = delaySearch;
       getListOfRowData(bodyObjectWithSearch);
-    } else {
+    } else if (delaySearch === "") {
       getListOfRowData(bodyObject);
     }
   }, [delaySearch]);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (paginationPageSize && paginationPageSize !== undefined) {
-      getListOfRowData(bodyObject);
-    }
-  }, [paginationPageSize]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Payments", breadcrumbItems);
+  //   if (paginationPageSize && paginationPageSize !== undefined) {
+  //     getListOfRowData(bodyObject);
+  //   }
+  // }, [paginationPageSize]);
 
   const handleChange = (e) => {
     setCustomer(e.target.value);

@@ -20,7 +20,7 @@ const OrderEstimates = (props) => {
     let dispatch = useDispatch();
     let navigate = useNavigate();
     const effectCalled = useRef(false);
-    const [searchValue, setSearchValue] = useState('');
+    const [searchValue, setSearchValue] = useState();
     const [inputValue, setInputValue] = useState('');
 
 
@@ -153,11 +153,11 @@ const OrderEstimates = (props) => {
   useEffect(() => {
     if (searchValue) {
       bodyObject.search_text = searchValue;
-    } else {
+      getListOfRowData(bodyObject);
+    } else if(searchValue === "") {
       delete bodyObject.search_text
+      getListOfRowData(bodyObject);
     }
-
-    getListOfRowData(bodyObject); 
   }, [searchValue])
 
   const handleSearch = (event) => {

@@ -186,12 +186,12 @@ const AllInvoices = (props) => {
   const [allCustomers, setAllCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState();
 
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
-  const [delaySearch, setDelaySearch] = useState("");
+  const [delaySearch, setDelaySearch] = useState();
 
   let bodyObject = {
     page: 1,
@@ -258,19 +258,19 @@ const AllInvoices = (props) => {
     }
   }, []);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Invoices", breadcrumbItems);
-    if (customer && customer !== undefined && customer !== "") {
-      let bodyObjectWithCategory = { ...bodyObjectReq };
-      bodyObjectWithCategory.filter = {};
-      bodyObjectWithCategory.filter.customer_name = customer;
-      getListOfRowData(bodyObjectWithCategory);
-    } else {
-      let bodyObjectWithCategory = { ...bodyObjectReq };
-      delete bodyObjectWithCategory["filter"];
-      getListOfRowData(bodyObjectWithCategory);
-    }
-  }, [customer]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Invoices", breadcrumbItems);
+  //   if (customer && customer !== undefined && customer !== "") {
+  //     let bodyObjectWithCategory = { ...bodyObjectReq };
+  //     bodyObjectWithCategory.filter = {};
+  //     bodyObjectWithCategory.filter.customer_name = customer;
+  //     getListOfRowData(bodyObjectWithCategory);
+  //   } else {
+  //     let bodyObjectWithCategory = { ...bodyObjectReq };
+  //     delete bodyObjectWithCategory["filter"];
+  //     getListOfRowData(bodyObjectWithCategory);
+  //   }
+  // }, [customer]);
 
   useEffect(() => {
     props.setBreadcrumbItems("Invoices", breadcrumbItems);
@@ -278,19 +278,19 @@ const AllInvoices = (props) => {
       let bodyObjectWithCategory = { ...bodyObject };
       bodyObjectWithCategory.search_text = delaySearch;
       getListOfRowData(bodyObjectWithCategory);
-    } else {
+    } else if (delaySearch === "")  {
       getListOfRowData(bodyObject);
     }
   }, [delaySearch]);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Invoices", breadcrumbItems);
-    if (paginationPageSize && paginationPageSize !== undefined) {
-      let bodyObjectWithCategory = { ...bodyObject };
-      // bodyObjectWithCategory.limit=
-      getListOfRowData(bodyObjectWithCategory);
-    }
-  }, [paginationPageSize]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Invoices", breadcrumbItems);
+  //   if (paginationPageSize && paginationPageSize !== undefined) {
+  //     let bodyObjectWithCategory = { ...bodyObject };
+  //     // bodyObjectWithCategory.limit=
+  //     getListOfRowData(bodyObjectWithCategory);
+  //   }
+  // }, [paginationPageSize]);
 
   const handleChange = (e) => {
     setCustomer(e.target.value);

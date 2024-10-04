@@ -111,7 +111,7 @@ const Expenses = (props) => {
 
   const [page, setPage] = useState(1);
 
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState();
   const [inputValue, setInputValue] = useState('');
 
   const onPaginationChanged = useCallback((event) => {
@@ -153,11 +153,11 @@ const Expenses = (props) => {
   useEffect(() => {
     if (searchValue) {
       bodyObject.search_text = searchValue;
-    } else {
+      getListOfRowData(bodyObject);
+    } else if(searchValue === "") {
       delete bodyObject.search_text
+      getListOfRowData(bodyObject);
     }
-
-    getListOfRowData(bodyObject); 
   }, [searchValue])
 
   const handleSearch = (event) => {
@@ -192,7 +192,7 @@ const Expenses = (props) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Reference number or Paid through"
+                          placeholder="Search by Reference no. or Paid through"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
