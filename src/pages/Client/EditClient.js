@@ -8,7 +8,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
 import StyledButton from "../../components/Common/StyledButton";
-import { getClientWithIdReq } from "../../service/clientService";
+import { getClientWithIdReq, updateClientReq } from "../../service/clientService";
 
 const EditClient = (props) => {
   const { id } = useParams();
@@ -21,6 +21,7 @@ const EditClient = (props) => {
 
   const [selectedFiles, setselectedFiles] = useState([]);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [status, setStatus] = useState("active")
 
   const notify = (type, message, id) => {
     if (type === "Error") {
@@ -72,22 +73,37 @@ const EditClient = (props) => {
     }),
     onSubmit: (values) => {
       setIsButtonLoading(true);
-      values.logo = `${selectedFiles[0]?.preview}`;
-      handleEditClient(values);
+
+      const body = {
+        ...values,
+        _id: id,
+        status
+      }
+
+      handleEditClient(body);
     },
   });
 
-  const handleEditClient = async (values) => {
-    console.log(values)
-    setIsButtonLoading(false)
-    notify("Success", "Successfully Updated Client", id)
+  const handleEditClient = async (body) => {
+    try {
+      setIsButtonLoading(true)
+      const response = await updateClientReq(body);
+
+      console.log("Form submitted");
+      if (response.success) {
+        notify("Success", response.message, id)
+      }
+      setIsButtonLoading(false)
+    } catch (error) {
+      notify("Error", error.message, id)
+      setIsButtonLoading(false)
+    }
 };
 
-  const onEditClientClick = (e) => {
-    e.preventDefault();
-    validation.handleSubmit();
-    return false;
+  const handleClientStatus = async (e) => {
+    setStatus(e.target.value)
   };
+
 
   function handleAcceptedFiles(files) {
     files.map((file) =>
@@ -119,6 +135,7 @@ const EditClient = (props) => {
         validation.setFieldValue("bankAccountNumber", client.bankAccountNumber || "");
         validation.setFieldValue("ifscCode", client.ifscCode || "");
         validation.setFieldValue("status", client.status || "");
+        setStatus(client.status)
   
         setBreadCrubmsItems([
           { title: "Dashboard", link: "/dashboard" },
@@ -154,7 +171,7 @@ const EditClient = (props) => {
   }, [breadcrumbItems]);
 
   return (
-    <Form className="form-horizontal mt-4" autoComplete="off">
+    <Form className="form-horizontal mt-4" autoComplete="off" onSubmit={validation.handleSubmit}>
       <div style={{ position: "relative" }}>
         <div
           style={{
@@ -164,14 +181,14 @@ const EditClient = (props) => {
             display: "flex",
           }}
         >
-          <select className="form-select focus-width" name="status">
+          <select className="form-select focus-width" name="status" value={status} onChange={handleClientStatus}>
             <option value="active">Published</option>
             <option value="inactive">Draft</option>
           </select>
           <StyledButton
+            type="submit"
             color={"primary"}
             className={"w-md mx-2"}
-            onClick={onEditClientClick}
             isLoading={isButtonLoading}
           >
             Submit
