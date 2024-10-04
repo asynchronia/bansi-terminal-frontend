@@ -33,6 +33,7 @@ import "./styles/CreateOrderCard.scss";
 
 import { HighlightOff } from "@mui/icons-material";
 import Hero from "../../components/Common/Hero";
+import { getClientWithIdReq } from "../../service/clientService";
 
 const CreateOrder = (props) => {
   let { id } = useParams();
@@ -79,6 +80,8 @@ const CreateOrder = (props) => {
     page: 1,
     limit: 200,
   };
+
+  const clientId = JSON.parse(localStorage.getItem("user")).clientId
 
   const redirectToPurchaseDetails = (id) => {
     let path = `/purchase-orders/${id}`;
@@ -159,6 +162,18 @@ const CreateOrder = (props) => {
       console.error("Error fetching agreement items", error);
     } finally {
       setLoadedData(true);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const data = { _id: clientId };
+      const res = await getClientWithIdReq(data);
+
+      // set the client poPrefix
+      setPoPrefix(res.payload.client.poPrefix)
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
   };
 
@@ -354,6 +369,7 @@ const CreateOrder = (props) => {
     if (!effectCalled.current) {
       getBranchData();
       getListOfRowData();
+      fetchUserData()
       effectCalled.current = true;
     }
   }, [props, breadcrumbItems, getBranchData]);

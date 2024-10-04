@@ -167,19 +167,24 @@ const AllPayments = (props) => {
 
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-    const response = await getPaymentReq(body);
-    let custList = new Set();
-    response.map((val, id) => {
-      custList.add(val.customer_name);
-    });
-    let custArr = [];
-    custList?.forEach((val, key, set) => {
-      custArr.push(val);
-    });
-    setAllCustomers([...custArr]);
-    setRowData(response);
-    setBodyObjectReq(body);
-    dispatch(changePreloader(false));
+    try {
+      const response = await getPaymentReq(body);
+      let custList = new Set();
+      response.map((val, id) => {
+        custList.add(val.customer_name);
+      });
+      let custArr = [];
+      custList?.forEach((val, key, set) => {
+        custArr.push(val);
+      });
+      setAllCustomers([...custArr]);
+      setRowData(response);
+      setBodyObjectReq(body);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
+    }
   });
 
   useEffect(() => {
@@ -208,7 +213,7 @@ const AllPayments = (props) => {
     props.setBreadcrumbItems("Payments", breadcrumbItems);
     if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
       let bodyObjectWithSearch = { ...bodyObject };
-      bodyObjectWithSearch.search = delaySearch;
+      bodyObjectWithSearch.search_text = delaySearch;
       getListOfRowData(bodyObjectWithSearch);
     } else {
       getListOfRowData(bodyObject);
@@ -301,12 +306,12 @@ const AllPayments = (props) => {
                           value={searchValue}
                           onChange={handleInputChange}
                           className="form-control rounded border"
-                          placeholder="Search..."
+                          placeholder="Search by Payment number or Client"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
                     </div>
-                    <select
+                    {/* <select
                       onChange={handleChange}
                       id="customer"
                       name="customer"
@@ -319,7 +324,7 @@ const AllPayments = (props) => {
                       {allCustomers.map((e) => (
                         <option value={e}>{e}</option>
                       ))}
-                    </select>
+                    </select> */}
                   </div>
                 </div>
                 <div

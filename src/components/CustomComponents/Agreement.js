@@ -22,7 +22,8 @@ const Agreement = (props) => {
     displayTableData,
     setDisplayTableData,
     openModal,
-    setOpenModal
+    setOpenModal,
+    isButtonLoading
   } = props;
   const [rowData, setRowData] = useState([]);
   const [showRowData, setShowRowData] = useState(false);
@@ -107,18 +108,23 @@ const Agreement = (props) => {
   const handleSearchQuery = (event) => {
     let data = {
       limit: 10,
-      search: event.target.value || 'a'
+      search: event.target.value
     };
 
-    setShowRowData(true);
-    setLoadedData(true);
-    debouncedFetchResults(data);
+    if(event.target.value === ""){
+      setShowRowData(false);
+    } else {
+      setShowRowData(true);
+      setLoadedData(false);
+      debouncedFetchResults(data);
+    }
   };
 
   const getListOfRowData = async (data) => {
     const response = await searchItemReq(data);
 
     setRowData(response?.payload?.items);
+    setLoadedData(true)
   };
 
   const handleFileUpload = async (event) => {
@@ -174,7 +180,7 @@ const Agreement = (props) => {
             >
               Close
             </Button>
-            <Button
+            <StyledButton
               className="btn btn-primary waves-effect waves-light "
               onClick={() => {
                 let isCostError = false;
@@ -183,7 +189,7 @@ const Agreement = (props) => {
                   if (!sellingPrice) {
                     isCostError = true;
                     toast.error(`Please enter Cost for ${displayTableData[i].title}`);
-                  } else if (typeof Number(sellingPrice) !== 'number') {
+                  } else if (sellingPrice <= 0) {
                     isCostError = true;
                     toast.error(`Please enter valid Cost for ${displayTableData[i].title}`);
                   }
@@ -200,9 +206,10 @@ const Agreement = (props) => {
                   }
                 }
               }}
+              isLoading={isButtonLoading}
             >
               Save
-            </Button>
+            </StyledButton>
           </div>
         </div>
       </div>
@@ -302,7 +309,7 @@ const Agreement = (props) => {
               {loadedData ? (
                 rowData.length === 0 ? (
                   <Row>
-                    <p className="form-text-lg text-center">No Data Found</p>{" "}
+                    <p className="form-text-lg text-center">No Data Found</p>
                   </Row>
                 ) : (
                   rowData?.map((item) =>

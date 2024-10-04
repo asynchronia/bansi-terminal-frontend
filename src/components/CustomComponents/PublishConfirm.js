@@ -13,12 +13,12 @@ const PublishConfirm = ({ setPublishModal, setStatus, id }) => {
       console.log("Publish Confirm Message", res);
       if (res.payload.success) {
         setStatus("published");
-        //toast.success("Purchase Order Published Successfully!");
+        toast.success("Purchase Order Published Successfully!");
       } else {
-        //toast.error("Sorry, something went wrong!");
+        toast.error("Sorry, something went wrong!");
       }
     } catch (error) {
-      //toast.error("Sorry, something went wrong!");
+      toast.error("Sorry, something went wrong!");
     } finally {
       setPublishModal(false);
       setIsLoading(false);

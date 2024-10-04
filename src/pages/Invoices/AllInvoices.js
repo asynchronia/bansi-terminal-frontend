@@ -227,22 +227,27 @@ const AllInvoices = (props) => {
 * */
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
-    const response = await getInvoicesReq(body);
+    try {
+      const response = await getInvoicesReq(body);
 
-    let custList = new Set();
-    response.map((val, id) => {
-      custList.add(val.customer_name);
-    });
-    let custArr = [];
+      let custList = new Set();
+      response.map((val, id) => {
+        custList.add(val.customer_name);
+      });
+      let custArr = [];
 
-    custList?.forEach((val, key, set) => {
-      custArr.push(val);
-    });
+      custList?.forEach((val, key, set) => {
+        custArr.push(val);
+      });
 
-    setAllCustomers([...custArr]);
-    setRowData(response);
-    setBodyObjectReq(body);
-    dispatch(changePreloader(false));
+      setAllCustomers([...custArr]);
+      setRowData(response);
+      setBodyObjectReq(body);
+    } catch (error) {
+      console.error("Error fetching purchase orders:", error);
+    } finally {
+      dispatch(changePreloader(false));
+    }
   });
 
   useEffect(() => {
@@ -271,7 +276,7 @@ const AllInvoices = (props) => {
     props.setBreadcrumbItems("Invoices", breadcrumbItems);
     if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
       let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.search = delaySearch;
+      bodyObjectWithCategory.search_text = delaySearch;
       getListOfRowData(bodyObjectWithCategory);
     } else {
       getListOfRowData(bodyObject);
@@ -386,12 +391,12 @@ const onGridReady = useCallback((params) => {
                           value={searchValue}
                           onChange={handleInputChange}
                           className="form-control rounded border"
-                          placeholder="Search..."
+                          placeholder="Search by Invoice number or client"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
                     </div>
-                    <select
+                    {/* <select
                       onChange={handleChange}
                       id="customer"
                       name="customer"
@@ -404,7 +409,7 @@ const onGridReady = useCallback((params) => {
                       {allCustomers.map((e) => (
                         <option value={e}>{e}</option>
                       ))}
-                    </select>
+                    </select> */}
                   </div>
                 </div>
                 <div

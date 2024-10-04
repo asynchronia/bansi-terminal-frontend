@@ -30,11 +30,11 @@ const DropdownMenuBtn = (props) => {
                 permission: PERMISSIONS_ENUM.UPDATE,
               },
               { label: "View Item", onClick: onViewClick },
-              {
-                label: "Change Status",
-                module: MODULES_ENUM.ITEMS,
-                permission: PERMISSIONS_ENUM.UPDATE,
-              },
+              // {
+              //   label: "Change Status",
+              //   module: MODULES_ENUM.ITEMS,
+              //   permission: PERMISSIONS_ENUM.UPDATE,
+              // },
               {
                 label: "Delete Item",
                 onClick: onDeleteItem,
@@ -44,11 +44,11 @@ const DropdownMenuBtn = (props) => {
             ]
           : [
               { label: "View Item", onClick: onViewClick },
-              {
-                label: "Change Status",
-                module: MODULES_ENUM.ITEMS,
-                permission: PERMISSIONS_ENUM.UPDATE,
-              },
+              // {
+              //   label: "Change Status",
+              //   module: MODULES_ENUM.ITEMS,
+              //   permission: PERMISSIONS_ENUM.UPDATE,
+              // },
               {
                 label: "Delete Item",
                 onClick: onDeleteItem,

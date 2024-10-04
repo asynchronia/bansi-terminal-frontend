@@ -40,6 +40,7 @@ const BranchData = (props) => {
         address: null,
         associatedWarehouse: null,
         contact: null,
+        code: null
       },
     },
     validationSchema: Yup.object({
@@ -48,17 +49,14 @@ const BranchData = (props) => {
         address: Yup.string().required("Please Enter Branch Address"),
         associatedWarehouse: Yup.string().required("Please Select Associated Warehouse"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
+        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character")
       }),
     }),
     onSubmit: (values) => {
-      const code = warehouseList.find(e => e._id === values.primaryBranch.associatedWarehouse)?.code
       const newBranch = {
         ...values.primaryBranch,
         clientId,
       };
-      if (!edit) {
-        newBranch.code = code
-      }
       handleSubmit(newBranch, edit);
     },
   });

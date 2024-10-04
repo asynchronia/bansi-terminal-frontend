@@ -11,6 +11,7 @@ import './styles/Profile.scss'
 
 const UserProfile = (props) => {
   document.title = "Users";
+  const [branchData, setBranchData] = useState([])
 
   const formik = useFormik({
     initialValues: {
@@ -61,6 +62,8 @@ const UserProfile = (props) => {
         emailID: getUserData.email,
         gender: getUserData.gender,
       });
+
+      setBranchData(getUserData.associatedBranches)
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -181,15 +184,15 @@ const UserProfile = (props) => {
                 >
                   <Label className="pt-2">Branch / Warehouse Access</Label>
                   <div className="d-flex gap-2 flex-wrap pb-2">
-                    <p className="px-2 py-1 rounded border text-sm text-nowrap m-0">
-                      Pune Branch
-                    </p>
-                    <p className="px-2 py-1 rounded border text-sm text-nowrap m-0">
-                      Nagpur Branch
-                    </p>
-                    <p className="px-2 py-1 rounded border text-sm text-nowrap m-0">
-                      Hyderabad Branch
-                    </p>
+                    {branchData.length > 0 ? branchData.map((branch, index) => (
+                      <p key={`${branch.name}-${index}`} className="px-2 py-1 rounded border text-sm text-nowrap m-0 capitalize">
+                        {branch.name}
+                      </p>
+                    )): (
+                      <p className="py-1 text-sm text-nowrap m-0 capitalize">
+                        No branch data
+                      </p>
+                    )}
                   </div>
                   <Label className="pt-2">User Role</Label>
                   <p>{userRole}</p>
