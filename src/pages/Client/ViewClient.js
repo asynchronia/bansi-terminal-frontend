@@ -131,7 +131,8 @@ const ViewClient = (props) => {
 
           for (const variantItem of variants) {
             const {
-              variant: { _id: variantId, sellingPrice: price },
+              price: price,
+              variant: { _id: variantId },
             } = variantItem;
 
             // Wait for handleAddToAgreement to complete
