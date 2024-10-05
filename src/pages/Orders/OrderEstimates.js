@@ -20,6 +20,8 @@ const OrderEstimates = (props) => {
     let dispatch = useDispatch();
     let navigate = useNavigate();
     const effectCalled = useRef(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [inputValue, setInputValue] = useState('');
 
 
     const redirectToViewPage = (id) => {
@@ -30,8 +32,8 @@ const OrderEstimates = (props) => {
       };
 
       
-  const handleViewClick = (id) => {
-    redirectToViewPage(id.estimate_id);
+  const handleViewClick = (item) => {
+    redirectToViewPage(item.estimate_id);
   }
   const breadcrumbItems = [
 
@@ -102,8 +104,6 @@ const OrderEstimates = (props) => {
 
   const paginationPageSizeSelector = [25,50,100];
 
-
- 
   const [rowData, setRowData] = useState([]);
 
   const [paginationPageSize, setPaginationPageSize] = useState(25);
@@ -150,6 +150,27 @@ const OrderEstimates = (props) => {
 //     redirectToViewPage(event.data?.estimate_id);
 //  }
 
+  useEffect(() => {
+    if (searchValue) {
+      bodyObject.search_text = searchValue;
+    } else {
+      delete bodyObject.search_text
+    }
+
+    getListOfRowData(bodyObject); 
+  }, [searchValue])
+
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+    setPage(1);
+    setRowData([]);
+  }
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  }
+
   return (
     <React.Fragment>
       <div className="all-clients">
@@ -157,6 +178,27 @@ const OrderEstimates = (props) => {
           <Col className="col-12">
             <Card>
               <CardBody>
+                <div className="button-section">
+                  <div className="button-right-section">
+                    <div className="invoice-search-box">
+                      <div className="search-box position-relative">
+                        <Input
+                          type="text"
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
+                          className="form-control rounded border"
+                          placeholder="Search by Estimate number or Client"
+                        />
+                        <i className="mdi mdi-magnify search-icon"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div
                   className="ag-theme-quartz"
                   style={{

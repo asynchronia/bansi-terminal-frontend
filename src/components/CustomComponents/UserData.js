@@ -188,7 +188,7 @@ const UserData = (props) => {
                               />
                             )) : (
                               <p className="py-1 text-sm text-nowrap m-0 capitalize">
-                                No branch data
+                                -
                               </p>
                             )}
                           </div>
