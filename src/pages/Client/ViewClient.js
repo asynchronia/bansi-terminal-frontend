@@ -3,7 +3,7 @@ import { Avatar, CircularProgress } from "@mui/material";
 import "jspdf-autotable";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   Button,
@@ -31,6 +31,7 @@ import { setBreadcrumbItems } from "../../store/actions";
 
 import ENV from "../../utility/env";
 const ViewClient = (props) => {
+  const navigateTo = useNavigate()
   const [clientData, setClientData] = useState({});
   const [agreementData, setAgreementData] = useState([]);
 
@@ -59,6 +60,18 @@ const ViewClient = (props) => {
     paymentTerms: 0
   });
   const [isButtonLoading, setIsButtonLoading] = useState(false)
+
+  const redirectToEditPage = (id) => {
+    let path = `/client/edit/${id}`;
+    setTimeout(() => {
+    navigateTo(path, id);
+    }, 300);
+  };
+
+  const handleEditClick = (id) => {
+    redirectToEditPage(id);
+  };
+
 
   const searchAllTaxes = async (part) => {
     try {
@@ -488,7 +501,7 @@ const ViewClient = (props) => {
           <option value="active">Published</option>
           <option value="inactive">Draft</option>
         </select>
-        <button type="submit" className="btn btn-primary w-sm mx-1">
+        <button type="submit" onClick={() => handleEditClick(id)} className="btn btn-primary w-sm mx-1">
           <DriveFileRenameOutline fontSize="small" />Edit
         </button>
       </div>

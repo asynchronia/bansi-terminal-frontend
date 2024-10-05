@@ -51,6 +51,7 @@ const API_URL = {
   convertToSalesOrder: "/api/orders/convert-to-sales-order",
   getUserProfile: "/api/users/profile",
   getPurchaseOrderStatusList: "/api/purchaseorders/list/status",
+  updateClient: '/api/clients/update'
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -116,6 +117,20 @@ export async function createClient(body) {
   return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.createClient}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      })
+      .catch((error) => reject(error));
+  });
+}
+
+export async function updateClient(body) {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`${baseUrl}${API_URL.updateClient}`, body, {
         headers: getHeaders(),
       })
       .then((res) => {
