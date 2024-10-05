@@ -267,6 +267,7 @@ const EditItems = (props) => {
       status: itemsData.payload?.item?.status,
       images: itemsData.payload?.item?.images,
       variants: itemsData.payload?.variants,
+      zohoItemId: itemsData.payload?.item?.zohoItemId,
       deletedVariants: [],
     },
     validationSchema: Yup.object({
@@ -341,6 +342,7 @@ const EditItems = (props) => {
         values.taxes = [taxArr];
         values.category = categoryData.id;
         values.deletedVariants = [...deletedVariant];
+        delete values.zohoItemId
         
         handleItemEdit(values);
       }
@@ -591,6 +593,27 @@ const EditItems = (props) => {
                       rows="14"
                       placeholder="Add a short description for the item"
                     />
+                    <span className="badgecount badge badge-success"></span>
+                  </div>
+                  <div className="mt-3">
+                    <Label>Zoho Item Id</Label>
+                    <input
+                      name="zohoItemId"
+                      id="zohoItemId"
+                      className="form-control"
+                      type="text"
+                      placeholder="Enter Zoho Item Id"
+                      onChange={validation.handleChange}
+                      onBlur={validation.handleBlur}
+                      value={validation.values.zohoItemId}
+                      invalid={
+                        validation.touched.zohoItemId && validation.errors.zohoItemId
+                      }
+                      disabled={true}
+                    />
+                    {validation.errors.zohoItemId && validation.touched.zohoItemId ? (
+                      <p style={{ color: "red" }}>{validation.errors.zohoItemId}</p>
+                    ) : null}
                     <span className="badgecount badge badge-success"></span>
                   </div>
                 </div>

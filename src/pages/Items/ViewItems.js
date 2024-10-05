@@ -212,6 +212,7 @@ const ViewItems = (props, { route, navigate }) => {
       <div style={{ position: "relative" }}>
         <Modal
           isOpen={openModal.status}
+          centered
           toggle={() => {
             handleModalToggle("status");
           }}

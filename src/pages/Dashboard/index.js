@@ -304,7 +304,7 @@ const Dashboard = (props) => {
                 <h2 className="mb-0 font-size-20 text-black">{agreementData.AgreementNumber ? agreementData.AgreementNumber : "XXXXXXXXXXXXXXXX"}</h2>
               </div>
               <div>
-                <h6 className="font-size-12 mb-0">Term</h6>
+                <h6 className="font-size-12 mb-0">Payment Terms</h6>
                 <h2 className="mb-0 font-size-20 text-black">
                   {agreementData.paymentTerms > 0 
                   ? agreementData.paymentTerms <= 30

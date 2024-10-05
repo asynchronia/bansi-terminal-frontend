@@ -391,7 +391,7 @@ const onGridReady = useCallback((params) => {
                           value={searchValue}
                           onChange={handleInputChange}
                           className="form-control rounded border"
-                          placeholder="Search by Invoice number or client"
+                          placeholder="Search by Invoice number or Client"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
