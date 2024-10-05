@@ -1,8 +1,9 @@
 import { Info } from "@mui/icons-material";
 import React from "react";
-import { Button, ModalBody } from "reactstrap";
+import { ModalBody } from "reactstrap";
+import StyledButton from "../Common/StyledButton";
 
-const ApproveConfirm = ({ setApproveModal, handlePurchaseOrderStatusChange, status }) => {
+const ApproveConfirm = ({ setApproveModal, handlePurchaseOrderStatusChange, status, isButtonLoading }) => {
   console.log(`APPROVE CONFIRM MODAL CALLED WITH SET STATUS VALUE: ${status}`);
   const statusToTextMap = {
     "draft": "Draft",
@@ -10,27 +11,30 @@ const ApproveConfirm = ({ setApproveModal, handlePurchaseOrderStatusChange, stat
     "sent": "Approve",
     "accepted": "Accept",
     "rejected": "Reject",
+    "declined": "Declined"
   }
   return (
     <ModalBody className="text-center">
-      <Info color="primary" />
+      {/* <Info color="primary" /> */}
       <h5 className="my-3">{`Are You sure you Want to ${statusToTextMap[status]}?`}</h5>
-      <div className="d-flex justify-content-center gap-1 my-2">
-        <Button color="primary" block
+      <div className="d-flex justify-content-center gap-2 my-2">
+        <StyledButton
           onClick={() => {
-            setApproveModal(false);
             handlePurchaseOrderStatusChange(status);
           }}
+          className="btn btn-primary w-md"
+          isLoading={isButtonLoading}
         >
           Yes
-        </Button>
-        <Button outline color="primary" block
+        </StyledButton>
+        <StyledButton
           onClick={() => {
             setApproveModal(false);
           }}
+          className="btn btn-secondary w-md"
         >
           No
-        </Button>
+        </StyledButton>
       </div>
     </ModalBody>
   );

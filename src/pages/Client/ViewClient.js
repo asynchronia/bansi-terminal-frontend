@@ -458,7 +458,6 @@ const ViewClient = (props) => {
         <AddBranch />
       </Modal> */}
       <Modal
-        size="sm"
         centered
         isOpen={openModal.status}
         toggle={() => {

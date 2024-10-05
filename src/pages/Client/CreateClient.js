@@ -24,6 +24,10 @@ const CreateClient = (props) => {
   const [selectedFiles, setselectedFiles] = useState([]);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [warehouseList, setWarehouseList] = useState([]);
+  const [status, setStatus] = useState("active")
+  const [openModal, setOpenModal] = useState({
+    status: false,
+  });
 
   const searchAllWareHouses = async () => {
     try {
@@ -139,6 +143,8 @@ const CreateClient = (props) => {
     onSubmit: (values) => {
       setIsButtonLoading(true);
       values.logo = `${selectedFiles[0]?.preview}`;
+      values.status = status
+      
       handleCreateClient(values);
     },
   });
@@ -152,6 +158,10 @@ const CreateClient = (props) => {
     );
     setselectedFiles(files);
   }
+
+  const handleClientStatus = async (e) => {
+    setStatus(e.target.value)
+  };
 
   const onCreateClientClick = (e) => {
     e.preventDefault();
@@ -183,7 +193,7 @@ const CreateClient = (props) => {
             display: "flex",
           }}
         >
-          <select className="form-select focus-width" name="status">
+          <select className="form-select focus-width" name="status" onChange={handleClientStatus}>
             <option value="active">Published</option>
             <option value="inactive">Draft</option>
           </select>
