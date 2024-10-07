@@ -413,7 +413,7 @@ export async function updateBranch(body) {
 }
 
 export async function updateUser(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.updateUser}`, body, {
         headers: getHeaders(),
@@ -421,6 +421,8 @@ export async function updateUser(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+        reject(error)
       });
   });
 }
