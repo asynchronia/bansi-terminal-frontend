@@ -57,8 +57,10 @@ const AllPayments = (props) => {
       headerName: "Invoice Date",
       field: "date",
       cellRenderer: (props) => {
-        let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
+        if(props.value) {
+          let date = new Date(props.value);
+          return <>{date.toDateString()}</>;
+      }
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
@@ -140,18 +142,13 @@ const AllPayments = (props) => {
   const [allCustomers, setAllCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState();
+  const [searchValue, setSearchValue] = useState("");
   const [paginationPageSize, setPaginationPageSize] = useState(25);
+  const [page, setPage] = useState(1);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
   const [delaySearch, setDelaySearch] = useState();
 
-  let bodyObject = {
-    page: 1,
-    limit: 200,
-  };
-
-  const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
   const tog_standard = () => {
     setmodal_standard(!modal_standard);
     removeBodyCss();
@@ -163,9 +160,21 @@ const AllPayments = (props) => {
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
     setPaginationPageSize(pageSize);
+
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
+    }
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
+
+    if (page !== newPage) {
+      setPage(newPage);
+    }
   }, []);
 
   const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
     dispatch(changePreloader(true));
     try {
       const response = await getPaymentReq(body);
@@ -174,12 +183,25 @@ const AllPayments = (props) => {
         custList.add(val.customer_name);
       });
       let custArr = [];
+
       custList?.forEach((val, key, set) => {
         custArr.push(val);
       });
+
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.length < paginationPageSize) {
+        filledRows = [...response];
+      } else {
+        filledRows = [...response, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+
       setAllCustomers([...custArr]);
-      setRowData(response);
-      setBodyObjectReq(body);
+      setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
@@ -189,8 +211,12 @@ const AllPayments = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Payments", breadcrumbItems);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
     if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
+      getListOfRowData(body);
       effectCalled.current = true;
     }
   }, []);
@@ -210,14 +236,18 @@ const AllPayments = (props) => {
   // }, [customer]);
 
   useEffect(() => {
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
     if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithSearch = { ...bodyObject };
+      let bodyObjectWithSearch = { ...body };
       bodyObjectWithSearch.search_text = delaySearch;
       getListOfRowData(bodyObjectWithSearch);
-    } else if (delaySearch === "") {
-      getListOfRowData(bodyObject);
+    } else {
+      getListOfRowData(body);
     }
-  }, [delaySearch]);
+  }, [delaySearch, page, paginationPageSize]);
 
   // useEffect(() => {
   //   props.setBreadcrumbItems("Payments", breadcrumbItems);
@@ -237,6 +267,8 @@ const AllPayments = (props) => {
     const timerId = setTimeout(() => {
       console.log("Executing code after delay");
       setDelaySearch(e.target.value);
+      setPage(1)
+      setRowData([])
     }, delay);
 
     return () => clearTimeout(timerId);

@@ -84,8 +84,10 @@ const AllInvoices = (props) => {
       headerName: "Invoice Date",
       field: "date", width: 140,
       cellRenderer: (props) => {
-        let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
+        if(props.value) { 
+          let date = new Date(props.value);
+          return <>{props.value ? date.toDateString() : ""}</>;
+        }
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
@@ -115,30 +117,32 @@ const AllInvoices = (props) => {
       field: "status",
       width: 150,
       cellRenderer: (props) => {
-        let due_date = new Date(props.data.due_date);
+        if(props?.data?.due_date){
+          let due_date = new Date(props.data.due_date);
 
-        let curr_date = new Date();
-        let status_msg = "";
-        let statusClass = "status-msg ";
-        if (ifOverDue(curr_date, due_date)) {
-          let days = getDifferenceInDays(curr_date, due_date);
-          status_msg = days > 0 ? "Overdue by " + days + " day(s)" : "";
-          statusClass = statusClass + "red";
-        } else {
-          let days = getDifferenceInDays(curr_date, due_date);
+          let curr_date = new Date();
+          let status_msg = "";
+          let statusClass = "status-msg ";
+          if (ifOverDue(curr_date, due_date)) {
+            let days = getDifferenceInDays(curr_date, due_date);
+            status_msg = days > 0 ? "Overdue by " + days + " day(s)" : "";
+            statusClass = statusClass + "red";
+          } else {
+            let days = getDifferenceInDays(curr_date, due_date);
 
-          days > 0
-            ? (status_msg = "Pending in " + days + " day(s)")
-            : (status_msg = "");
+            days > 0
+              ? (status_msg = "Pending in " + days + " day(s)")
+              : (status_msg = "");
 
-          statusClass = statusClass + "green";
+            statusClass = statusClass + "green";
+          }
+          return (
+            <>
+              <p className="status-field">{getDateInFormat(due_date)}</p>
+              <p className={statusClass}>{status_msg}</p>{" "}
+            </>
+          );
         }
-        return (
-          <>
-            <p className="status-field">{getDateInFormat(due_date)}</p>
-            <p className={statusClass}>{status_msg}</p>{" "}
-          </>
-        );
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
@@ -186,19 +190,14 @@ const AllInvoices = (props) => {
   const [allCustomers, setAllCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState();
+  const [searchValue, setSearchValue] = useState("");
 
   const [paginationPageSize, setPaginationPageSize] = useState(25);
+  const [page, setPage] = useState(1);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
   const [delaySearch, setDelaySearch] = useState();
 
-  let bodyObject = {
-    page: 1,
-    limit: 200,
-  };
-
-  const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
   const tog_standard = () => {
     setmodal_standard(!modal_standard);
     removeBodyCss();
@@ -210,6 +209,15 @@ const AllInvoices = (props) => {
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
     setPaginationPageSize(pageSize);
+
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
+    }
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
+
+    if (page !== newPage) {
+      setPage(newPage);
+    }
   }, []);
   /*
 {
@@ -226,6 +234,9 @@ const AllInvoices = (props) => {
 }
 * */
   const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
     dispatch(changePreloader(true));
     try {
       const response = await getInvoicesReq(body);
@@ -240,20 +251,35 @@ const AllInvoices = (props) => {
         custArr.push(val);
       });
 
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.length < paginationPageSize) {
+        filledRows = [...response];
+      } else {
+        filledRows = [...response, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+
       setAllCustomers([...custArr]);
-      setRowData(response);
-      setBodyObjectReq(body);
+      setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
       dispatch(changePreloader(false));
     }
-  });
+  },[page, paginationPageSize, searchValue]);
 
   useEffect(() => {
     props.setBreadcrumbItems("Invoices", breadcrumbItems);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
     if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
+      getListOfRowData(body);
       effectCalled.current = true;
     }
   }, []);
@@ -273,15 +299,18 @@ const AllInvoices = (props) => {
   // }, [customer]);
 
   useEffect(() => {
-    props.setBreadcrumbItems("Invoices", breadcrumbItems);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
     if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithCategory = { ...bodyObject };
+      let bodyObjectWithCategory = { ...body };
       bodyObjectWithCategory.search_text = delaySearch;
       getListOfRowData(bodyObjectWithCategory);
-    } else if (delaySearch === "")  {
-      getListOfRowData(bodyObject);
+    } else {
+      getListOfRowData(body);
     }
-  }, [delaySearch]);
+  }, [delaySearch, page, paginationPageSize]);
 
   // useEffect(() => {
   //   props.setBreadcrumbItems("Invoices", breadcrumbItems);
@@ -303,6 +332,8 @@ const AllInvoices = (props) => {
     const timerId = setTimeout(() => {
       console.log("Executing code after delay");
       setDelaySearch(e.target.value);
+      setPage(1)
+      setRowData([])
     }, delay);
 
     return () => clearTimeout(timerId);
