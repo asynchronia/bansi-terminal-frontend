@@ -153,7 +153,7 @@ const AllOrders = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Sales Order", link: "#" },
+    { title: "Ongoing Orders", link: "#" },
   ];
 
   const agRowData = [
@@ -168,15 +168,29 @@ const AllOrders = (props) => {
       status: "invoiced",
     }
   ]
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+  
+    return `${day}/${month}/${year}`;
+  };
+
   const columnDefs = [
     {
       headerName: "Order Date", field: "date",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
+      cellRenderer: (props) => {
+          let date = new Date(props.value);
+          return <>{formatDate(date)}</>;
+      },
       sortable: false, width: 110
     },
     {
-      headerName: "Order No.", field: "salesorder_id", flex: 1,
+      headerName: "Order No.", field: "salesorder_number", flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
       sortable: false, minWidth: 140
