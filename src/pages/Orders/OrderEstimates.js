@@ -21,7 +21,7 @@ const OrderEstimates = (props) => {
     let navigate = useNavigate();
     const effectCalled = useRef(false);
     const [searchValue, setSearchValue] = useState('');
-    const [inputValue, setInputValue] = useState('');
+    const [delaySearch, setDelaySearch] = useState();
 
 
     const redirectToViewPage = (id) => {
@@ -175,25 +175,30 @@ const OrderEstimates = (props) => {
       "page": page,
       "limit": paginationPageSize
     };
-    if (searchValue) {
-      bodyObject.search_text = searchValue;
-      getListOfRowData(bodyObject);
+    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
+      let bodyObjectWithCategory = { ...bodyObject };
+      bodyObjectWithCategory.search_text = delaySearch;
+      getListOfRowData(bodyObjectWithCategory);
     } else {
       delete bodyObject.search_text
       getListOfRowData(bodyObject);
     }
-  }, [searchValue, page, paginationPageSize])
+  }, [delaySearch, page, paginationPageSize])
 
-  const handleSearch = (event) => {
-    setSearchValue(event.target.value);
-    console.log(event.target.value);
-    setPage(1);
-    setRowData([]);
-  }
+  const handleInputChange = (e) => {
+    setSearchValue(e.target.value);
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-  }
+    const delay = 2000;
+
+    const timerId = setTimeout(() => {
+      console.log("Executing code after delay");
+      setDelaySearch(e.target.value);
+      setPage(1)
+      setRowData([])
+    }, delay);
+
+    return () => clearTimeout(timerId);
+  };
 
   return (
     <React.Fragment>
@@ -208,13 +213,8 @@ const OrderEstimates = (props) => {
                       <div className="search-box position-relative">
                         <Input
                           type="text"
-                          value={inputValue}
+                          value={searchValue}
                           onChange={handleInputChange}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleSearch(event);
-                            }
-                          }}
                           className="form-control rounded border"
                           placeholder="Search by Estimate number or Client"
                         />
