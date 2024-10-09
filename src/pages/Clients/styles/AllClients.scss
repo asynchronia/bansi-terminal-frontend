@@ -19,8 +19,13 @@
     height: 50px;
 }
 .button-right-section{
-    float: right;
     display: inline-flex;
+    padding-left: 75%;
+    width: 100%;
+}
+.invoice-search-box{
+    width: 100%;
+    margin-right: 5px;
 }
 .all-items-btn{
     margin-right: 10px;

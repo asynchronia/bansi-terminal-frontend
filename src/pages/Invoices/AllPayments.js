@@ -57,8 +57,10 @@ const AllPayments = (props) => {
       headerName: "Invoice Date",
       field: "date",
       cellRenderer: (props) => {
-        let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
+        if(props.value) {
+          let date = new Date(props.value);
+          return <>{date.toDateString()}</>;
+      }
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
@@ -140,18 +142,14 @@ const AllPayments = (props) => {
   const [allCustomers, setAllCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState();
   const [paginationPageSize, setPaginationPageSize] = useState(25);
+  const [page, setPage] = useState(1);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
-  const [delaySearch, setDelaySearch] = useState("");
+  const [delaySearch, setDelaySearch] = useState();
+  const [inputValue, setInputValue] = useState('');
 
-  let bodyObject = {
-    page: 1,
-    limit: 200,
-  };
-
-  const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
   const tog_standard = () => {
     setmodal_standard(!modal_standard);
     removeBodyCss();
@@ -163,9 +161,21 @@ const AllPayments = (props) => {
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
     setPaginationPageSize(pageSize);
+
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
+    }
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
+
+    if (page !== newPage) {
+      setPage(newPage);
+    }
   }, []);
 
   const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
     dispatch(changePreloader(true));
     try {
       const response = await getPaymentReq(body);
@@ -174,12 +184,25 @@ const AllPayments = (props) => {
         custList.add(val.customer_name);
       });
       let custArr = [];
+
       custList?.forEach((val, key, set) => {
         custArr.push(val);
       });
+
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.length < paginationPageSize) {
+        filledRows = [...response];
+      } else {
+        filledRows = [...response, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+
       setAllCustomers([...custArr]);
-      setRowData(response);
-      setBodyObjectReq(body);
+      setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
@@ -189,59 +212,61 @@ const AllPayments = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Payments", breadcrumbItems);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
     if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
+      getListOfRowData(body);
       effectCalled.current = true;
     }
   }, []);
 
   useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (customer && customer !== undefined && customer !== "") {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      bodyObjectWithFilter.filter = {};
-      bodyObjectWithFilter.filter.customer_name = customer;
-      getListOfRowData(bodyObjectWithFilter);
-    } else {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      delete bodyObjectWithFilter["filter"];
-      getListOfRowData(bodyObjectWithFilter);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
     }
-  }, [customer]);
+    if (searchValue) {
+      body.search_text = searchValue;
+    }
+    getListOfRowData(body);
+  }, [searchValue, page, paginationPageSize])
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithSearch = { ...bodyObject };
-      bodyObjectWithSearch.search_text = delaySearch;
-      getListOfRowData(bodyObjectWithSearch);
-    } else {
-      getListOfRowData(bodyObject);
-    }
-  }, [delaySearch]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Payments", breadcrumbItems);
+  //   if (customer && customer !== undefined && customer !== "") {
+  //     let bodyObjectWithFilter = { ...bodyObjectReq };
+  //     bodyObjectWithFilter.filter = {};
+  //     bodyObjectWithFilter.filter.customer_name = customer;
+  //     getListOfRowData(bodyObjectWithFilter);
+  //   } else {
+  //     let bodyObjectWithFilter = { ...bodyObjectReq };
+  //     delete bodyObjectWithFilter["filter"];
+  //     getListOfRowData(bodyObjectWithFilter);
+  //   }
+  // }, [customer]);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (paginationPageSize && paginationPageSize !== undefined) {
-      getListOfRowData(bodyObject);
-    }
-  }, [paginationPageSize]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Payments", breadcrumbItems);
+  //   if (paginationPageSize && paginationPageSize !== undefined) {
+  //     getListOfRowData(bodyObject);
+  //   }
+  // }, [paginationPageSize]);
 
   const handleChange = (e) => {
     setCustomer(e.target.value);
   };
   const handleInputChange = (e) => {
-    setSearchValue(e.target.value);
-
-    const delay = 2000;
-
-    const timerId = setTimeout(() => {
-      console.log("Executing code after delay");
-      setDelaySearch(e.target.value);
-    }, delay);
-
-    return () => clearTimeout(timerId);
+    setInputValue(e.target.value);
   };
+
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+    setPage(1);
+    setRowData([]);
+  }
 
   return (
     <React.Fragment>
@@ -303,8 +328,13 @@ const AllPayments = (props) => {
                       <div className="search-box position-relative">
                         <Input
                           type="text"
-                          value={searchValue}
+                          value={inputValue}
                           onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
                           className="form-control rounded border"
                           placeholder="Search by Payment number or Client"
                         />

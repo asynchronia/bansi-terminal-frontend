@@ -20,7 +20,8 @@ const OrderEstimates = (props) => {
     let dispatch = useDispatch();
     let navigate = useNavigate();
     const effectCalled = useRef(false);
-    const [searchValue, setSearchValue] = useState('');
+    const [searchValue, setSearchValue] = useState();
+    const [delaySearch, setDelaySearch] = useState();
     const [inputValue, setInputValue] = useState('');
 
 
@@ -42,10 +43,7 @@ const OrderEstimates = (props) => {
 
   ];
   const gridRef = useRef();
-  let bodyObject = {
-    "page": 1,
-    "limit": 200
-  };
+  
   const columnDefs = [
     {
         headerName: "Order Date",
@@ -53,8 +51,10 @@ const OrderEstimates = (props) => {
         headerCheckboxSelection: true,
         checkboxSelection: true,
         cellRenderer: (props) => {
-          let date = new Date(props.value);
-          return <>{date.toDateString()}</>;
+          if(props.value) {
+            let date = new Date(props.value);
+            return <>{date.toDateString()}</>;
+          }
         },
         suppressMenu: true,
         floatingFilterComponentParams: { suppressFilterButton: true },
@@ -111,7 +111,8 @@ const OrderEstimates = (props) => {
 
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
-    const pageSize = gridRef.current.api.paginationGetPageSize();
+    let pageSize = gridRef.current.api.paginationGetPageSize();
+    setPaginationPageSize(pageSize);
 
     if (pageSize !== paginationPageSize) {
       setPaginationPageSize(pageSize);
@@ -125,10 +126,26 @@ const OrderEstimates = (props) => {
 
   
   const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
     dispatch(changePreloader(true));
     try { 
       const response = await getEstimatesReq(body);
-      setRowData(response.data);
+
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.data.length < paginationPageSize) {
+        filledRows = [...response.data];
+      } else {
+        filledRows = [...response.data, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+
+      setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
@@ -138,6 +155,10 @@ const OrderEstimates = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Estimates", breadcrumbItems);
+    const bodyObject = {
+      "page": page,
+      "limit": paginationPageSize
+    };
     if (!effectCalled.current) {
       getListOfRowData(bodyObject);
       effectCalled.current = true;
@@ -150,25 +171,26 @@ const OrderEstimates = (props) => {
 //     redirectToViewPage(event.data?.estimate_id);
 //  }
 
-  useEffect(() => {
-    if (searchValue) {
-      bodyObject.search_text = searchValue;
-    } else {
-      delete bodyObject.search_text
-    }
+useEffect(() => {
+  const body = {
+    page: page,
+    limit: paginationPageSize,
+  }
+  if (searchValue) {
+    body.search_text = searchValue;
+  }
+  getListOfRowData(body);
+}, [searchValue, page, paginationPageSize])
 
-    getListOfRowData(bodyObject); 
-  }, [searchValue])
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value)
+  };
 
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
     console.log(event.target.value);
     setPage(1);
     setRowData([]);
-  }
-
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
   }
 
   return (
