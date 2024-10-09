@@ -125,8 +125,8 @@ const Dashboard = (props) => {
 
   const formatDate = (format, dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     const monthName = getMonthName(date.getMonth());
     const ordinalDay = getOrdinal(day);
