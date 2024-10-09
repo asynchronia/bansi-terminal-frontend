@@ -23,6 +23,7 @@ import { getAgreementItemsReq } from "../../service/itemService";
 import {
   createPurchaseOrderReq,
   getPurchaseOrderDetailsReq,
+  getPurchaseOrderSequenceReq,
   updatePurchaseOrderReq,
 } from "../../service/purchaseService";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -58,7 +59,7 @@ const CreateOrder = (props) => {
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
-  const [poPrefix, setPoPrefix] = useState("PO");
+  const [poPrefix, setPoPrefix] = useState("");
 
   const [minDate, setMinDate] = useState(() => {
     const today = new Date();
@@ -133,15 +134,11 @@ const CreateOrder = (props) => {
     initialValues: {
       billingAddress: "",
       shippingAddress: "",
-      purchaseOrderNumber: "",
       deliveryDate: "",
     },
     validationSchema: Yup.object({
       billingAddress: Yup.string().required("Please Select Billing Address"),
       shippingAddress: Yup.string().required("Please Select Shipping Address"),
-      purchaseOrderNumber: Yup.string().required(
-        "Please Enter Purchase Order Number"
-      ),
       deliveryDate: Yup.string().required("Please Enter Delivery Date"),
     }),
     onSubmit: (values) => {
@@ -165,13 +162,24 @@ const CreateOrder = (props) => {
     }
   };
 
-  const fetchUserData = async () => {
-    try {
-      const data = { _id: clientId };
-      const res = await getClientWithIdReq(data);
+  // const fetchUserData = async () => {
+  //   try {
+  //     const data = { _id: clientId };
+  //     const res = await getClientWithIdReq(data);
 
-      // set the client poPrefix
-      setPoPrefix(res.payload.client.poPrefix)
+  //     // set the client poPrefix
+  //     setPoPrefix(res.payload.client.poPrefix)
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  // };
+
+  const fetchPurchaseOrderSequence = async () => {
+    try {
+      const res = await getPurchaseOrderSequenceReq();
+      
+      // set the PO Number
+      setPoPrefix(res.purchaseOrderNumber)
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -369,10 +377,14 @@ const CreateOrder = (props) => {
     if (!effectCalled.current) {
       getBranchData();
       getListOfRowData();
-      fetchUserData()
+      fetchPurchaseOrderSequence()
       effectCalled.current = true;
     }
   }, [props, breadcrumbItems, getBranchData]);
+
+  useEffect(() => {
+    formik.setFieldValue("purchaseOrderNumber", poPrefix)
+  },[poPrefix])
 
   const saveOrUpdatePurchaseOrder = (values) => {
     if (selectedItems.length === 0) {
@@ -416,13 +428,11 @@ const CreateOrder = (props) => {
       }
       // validation.handleSubmit();
       const {
-        purchaseOrderNumber,
         deliveryDate,
         billingAddress,
         shippingAddress,
       } = values;
       const body = {
-        purchaseOrderNumber,
         agreementId,
         status,
         deliveryDate,
@@ -506,7 +516,7 @@ const CreateOrder = (props) => {
               <span className="purchase-order">Purchase Order</span>
               <br />
               <span className="purchase-order-no">
-                {formik.values.purchaseOrderNumber}
+                {poPrefix}
               </span>
             </div>
           </div>
@@ -616,11 +626,12 @@ const CreateOrder = (props) => {
                         type="text"
                         name="purchaseOrderNumber"
                         id="purchaseOrderNumber"
-                        value={formik.values.purchaseOrderNumber}
+                        value={poPrefix}
                         placeholder="PO/BLR/#123"
                         onChange={handleChangePO}
                         onClick={handleClickPO}
                         onBlur={formik.handleBlur}
+                        disabled={true}
                       />
                       {formik.touched.purchaseOrderNumber &&
                       formik.errors.purchaseOrderNumber ? (

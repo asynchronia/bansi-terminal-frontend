@@ -51,7 +51,8 @@ const API_URL = {
   convertToSalesOrder: "/api/orders/convert-to-sales-order",
   getUserProfile: "/api/users/profile",
   getPurchaseOrderStatusList: "/api/purchaseorders/list/status",
-  updateClient: '/api/clients/update'
+  updateClient: '/api/clients/update',
+  getPurchaseOrderSequence: '/api/purchaseorders/sequence',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -760,6 +761,19 @@ export async function getPurchaseOrderStatusList() {
   return new Promise((resolve) => {
     axios
       .get(`${baseUrl}${API_URL.getPurchaseOrderStatusList}`, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function getPurchaseOrderSequence() {
+  return new Promise((resolve) => {
+    axios
+      .get(`${baseUrl}${API_URL.getPurchaseOrderSequence}`, {
         headers: getHeaders(),
       })
       .then((res) => {

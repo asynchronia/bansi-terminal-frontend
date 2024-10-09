@@ -1,4 +1,4 @@
-import { getPurchaseOrderList, createPurchaseOrder, getPurchaseOrderDetails, purchaseOrderStatusChange, convertToSalesOrder, updatePurchaseOrder, getPurchaseOrderStatusList } from "../api";
+import { getPurchaseOrderList, createPurchaseOrder, getPurchaseOrderDetails, purchaseOrderStatusChange, convertToSalesOrder, updatePurchaseOrder, getPurchaseOrderStatusList, getPurchaseOrderSequence } from "../api";
 
 export const getPurchaseOrderListReq = async (body) => {
   const response = await getPurchaseOrderList(body);
@@ -31,5 +31,10 @@ export const convertToSalesOrderReq = async (body) => {
 
 export const getPurchaseOrderStatusListReq = async (body) => {
   const response = await getPurchaseOrderStatusList(body);
+  return response.payload;
+};
+
+export const getPurchaseOrderSequenceReq = async (body) => {
+  const response = await getPurchaseOrderSequence(body);
   return response.payload;
 };
