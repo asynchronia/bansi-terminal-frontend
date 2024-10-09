@@ -20,8 +20,9 @@ const OrderEstimates = (props) => {
     let dispatch = useDispatch();
     let navigate = useNavigate();
     const effectCalled = useRef(false);
-    const [searchValue, setSearchValue] = useState('');
+    const [searchValue, setSearchValue] = useState();
     const [delaySearch, setDelaySearch] = useState();
+    const [inputValue, setInputValue] = useState('');
 
 
     const redirectToViewPage = (id) => {
@@ -170,35 +171,27 @@ const OrderEstimates = (props) => {
 //     redirectToViewPage(event.data?.estimate_id);
 //  }
 
-  useEffect(() => {
-    const bodyObject = {
-      "page": page,
-      "limit": paginationPageSize
-    };
-    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithCategory = { ...bodyObject };
-      bodyObjectWithCategory.search_text = delaySearch;
-      getListOfRowData(bodyObjectWithCategory);
-    } else {
-      delete bodyObject.search_text
-      getListOfRowData(bodyObject);
-    }
-  }, [delaySearch, page, paginationPageSize])
+useEffect(() => {
+  const body = {
+    page: page,
+    limit: paginationPageSize,
+  }
+  if (searchValue) {
+    body.search_text = searchValue;
+  }
+  getListOfRowData(body);
+}, [searchValue, page, paginationPageSize])
 
   const handleInputChange = (e) => {
-    setSearchValue(e.target.value);
-
-    const delay = 2000;
-
-    const timerId = setTimeout(() => {
-      console.log("Executing code after delay");
-      setDelaySearch(e.target.value);
-      setPage(1)
-      setRowData([])
-    }, delay);
-
-    return () => clearTimeout(timerId);
+    setInputValue(e.target.value)
   };
+
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+    setPage(1);
+    setRowData([]);
+  }
 
   return (
     <React.Fragment>
@@ -213,8 +206,13 @@ const OrderEstimates = (props) => {
                       <div className="search-box position-relative">
                         <Input
                           type="text"
-                          value={searchValue}
+                          value={inputValue}
                           onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
                           className="form-control rounded border"
                           placeholder="Search by Estimate number or Client"
                         />

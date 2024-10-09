@@ -190,13 +190,14 @@ const AllInvoices = (props) => {
   const [allCustomers, setAllCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState();
 
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
   const [delaySearch, setDelaySearch] = useState();
+  const [inputValue, setInputValue] = useState('');
 
   const tog_standard = () => {
     setmodal_standard(!modal_standard);
@@ -284,6 +285,17 @@ const AllInvoices = (props) => {
     }
   }, []);
 
+  useEffect(() => {
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
+    if (searchValue) {
+      body.search_text = searchValue;
+    }
+    getListOfRowData(body);
+  }, [searchValue, page, paginationPageSize])
+
   // useEffect(() => {
   //   props.setBreadcrumbItems("Invoices", breadcrumbItems);
   //   if (customer && customer !== undefined && customer !== "") {
@@ -298,19 +310,19 @@ const AllInvoices = (props) => {
   //   }
   // }, [customer]);
 
-  useEffect(() => {
-    const body = {
-      page: page,
-      limit: paginationPageSize,
-    }
-    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithCategory = { ...body };
-      bodyObjectWithCategory.search_text = delaySearch;
-      getListOfRowData(bodyObjectWithCategory);
-    } else {
-      getListOfRowData(body);
-    }
-  }, [delaySearch, page, paginationPageSize]);
+  // useEffect(() => {
+  //   const body = {
+  //     page: page,
+  //     limit: paginationPageSize,
+  //   }
+  //   if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
+  //     let bodyObjectWithCategory = { ...body };
+  //     bodyObjectWithCategory.search_text = delaySearch;
+  //     getListOfRowData(bodyObjectWithCategory);
+  //   } else {
+  //     getListOfRowData(body);
+  //   }
+  // }, [delaySearch, page, paginationPageSize]);
 
   // useEffect(() => {
   //   props.setBreadcrumbItems("Invoices", breadcrumbItems);
@@ -325,19 +337,27 @@ const AllInvoices = (props) => {
     setCustomer(e.target.value);
   };
   const handleInputChange = (e) => {
-    setSearchValue(e.target.value);
+    setInputValue(e.target.value)
+    // setSearchValue(e.target.value);
 
-    const delay = 2000;
+    // const delay = 2000;
 
-    const timerId = setTimeout(() => {
-      console.log("Executing code after delay");
-      setDelaySearch(e.target.value);
-      setPage(1)
-      setRowData([])
-    }, delay);
+    // const timerId = setTimeout(() => {
+    //   console.log("Executing code after delay");
+    //   setDelaySearch(e.target.value);
+    //   setPage(1)
+    //   setRowData([])
+    // }, delay);
 
-    return () => clearTimeout(timerId);
+    // return () => clearTimeout(timerId);
   };
+
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+    setPage(1);
+    setRowData([]);
+  }
 
   /*
 const onGridReady = useCallback((params) => {
@@ -419,8 +439,14 @@ const onGridReady = useCallback((params) => {
                       <div className="search-box position-relative">
                         <Input
                           type="text"
-                          value={searchValue}
+                          // value={searchValue}
+                          value={inputValue}
                           onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
                           className="form-control rounded border"
                           placeholder="Search by Invoice number or Client"
                         />
