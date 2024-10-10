@@ -44,7 +44,7 @@ const OrderDetails = (props) => {
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Sales Orders", link: "/ongoing-orders" },
+    { title: "Ongoing Orders", link: "/ongoing-orders" },
     { title: "Order #" + orderData?.salesorder_number, link: "#" },
   ];
 
@@ -276,8 +276,8 @@ const OrderDetails = (props) => {
               }}
             >
               <div>
-                <h1 className="secondary">Sales Order</h1>
-                <h6>Sales Order #{orderData?.salesorder_number}</h6>
+                <h1 className="secondary">Ongoing Order</h1>
+                <h6>Ongoing Order #{orderData?.salesorder_number}</h6>
               </div>
               <Chip label='Draft' />
             </CardBody>
