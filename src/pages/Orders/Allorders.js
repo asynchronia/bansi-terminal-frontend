@@ -215,7 +215,10 @@ const AllOrders = (props) => {
       headerName: "Order Date", field: "date",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-<<<<<<< HEAD
+      cellRenderer: (props) => {
+          let date = new Date(props.value);
+          return <>{formatDate(date)}</>;
+      },
       sortable: false, width: 110,
       headerComponent: headerTemplate,
       headerComponentParams:  (props) => ({
@@ -223,13 +226,6 @@ const AllOrders = (props) => {
         data: props,
         sortBody,
       })
-=======
-      cellRenderer: (props) => {
-          let date = new Date(props.value);
-          return <>{formatDate(date)}</>;
-      },
-      sortable: false, width: 110
->>>>>>> 1cb9c78d195749d9c8a50bc45fd8a6ee11dcc9fc
     },
     {
       headerName: "Order No.", field: "salesorder_number", flex: 1,
