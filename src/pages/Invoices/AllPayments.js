@@ -22,6 +22,10 @@ const AllPayments = (props) => {
   let navigate = useNavigate();
   let dispatch = useDispatch();
   const effectCalled = useRef(false);
+  const [sortBody, setSortBody] = useState({
+    key: 'date',
+    order: "D"
+  })
 
   const redirectToViewPage = (id) => {
     let path = `/payment/${id.payment_id}`;
@@ -52,6 +56,31 @@ const AllPayments = (props) => {
     redirectToViewPage(data);
   };
 
+  const headerTemplate = (props) => {
+    const {handleSort, data} = props
+    return (
+      <button onClick={() => handleSort(data, sortBody)} style={{background: 'transparent', border: 'none'}}>
+        <span style={{fontWeight: 600}}>
+          {data?.displayName}&nbsp;
+          {sortBody?.key === data?.column.userProvidedColDef.field ? <i className={sortBody?.order === "A" ? "mdi mdi-arrow-up" : "mdi mdi-arrow-down"}></i> : ''}
+        </span>
+      </button>
+    )
+  }
+
+  const handleSort = (data, sortBody) => {
+    if(data.column.userProvidedColDef.field === sortBody?.key) {
+      setSortBody({...sortBody, order: sortBody?.order === "A" ? "D" : "A"})
+    } else {
+      setSortBody({
+        key: data.column.userProvidedColDef.field,
+        order: "D"
+      })
+    }
+    setPage(1)
+    setRowData([])
+  }
+
   const columnDefs = [
     {
       headerName: "Invoice Date",
@@ -64,7 +93,13 @@ const AllPayments = (props) => {
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      sortable: false
+      sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
 
     },
     {
@@ -72,7 +107,13 @@ const AllPayments = (props) => {
       field: "payment_number",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width: 120, sortable: false
+      width: 120, sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Type",
@@ -87,7 +128,13 @@ const AllPayments = (props) => {
       tooltipField: "customer_name",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      flex: 1, sortable: false
+      flex: 1, sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Invoice#",
@@ -111,7 +158,13 @@ const AllPayments = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
-      flex: 1, sortable: false
+      flex: 1, sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
 
     },
     {
@@ -230,8 +283,11 @@ const AllPayments = (props) => {
     if (searchValue) {
       body.search_text = searchValue;
     }
+    if (sortBody) {
+      body.sort = sortBody;
+    }
     getListOfRowData(body);
-  }, [searchValue, page, paginationPageSize])
+  }, [searchValue, page, paginationPageSize, sortBody])
 
   // useEffect(() => {
   //   props.setBreadcrumbItems("Payments", breadcrumbItems);

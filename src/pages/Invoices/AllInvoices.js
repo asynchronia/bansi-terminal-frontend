@@ -27,6 +27,10 @@ const AllInvoices = (props) => {
   let navigate = useNavigate();
   let dispatch = useDispatch();
   const effectCalled = useRef(false);
+  const [sortBody, setSortBody] = useState({
+    key: 'date',
+    order: "D"
+  })
 
   const redirectToViewPage = (id) => {
     let path = "/view-invoice/" + id;
@@ -79,6 +83,31 @@ const AllInvoices = (props) => {
     redirectToViewPage(id);
   };
 
+  const headerTemplate = (props) => {
+    const {handleSort, data} = props
+    return (
+      <button onClick={() => handleSort(data, sortBody)} style={{background: 'transparent', border: 'none'}}>
+        <span style={{fontWeight: 600}}>
+          {data?.displayName}&nbsp;
+          {sortBody?.key === data?.column.userProvidedColDef.field ? <i className={sortBody?.order === "A" ? "mdi mdi-arrow-up" : "mdi mdi-arrow-down"}></i> : ''}
+        </span>
+      </button>
+    )
+  }
+
+  const handleSort = (data, sortBody) => {
+    if(data.column.userProvidedColDef.field === sortBody?.key) {
+      setSortBody({...sortBody, order: sortBody?.order === "A" ? "D" : "A"})
+    } else {
+      setSortBody({
+        key: data.column.userProvidedColDef.field,
+        order: "D"
+      })
+    }
+    setPage(1)
+    setRowData([])
+  }
+
   const columnDefs = [
     {
       headerName: "Invoice Date",
@@ -91,6 +120,13 @@ const AllInvoices = (props) => {
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Invoice No.",
@@ -98,12 +134,20 @@ const AllInvoices = (props) => {
       tooltipField: "invoice_number",
       suppressMenu: true, width: 150,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Order No.",
       field: "reference_number",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      sortable: false,
     },
     {
       headerName: "Client",
@@ -111,6 +155,13 @@ const AllInvoices = (props) => {
       tooltipField: "customer_name",
       suppressMenu: true, minWidth: 150, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Status",
@@ -146,6 +197,7 @@ const AllInvoices = (props) => {
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      sortable: false,
     },
     {
       headerName: "Total Amount",
@@ -155,12 +207,19 @@ const AllInvoices = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Amount Due",
       field: "balance",
       suppressMenu: true, width: 140,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      sortable: false,
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
     },
@@ -293,8 +352,11 @@ const AllInvoices = (props) => {
     if (searchValue) {
       body.search_text = searchValue;
     }
+    if (sortBody) {
+      body.sort = sortBody;
+    } 
     getListOfRowData(body);
-  }, [searchValue, page, paginationPageSize])
+  }, [searchValue, page, paginationPageSize, sortBody])
 
   // useEffect(() => {
   //   props.setBreadcrumbItems("Invoices", breadcrumbItems);
