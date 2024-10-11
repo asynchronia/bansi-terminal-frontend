@@ -36,6 +36,10 @@ const AllOrders = (props) => {
   const [page, setPage] = useState(1);
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
+  const [sortBody, setSortBody] = useState({
+    key: 'date',
+    order: "D"
+  })
 
   const redirectToViewPage = (id) => {
     let path = `/order/${id.salesorder_id}`;
@@ -63,8 +67,11 @@ const AllOrders = (props) => {
     if (searchValue) {
       body.search_text = searchValue;
     }
+    if (sortBody) {
+      body.sort = sortBody;
+    } 
     getListOfRowData(body);
-  }, [page, paginationPageSize, searchValue]);
+  }, [page, paginationPageSize, searchValue, sortBody]);
 
   const getListOfRowData = useCallback(async (body) => {
     if (rowData[(page - 1) * paginationPageSize]) {
@@ -151,6 +158,31 @@ const AllOrders = (props) => {
 
   const gridRef = useRef();
 
+  const headerTemplate = (props) => {
+    const {handleSort, data} = props
+    return (
+      <button onClick={() => handleSort(data, sortBody)} style={{background: 'transparent', border: 'none'}}>
+        <span style={{fontWeight: 600}}>
+          {data?.displayName}&nbsp;
+          {sortBody?.key === data?.column.userProvidedColDef.field ? <i className={sortBody?.order === "A" ? "mdi mdi-arrow-up" : "mdi mdi-arrow-down"}></i> : ''}
+        </span>
+      </button>
+    )
+  }
+
+  const handleSort = (data, sortBody) => {
+    if(data.column.userProvidedColDef.field === sortBody?.key) {
+      setSortBody({...sortBody, order: sortBody?.order === "A" ? "D" : "A"})
+    } else {
+      setSortBody({
+        key: data.column.userProvidedColDef.field,
+        order: "D"
+      })
+    }
+    setPage(1)
+    setRowData([])
+  }
+
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Sales Order", link: "#" },
@@ -173,13 +205,25 @@ const AllOrders = (props) => {
       headerName: "Order Date", field: "date",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: false, width: 110
+      sortable: false, width: 110,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
-      headerName: "Order No.", field: "salesorder_id", flex: 1,
+      headerName: "Order No.", field: "salesorder_number", flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: false, minWidth: 140
+      sortable: false, minWidth: 140,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Client", field: "customer_name", flex: 1,
@@ -187,7 +231,13 @@ const AllOrders = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: false, minWidth: 180
+      sortable: false, minWidth: 180,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Status", field: "order_status", cellRenderer: OrderStatusRenderer,
@@ -200,7 +250,13 @@ const AllOrders = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
-      sortable: false
+      sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,
