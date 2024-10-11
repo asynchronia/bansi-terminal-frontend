@@ -12,6 +12,7 @@ import { changePreloader } from "../../store/actions";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
+import { formatDate } from '../../utility/formatDate';
 
 const ViewPurchaseOrder = (props) => {
   document.title = "All Purchase Orders";
@@ -126,35 +127,6 @@ const ViewPurchaseOrder = (props) => {
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
-  }
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = getMonthName(date.getMonth());
-    const year = date.getFullYear();
-    const ordinalDay = getOrdinal(day);
-
-    return `${ordinalDay} ${month} ${year}`;
-  }
-
-  const getMonthName = (monthIndex) => {
-    const months = [
-      'January', 'February', 'March', 'April',
-      'May', 'June', 'July', 'August',
-      'September', 'October', 'November', 'December'
-    ];
-    return months[monthIndex];
-  }
-
-  const getOrdinal = (day) => {
-    if (day > 3 && day < 21) return `${day}th`;
-    switch (day % 10) {
-      case 1: return `${day}st`;
-      case 2: return `${day}nd`;
-      case 3: return `${day}rd`;
-      default: return `${day}th`;
-    }
   }
 
   const handleSearch = (event) => {

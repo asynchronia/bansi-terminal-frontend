@@ -14,6 +14,7 @@ import "./styles/datatables.scss";
 import { changePreloader } from "../../store/actions";
 import { getEstimatesReq } from "../../service/orderService";
 import DropdownMenuBtn from "./DropdownMenuBtn";
+import { formatDate } from "../../utility/formatDate";
 
 const OrderEstimates = (props) => {
     document.title = "Estimates";
@@ -53,7 +54,7 @@ const OrderEstimates = (props) => {
         cellRenderer: (props) => {
           if(props.value) {
             let date = new Date(props.value);
-            return <>{date.toDateString()}</>;
+            return <>{formatDate(date)}</>;
           }
         },
         suppressMenu: true,
