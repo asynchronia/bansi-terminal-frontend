@@ -13,6 +13,7 @@ import "./styles/datatables.scss";
 import { changePreloader } from "../../store/actions";
 import { getExpensesReq } from "../../service/expenseService";
 import DropdownMenuBtn from "../Orders/DropdownMenuBtn";
+import { formatDate } from "../../utility/formatDate";
 
 const Expenses = (props) => {
   document.title = "Estimates";
@@ -53,7 +54,7 @@ const Expenses = (props) => {
         checkboxSelection: true,
         cellRenderer: (props) => {
           let date = new Date(props.value);
-          return <>{date.toDateString()}</>;
+          return <>{formatDate(date)}</>;
         },
         suppressMenu: true,
         floatingFilterComponentParams: { suppressFilterButton: true },

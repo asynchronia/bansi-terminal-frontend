@@ -24,6 +24,7 @@ import { getAgreement } from "../../api";
 import "./styles/Dashboard.scss";
 import { USER_TYPES_ENUM } from "../../utility/constants";
 import RequireUserType from "../../routes/middleware/requireUserType";
+import { formatDate } from "../../utility/formatDate";
 
 const Dashboard = (props) => {
   document.title = "Willsmeet Portal";
@@ -123,15 +124,13 @@ const Dashboard = (props) => {
     }
   }
 
-  const formatDate = (format, dateString) => {
+  const ordinalFormatDate = (dateString) => {
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     const monthName = getMonthName(date.getMonth());
-    const ordinalDay = getOrdinal(day);
+    const ordinalDay = getOrdinal(date.getDate());
 
-    return format === "DDMMYY" ? `${day}-${month}-${year}` : `${ordinalDay} ${monthName} ${year}`;
+    return `${ordinalDay} ${monthName} ${year}`;
   };
 
   const columnDefs = [
@@ -264,7 +263,7 @@ const Dashboard = (props) => {
       const newData = response.purchaseOrders.map((order) => ({
         order_id: order._id,
         order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : '-',
-        createdAt: formatDate("DDMMYY", order.createdAt),
+        createdAt: formatDate(order.createdAt),
         total: order.items.reduce((total, item) => total + item.unitPrice * item.quantity, 0),
         order_status: order.status,
       }));
@@ -298,16 +297,12 @@ const Dashboard = (props) => {
           </Col>
         </RequireUserType>
         <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
-          <Col xl={"8"} style={{ paddingTop: '24px' }}>
+          <Col xl={"8"}>
               <Miniwidget reports={chipData} />
           </Col>
           <Col xl="4">
             <Card className="agreement-card">
               <CardBody className="agreement-body">
-                <div>
-                  <h6 className="font-size-12 mb-0">Agreement No.</h6>
-                  <h2 className="mb-0 font-size-20 text-black">{agreementData.AgreementNumber ? agreementData.AgreementNumber : "XXXXXXXXXXXXXXXX"}</h2>
-                </div>
                 <div>
                   <h6 className="font-size-12 mb-0">Payment Terms</h6>
                   <h2 className="mb-0 font-size-20 text-black">
@@ -321,7 +316,7 @@ const Dashboard = (props) => {
                 </div>
                 <div>
                   <h6 className="font-size-12 mb-0">Valid Until</h6>
-                  <h2 className="mb-0 font-size-20 text-black">{agreementData.validUntil ? formatDate("DayMMYY",agreementData.validUntil): "Day/MM/YYYY"}</h2>
+                  <h2 className="mb-0 font-size-20 text-black">{agreementData.validUntil ? ordinalFormatDate(agreementData.validUntil): "Day/MM/YYYY"}</h2>
                 </div>
                 <StyledButton color={'primary'} type="submit" className={'w-md agreement-btn'} disabled={!agreementData.AgreementNumber || !agreementData.validUntil || !agreementData.paymentTerms}>
                   <i className={'btn-icon mdi mdi-download'}></i>

@@ -21,6 +21,7 @@ import "./styles/datatables.scss";
 import "./styles/AllInvoices.scss";
 import InvoiceActionBtn from "./InvoiceActionBtn";
 import { getDateInFormat, getDifferenceInDays, ifOverDue } from "./invoiceUtil";
+import { formatDate } from "../../utility/formatDate";
 
 const AllInvoices = (props) => {
   document.title = "Invoices";
@@ -86,7 +87,7 @@ const AllInvoices = (props) => {
       cellRenderer: (props) => {
         if(props.value) { 
           let date = new Date(props.value);
-          return <>{props.value ? date.toDateString() : ""}</>;
+          return <>{formatDate(date)}</>;
         }
       },
       suppressMenu: true,
