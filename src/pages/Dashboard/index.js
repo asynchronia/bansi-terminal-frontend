@@ -22,6 +22,8 @@ import { toast } from "react-toastify";
 import StyledButton from "../../components/Common/StyledButton";
 import { getAgreement } from "../../api";
 import "./styles/Dashboard.scss";
+import { USER_TYPES_ENUM } from "../../utility/constants";
+import RequireUserType from "../../routes/middleware/requireUserType";
 
 const Dashboard = (props) => {
   document.title = "Willsmeet Portal";
@@ -29,8 +31,8 @@ const Dashboard = (props) => {
 
   const breadcrumbItems = [{ title: "Dashboard", link: "#" }];
 
+  const user = JSON.parse(localStorage.getItem("user"))
   const [inputValue, setInputValue] = useState('');
-  const [clientId, setClientId] = useState('')
   const [rowData, setRowData] = useState([]);
   const [chipData, setChipData] = useState([
     {
@@ -123,8 +125,8 @@ const Dashboard = (props) => {
 
   const formatDate = (format, dateString) => {
     const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.getMonth();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     const monthName = getMonthName(date.getMonth());
     const ordinalDay = getOrdinal(day);
@@ -275,56 +277,60 @@ const Dashboard = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems('Dashboard' , breadcrumbItems)
-    const user = JSON.parse(localStorage.getItem("user"))
-    setClientId(user.clientId)
-  }, []);
-
-  useEffect(() => {
     getPurchaseOrderListData();
     getPurchaseOrderStatusList();
   }, []);
 
   useEffect(() => {
-    getAgreementData(clientId);
-  }, [clientId]);
+    if(user.userType === "client") {
+      getAgreementData(user.clientId);
+    }
+  }, [user.clientId, user.userType]);
 
 
   return (
     <React.Fragment>
       {/*mimi widgets */}
       <Row>
-        <Col xl="8" style={{ paddingTop: '24px' }}>
-          <Miniwidget reports={chipData} />
-        </Col>
-        <Col xl="4">
-          <Card className="agreement-card">
-            <CardBody className="agreement-body">
-              <div>
-                <h6 className="font-size-12 mb-0">Agreement No.</h6>
-                <h2 className="mb-0 font-size-20 text-black">{agreementData.AgreementNumber ? agreementData.AgreementNumber : "XXXXXXXXXXXXXXXX"}</h2>
-              </div>
-              <div>
-                <h6 className="font-size-12 mb-0">Payment Terms</h6>
-                <h2 className="mb-0 font-size-20 text-black">
-                  {agreementData.paymentTerms > 0 
-                  ? agreementData.paymentTerms <= 30
-                  ? `${agreementData.paymentTerms} ${agreementData.paymentTerms === 1 ? 'day' : 'days'}`
-                  : agreementData.paymentTerms <= 60
-                  ? `1 month`
-                  : `${Math.floor(agreementData.paymentTerms / 30)} months` : "0 days"}
-                </h2>
-              </div>
-              <div>
-                <h6 className="font-size-12 mb-0">Valid Until</h6>
-                <h2 className="mb-0 font-size-20 text-black">{agreementData.validUntil ? formatDate("DayMMYY",agreementData.validUntil): "Day/MM/YYYY"}</h2>
-              </div>
-              <StyledButton color={'primary'} type="submit" className={'w-md agreement-btn'} disabled={!agreementData.AgreementNumber || !agreementData.validUntil || !agreementData.paymentTerms}>
-                <i className={'btn-icon mdi mdi-download'}></i>
-                Download Agreement
-              </StyledButton>
-            </CardBody>
-          </Card>
-        </Col>
+        <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+          <Col xl={"12"}>
+            <Miniwidget reports={chipData} />
+          </Col>
+        </RequireUserType>
+        <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+          <Col xl={"8"} style={{ paddingTop: '24px' }}>
+              <Miniwidget reports={chipData} />
+          </Col>
+          <Col xl="4">
+            <Card className="agreement-card">
+              <CardBody className="agreement-body">
+                <div>
+                  <h6 className="font-size-12 mb-0">Agreement No.</h6>
+                  <h2 className="mb-0 font-size-20 text-black">{agreementData.AgreementNumber ? agreementData.AgreementNumber : "XXXXXXXXXXXXXXXX"}</h2>
+                </div>
+                <div>
+                  <h6 className="font-size-12 mb-0">Payment Terms</h6>
+                  <h2 className="mb-0 font-size-20 text-black">
+                    {agreementData.paymentTerms > 0 
+                    ? agreementData.paymentTerms <= 30
+                    ? `${agreementData.paymentTerms} ${agreementData.paymentTerms === 1 ? 'day' : 'days'}`
+                    : agreementData.paymentTerms <= 60
+                    ? `1 month`
+                    : `${Math.floor(agreementData.paymentTerms / 30)} months` : "0 days"}
+                  </h2>
+                </div>
+                <div>
+                  <h6 className="font-size-12 mb-0">Valid Until</h6>
+                  <h2 className="mb-0 font-size-20 text-black">{agreementData.validUntil ? formatDate("DayMMYY",agreementData.validUntil): "Day/MM/YYYY"}</h2>
+                </div>
+                <StyledButton color={'primary'} type="submit" className={'w-md agreement-btn'} disabled={!agreementData.AgreementNumber || !agreementData.validUntil || !agreementData.paymentTerms}>
+                  <i className={'btn-icon mdi mdi-download'}></i>
+                  Download Agreement
+                </StyledButton>
+              </CardBody>
+            </Card>
+          </Col>
+        </RequireUserType>
       </Row>
       <Row>
         <div className="ag-theme-quartz list-grid">
