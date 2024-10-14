@@ -16,6 +16,7 @@ import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { getPaymentReq } from "../../service/invoiceService";
 import "./styles/datatables.scss";
 import "./styles/AllInvoices.scss";
+import { formatDate } from "../../utility/formatDate";
 
 const AllPayments = (props) => {
   document.title = "Payments";
@@ -88,7 +89,7 @@ const AllPayments = (props) => {
       cellRenderer: (props) => {
         if(props.value) {
           let date = new Date(props.value);
-          return <>{date.toDateString()}</>;
+          return <>{formatDate(date)}</>;
       }
       },
       suppressMenu: true,

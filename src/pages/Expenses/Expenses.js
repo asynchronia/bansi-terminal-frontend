@@ -13,6 +13,7 @@ import "./styles/datatables.scss";
 import { changePreloader } from "../../store/actions";
 import { getExpensesReq } from "../../service/expenseService";
 import DropdownMenuBtn from "../Orders/DropdownMenuBtn";
+import { formatDate } from "../../utility/formatDate";
 
 const Expenses = (props) => {
   document.title = "Expenses";
@@ -76,10 +77,8 @@ const Expenses = (props) => {
         headerCheckboxSelection: true,
         checkboxSelection: true,
         cellRenderer: (props) => {
-          if(props.value){
-            let date = new Date(props.value);
-            return <>{date.toDateString()}</>;
-          }
+          let date = new Date(props.value);
+          return <>{formatDate(date)}</>;
         },
         suppressMenu: true,
         floatingFilterComponentParams: { suppressFilterButton: true },

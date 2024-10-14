@@ -14,6 +14,7 @@ import CircleRenderer from "./CircleRenderer";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import './styles/AllOrders.scss'
+import { formatDate } from '../../utility/formatDate';
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -201,23 +202,16 @@ const AllOrders = (props) => {
     }
   ]
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-  
-    return `${day}/${month}/${year}`;
-  };
-
   const columnDefs = [
     {
       headerName: "Order Date", field: "date",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
       cellRenderer: (props) => {
+        if(props.value) {
           let date = new Date(props.value);
           return <>{formatDate(date)}</>;
+        }
       },
       sortable: false, width: 110,
       headerComponent: headerTemplate,

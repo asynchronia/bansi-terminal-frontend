@@ -26,6 +26,7 @@ import RequirePermission from "../../routes/middleware/requirePermission";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import { ReactComponent as Import } from "../../assets/images/svg/import-button.svg";
 import { ReactComponent as Add } from "../../assets/images/svg/add-button.svg";
+import { formatDate } from "../../utility/formatDate";
 
 const AllItems = (props) => {
   document.title = "All Items";
@@ -174,7 +175,7 @@ const AllItems = (props) => {
       field: "createdAt",
       cellRenderer: (props) => {
         let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
+        return <>{formatDate(date)}</>;
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
