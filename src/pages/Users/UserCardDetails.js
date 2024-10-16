@@ -1,22 +1,23 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 // import React, { useState } from 'react';
 // import { useCallback } from 'react';
-import { Card, CardBody, Row, Col } from "reactstrap";
+import { Card, CardBody, Row, Col, Button } from "reactstrap";
 import Chip from "@mui/material/Chip";
 import { getUserRoleListReq } from "../../service/usersService";
 import { ReactComponent as Edit } from "../../assets/images/svg/edit-button.svg";
 import { ReactComponent as Delete } from "../../assets/images/svg/delete-button.svg";
 
 const UserCardDetails = (user) => {
+  const {usersData, setOpenModal, setEditUserData, setSelectedItems} = user
   const [userRole, setUserRole] = useState("");
   const effectCalled = useRef(false);
-  const color = user?.usersData?.status === "active" ? "#2ecc71" : "red";
+  const color = usersData?.status === "active" ? "#2ecc71" : "red";
   const roleData = useCallback(async (body) => {
-    const response = await getUserRoleListReq(user.usersData.role);
+    const response = await getUserRoleListReq(usersData.role);
     if (response && response.payload) {
       setUserRole(
         response?.payload.roles.filter(
-          (role) => role._id === user.usersData.role
+          (role) => role._id === usersData.role
         )[0].title
       );
     }
@@ -33,7 +34,7 @@ const UserCardDetails = (user) => {
   return (
     <Card
       style={
-        user?.usersData?.associatedBranch?.isPrimary
+        usersData?.associatedBranch?.isPrimary
           ? { border: "2px solid blue" }
           : { border: "none" }
       }
@@ -53,18 +54,26 @@ const UserCardDetails = (user) => {
           </Col>
           <Col>
             <h3 className="card-title">
-              {user?.usersData?.firstName} {user?.usersData?.lastName}
+              {usersData?.firstName} {usersData?.lastName}
             </h3>
           </Col>
           <Col xs="auto" className="ml-auto">
-            <Edit style={{ cursor: "pointer", marginRight: "0.4rem" }} />
+            <button type="button"
+             style={{border: "none", background: "transparent"}}
+             onClick={() => {
+              setOpenModal(true);
+              setEditUserData(usersData)
+              setSelectedItems(usersData?.associatedWarehouses)
+            }}>
+              <Edit style={{ cursor: "pointer", marginRight: "0.4rem" }} />
+            </button>
             <Delete style={{ cursor: "pointer" }} />
           </Col>
         </Row>
         <Row className="mt-3">
           <Col>
             <div className="d-flex flex-wrap">
-              {user?.usersData?.associatedWarehouses.map((warehouse, index) => (
+              {usersData?.associatedWarehouses.map((warehouse, index) => (
                 <Chip key={index} label={warehouse.code} className="mr-2" />
               ))}
             </div>
@@ -81,11 +90,11 @@ const UserCardDetails = (user) => {
             <p>Contact</p>
           </Col>
           <Col xs="6">
-            <p>{user?.usersData?.email}</p>
+            <p>{usersData?.email}</p>
           </Col>
         </Row>
       </CardBody>
-      {user?.usersData?.associatedBranch?.isPrimary ? (
+      {usersData?.associatedBranch?.isPrimary ? (
         <div
           style={{
             fontSize: "0.9em",
