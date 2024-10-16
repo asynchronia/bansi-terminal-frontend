@@ -16,7 +16,7 @@ import DropdownMenuBtn from "../Orders/DropdownMenuBtn";
 import { formatDate } from "../../utility/formatDate";
 
 const Expenses = (props) => {
-  document.title = "Estimates";
+  document.title = "Expenses";
   let dispatch = useDispatch();
   let navigate = useNavigate();
 
@@ -29,10 +29,10 @@ const Expenses = (props) => {
 
   ];
   const gridRef = useRef();
-  let bodyObject = {
-    "page": 1,
-    "limit": 200
-  };
+  const [sortBody, setSortBody] = useState({
+    key: 'date',
+    order: "D"
+  })
 
   const redirectToViewPage = (id) => {
     let path = "/view-expense/" + id;
@@ -45,11 +45,35 @@ const Expenses = (props) => {
     redirectToViewPage(item.expense_id);
   };
 
+  const headerTemplate = (props) => {
+    const {handleSort, data} = props
+    return (
+      <button onClick={() => handleSort(data, sortBody)} style={{background: 'transparent', border: 'none'}}>
+        <span style={{fontWeight: 600}}>
+          {data?.displayName}&nbsp;
+          {sortBody?.key === data?.column.userProvidedColDef.field ? <i className={sortBody?.order === "A" ? "mdi mdi-arrow-up" : "mdi mdi-arrow-down"}></i> : ''}
+        </span>
+      </button>
+    )
+  }
+
+  const handleSort = (data, sortBody) => {
+    if(data.column.userProvidedColDef.field === sortBody?.key) {
+      setSortBody({...sortBody, order: sortBody?.order === "A" ? "D" : "A"})
+    } else {
+      setSortBody({
+        key: data.column.userProvidedColDef.field,
+        order: "D"
+      })
+    }
+    setPage(1)
+    setRowData([])
+  }
   
   const columnDefs = [
     {
         headerName: "Order Date",
-        field: "created_time",
+        field: "date",
         headerCheckboxSelection: true,
         checkboxSelection: true,
         cellRenderer: (props) => {
@@ -58,6 +82,12 @@ const Expenses = (props) => {
         },
         suppressMenu: true,
         floatingFilterComponentParams: { suppressFilterButton: true },
+        headerComponent: headerTemplate,
+        headerComponentParams:  (props) => ({
+          handleSort: handleSort,
+          data: props,
+          sortBody,
+        })
       },
     { 
         headerName: "Reference No.",
@@ -77,12 +107,20 @@ const Expenses = (props) => {
         field: "status" ,
         suppressMenu: true,
         comparator: () => false,
-        floatingFilterComponentParams: {suppressFilterButton:true}},
+        floatingFilterComponentParams: {suppressFilterButton:true},
+        sortable: false,
+      },
     {
         headerName: "Amount", field: "total",suppressMenu: true,
         floatingFilterComponentParams: {suppressFilterButton:true},
         tooltipValueGetter: (p) => p.value,headerTooltip: "Amount",
-        valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+        valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
+        headerComponent: headerTemplate,
+        headerComponentParams:  (props) => ({
+          handleSort: handleSort,
+          data: props,
+          sortBody,
+        })
       },
       {
         headerName: "Action",
@@ -131,11 +169,26 @@ const Expenses = (props) => {
 
   
   const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
     dispatch(changePreloader(true));
     try {
       const response = await getExpensesReq(body);
 
-      setRowData(response.data);
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.data.length < paginationPageSize) {
+        filledRows = [...response.data];
+      } else {
+        filledRows = [...response.data, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+
+      setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
@@ -144,22 +197,30 @@ const Expenses = (props) => {
   });
 
   useEffect(() => {
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
     props.setBreadcrumbItems("Expenses", breadcrumbItems);
     if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
+      getListOfRowData(body);
       effectCalled.current = true;
     }
   }, []);
 
   useEffect(() => {
-    if (searchValue) {
-      bodyObject.search_text = searchValue;
-      getListOfRowData(bodyObject);
-    } else if(searchValue === "") {
-      delete bodyObject.search_text
-      getListOfRowData(bodyObject);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
     }
-  }, [searchValue])
+    if (searchValue) {
+      body.search_text = searchValue;
+    }
+    if (sortBody) {
+      body.sort = sortBody;
+    } 
+    getListOfRowData(body);
+  }, [searchValue, page, paginationPageSize, sortBody])
 
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
