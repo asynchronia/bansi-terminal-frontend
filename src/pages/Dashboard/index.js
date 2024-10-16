@@ -25,6 +25,9 @@ import "./styles/Dashboard.scss";
 import { USER_TYPES_ENUM } from "../../utility/constants";
 import RequireUserType from "../../routes/middleware/requireUserType";
 import { formatDate } from "../../utility/formatDate";
+import { getTaxesReq } from "../../service/itemService";
+import jsPDF from "jspdf";
+import { getClientWithIdReq } from "../../service/clientService";
 
 const Dashboard = (props) => {
   document.title = "Willsmeet Portal";
@@ -58,6 +61,9 @@ const Dashboard = (props) => {
     validUntil: "",
     paymentTerms: ""
   })
+  const [allTaxes, setAllTaxes] = useState([]);
+  const [displayTableData, setDisplayTableData] = useState([]);
+  const [clientData, setClientData] = useState({});
 
   const redirectToViewPage = (id) => {
     let path = `/purchase-orders/${id}`;
@@ -236,10 +242,36 @@ const Dashboard = (props) => {
     }
   };
 
+  const searchClient = async (id) => {
+    try {
+      const data = { _id: id };
+      const res = await getClientWithIdReq(data);
+
+      setClientData(res.payload?.client);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  
+  const searchAllTaxes = async (part) => {
+    try {
+      const response = await getTaxesReq();
+      let data = await response;
+      setAllTaxes(data?.payload?.taxes);
+      if (part === "agreement") {
+        return data?.payload?.taxes;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getAgreementData = async (id) => {
     try {
       const data = {clientId: id}
       const res = await getAgreement(data);
+      let taxes = await searchAllTaxes("agreement");
       
       setAgreementData({
         AgreementNumber: res.payload._id        ,
@@ -247,6 +279,32 @@ const Dashboard = (props) => {
         paymentTerms: res.payload.paymentTerms
       })
 
+      let array;
+
+      array = res?.payload?.items?.flatMap((item) => {
+        return item.variants.map((variant) => {
+          const attributes = variant.variant.attributes;
+          let taxName;
+          for (let i = 0; i < taxes.length; i++) {
+            if (taxes[i]._id === item.item.taxes[0]) {
+              taxName = taxes[i].name;
+            }
+          }
+          return {
+            id: variant.variant._id,
+            itemId: variant.variant.itemId,
+            title: item.item.title,
+            sku: variant.variant.sku,
+            sellingPrice: variant.price,
+            attributes: attributes,
+            tax: taxName,
+            unit: item.item.itemUnit,
+            type: item.item.itemType,
+          };
+        });
+      });
+
+      setDisplayTableData(array);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -278,7 +336,8 @@ const Dashboard = (props) => {
     props.setBreadcrumbItems('Dashboard' , breadcrumbItems)
     getPurchaseOrderListData();
     getPurchaseOrderStatusList();
-  }, []);
+    searchClient(user.clientId)
+  }, [user.clientId]);
 
   useEffect(() => {
     if(user.userType === "client") {
@@ -286,6 +345,93 @@ const Dashboard = (props) => {
     }
   }, [user.clientId, user.userType]);
 
+  const downloadPDF = () => {
+    const data = [...displayTableData];
+    const doc = new jsPDF();
+  
+    // Load the image and add it to the PDF after it is loaded
+    const img = new Image();
+    img.src = require("../../assets/images/Willsmeet-Logo.png"); // Ensure correct path in your environment
+  
+    img.onload = function() {
+      // Add the image to the PDF (x, y, width, height)
+      doc.addImage(img, 'PNG', 20, 10, 40, 20); // Adjust position and size as needed
+  
+      // Add company details aligned with the image
+      const textStartX = 80; // Align text with the right side of the image
+      const startY = 10; // Ensure this is aligned with the image vertically
+  
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Bansi Office Solutions Private Limited", textStartX, startY);
+  
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text("#1496, 19th Main Road, Opp Park Square Apartment,", textStartX, startY + 6);
+      doc.text("HSR Layout, Bangalore Karnataka 560102, India", textStartX, startY + 12);
+      doc.text("GSTIN: 29AAJCB1807A1Z3 CIN: U74999KA2020PTC137142", textStartX, startY + 18);
+      doc.text("MSME No : UDYAM-KR-03-0065095", textStartX, startY + 24);
+      doc.text("Web: www.willsmeet.com, Email: sales@willsmeet.com", textStartX, startY + 30);
+  
+      const clientTableStartY = startY + 40;
+  
+      // Client Details Table
+      const clientDetails = [
+        ["Name:", clientData.name],
+        ["Email:", clientData.email],
+        ["Contact", clientData.contact],
+        ["Agreement Validity:", formatDate(agreementData.validUntil)],
+        ["Payment Terms:", `${agreementData.paymentTerms} Days`]
+      ];
+  
+      doc.autoTable({
+        head: [],
+        body: clientDetails,
+        theme: 'plain',
+        styles: {
+          fontSize: 10,
+        },
+        startY: clientTableStartY,
+        columnWidths: {
+          cellWidth: 30
+        }
+      });
+  
+      // Add S.No. column to table and remove id column
+      const tableColumn = ['S.No.', ...Object.keys(data[0]).filter((key) => key !== 'id')];
+      const tableRows = data.map((obj, index) => [
+        index + 1, // Set the row number sequence
+        ...Object.values(obj).filter((_, keyIndex) => Object.keys(obj)[keyIndex] !== 'id') // Remove 'id' from the data
+      ]);
+  
+      // Calculate column widths based on the percentages you provided
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      const contentWidth = pageWidth - margin * 2;
+      const percentageWidths = [7, 20, 20, 15, 10, 10, 10, 7, 10];
+      const columnWidths = {};
+      percentageWidths.forEach((percentage, index) => {
+        columnWidths[index] = { cellWidth: (percentage / 100) * contentWidth };
+      });
+
+      // Items Info Table
+      doc.autoTable({
+        head: [tableColumn],
+        body: tableRows,
+        theme: 'grid',
+        styles: {
+          fontSize: 10,
+        },
+        margin: { top: 10 },
+        startY: doc.autoTable.previous.finalY + 10,
+        columnStyles: columnWidths,
+        headStyles: {
+          fillColor: '#0053FF', 
+        },
+      });
+      doc.save("Agreement.pdf");
+    };
+  };
 
   return (
     <React.Fragment>
@@ -318,7 +464,7 @@ const Dashboard = (props) => {
                   <h6 className="font-size-12 mb-0">Valid Until</h6>
                   <h2 className="mb-0 font-size-20 text-black">{agreementData.validUntil ? ordinalFormatDate(agreementData.validUntil): "Day/MM/YYYY"}</h2>
                 </div>
-                <StyledButton color={'primary'} type="submit" className={'w-md agreement-btn'} disabled={!agreementData.AgreementNumber || !agreementData.validUntil || !agreementData.paymentTerms}>
+                <StyledButton color={'primary'} onClick={downloadPDF} type="button" className={'w-md agreement-btn'} disabled={!agreementData.validUntil || !agreementData.paymentTerms}>
                   <i className={'btn-icon mdi mdi-download'}></i>
                   Download Agreement
                 </StyledButton>
