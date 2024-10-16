@@ -1,26 +1,34 @@
 import React, { useState } from "react";
 
-const MultipleLayerSelect = ({ categories, setCategoryData, levelTwo, setBodyData }) => {
+const MultipleLayerSelect = ({ categories, setCategoryData, levelTwo, setBodyData, setRowData, setPage }) => {
   const handleCategoryClick = (event, categoryId, categoryName) => {
     event.stopPropagation();
     setCategoryData({ id: categoryId, name: categoryName, show: false });
+    setPage && setPage(1)
+    setRowData && setRowData([])
     setBodyData && setBodyData(prevState => ({ ...prevState, filter: { category: categoryId } }));
   };
 
   const handleChildClick = (event, childId, childName) => {
     event.stopPropagation();
     setCategoryData({ id: childId, name: childName, show: false });
+    setPage && setPage(1)
+    setRowData && setRowData([])
     setBodyData && setBodyData(prevState => ({ ...prevState, filter: { category: childId } }));
   };
 
   const handleGrandchildClick = (event, grandchildId, grandchildName) => {
     event.stopPropagation();
     setCategoryData({ id: grandchildId, name: grandchildName, show: false });
+    setPage && setPage(1)
+    setRowData && setRowData([])
     setBodyData && setBodyData(prevState => ({ ...prevState, filter: { category: grandchildId } }));
   };
 
   const handleAllCategoriesClick = () => {
     setCategoryData({ id: null, name: "", show: false });
+    setPage && setPage(1)
+    setRowData && setRowData([])
     setBodyData && setBodyData((prevState) => ({
       ...prevState,
       filter: { category: null },
