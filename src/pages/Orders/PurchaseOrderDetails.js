@@ -21,6 +21,7 @@ import Hero from "../../components/Common/Hero";
 import { toast } from "react-toastify";
 import { formatDate } from "../../utility/formatDate";
 import { getAgreement } from "../../api";
+import getPaymentTerm from "../../utility/getPaymentTerm";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -343,12 +344,7 @@ const PurchaseOrderDetails = (props) => {
                     <Row className="py-2 border-bottom">
                       <Col>Payment Terms</Col>
                       <Col>
-                        {paymentTerms > 0 
-                        ? paymentTerms <= 30
-                        ? `${paymentTerms} ${paymentTerms === 1 ? 'day' : 'days'}`
-                        : paymentTerms <= 60
-                        ? `1 month`
-                        : `${Math.floor(paymentTerms / 30)} months` : "0 days"}
+                        {getPaymentTerm(paymentTerms)}
                       </Col>
                     </Row>
                   </CardBody>
@@ -389,7 +385,7 @@ const PurchaseOrderDetails = (props) => {
                         <Col xl="3">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
                         </Col>
-                        <Col xl="3">{item.quantity} Nos</Col>
+                        <Col xl="3">{item.quantity}&nbsp;{item.itemUnit}</Col>
                         <Col xl="2">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
                         </Col>

@@ -31,3 +31,11 @@ export const USER_GENDER_ENUM = {
   FEMALE: "female",
   OTHERS: "others",
 };
+
+export const PAYMENT_TERM_ENUM = {
+  ADVANCE: 0,
+  "50% ADVANCE": 0.5,
+  15: 15,
+  30: 30,
+  45: 45
+}

@@ -74,15 +74,31 @@ const ViewPurchaseOrder = (props) => {
         return;
       }
 
-      const newData = response.purchaseOrders.map(order => ({
-        order_id: order._id,
-        order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : "-",
-        client_name: order.clientId.name,
-        createdAt: formatDate(order.createdAt),
-        total: order.items.reduce((total, item) => total + (item.unitPrice * item.quantity), 0),
-        order_status: order.status,
-      }));
-
+      const newData = response.purchaseOrders.map(order => {
+        let subTotal = 0;
+        let totalQuantity = 0;
+        let gstTotal = 0;
+      
+        order.items.forEach((item) => {
+          subTotal += item.unitPrice * item.quantity;
+          totalQuantity += item.quantity;
+          item.taxes.forEach((tax) => {
+            gstTotal += (item.unitPrice * item.quantity * tax.taxPercentage) / 100;
+          });
+        });
+      
+        const total = subTotal + gstTotal;
+      
+        return {
+          order_id: order._id,
+          order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : "-",
+          client_name: order.clientId.name,
+          createdAt: formatDate(order.createdAt),
+          total: total,
+          order_status: order.status,
+        };
+      });
+      
       setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
