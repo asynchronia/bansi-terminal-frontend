@@ -21,7 +21,7 @@ const DropdownMenuBtn = (props) => {
       direction={"down"}
       toggle={() => setMenu(!menu)}
       items={
-        data.status != "published"
+        data?.status != "published"
           ? [
               {
                 label: "Edit Item",
