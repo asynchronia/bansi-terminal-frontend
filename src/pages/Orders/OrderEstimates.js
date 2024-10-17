@@ -24,7 +24,10 @@ const OrderEstimates = (props) => {
     const [searchValue, setSearchValue] = useState();
     const [delaySearch, setDelaySearch] = useState();
     const [inputValue, setInputValue] = useState('');
-
+    const [sortBody, setSortBody] = useState({
+      key: 'date',
+      order: "D"
+    })
 
     const redirectToViewPage = (id) => {
         let path = "/view-estimate/" + id;
@@ -44,11 +47,36 @@ const OrderEstimates = (props) => {
 
   ];
   const gridRef = useRef();
+
+  const headerTemplate = (props) => {
+    const {handleSort, data} = props
+    return (
+      <button onClick={() => handleSort(data, sortBody)} style={{background: 'transparent', border: 'none'}}>
+        <span style={{fontWeight: 600}}>
+          {data?.displayName}&nbsp;
+          {sortBody?.key === data?.column.userProvidedColDef.field ? <i className={sortBody?.order === "A" ? "mdi mdi-arrow-up" : "mdi mdi-arrow-down"}></i> : ''}
+        </span>
+      </button>
+    )
+  }
+
+  const handleSort = (data, sortBody) => {
+    if(data.column.userProvidedColDef.field === sortBody?.key) {
+      setSortBody({...sortBody, order: sortBody?.order === "A" ? "D" : "A"})
+    } else {
+      setSortBody({
+        key: data.column.userProvidedColDef.field,
+        order: "D"
+      })
+    }
+    setPage(1)
+    setRowData([])
+  }
   
   const columnDefs = [
     {
         headerName: "Order Date",
-        field: "created_time",
+        field: "date",
         headerCheckboxSelection: true,
         checkboxSelection: true,
         cellRenderer: (props) => {
@@ -59,6 +87,13 @@ const OrderEstimates = (props) => {
         },
         suppressMenu: true,
         floatingFilterComponentParams: { suppressFilterButton: true },
+        sortable: false,
+        headerComponent: headerTemplate,
+        headerComponentParams:  (props) => ({
+          handleSort: handleSort,
+          data: props,
+          sortBody,
+        })
       },
     { 
         headerName: "Estimate No.",
@@ -66,25 +101,47 @@ const OrderEstimates = (props) => {
         tooltipField: "estimate_number",
         sortable: false ,
         suppressMenu: true,
-        floatingFilterComponentParams: {suppressFilterButton:true}},
+        floatingFilterComponentParams: {suppressFilterButton:true},
+        headerComponent: headerTemplate,
+        headerComponentParams:  (props) => ({
+          handleSort: handleSort,
+          data: props,
+          sortBody,
+        })},
+        
     { 
         headerName: "Client", 
         field: "customer_name", 
         tooltipField: "customer_name", 
         sortable: false ,suppressMenu: true,
         tooltipValueGetter: (p) => p.value,headerTooltip: "Client",
-        floatingFilterComponentParams: {suppressFilterButton:true} },
+        floatingFilterComponentParams: {suppressFilterButton:true},
+        headerComponent: headerTemplate,
+        headerComponentParams:  (props) => ({
+          handleSort: handleSort,
+          data: props,
+          sortBody,
+        })
+      },
     { 
         headerName: "Order Status",
         field: "status" ,
         suppressMenu: true,
         comparator: () => false,
-        floatingFilterComponentParams: {suppressFilterButton:true}},
+        floatingFilterComponentParams: {suppressFilterButton:true},
+        sortable: false,
+      },
     {
         headerName: "Total Amount", field: "total",suppressMenu: true,
         floatingFilterComponentParams: {suppressFilterButton:true},
         tooltipValueGetter: (p) => p.value,headerTooltip: "Total Amount",
-        valueFormatter: params => formatNumberWithCommasAndDecimal(params.value)
+        valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
+        headerComponent: headerTemplate,
+        headerComponentParams:  (props) => ({
+          handleSort: handleSort,
+          data: props,
+          sortBody,
+        })
     },
     {
       headerName: "Action", field: "action", sortable: false, width: 100,
@@ -180,8 +237,11 @@ useEffect(() => {
   if (searchValue) {
     body.search_text = searchValue;
   }
+  if (sortBody) {
+    body.sort = sortBody;
+  }
   getListOfRowData(body);
-}, [searchValue, page, paginationPageSize])
+}, [searchValue, page, paginationPageSize, sortBody])
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value)
