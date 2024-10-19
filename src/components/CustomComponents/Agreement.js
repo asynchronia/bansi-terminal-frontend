@@ -16,6 +16,7 @@ const Agreement = (props) => {
   const {
     allTaxes,
     handleSubmitAgreement,
+    tableData,
     agreementData,
     setAgreementData,
     additionalData,
@@ -395,6 +396,7 @@ const Agreement = (props) => {
           <AgreementTable
             editable={true}
             agreementData={agreementData}
+            tableData={tableData}
             displayTableData={displayTableData}
             setAgreementData={setAgreementData}
             setDisplayTableData={setDisplayTableData}

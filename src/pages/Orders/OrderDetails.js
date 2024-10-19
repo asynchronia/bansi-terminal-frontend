@@ -365,7 +365,7 @@ const OrderDetails = (props) => {
                         <span>PO Number</span>
                       </Col>
                       <Col xs="6">
-                        <span>{orderData?.sales_channel_formatted}</span>
+                        <span>{orderData?.custom_fields?.find(field => field.label === "PO No")?.value || "-"}</span>
                       </Col>
                       <hr />
                     </Row>}
