@@ -367,7 +367,7 @@ const PurchaseOrderDetails = (props) => {
             </Row>
             <Row>
               <Col xl="8">
-                <Card className="mt-3" style={{ height: "100%" }}>
+                <Card className="mt-3" style={{ height: "fit-content" }}>
                   <CardHeader>Sales Information</CardHeader>
                   <CardBody>
                     <Row className="py-2 border-bottom">
@@ -439,6 +439,18 @@ const PurchaseOrderDetails = (props) => {
                 </Card>
               </Col>
             </Row>
+            <Row>
+            <Col xl="8">
+              <Card className="mt-3">
+                <CardHeader>Terms & Conditions</CardHeader>
+                <CardBody>
+                  <div style={{ whiteSpace: "pre-wrap" }}>
+                    {orderInfo.terms}
+                  </div>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
           </div>
         </Row>
       </div>
