@@ -19,6 +19,9 @@ import { Cancel, CheckCircle, Print } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
 import Hero from "../../components/Common/Hero";
 import { toast } from "react-toastify";
+import { formatDate } from "../../utility/formatDate";
+import { getAgreement } from "../../api";
+import getPaymentTerm from "../../utility/getPaymentTerm";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -30,6 +33,7 @@ const PurchaseOrderDetails = (props) => {
   const [approveModal, setApproveModal] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("published");
+  const [paymentTerms, setPaymentTerms] = useState()
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -167,6 +171,17 @@ const PurchaseOrderDetails = (props) => {
     });
   };
 
+  const getAgreementData = async (id) => {
+    try {
+      const data = {clientId: id}
+      const res = await getAgreement(data);
+      
+      setPaymentTerms(res.payload.paymentTerms)
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   useEffect(() => {
     props.setBreadcrumbItems("Purchase Order", breadcrumbItems);
     if (!effectCalled.current) {
@@ -174,6 +189,12 @@ const PurchaseOrderDetails = (props) => {
       effectCalled.current = true;
     }
   }, []);
+
+  useEffect(() => {
+    if(orderInfo.clientId) {
+      getAgreementData(orderInfo.clientId);
+    }
+  }, [orderInfo.clientId]);
 
   const options = {
     filename: "Purchase Order.pdf",
@@ -318,11 +339,13 @@ const PurchaseOrderDetails = (props) => {
                   <CardBody>
                     <Row className="py-2 border-bottom">
                       <Col>Order Date</Col>
-                      <Col>{new Date(orderInfo?.createdAt).toLocaleDateString()}</Col>
+                      <Col>{formatDate(orderInfo?.createdAt)}</Col>
                     </Row>
                     <Row className="py-2 border-bottom">
                       <Col>Payment Terms</Col>
-                      <Col></Col>
+                      <Col>
+                        {getPaymentTerm(paymentTerms)}
+                      </Col>
                     </Row>
                   </CardBody>
                 </Card>
@@ -362,7 +385,7 @@ const PurchaseOrderDetails = (props) => {
                         <Col xl="3">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
                         </Col>
-                        <Col xl="3">{item.quantity} Nos</Col>
+                        <Col xl="3">{item.quantity}&nbsp;{item.itemUnit}</Col>
                         <Col xl="2">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
                         </Col>

@@ -14,20 +14,28 @@
     z-index: 1;
 }
 .button-section{
-    display: block;
+    display: flex;
     padding-bottom: 10px;
     height: 50px;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 .button-right-section{
     display: inline-flex;
-    padding-left: 75%;
-    width: 100%;
 }
-.invoice-search-box{
-    width: 100%;
+.search-box{
     margin-right: 5px;
+    height: 100%;
+}
+.search-icon {
+    top: 4px !important;
+}
+.form-control{
+    height: 100%;
 }
 .all-items-btn{
     margin-right: 10px;
+    margin-bottom: 4px;
+
 }
 }

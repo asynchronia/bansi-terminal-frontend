@@ -21,7 +21,7 @@ export const getItemByIdReq = async (body) => {
 export const getItemsReq = async (body = {}) => {
   const response = await getItems(body);
   if (response.success && response.success === true) {
-    return response.payload.items;
+    return response.payload;
   }
   return [];
 };
