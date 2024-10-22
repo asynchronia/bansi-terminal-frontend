@@ -21,6 +21,7 @@ import Hero from "../../components/Common/Hero";
 import { toast } from "react-toastify";
 import { formatDate } from "../../utility/formatDate";
 import { getAgreement } from "../../api";
+import PdfTableComponent from "./PdfTableComponent";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -256,7 +257,7 @@ const PurchaseOrderDetails = (props) => {
               :
               <>
                 {OrderStatusRenderer({ value: status })}
-                <Button color="primary" outline onClick={downloadPDF}>Download PDF</Button>
+                <PdfTableComponent data={{orderInfo, itemsData, paymentTerms}}/>
               </>
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}
