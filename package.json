@@ -7,7 +7,6 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.16.4",
     "@mui/material": "^5.15.11",
-    "@react-pdf/renderer": "^4.0.0",
     "ag-grid-community": "^31.1.1",
     "ag-grid-react": "^31.1.1",
     "apexcharts": "^3.47.0",
