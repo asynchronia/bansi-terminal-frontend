@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import { formatDate } from "../../utility/formatDate";
 import { getAgreement } from "../../api";
 import getPaymentTerm from "../../utility/getPaymentTerm";
-import PdfTableComponent from "./PdfTableComponent";
+import PdfComponent from "./PdfComponent";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -258,7 +258,7 @@ const PurchaseOrderDetails = (props) => {
               :
               <>
                 {OrderStatusRenderer({ value: status })}
-                <PdfTableComponent data={{orderInfo, itemsData, paymentTerms}}/>
+                <PdfComponent data={{orderInfo, itemsData, paymentTerms}}/>
               </>
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}

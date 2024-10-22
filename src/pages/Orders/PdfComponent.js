@@ -238,7 +238,7 @@ const PdfDocument = ({data}) => (
       <View style={styles.table}>
         <Text style={styles.header}>Sales Information</Text>
        
-        <TableWithPagination data={[...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,...data.itemsData,]} />
+        <TableWithPagination data={[...data.itemsData,]} />
 
         {/* Terms & Conditions and Total Section */}
         <View style={[styles.tableRow, { height: 150, borderStyle: 'solid', borderWidth: 1 },]}>
@@ -271,7 +271,7 @@ const PdfDocument = ({data}) => (
   </Document>
 );
 
-const PdfTableComponent = ({data}) => {
+const PdfComponent = ({data}) => {
   const handleOpenPdf = async () => {
     const blob = await pdf(<PdfDocument data={data} />).toBlob();
     const url = URL.createObjectURL(blob);
@@ -291,4 +291,4 @@ const PdfTableComponent = ({data}) => {
   );
 };
 
-export default PdfTableComponent;
+export default PdfComponent;
