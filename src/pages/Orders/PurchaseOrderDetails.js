@@ -444,9 +444,12 @@ const PurchaseOrderDetails = (props) => {
               <Card className="mt-3">
                 <CardHeader>Terms & Conditions</CardHeader>
                 <CardBody>
+                  {orderInfo.terms ?
                   <div style={{ whiteSpace: "pre-wrap" }}>
-                    {orderInfo.terms}
-                  </div>
+                    {orderInfo.terms} 
+                  </div> 
+                  : <span style={{color: 'grey'}}>No Terms & Conditions</span>
+                  }
                 </CardBody>
               </Card>
             </Col>
