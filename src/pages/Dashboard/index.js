@@ -28,6 +28,7 @@ import { formatDate } from "../../utility/formatDate";
 import { getTaxesReq } from "../../service/itemService";
 import jsPDF from "jspdf";
 import { getClientWithIdReq } from "../../service/clientService";
+import getPaymentTerm from "../../utility/getPaymentTerm";
 
 const Dashboard = (props) => {
   document.title = "Willsmeet Portal";
@@ -452,12 +453,7 @@ const Dashboard = (props) => {
                 <div>
                   <h6 className="font-size-12 mb-0">Payment Terms</h6>
                   <h2 className="mb-0 font-size-20 text-black">
-                    {agreementData.paymentTerms > 0 
-                    ? agreementData.paymentTerms <= 30
-                    ? `${agreementData.paymentTerms} ${agreementData.paymentTerms === 1 ? 'day' : 'days'}`
-                    : agreementData.paymentTerms <= 60
-                    ? `1 month`
-                    : `${Math.floor(agreementData.paymentTerms / 30)} months` : "0 days"}
+                    {getPaymentTerm(agreementData.paymentTerms)}
                   </h2>
                 </div>
                 <div>

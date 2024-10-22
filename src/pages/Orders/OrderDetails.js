@@ -18,6 +18,7 @@ import OrderTrackingRenderer from "./OrderTrackingRenderer";
 
 import { styled } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import getPaymentTerm from "../../utility/getPaymentTerm";
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -130,6 +131,12 @@ const OrderDetails = (props) => {
     {
       headerName: "Quantity",
       field: "quantity",
+      suppressMenu: true, width: 100,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Unit",
+      field: "unit",
       suppressMenu: true, width: 100,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -279,7 +286,7 @@ const OrderDetails = (props) => {
                 <h1 className="secondary">Ongoing Order</h1>
                 <h6>Ongoing Order #{orderData?.salesorder_number}</h6>
               </div>
-              <Chip label='Draft' />
+              {orderData?.order_status && <Chip className="capitalize" label={orderData?.order_status} />}
             </CardBody>
             <div className="d-flex justify-content-between align-items-center m-4">
               <OrderTrackingRenderer
@@ -339,7 +346,7 @@ const OrderDetails = (props) => {
                       <span>Payment Terms</span>
                     </Col>
                     <Col xs="6">
-                      <span>{orderData?.payment_terms}</span>
+                      <span>{getPaymentTerm(orderData?.payment_terms)}</span>
                     </Col>
                     <hr />
                   </Row>
@@ -358,7 +365,7 @@ const OrderDetails = (props) => {
                         <span>PO Number</span>
                       </Col>
                       <Col xs="6">
-                        <span>{orderData?.sales_channel_formatted}</span>
+                        <span>{orderData?.custom_fields?.find(field => field.label === "PO No")?.value || "-"}</span>
                       </Col>
                       <hr />
                     </Row>}

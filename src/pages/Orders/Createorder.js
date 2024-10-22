@@ -277,6 +277,7 @@ const CreateOrder = (props) => {
             }}
           />
         </td>
+        <td style={{ whiteSpace: "nowrap" }}>{item.itemUnit}</td>
         <td style={{ whiteSpace: "nowrap" }}>
           {formatNumberWithCommasAndDecimal(
             item.unitPrice *
@@ -774,6 +775,7 @@ const CreateOrder = (props) => {
                           <th>Category</th>
                           <th>Cost</th>
                           <th>Quantity</th>
+                          <th>Unit</th>
                           <th>Total</th>
                           <th>GST</th>
                           <th></th>

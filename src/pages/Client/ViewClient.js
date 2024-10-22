@@ -44,6 +44,7 @@ const ViewClient = (props) => {
 
   const [displayTableData, setDisplayTableData] = useState([]);
   const [agreementAvailable, setAgreementAvailable] = useState({ loading: true, value: false, });
+  const [tableData, setTableData] = useState([])
 
   const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
@@ -144,6 +145,7 @@ const ViewClient = (props) => {
 
       if (array.length > 0) {
         setDisplayTableData(array);
+        setTableData(array)
         setAgreementAvailable({ loading: false, value: true });
       } else {
         setAgreementAvailable({ loading: false, value: false });
@@ -536,6 +538,7 @@ const ViewClient = (props) => {
         <Agreement
           allTaxes={allTaxes}
           handleSubmitAgreement={handleSubmitAgreement}
+          tableData={tableData}
           displayTableData={displayTableData}
           setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
@@ -652,6 +655,7 @@ const ViewClient = (props) => {
                 <div style={{ maxHeight: "450px", overflow: "auto" }}>
                   <AgreementTable
                     editable={false}
+                    tableData={tableData}
                     agreementData={agreementData}
                     setAgreementData={setAgreementData}
                     displayTableData={displayTableData}
