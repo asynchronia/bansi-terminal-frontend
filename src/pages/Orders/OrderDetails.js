@@ -133,7 +133,7 @@ const OrderDetails = (props) => {
         return (
           <div>
             <h6 style={{margin: 0, fontSize: '14px', paddingTop: '3px'}}>{name}</h6>
-            <p style={{margin: 0, fontSize: '12px', paddingTop: '2px'}}>{description}</p>
+            <p style={{margin: 0, fontSize: '12px', color: 'grey', paddingTop: '2px'}}>{description}</p>
           </div>
         );
       },

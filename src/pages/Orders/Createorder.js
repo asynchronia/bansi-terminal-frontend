@@ -60,8 +60,8 @@ const CreateOrder = (props) => {
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
   const [poPrefix, setPoPrefix] = useState("");
-  const [terms, setTerms] = useState(`1.All the invoices should mandatorily be mentioned with Bansi Office Solutions Private Limited PO Number & should be attached with PO copy ,without which the invoice would be considered invalid.
-2.All the invoices should be mentioned with vendor bank details.`)
+  const [terms, setTerms] = useState(`1. All the invoices should mandatorily be mentioned with Bansi Office Solutions Private Limited PO Number & should be attached with PO copy ,without which the invoice would be considered invalid.
+2. All the invoices should be mentioned with vendor bank details.`)
 
   const [minDate, setMinDate] = useState(() => {
     const today = new Date();
@@ -283,12 +283,11 @@ const CreateOrder = (props) => {
           <td>
             {item.itemName}
             <Input
-              type="textarea"
+              type="text"
               id="itemDescription"
               name="itemDescription"
               onChange={handleDescriptionChange}
               value={item.itemDescription}
-              rows="2"
               placeholder="Description for the item"
             />
           </td>
@@ -377,9 +376,9 @@ const CreateOrder = (props) => {
       shippingAddress: purchaseOrder.shipping.branchId,
       purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
       deliveryDate: formatDate(purchaseOrder.deliveryDate),
-      terms: purchaseOrder.terms
+      terms: purchaseOrder.terms ? purchaseOrder.terms : terms
     });
-    setTerms(purchaseOrder.terms)
+    purchaseOrder.terms && setTerms(purchaseOrder.terms)
 
     let items = purchaseOrder.items;
     items.forEach((item) => {

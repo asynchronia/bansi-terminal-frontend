@@ -379,8 +379,8 @@ const PurchaseOrderDetails = (props) => {
                     {itemsData && itemsData.map((item, index) => (
                       <Row key={index} className="py-2 border-bottom align-items-center">
                         <Col xl="4">
-                          <h6 className="m-0">{item.itemName}</h6>
-                          <span>{item.itemDescription}</span>
+                          <h6 style={{margin: 0, fontSize: '14px', paddingTop: '3px'}}>{item.itemName}</h6>
+                          <span style={{margin: 0, fontSize: '12px', color: 'grey', paddingTop: '2px'}}>{item.itemDescription}</span>
                         </Col>
                         <Col xl="3">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
