@@ -1,13 +1,22 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, PDFDownloadLink, pdf } from '@react-pdf/renderer';
 import { formatDate } from '../../utility/formatDate';
-import { formatNumberWithCommasAndDecimal } from '../Invoices/invoiceUtil';
 import { Button } from 'reactstrap';
+import getPaymentTerm from "../../utility/getPaymentTerm";
+
 
 // Define styles for the PDF
 const styles = StyleSheet.create({
   page: {
     padding: 30,
+  },
+  status: {
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderRadius: 50,
+    padding: "3px 8px",
+    textTransform: "capitalize",
+    fontSize: 12,
   },
   title: {
     fontSize: 14,
@@ -109,15 +118,15 @@ const TableWithPagination = ({ data }) => {
           </Text>
         </View>
         <View style={styles.tableCol}>
-          <Text style={[styles.tableCell, { textAlign: 'left' }]}>Unit</Text>
+          <Text style={[styles.tableCell, { textAlign: 'left' }]}>Qty</Text>
         </View>
         <View style={styles.tableCol}>
           <Text style={[styles.tableCell, { textAlign: 'left' }]}>
-            HSN/SAC
+            Unit
           </Text>
         </View>
         <View style={styles.tableCol}>
-          <Text style={[styles.tableCell, { textAlign: 'left' }]}>Qty</Text>
+          <Text style={[styles.tableCell, { textAlign: 'left' }]}>HSN/SAC</Text>
         </View>
         <View style={styles.tableCol}>
           <Text style={[styles.tableCell, { textAlign: 'left' }]}>Rate</Text>
@@ -150,17 +159,17 @@ const TableWithPagination = ({ data }) => {
           </View>
           <View style={styles.tableCol}>
             <Text style={[styles.tableCell, { textAlign: 'left' }]}>
-              {item.unitPrice}
+              {item.quantity}
             </Text>
           </View>
           <View style={styles.tableCol}>
             <Text style={[styles.tableCell, { textAlign: 'left' }]}>
-              {item.hsnCode}
+              {item.itemUnit}
             </Text>
           </View>
           <View style={styles.tableCol}>
             <Text style={[styles.tableCell, { textAlign: 'right' }]}>
-              {item.quantity}
+              {item.hsnCode}
             </Text>
           </View>
           <View style={styles.tableCol}>
@@ -188,6 +197,9 @@ const TableWithPagination = ({ data }) => {
 const PdfDocument = ({data}) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      <View style={[styles.section, { justifyContent: 'flex-end'}]}>
+        <Text style={styles.status}>{data.orderInfo.status}</Text>
+      </View>
       <View style={styles.section}>
         <View style={styles.address}>
             <Text style={styles.header}>{data.orderInfo.clientName}</Text>
@@ -210,7 +222,7 @@ const PdfDocument = ({data}) => (
         </View>
         <View style={styles.section}>
           <Text style={[styles.address, styles.info]}>Client GST No.: {data.orderInfo.clientGst}</Text>
-          <Text style={[styles.address, styles.info]}>Payment Terms: {data.paymentTerms}</Text>
+          <Text style={[styles.address, styles.info]}>Payment Terms: {getPaymentTerm(data.paymentTerms)}</Text>
         </View>
       </View>
 
@@ -259,9 +271,9 @@ const PdfDocument = ({data}) => (
               <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>Total:</Text>
             </View>
             <View style={styles.address}>
-              <Text style={[styles.tableCell, { textAlign: 'right'}]}>{data.orderInfo.subTotal}</Text>
-              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{data.orderInfo.gstTotal}</Text>
-              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{data.orderInfo.total}</Text>
+              <Text style={[styles.tableCell, { textAlign: 'right'}]}>{parseFloat(data.orderInfo.subTotal).toFixed(2)}</Text>
+              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{parseFloat(data.orderInfo.gstTotal).toFixed(2)}</Text>
+              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{parseFloat(data.orderInfo.total).toFixed(2)}</Text>
             </View>
           </View>
         </View>
