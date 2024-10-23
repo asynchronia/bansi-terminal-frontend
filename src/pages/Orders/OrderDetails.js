@@ -127,6 +127,16 @@ const OrderDetails = (props) => {
       field: "description",
       suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      cellRenderer: (params) => {
+        const { name, description } = params.data;
+  
+        return (
+          <div>
+            <h6 style={{margin: 0, fontSize: '14px', paddingTop: '3px'}}>{name}</h6>
+            <p style={{margin: 0, fontSize: '12px', color: 'grey', paddingTop: '2px'}}>{description}</p>
+          </div>
+        );
+      },
     },
     {
       headerName: "Quantity",
@@ -448,6 +458,7 @@ const OrderDetails = (props) => {
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={lineItems}
                     onPaginationChanged={onPaginationChanged}
+                    rowHeight={50}
                   ></AgGridReact>
                 </div>
               </div>
