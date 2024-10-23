@@ -15,6 +15,8 @@ import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import './styles/AllOrders.scss'
 import { formatDate } from '../../utility/formatDate';
+import RequireUserType from '../../routes/middleware/requireUserType';
+import { USER_TYPES_ENUM } from '../../utility/constants';
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -213,7 +215,7 @@ const AllOrders = (props) => {
           return <>{formatDate(date)}</>;
         }
       },
-      sortable: false, width: 110,
+      sortable: false, minWidth: 110,
       headerComponent: headerTemplate,
       headerComponentParams:  (props) => ({
         handleSort: handleSort,
@@ -251,10 +253,10 @@ const AllOrders = (props) => {
       headerName: "Status", field: "order_status", cellRenderer: OrderStatusRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      sortable: false, width: 90
+      sortable: false, minWidth: 90
     },
     {
-      headerName: "Amount", field: "total", width: 100,
+      headerName: "Amount", field: "total", minWidth: 100,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
@@ -270,20 +272,20 @@ const AllOrders = (props) => {
       headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Invoice",
-      sortable: false, width: 90
+      sortable: false, minWidth: 90
     },
     {
       headerName: "Payment", field: "paid_status", cellRenderer: CircleRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Payment",
-      sortable: false, width: 90
+      sortable: false, minWidth: 90
     },
     {
       headerName: "Shipment", field: "shipped_status", cellRenderer: CircleRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Shipment",
-      sortable: false, width: 100
+      sortable: false, minWidth: 100
 
     },
     {
@@ -311,6 +313,8 @@ const AllOrders = (props) => {
       })
     }
   }
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
 
   return (
     <>
@@ -347,18 +351,34 @@ const AllOrders = (props) => {
                     width: '100%'
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    defaultColDef={{ resizable: false, suppressMovable: true }}
-                    columnDefs={columnDefs}
-                    pagination={pagination}
-                    paginationPageSize={20}
-                    paginationPageSizeSelector={false}
-                    rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}
-                    onGridReady={onGridReady}
-                  >
-                  </AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      defaultColDef={{ resizable: false, suppressMovable: true }}
+                      columnDefs={columnDefs}
+                      pagination={pagination}
+                      paginationPageSize={20}
+                      paginationPageSizeSelector={false}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                      onGridReady={onGridReady}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      defaultColDef={{ resizable: false, suppressMovable: true }}
+                      columnDefs={clientColumnDefs}
+                      pagination={pagination}
+                      paginationPageSize={20}
+                      paginationPageSizeSelector={false}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                      onGridReady={onGridReady}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>

@@ -347,6 +347,12 @@ const PurchaseOrderDetails = (props) => {
                         {getPaymentTerm(paymentTerms)}
                       </Col>
                     </Row>
+                    <Row className="py-2 border-bottom">
+                      <Col>Sales Order No.</Col>
+                      <Col>
+                        {orderInfo?.salesOrderNumber ? orderInfo?.salesOrderNumber : "-"}
+                      </Col>
+                    </Row>
                   </CardBody>
                 </Card>
               </Col>
