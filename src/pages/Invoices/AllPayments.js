@@ -17,6 +17,8 @@ import { getPaymentReq } from "../../service/invoiceService";
 import "./styles/datatables.scss";
 import "./styles/AllInvoices.scss";
 import { formatDate } from "../../utility/formatDate";
+import RequireUserType from "../../routes/middleware/requireUserType";
+import { USER_TYPES_ENUM } from "../../utility/constants";
 
 const AllPayments = (props) => {
   document.title = "Payments";
@@ -183,6 +185,9 @@ const AllPayments = (props) => {
 
     },
   ];
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+
   const autoSizeStrategy = {
     type: "fitGridWidth",
   };
@@ -421,17 +426,32 @@ const AllPayments = (props) => {
                     width: "100%",
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    columnDefs={columnDefs}
-                    pagination={pagination}
-                    paginationPageSize={paginationPageSize}
-                    paginationPageSizeSelector={paginationPageSizeSelector}
-                    reactiveCustomComponents
-                    autoSizeStrategy={autoSizeStrategy}
-                    rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}
-                  ></AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      columnDefs={columnDefs}
+                      pagination={pagination}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      reactiveCustomComponents
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                    ></AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      columnDefs={clientColumnDefs}
+                      pagination={pagination}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      reactiveCustomComponents
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                    ></AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>

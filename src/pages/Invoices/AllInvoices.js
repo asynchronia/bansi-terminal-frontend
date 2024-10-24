@@ -22,6 +22,8 @@ import "./styles/AllInvoices.scss";
 import InvoiceActionBtn from "./InvoiceActionBtn";
 import { getDateInFormat, getDifferenceInDays, ifOverDue } from "./invoiceUtil";
 import { formatDate } from "../../utility/formatDate";
+import RequireUserType from "../../routes/middleware/requireUserType";
+import { USER_TYPES_ENUM } from "../../utility/constants";
 
 const AllInvoices = (props) => {
   document.title = "Invoices";
@@ -112,7 +114,7 @@ const AllInvoices = (props) => {
   const columnDefs = [
     {
       headerName: "Invoice Date",
-      field: "date", width: 140,
+      field: "date", minWidth: 140,
       cellRenderer: (props) => {
         if(props.value) { 
           let date = new Date(props.value);
@@ -133,7 +135,7 @@ const AllInvoices = (props) => {
       headerName: "Invoice No.",
       field: "invoice_number",
       tooltipField: "invoice_number",
-      suppressMenu: true, width: 150,
+      suppressMenu: true, minWidth: 150,
       floatingFilterComponentParams: { suppressFilterButton: true },
       sortable: false,
       headerComponent: headerTemplate,
@@ -167,7 +169,7 @@ const AllInvoices = (props) => {
     {
       headerName: "Status",
       field: "status",
-      width: 150,
+      minWidth: 150,
       cellRenderer: (props) => {
         if(props?.data?.due_date){
           let due_date = new Date(props.data.due_date);
@@ -204,7 +206,7 @@ const AllInvoices = (props) => {
       headerName: "Total Amount",
       field: "total",
       sortable: false,
-      suppressMenu: true, width: 140,
+      suppressMenu: true, minWidth: 140,
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
@@ -218,7 +220,7 @@ const AllInvoices = (props) => {
     {
       headerName: "Amount Due",
       field: "balance",
-      suppressMenu: true, width: 140,
+      suppressMenu: true, minWidth: 140,
       floatingFilterComponentParams: { suppressFilterButton: true },
       sortable: false,
       valueFormatter: (params) =>
@@ -237,6 +239,9 @@ const AllInvoices = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
   ];
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+
   const autoSizeStrategy = {
     type: "fitGridWidth",
   };
@@ -539,19 +544,36 @@ const onGridReady = useCallback((params) => {
                     width: "100%",
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    rowHeight={60}
-                    columnDefs={columnDefs}
-                    pagination={pagination}
-                    paginationPageSize={paginationPageSize}
-                    paginationPageSizeSelector={paginationPageSizeSelector}
-                    reactiveCustomComponents
-                    autoSizeStrategy={autoSizeStrategy}
-                    rowData={rowData}
-                    defaultColDef={{ resizable: false, suppressMovable: true }}
-                    onPaginationChanged={onPaginationChanged}
-                  ></AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      rowHeight={60}
+                      columnDefs={columnDefs}
+                      pagination={pagination}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      reactiveCustomComponents
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      defaultColDef={{ resizable: false, suppressMovable: true }}
+                      onPaginationChanged={onPaginationChanged}
+                    ></AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      rowHeight={60}
+                      columnDefs={clientColumnDefs}
+                      pagination={pagination}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      reactiveCustomComponents
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      defaultColDef={{ resizable: false, suppressMovable: true }}
+                      onPaginationChanged={onPaginationChanged}
+                    ></AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>

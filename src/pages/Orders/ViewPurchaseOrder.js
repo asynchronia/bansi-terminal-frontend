@@ -166,13 +166,13 @@ const ViewPurchaseOrder = (props) => {
       headerName: "Order No.", field: "order_number", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: true, flex: 1
+      sortable: true, minWidth: 150,
     },
     {
       headerName: "Sales Order No.", field: "salesOrderNumber", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Sales Order No.",
-      sortable: true, flex: 1,
+      sortable: true, minWidth: 150,
       cellRenderer: (props) => {
         return <>{props.value ? props.value : "-" }</>
       }
@@ -181,27 +181,27 @@ const ViewPurchaseOrder = (props) => {
       headerName: "Order Date", field: "createdAt", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Client", field: "client_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: true, flex: 1
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) + " /-",
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Order Status", field: "order_status", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status", cellRenderer: OrderStatusRenderer,
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Action", field: "action", sortable: false, width: 100,
@@ -272,6 +272,7 @@ const ViewPurchaseOrder = (props) => {
                       autoSizeStrategy={autoSizeStrategy}
                       rowData={rowData}
                       quickFilterText={inputValue}
+                      reactiveCustomComponents
                       onPaginationChanged={onPaginationChanged}
                     >
                     </AgGridReact>
@@ -286,6 +287,7 @@ const ViewPurchaseOrder = (props) => {
                       autoSizeStrategy={autoSizeStrategy}
                       rowData={rowData}
                       quickFilterText={inputValue}
+                      reactiveCustomComponents
                       onPaginationChanged={onPaginationChanged}
                     >
                     </AgGridReact>
