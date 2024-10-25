@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
     padding: "3px 8px",
     textTransform: "capitalize",
     fontSize: 12,
+    marginTop: 4
   },
   title: {
     fontSize: 14,
@@ -197,9 +198,6 @@ const TableWithPagination = ({ data }) => {
 const PdfDocument = ({data}) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={[styles.section, { justifyContent: 'flex-end'}]}>
-        <Text style={styles.status}>{data.orderInfo.status}</Text>
-      </View>
       <View style={styles.section}>
         <View style={styles.address}>
             <Text style={styles.header}>{data.orderInfo.clientName}</Text>
@@ -207,8 +205,11 @@ const PdfDocument = ({data}) => (
             <Text style={styles.info}>{data.orderInfo.billing?.address}</Text>
             <Text style={styles.info}>{data.orderInfo.billing?.contact}</Text>
         </View>
-        <View  style={styles.address}>
+        <View style={styles.address}>
             <Text style={[styles.title, {textAlign: 'right'}]}>PURCHASE ORDER</Text>
+            <View style={[styles.section, { justifyContent: 'flex-end'}]}>
+              <Text style={styles.status}>{data.orderInfo.status}</Text>
+            </View>
         </View>
       </View>
 
@@ -294,11 +295,12 @@ const PdfComponent = ({data}) => {
   console.log(data)
   return (
     <div>
-      <PDFDownloadLink document={<PdfDocument data={data} />} fileName={`${data.orderInfo.purchaseOrderNumber}.pdf`}>
+      {/* <PDFDownloadLink document={<PdfDocument data={data} />} fileName={`${data.orderInfo.purchaseOrderNumber}.pdf`}>
         {({ blob, url, loading, error }) =>
           <Button color="primary" outline onClick={handleOpenPdf}>{loading ? 'Loading...' : 'Download PDF'}</Button>
         }
-      </PDFDownloadLink>
+      </PDFDownloadLink> */}
+      <Button color="primary" outline onClick={handleOpenPdf}>Download PDF</Button>
     </div>
   );
 };
