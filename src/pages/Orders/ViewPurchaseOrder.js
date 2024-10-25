@@ -13,6 +13,8 @@ import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import { formatDate } from '../../utility/formatDate';
+import { USER_TYPES_ENUM } from '../../utility/constants';
+import RequireUserType from '../../routes/middleware/requireUserType';
 
 const ViewPurchaseOrder = (props) => {
   document.title = "All Purchase Orders";
@@ -96,6 +98,7 @@ const ViewPurchaseOrder = (props) => {
           createdAt: formatDate(order.createdAt),
           total: total,
           order_status: order.status,
+          salesOrderNumber: order.salesOrderNumber
         };
       });
       
@@ -152,7 +155,7 @@ const ViewPurchaseOrder = (props) => {
   }
 
   const gridRef = useRef();
-
+  
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Purchase Order", link: "#" },
@@ -163,33 +166,42 @@ const ViewPurchaseOrder = (props) => {
       headerName: "Order No.", field: "order_number", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: true, flex: 1
+      sortable: true, minWidth: 150,
+    },
+    {
+      headerName: "Sales Order No.", field: "salesOrderNumber", suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Sales Order No.",
+      sortable: true, minWidth: 150,
+      cellRenderer: (props) => {
+        return <>{props.value ? props.value : "-" }</>
+      }
     },
     {
       headerName: "Order Date", field: "createdAt", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Client", field: "client_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: true, flex: 1
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) + " /-",
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Order Status", field: "order_status", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status", cellRenderer: OrderStatusRenderer,
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Action", field: "action", sortable: false, width: 100,
@@ -203,6 +215,8 @@ const ViewPurchaseOrder = (props) => {
       tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
     }
   ];
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -248,18 +262,36 @@ const ViewPurchaseOrder = (props) => {
                     width: '100%'
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    suppressRowClickSelection={true}
-                    columnDefs={columnDefs}
-                    pagination={true}
-                    paginationAutoPageSize={true}
-                    autoSizeStrategy={autoSizeStrategy}
-                    rowData={rowData}
-                    quickFilterText={inputValue}
-                    onPaginationChanged={onPaginationChanged}
-                  >
-                  </AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      suppressRowClickSelection={true}
+                      columnDefs={columnDefs}
+                      pagination={true}
+                      paginationAutoPageSize={true}
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      quickFilterText={inputValue}
+                      reactiveCustomComponents
+                      onPaginationChanged={onPaginationChanged}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      suppressRowClickSelection={true}
+                      columnDefs={clientColumnDefs}
+                      pagination={true}
+                      paginationAutoPageSize={true}
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      quickFilterText={inputValue}
+                      reactiveCustomComponents
+                      onPaginationChanged={onPaginationChanged}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>

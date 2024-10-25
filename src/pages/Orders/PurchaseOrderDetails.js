@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { formatDate } from "../../utility/formatDate";
 import { getAgreement } from "../../api";
 import getPaymentTerm from "../../utility/getPaymentTerm";
+import PdfComponent from "./PdfComponent";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -257,7 +258,7 @@ const PurchaseOrderDetails = (props) => {
               :
               <>
                 {OrderStatusRenderer({ value: status })}
-                <Button color="primary" outline onClick={downloadPDF}>Download PDF</Button>
+                <PdfComponent data={{orderInfo, itemsData, paymentTerms}}/>
               </>
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}
@@ -347,6 +348,12 @@ const PurchaseOrderDetails = (props) => {
                         {getPaymentTerm(paymentTerms)}
                       </Col>
                     </Row>
+                    <Row className="py-2 border-bottom">
+                      <Col>Sales Order No.</Col>
+                      <Col>
+                        {orderInfo?.salesOrderNumber ? orderInfo?.salesOrderNumber : "-"}
+                      </Col>
+                    </Row>
                   </CardBody>
                 </Card>
               </Col>
@@ -367,7 +374,7 @@ const PurchaseOrderDetails = (props) => {
             </Row>
             <Row>
               <Col xl="8">
-                <Card className="mt-3" style={{ height: "100%" }}>
+                <Card className="mt-3" style={{ height: "fit-content" }}>
                   <CardHeader>Sales Information</CardHeader>
                   <CardBody>
                     <Row className="py-2 border-bottom">
@@ -379,8 +386,8 @@ const PurchaseOrderDetails = (props) => {
                     {itemsData && itemsData.map((item, index) => (
                       <Row key={index} className="py-2 border-bottom align-items-center">
                         <Col xl="4">
-                          <h6 className="m-0">{item.itemName}</h6>
-                          <span>{item.itemDescription}</span>
+                          <h6 style={{margin: 0, fontSize: '14px', paddingTop: '3px'}}>{item.itemName}</h6>
+                          <span style={{margin: 0, fontSize: '12px', color: 'grey', paddingTop: '2px'}}>{item.itemDescription}</span>
                         </Col>
                         <Col xl="3">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
@@ -439,6 +446,21 @@ const PurchaseOrderDetails = (props) => {
                 </Card>
               </Col>
             </Row>
+            <Row>
+            <Col xl="8">
+              <Card className="mt-3">
+                <CardHeader>Terms & Conditions</CardHeader>
+                <CardBody>
+                  {orderInfo.terms ?
+                  <div style={{ whiteSpace: "pre-wrap" }}>
+                    {orderInfo.terms} 
+                  </div> 
+                  : <span style={{color: 'grey'}}>No Terms & Conditions</span>
+                  }
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
           </div>
         </Row>
       </div>
