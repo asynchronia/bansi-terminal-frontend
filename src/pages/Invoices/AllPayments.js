@@ -16,12 +16,19 @@ import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
 import { getPaymentReq } from "../../service/invoiceService";
 import "./styles/datatables.scss";
 import "./styles/AllInvoices.scss";
+import { formatDate } from "../../utility/formatDate";
+import RequireUserType from "../../routes/middleware/requireUserType";
+import { USER_TYPES_ENUM } from "../../utility/constants";
 
 const AllPayments = (props) => {
   document.title = "Payments";
   let navigate = useNavigate();
   let dispatch = useDispatch();
   const effectCalled = useRef(false);
+  const [sortBody, setSortBody] = useState({
+    key: 'date',
+    order: "D"
+  })
 
   const redirectToViewPage = (id) => {
     let path = `/payment/${id.payment_id}`;
@@ -52,17 +59,50 @@ const AllPayments = (props) => {
     redirectToViewPage(data);
   };
 
+  const headerTemplate = (props) => {
+    const {handleSort, data} = props
+    return (
+      <button onClick={() => handleSort(data, sortBody)} style={{background: 'transparent', border: 'none'}}>
+        <span style={{fontWeight: 600}}>
+          {data?.displayName}&nbsp;
+          {sortBody?.key === data?.column.userProvidedColDef.field ? <i className={sortBody?.order === "A" ? "mdi mdi-arrow-up" : "mdi mdi-arrow-down"}></i> : ''}
+        </span>
+      </button>
+    )
+  }
+
+  const handleSort = (data, sortBody) => {
+    if(data.column.userProvidedColDef.field === sortBody?.key) {
+      setSortBody({...sortBody, order: sortBody?.order === "A" ? "D" : "A"})
+    } else {
+      setSortBody({
+        key: data.column.userProvidedColDef.field,
+        order: "D"
+      })
+    }
+    setPage(1)
+    setRowData([])
+  }
+
   const columnDefs = [
     {
       headerName: "Invoice Date",
       field: "date",
       cellRenderer: (props) => {
-        let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
+        if(props.value) {
+          let date = new Date(props.value);
+          return <>{formatDate(date)}</>;
+      }
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      sortable: false
+      sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
 
     },
     {
@@ -70,7 +110,13 @@ const AllPayments = (props) => {
       field: "payment_number",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      width: 120, sortable: false
+      width: 120, sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Type",
@@ -85,7 +131,13 @@ const AllPayments = (props) => {
       tooltipField: "customer_name",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      flex: 1, sortable: false
+      flex: 1, sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Invoice#",
@@ -109,7 +161,13 @@ const AllPayments = (props) => {
       floatingFilterComponentParams: { suppressFilterButton: true },
       valueFormatter: (params) =>
         formatNumberWithCommasAndDecimal(params.value),
-      flex: 1, sortable: false
+      flex: 1, sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
 
     },
     {
@@ -127,6 +185,9 @@ const AllPayments = (props) => {
 
     },
   ];
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+
   const autoSizeStrategy = {
     type: "fitGridWidth",
   };
@@ -140,18 +201,14 @@ const AllPayments = (props) => {
   const [allCustomers, setAllCustomers] = useState([]);
   const [customer, setCustomer] = useState("");
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState();
   const [paginationPageSize, setPaginationPageSize] = useState(25);
+  const [page, setPage] = useState(1);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
-  const [delaySearch, setDelaySearch] = useState("");
+  const [delaySearch, setDelaySearch] = useState();
+  const [inputValue, setInputValue] = useState('');
 
-  let bodyObject = {
-    page: 1,
-    limit: 200,
-  };
-
-  const [bodyObjectReq, setBodyObjectReq] = useState(bodyObject);
   const tog_standard = () => {
     setmodal_standard(!modal_standard);
     removeBodyCss();
@@ -163,9 +220,21 @@ const AllPayments = (props) => {
     // Workaround for bug in events order
     let pageSize = gridRef.current.api.paginationGetPageSize();
     setPaginationPageSize(pageSize);
+
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
+    }
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
+
+    if (page !== newPage) {
+      setPage(newPage);
+    }
   }, []);
 
   const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
     dispatch(changePreloader(true));
     try {
       const response = await getPaymentReq(body);
@@ -174,12 +243,25 @@ const AllPayments = (props) => {
         custList.add(val.customer_name);
       });
       let custArr = [];
+
       custList?.forEach((val, key, set) => {
         custArr.push(val);
       });
+
+      const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
+      let filledRows;
+
+      if (response.length < paginationPageSize) {
+        filledRows = [...response];
+      } else {
+        filledRows = [...response, ...emptyObjects];
+      }
+
+      const newData = [...rowData];
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+
       setAllCustomers([...custArr]);
-      setRowData(response);
-      setBodyObjectReq(body);
+      setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
@@ -189,59 +271,64 @@ const AllPayments = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Payments", breadcrumbItems);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
+    }
     if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
+      getListOfRowData(body);
       effectCalled.current = true;
     }
   }, []);
 
   useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (customer && customer !== undefined && customer !== "") {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      bodyObjectWithFilter.filter = {};
-      bodyObjectWithFilter.filter.customer_name = customer;
-      getListOfRowData(bodyObjectWithFilter);
-    } else {
-      let bodyObjectWithFilter = { ...bodyObjectReq };
-      delete bodyObjectWithFilter["filter"];
-      getListOfRowData(bodyObjectWithFilter);
+    const body = {
+      page: page,
+      limit: paginationPageSize,
     }
-  }, [customer]);
+    if (searchValue) {
+      body.search_text = searchValue;
+    }
+    if (sortBody) {
+      body.sort = sortBody;
+    }
+    getListOfRowData(body);
+  }, [searchValue, page, paginationPageSize, sortBody])
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (delaySearch && delaySearch !== undefined && delaySearch !== "") {
-      let bodyObjectWithSearch = { ...bodyObject };
-      bodyObjectWithSearch.search_text = delaySearch;
-      getListOfRowData(bodyObjectWithSearch);
-    } else {
-      getListOfRowData(bodyObject);
-    }
-  }, [delaySearch]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Payments", breadcrumbItems);
+  //   if (customer && customer !== undefined && customer !== "") {
+  //     let bodyObjectWithFilter = { ...bodyObjectReq };
+  //     bodyObjectWithFilter.filter = {};
+  //     bodyObjectWithFilter.filter.customer_name = customer;
+  //     getListOfRowData(bodyObjectWithFilter);
+  //   } else {
+  //     let bodyObjectWithFilter = { ...bodyObjectReq };
+  //     delete bodyObjectWithFilter["filter"];
+  //     getListOfRowData(bodyObjectWithFilter);
+  //   }
+  // }, [customer]);
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Payments", breadcrumbItems);
-    if (paginationPageSize && paginationPageSize !== undefined) {
-      getListOfRowData(bodyObject);
-    }
-  }, [paginationPageSize]);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Payments", breadcrumbItems);
+  //   if (paginationPageSize && paginationPageSize !== undefined) {
+  //     getListOfRowData(bodyObject);
+  //   }
+  // }, [paginationPageSize]);
 
   const handleChange = (e) => {
     setCustomer(e.target.value);
   };
   const handleInputChange = (e) => {
-    setSearchValue(e.target.value);
-
-    const delay = 2000;
-
-    const timerId = setTimeout(() => {
-      console.log("Executing code after delay");
-      setDelaySearch(e.target.value);
-    }, delay);
-
-    return () => clearTimeout(timerId);
+    setInputValue(e.target.value);
   };
+
+  const handleSearch = (event) => {
+    setSearchValue(event.target.value);
+    console.log(event.target.value);
+    setPage(1);
+    setRowData([]);
+  }
 
   return (
     <React.Fragment>
@@ -303,8 +390,13 @@ const AllPayments = (props) => {
                       <div className="search-box position-relative">
                         <Input
                           type="text"
-                          value={searchValue}
+                          value={inputValue}
                           onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
                           className="form-control rounded border"
                           placeholder="Search by Payment number or Client"
                         />
@@ -334,17 +426,32 @@ const AllPayments = (props) => {
                     width: "100%",
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    columnDefs={columnDefs}
-                    pagination={pagination}
-                    paginationPageSize={paginationPageSize}
-                    paginationPageSizeSelector={paginationPageSizeSelector}
-                    reactiveCustomComponents
-                    autoSizeStrategy={autoSizeStrategy}
-                    rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}
-                  ></AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      columnDefs={columnDefs}
+                      pagination={pagination}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      reactiveCustomComponents
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                    ></AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      columnDefs={clientColumnDefs}
+                      pagination={pagination}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      reactiveCustomComponents
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                    ></AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>

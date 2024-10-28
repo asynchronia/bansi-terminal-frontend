@@ -23,6 +23,7 @@ import { getAgreementItemsReq } from "../../service/itemService";
 import {
   createPurchaseOrderReq,
   getPurchaseOrderDetailsReq,
+  getPurchaseOrderSequenceReq,
   updatePurchaseOrderReq,
 } from "../../service/purchaseService";
 import { setBreadcrumbItems } from "../../store/Breadcrumb/actions";
@@ -58,7 +59,9 @@ const CreateOrder = (props) => {
   const [agreementId, setAgreementId] = useState(0);
   const [status, setStatus] = useState("draft");
   const [publishModal, setPublishModal] = useState(false);
-  const [poPrefix, setPoPrefix] = useState("PO");
+  const [poPrefix, setPoPrefix] = useState("");
+  const [terms, setTerms] = useState(`1. All the invoices should mandatorily be mentioned with Bansi Office Solutions Private Limited PO Number & should be attached with PO copy ,without which the invoice would be considered invalid.
+2. All the invoices should be mentioned with vendor bank details.`)
 
   const [minDate, setMinDate] = useState(() => {
     const today = new Date();
@@ -133,16 +136,14 @@ const CreateOrder = (props) => {
     initialValues: {
       billingAddress: "",
       shippingAddress: "",
-      purchaseOrderNumber: "",
       deliveryDate: "",
+      terms: terms
     },
     validationSchema: Yup.object({
       billingAddress: Yup.string().required("Please Select Billing Address"),
       shippingAddress: Yup.string().required("Please Select Shipping Address"),
-      purchaseOrderNumber: Yup.string().required(
-        "Please Enter Purchase Order Number"
-      ),
       deliveryDate: Yup.string().required("Please Enter Delivery Date"),
+      terms: Yup.string().optional()
     }),
     onSubmit: (values) => {
       saveOrUpdatePurchaseOrder(values);
@@ -165,13 +166,24 @@ const CreateOrder = (props) => {
     }
   };
 
-  const fetchUserData = async () => {
-    try {
-      const data = { _id: clientId };
-      const res = await getClientWithIdReq(data);
+  // const fetchUserData = async () => {
+  //   try {
+  //     const data = { _id: clientId };
+  //     const res = await getClientWithIdReq(data);
 
-      // set the client poPrefix
-      setPoPrefix(res.payload.client.poPrefix)
+  //     // set the client poPrefix
+  //     setPoPrefix(res.payload.client.poPrefix)
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  // };
+
+  const fetchPurchaseOrderSequence = async () => {
+    try {
+      const res = await getPurchaseOrderSequenceReq();
+      
+      // set the PO Number
+      setPoPrefix(res.purchaseOrderNumber)
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -183,7 +195,7 @@ const CreateOrder = (props) => {
       itemId: item._id,
       zohoItemId: item.zohoItemId,
       itemName: item.title,
-      itemDescription: item.description,
+      itemDescription: item.description ? item.description : item.title,
       itemType: item.itemType,
       itemUnit: item.itemUnit,
       hsnCode: item.hsnCode,
@@ -243,48 +255,79 @@ const CreateOrder = (props) => {
       );
     }
 
-    return selectedItems.map((item) => (
-      <tr
-        key={`${item.itemId}-${item.variantId}`}
-        style={{ verticalAlign: "middle" }}
-      >
-        <td>{item.itemName}</td>
-        <td>{item.hsnCode}</td>
-        <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
-        <td style={{ whiteSpace: "nowrap" }}>
-          {formatNumberWithCommasAndDecimal(item.unitPrice)}
-        </td>
-        <td style={{ width: "10%" }}>
-          <Input
-            type="number"
-            min="1"
-            value={selectedQuantities[`${item.itemId}-${item.variantId}`] || 1}
-            onChange={(e) => {
-              const quantity = parseInt(e.target.value, 10);
-              setSelectedQuantities({
-                ...selectedQuantities,
-                [`${item.itemId}-${item.variantId}`]: quantity,
-              });
-              updateTotals();
-            }}
-          />
-        </td>
-        <td style={{ whiteSpace: "nowrap" }}>
-          {formatNumberWithCommasAndDecimal(
-            item.unitPrice *
-              (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
-          )}
-        </td>
-        <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
-        <td>
-          <HighlightOff
-            color="error"
-            style={{ cursor: "pointer" }}
-            onClick={() => handleItemDelete(item.itemId, item.variantId)}
-          />
-        </td>
-      </tr>
-    ));
+    return selectedItems.map((item) => {
+      const handleDescriptionChange = (e) => {
+        const newDescription = e.target.value;
+  
+        // Create a new array with updated item descriptions
+        const updatedItems = selectedItems.map((currentItem) => {
+          if (currentItem.itemId === item.itemId && currentItem.variantId === item.variantId) {
+            // Update the itemDescription for the matching item
+            return {
+              ...currentItem,
+              itemDescription: newDescription,
+            };
+          }
+          return currentItem; // Keep the rest of the items unchanged
+        });
+  
+        // Update the selectedItems state
+        setSelectedItems(updatedItems);
+      };
+
+      return (
+        <tr
+          key={`${item.itemId}-${item.variantId}`}
+          style={{ verticalAlign: "start" }}
+        >
+          <td>
+            {item.itemName}
+            <Input
+              type="text"
+              id="itemDescription"
+              name="itemDescription"
+              onChange={handleDescriptionChange}
+              value={item.itemDescription}
+              placeholder="Description for the item"
+            />
+          </td>
+          <td>{item.hsnCode}</td>
+          <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
+          <td style={{ whiteSpace: "nowrap" }}>
+            {formatNumberWithCommasAndDecimal(item.unitPrice)}
+          </td>
+          <td style={{ width: "10%" }}>
+            <Input
+              type="number"
+              min="1"
+              value={selectedQuantities[`${item.itemId}-${item.variantId}`] || 1}
+              onChange={(e) => {
+                const quantity = parseInt(e.target.value, 10);
+                setSelectedQuantities({
+                  ...selectedQuantities,
+                  [`${item.itemId}-${item.variantId}`]: quantity,
+                });
+                updateTotals();
+              }}
+            />
+          </td>
+          <td style={{ whiteSpace: "nowrap" }}>{item.itemUnit}</td>
+          <td style={{ whiteSpace: "nowrap" }}>
+            {formatNumberWithCommasAndDecimal(
+              item.unitPrice *
+                (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
+            )}
+          </td>
+          <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
+          <td>
+            <HighlightOff
+              color="error"
+              style={{ cursor: "pointer" }}
+              onClick={() => handleItemDelete(item.itemId, item.variantId)}
+            />
+          </td>
+        </tr>
+    )});
   };
 
   const updateTotals = () => {
@@ -333,7 +376,9 @@ const CreateOrder = (props) => {
       shippingAddress: purchaseOrder.shipping.branchId,
       purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
       deliveryDate: formatDate(purchaseOrder.deliveryDate),
+      terms: purchaseOrder.terms ? purchaseOrder.terms : terms
     });
+    purchaseOrder.terms && setTerms(purchaseOrder.terms)
 
     let items = purchaseOrder.items;
     items.forEach((item) => {
@@ -369,10 +414,18 @@ const CreateOrder = (props) => {
     if (!effectCalled.current) {
       getBranchData();
       getListOfRowData();
-      fetchUserData()
+      fetchPurchaseOrderSequence()
       effectCalled.current = true;
     }
   }, [props, breadcrumbItems, getBranchData]);
+
+  useEffect(() => {
+    formik.setFieldValue("purchaseOrderNumber", poPrefix)
+  },[poPrefix])
+  
+  useEffect(() => {
+    formik.setFieldValue("terms", terms)
+  },[terms])
 
   const saveOrUpdatePurchaseOrder = (values) => {
     if (selectedItems.length === 0) {
@@ -416,13 +469,12 @@ const CreateOrder = (props) => {
       }
       // validation.handleSubmit();
       const {
-        purchaseOrderNumber,
         deliveryDate,
         billingAddress,
         shippingAddress,
+        terms
       } = values;
       const body = {
-        purchaseOrderNumber,
         agreementId,
         status,
         deliveryDate,
@@ -434,6 +486,7 @@ const CreateOrder = (props) => {
             selectedQuantities[`${rest.itemId}-${rest.variantId}`] ||
             rest.quantity,
         })),
+        terms
       };
 
       if (id) {
@@ -460,6 +513,12 @@ const CreateOrder = (props) => {
       formik.setFieldValue("purchaseOrderNumber", value);
     }
   };
+
+  const handleChangeTerms = (e) => {
+    let value = e.target.value;
+    formik.setFieldValue("terms", value)
+    setTerms(value)
+  }
 
   return (
     <form onSubmit={formik.handleSubmit} autoComplete="off">
@@ -506,7 +565,7 @@ const CreateOrder = (props) => {
               <span className="purchase-order">Purchase Order</span>
               <br />
               <span className="purchase-order-no">
-                {formik.values.purchaseOrderNumber}
+                {poPrefix}
               </span>
             </div>
           </div>
@@ -616,11 +675,12 @@ const CreateOrder = (props) => {
                         type="text"
                         name="purchaseOrderNumber"
                         id="purchaseOrderNumber"
-                        value={formik.values.purchaseOrderNumber}
+                        value={poPrefix}
                         placeholder="PO/BLR/#123"
                         onChange={handleChangePO}
                         onClick={handleClickPO}
                         onBlur={formik.handleBlur}
+                        disabled={true}
                       />
                       {formik.touched.purchaseOrderNumber &&
                       formik.errors.purchaseOrderNumber ? (
@@ -660,7 +720,7 @@ const CreateOrder = (props) => {
           </Row>
           <Row>
             <Col xl="8">
-              <Card className="mt-3" style={{ height: "100%" }}>
+              <Card className="mt-3" style={{ height: "fit-content" }}>
                 <CardHeader>Order Details</CardHeader>
                 <CardBody>
                   <div
@@ -763,6 +823,7 @@ const CreateOrder = (props) => {
                           <th>Category</th>
                           <th>Cost</th>
                           <th>Quantity</th>
+                          <th>Unit</th>
                           <th>Total</th>
                           <th>GST</th>
                           <th></th>
@@ -815,6 +876,33 @@ const CreateOrder = (props) => {
                       <span>{formatNumberWithCommasAndDecimal(total)}</span>
                     </h5>
                   </div>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+          <Row>
+            <Col xl="8">
+              <Card>
+                <CardBody>
+                  <Label htmlFor="terms">
+                    Terms & Conditions
+                  </Label>
+                  <Input
+                    type="textarea"
+                    name="terms"
+                    id="terms"
+                    value={terms}
+                    placeholder="Terms & Conditions"
+                    onChange={handleChangeTerms}
+                    onBlur={formik.handleBlur}
+                    rows={10}
+                  />
+                  {formik.touched.terms &&
+                  formik.errors.terms ? (
+                    <div className="text-danger">
+                      {formik.errors.terms}
+                    </div>
+                  ) : null}
                 </CardBody>
               </Card>
             </Col>

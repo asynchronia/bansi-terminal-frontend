@@ -51,6 +51,8 @@ const API_URL = {
   convertToSalesOrder: "/api/orders/convert-to-sales-order",
   getUserProfile: "/api/users/profile",
   getPurchaseOrderStatusList: "/api/purchaseorders/list/status",
+  updateClient: '/api/clients/update',
+  getPurchaseOrderSequence: '/api/purchaseorders/sequence',
 };
 
 const getAccessToken = () => localStorage.getItem("accessToken");
@@ -116,6 +118,20 @@ export async function createClient(body) {
   return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.createClient}`, body, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      })
+      .catch((error) => reject(error));
+  });
+}
+
+export async function updateClient(body) {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(`${baseUrl}${API_URL.updateClient}`, body, {
         headers: getHeaders(),
       })
       .then((res) => {
@@ -339,7 +355,7 @@ export async function updatePurchaseOrder(body) {
 }
 
 export async function purchaseOrderStatusChange(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.purchaseOrderStatusChange}`, body, {
         headers: getHeaders(),
@@ -347,12 +363,14 @@ export async function purchaseOrderStatusChange(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+        reject(error)
       });
   });
 }
 
 export async function convertToSalesOrder(body) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     axios
       .post(`${baseUrl}${API_URL.convertToSalesOrder}`, body, {
         headers: getHeaders(),
@@ -360,6 +378,8 @@ export async function convertToSalesOrder(body) {
       .then((res) => {
         resolve(res.data);
         return res.data;
+      }).catch((error) => {
+        reject(error)
       });
   });
 }
@@ -743,6 +763,19 @@ export async function getPurchaseOrderStatusList() {
   return new Promise((resolve) => {
     axios
       .get(`${baseUrl}${API_URL.getPurchaseOrderStatusList}`, {
+        headers: getHeaders(),
+      })
+      .then((res) => {
+        resolve(res.data);
+        return res.data;
+      });
+  });
+}
+
+export async function getPurchaseOrderSequence() {
+  return new Promise((resolve) => {
+    axios
+      .get(`${baseUrl}${API_URL.getPurchaseOrderSequence}`, {
         headers: getHeaders(),
       })
       .then((res) => {

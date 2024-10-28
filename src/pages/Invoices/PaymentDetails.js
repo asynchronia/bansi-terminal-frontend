@@ -258,8 +258,11 @@ const PaymentDetails = (props) => {
               <h4 className="card-title">Payment For</h4>
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
                 <div
-                  className="ag-theme-quartz"
-                  style={{ width: "100%" }}
+                  // className="ag-theme-quartz"
+                  style={{
+                    height: "250px",
+                    width: "100%",
+                  }}
                 >
                   <AgGridReact
                     ref={gridRef}

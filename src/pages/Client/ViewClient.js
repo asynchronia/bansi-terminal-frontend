@@ -3,7 +3,7 @@ import { Avatar, CircularProgress } from "@mui/material";
 import "jspdf-autotable";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   Button,
@@ -31,6 +31,7 @@ import { setBreadcrumbItems } from "../../store/actions";
 
 import ENV from "../../utility/env";
 const ViewClient = (props) => {
+  const navigateTo = useNavigate()
   const [clientData, setClientData] = useState({});
   const [agreementData, setAgreementData] = useState([]);
 
@@ -42,6 +43,7 @@ const ViewClient = (props) => {
 
   const [displayTableData, setDisplayTableData] = useState([]);
   const [agreementAvailable, setAgreementAvailable] = useState({ loading: true, value: false, });
+  const [tableData, setTableData] = useState([])
 
   const [allTaxes, setAllTaxes] = useState([]);
   const [openModal, setOpenModal] = useState({
@@ -59,6 +61,18 @@ const ViewClient = (props) => {
     paymentTerms: 0
   });
   const [isButtonLoading, setIsButtonLoading] = useState(false)
+
+  const redirectToEditPage = (id) => {
+    let path = `/client/edit/${id}`;
+    setTimeout(() => {
+    navigateTo(path, id);
+    }, 300);
+  };
+
+  const handleEditClick = (id) => {
+    redirectToEditPage(id);
+  };
+
 
   const searchAllTaxes = async (part) => {
     try {
@@ -118,7 +132,8 @@ const ViewClient = (props) => {
 
           for (const variantItem of variants) {
             const {
-              variant: { _id: variantId, sellingPrice: price },
+              price: price,
+              variant: { _id: variantId },
             } = variantItem;
 
             // Wait for handleAddToAgreement to complete
@@ -129,6 +144,7 @@ const ViewClient = (props) => {
 
       if (array.length > 0) {
         setDisplayTableData(array);
+        setTableData(array)
         setAgreementAvailable({ loading: false, value: true });
       } else {
         setAgreementAvailable({ loading: false, value: false });
@@ -443,6 +459,7 @@ const ViewClient = (props) => {
         <Agreement
           allTaxes={allTaxes}
           handleSubmitAgreement={handleSubmitAgreement}
+          tableData={tableData}
           displayTableData={displayTableData}
           setDisplayTableData={setDisplayTableData}
           agreementData={agreementData}
@@ -458,7 +475,6 @@ const ViewClient = (props) => {
         <AddBranch />
       </Modal> */}
       <Modal
-        size="sm"
         centered
         isOpen={openModal.status}
         toggle={() => {
@@ -489,7 +505,7 @@ const ViewClient = (props) => {
           <option value="active">Published</option>
           <option value="inactive">Draft</option>
         </select>
-        <button type="submit" className="btn btn-primary w-sm mx-1">
+        <button type="submit" onClick={() => handleEditClick(id)} className="btn btn-primary w-sm mx-1">
           <DriveFileRenameOutline fontSize="small" />Edit
         </button>
       </div>
@@ -560,6 +576,7 @@ const ViewClient = (props) => {
                 <div style={{ maxHeight: "450px", overflow: "auto" }}>
                   <AgreementTable
                     editable={false}
+                    tableData={tableData}
                     agreementData={agreementData}
                     setAgreementData={setAgreementData}
                     displayTableData={displayTableData}

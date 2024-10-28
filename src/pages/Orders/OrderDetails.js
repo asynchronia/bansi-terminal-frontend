@@ -18,6 +18,7 @@ import OrderTrackingRenderer from "./OrderTrackingRenderer";
 
 import { styled } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import getPaymentTerm from "../../utility/getPaymentTerm";
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -44,7 +45,7 @@ const OrderDetails = (props) => {
   //Handles BreadCrumbs
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "All Orders", link: "#" },
+    { title: "Ongoing Orders", link: "/ongoing-orders" },
     { title: "Order #" + orderData?.salesorder_number, link: "#" },
   ];
 
@@ -126,10 +127,26 @@ const OrderDetails = (props) => {
       field: "description",
       suppressMenu: true, flex: 1,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      cellRenderer: (params) => {
+        const { name, description } = params.data;
+  
+        return (
+          <div>
+            <h6 style={{margin: 0, fontSize: '14px', paddingTop: '3px'}}>{name}</h6>
+            <p style={{margin: 0, fontSize: '12px', color: 'grey', paddingTop: '2px'}}>{description}</p>
+          </div>
+        );
+      },
     },
     {
       headerName: "Quantity",
       field: "quantity",
+      suppressMenu: true, width: 100,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+    },
+    {
+      headerName: "Unit",
+      field: "unit",
       suppressMenu: true, width: 100,
       floatingFilterComponentParams: { suppressFilterButton: true },
     },
@@ -276,10 +293,10 @@ const OrderDetails = (props) => {
               }}
             >
               <div>
-                <h1 className="secondary">Sales Order</h1>
-                <h6>Sales Order #{orderData?.salesorder_number}</h6>
+                <h1 className="secondary">Ongoing Order</h1>
+                <h6>Ongoing Order #{orderData?.salesorder_number}</h6>
               </div>
-              <Chip label='Draft' />
+              {orderData?.order_status && <Chip className="capitalize" label={orderData?.order_status} />}
             </CardBody>
             <div className="d-flex justify-content-between align-items-center m-4">
               <OrderTrackingRenderer
@@ -339,7 +356,7 @@ const OrderDetails = (props) => {
                       <span>Payment Terms</span>
                     </Col>
                     <Col xs="6">
-                      <span>{orderData?.payment_terms}</span>
+                      <span>{getPaymentTerm(orderData?.payment_terms)}</span>
                     </Col>
                     <hr />
                   </Row>
@@ -358,7 +375,7 @@ const OrderDetails = (props) => {
                         <span>PO Number</span>
                       </Col>
                       <Col xs="6">
-                        <span>{orderData?.sales_channel_formatted}</span>
+                        <span>{orderData?.custom_fields?.find(field => field.label === "PO No")?.value || "-"}</span>
                       </Col>
                       <hr />
                     </Row>}
@@ -441,6 +458,7 @@ const OrderDetails = (props) => {
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={lineItems}
                     onPaginationChanged={onPaginationChanged}
+                    rowHeight={50}
                   ></AgGridReact>
                 </div>
               </div>

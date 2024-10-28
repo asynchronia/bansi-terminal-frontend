@@ -12,6 +12,9 @@ import { changePreloader } from "../../store/actions";
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
+import { formatDate } from '../../utility/formatDate';
+import { USER_TYPES_ENUM } from '../../utility/constants';
+import RequireUserType from '../../routes/middleware/requireUserType';
 
 const ViewPurchaseOrder = (props) => {
   document.title = "All Purchase Orders";
@@ -73,15 +76,32 @@ const ViewPurchaseOrder = (props) => {
         return;
       }
 
-      const newData = response.purchaseOrders.map(order => ({
-        order_id: order._id,
-        order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : "-",
-        client_name: order.clientId.name,
-        createdAt: formatDate(order.createdAt),
-        total: order.items.reduce((total, item) => total + (item.unitPrice * item.quantity), 0),
-        order_status: order.status,
-      }));
-
+      const newData = response.purchaseOrders.map(order => {
+        let subTotal = 0;
+        let totalQuantity = 0;
+        let gstTotal = 0;
+      
+        order.items.forEach((item) => {
+          subTotal += item.unitPrice * item.quantity;
+          totalQuantity += item.quantity;
+          item.taxes.forEach((tax) => {
+            gstTotal += (item.unitPrice * item.quantity * tax.taxPercentage) / 100;
+          });
+        });
+      
+        const total = subTotal + gstTotal;
+      
+        return {
+          order_id: order._id,
+          order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : "-",
+          client_name: order.clientId.name,
+          createdAt: formatDate(order.createdAt),
+          total: total,
+          order_status: order.status,
+          salesOrderNumber: order.salesOrderNumber
+        };
+      });
+      
       setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
@@ -128,35 +148,6 @@ const ViewPurchaseOrder = (props) => {
     setInputValue(event.target.value);
   }
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = getMonthName(date.getMonth());
-    const year = date.getFullYear();
-    const ordinalDay = getOrdinal(day);
-
-    return `${ordinalDay} ${month} ${year}`;
-  }
-
-  const getMonthName = (monthIndex) => {
-    const months = [
-      'January', 'February', 'March', 'April',
-      'May', 'June', 'July', 'August',
-      'September', 'October', 'November', 'December'
-    ];
-    return months[monthIndex];
-  }
-
-  const getOrdinal = (day) => {
-    if (day > 3 && day < 21) return `${day}th`;
-    switch (day % 10) {
-      case 1: return `${day}st`;
-      case 2: return `${day}nd`;
-      case 3: return `${day}rd`;
-      default: return `${day}th`;
-    }
-  }
-
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
     setPage(1);
@@ -164,7 +155,7 @@ const ViewPurchaseOrder = (props) => {
   }
 
   const gridRef = useRef();
-
+  
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Purchase Order", link: "#" },
@@ -175,33 +166,42 @@ const ViewPurchaseOrder = (props) => {
       headerName: "Order No.", field: "order_number", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: true, flex: 1
+      sortable: true, minWidth: 150,
+    },
+    {
+      headerName: "Sales Order No.", field: "salesOrderNumber", suppressMenu: true,
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Sales Order No.",
+      sortable: true, minWidth: 150,
+      cellRenderer: (props) => {
+        return <>{props.value ? props.value : "-" }</>
+      }
     },
     {
       headerName: "Order Date", field: "createdAt", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Client", field: "client_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: true, flex: 1
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) + " /-",
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Order Status", field: "order_status", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status", cellRenderer: OrderStatusRenderer,
-      sortable: true, width: 150
+      sortable: true, minWidth: 150
     },
     {
       headerName: "Action", field: "action", sortable: false, width: 100,
@@ -215,6 +215,8 @@ const ViewPurchaseOrder = (props) => {
       tooltipValueGetter: (p) => p.value, headerTooltip: "Actions",
     }
   ];
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -260,18 +262,36 @@ const ViewPurchaseOrder = (props) => {
                     width: '100%'
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    suppressRowClickSelection={true}
-                    columnDefs={columnDefs}
-                    pagination={true}
-                    paginationAutoPageSize={true}
-                    autoSizeStrategy={autoSizeStrategy}
-                    rowData={rowData}
-                    quickFilterText={inputValue}
-                    onPaginationChanged={onPaginationChanged}
-                  >
-                  </AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      suppressRowClickSelection={true}
+                      columnDefs={columnDefs}
+                      pagination={true}
+                      paginationAutoPageSize={true}
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      quickFilterText={inputValue}
+                      reactiveCustomComponents
+                      onPaginationChanged={onPaginationChanged}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      suppressRowClickSelection={true}
+                      columnDefs={clientColumnDefs}
+                      pagination={true}
+                      paginationAutoPageSize={true}
+                      autoSizeStrategy={autoSizeStrategy}
+                      rowData={rowData}
+                      quickFilterText={inputValue}
+                      reactiveCustomComponents
+                      onPaginationChanged={onPaginationChanged}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>

@@ -3,44 +3,25 @@ import { setBreadcrumbItems } from "../../store/actions";
 import { connect } from "react-redux";
 import { Card, CardBody, Col, Form, Row } from "reactstrap";
 import Dropzone from "react-dropzone";
-import AddBranch from "../../components/CustomComponents/AddBranch";
-import AddUser from "../../components/CustomComponents/AddUser";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { createClientReq } from "../../service/clientService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import StyledButton from "../../components/Common/StyledButton";
-import { getWarehouseListReq } from "../../service/branchService";
+import { getClientWithIdReq, updateClientReq } from "../../service/clientService";
 
-const CreateClient = (props) => {
+const EditClient = (props) => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const breadcrumbItems = [
+  const [breadcrumbItems, setBreadCrubmsItems] = useState([
     { title: "Dashboard", link: "/dashboard" },
     { title: "Client", link: "/clients" },
-    { title: "Add new Client", link: "/client/add" },
-  ];
+    { title: "Edit", link: "/client/edit/:id" },
+  ]);
 
   const [selectedFiles, setselectedFiles] = useState([]);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const [warehouseList, setWarehouseList] = useState([]);
   const [status, setStatus] = useState("active")
-  const [openModal, setOpenModal] = useState({
-    status: false,
-  });
-
-  const searchAllWareHouses = async () => {
-    try {
-      const response = await getWarehouseListReq();
-      setWarehouseList(response?.payload?.warehouses);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    searchAllWareHouses();
-  }, []);
 
   const notify = (type, message, id) => {
     if (type === "Error") {
@@ -57,23 +38,6 @@ const CreateClient = (props) => {
       navigate(path);
     }
   };
-
-  const handleCreateClient = async (values) => {
-    try {
-      const response = await createClientReq(values);
-      if (response.success === true) {
-        notify("Success", response.message, response.payload?.client._id);
-      } else {
-        notify("Error", response.message);
-      }
-      setIsButtonLoading(false);
-    } catch (error) {
-      notify("Error", error.message);
-      setIsButtonLoading(false);
-    }
-  };
-
-
 
   const validation = useFormik({
     enableReinitialize: true,
@@ -92,22 +56,6 @@ const CreateClient = (props) => {
       bankAccountNumber: null,
       ifscCode: null,
       status: "active",
-      primaryBranch: {
-        name: null,
-        address: null,
-        associatedWarehouse: "65f4b5d66959ec3852a37e60",
-        contact: null,
-        code: null,
-      },
-      primaryUser: {
-        firstName: null,
-        lastName: null,
-        email: null,
-        password: null,
-        contact: null,
-        gender: null,
-        role: "65b4e43b671d73cc3c1bbf90",
-      },
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please Enter Client Name"),
@@ -122,32 +70,40 @@ const CreateClient = (props) => {
       bankAccountName: Yup.string().required("Please Enter Bank Account Name"),
       bankAccountNumber: Yup.string().required("Please Enter Back Account Number"),
       ifscCode: Yup.string().required("Please Enter IFSC Code"),
-      primaryBranch: Yup.object().shape({
-        name: Yup.string().required("Please Enter Branch Name"),
-        address: Yup.string().required("Please Enter Branch Address"),
-        contact: Yup.string().required("Please Enter Valid Contact Number"),
-        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character")
-      }),
-      primaryUser: Yup.object().shape({
-        firstName: Yup.string().required("Please Enter First Name"),
-        lastName: Yup.string().required("Please Enter Last Name"),
-        email: Yup.string().email("Please Enter Valid Email").required("Please Enter Email Id"),
-        password: Yup.string().required("Please Enter Password"),
-        contact: Yup.string()
-          .matches(/^\d+$/, 'Contact number must only contain digits')
-          .length(10, 'Contact number must be exactly 10 digits')
-          .required('Contact number is required'),
-        gender: Yup.string().required("Please Enter Gender"),
-      }),
     }),
     onSubmit: (values) => {
       setIsButtonLoading(true);
-      values.logo = `${selectedFiles[0]?.preview}`;
-      values.status = status
-      
-      handleCreateClient(values);
+
+      const body = {
+        ...values,
+        _id: id,
+        status
+      }
+
+      handleEditClient(body);
     },
   });
+
+  const handleEditClient = async (body) => {
+    try {
+      setIsButtonLoading(true)
+      const response = await updateClientReq(body);
+
+      console.log("Form submitted");
+      if (response.success) {
+        notify("Success", response.message, id)
+      }
+      setIsButtonLoading(false)
+    } catch (error) {
+      notify("Error", error.message, id)
+      setIsButtonLoading(false)
+    }
+};
+
+  const handleClientStatus = async (e) => {
+    setStatus(e.target.value)
+  };
+
 
   function handleAcceptedFiles(files) {
     files.map((file) =>
@@ -158,16 +114,47 @@ const CreateClient = (props) => {
     );
     setselectedFiles(files);
   }
-
-  const handleClientStatus = async (e) => {
-    setStatus(e.target.value)
+  
+  const getClientData = async (id) => {
+    try {
+      const data = { _id: id };
+      const res = await getClientWithIdReq(data);
+  
+      const client = res.payload?.client;
+      if (client) {
+        validation.setFieldValue("name", client.name || "");
+        validation.setFieldValue("contact", client.contact || "");
+        validation.setFieldValue("email", client.email || "");
+        validation.setFieldValue("clientType", client.clientType || "");
+        validation.setFieldValue("logo", client.logo || "");
+        validation.setFieldValue("gstin", client.gstin || "");
+        validation.setFieldValue("pan", client.pan || "");
+        validation.setFieldValue("zohoCustomerId", client.zohoCustomerId || "");
+        validation.setFieldValue("poPrefix", client.poPrefix || "");
+        validation.setFieldValue("bankAccountName", client.bankAccountName || "");
+        validation.setFieldValue("bankAccountNumber", client.bankAccountNumber || "");
+        validation.setFieldValue("ifscCode", client.ifscCode || "");
+        validation.setFieldValue("status", client.status || "");
+        setStatus(client.status)
+  
+        setBreadCrubmsItems([
+          { title: "Dashboard", link: "/dashboard" },
+          { title: "Clients", link: "/clients" },
+          { title: client.name, link: `/client/${id}` }, 
+          { title: "Edit", link: `/client/edit/:id` }, 
+        ]);
+      } else {
+        console.log("Client not found in response");
+      }
+    } catch (error) {
+      console.error("Error fetching client data:", error);
+    }
   };
+  
 
-  const onCreateClientClick = (e) => {
-    e.preventDefault();
-    validation.handleSubmit();
-    return false;
-  };
+  useEffect(() => {
+    getClientData(id);
+  }, []);
 
   function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return "0 Bytes";
@@ -180,10 +167,11 @@ const CreateClient = (props) => {
   }
 
   useEffect(() => {
-    props.setBreadcrumbItems("Add New Client", breadcrumbItems);
-  });
+    props.setBreadcrumbItems("Edit", breadcrumbItems);
+  }, [breadcrumbItems]);
+
   return (
-    <Form className="form-horizontal mt-4" autoComplete="off">
+    <Form className="form-horizontal mt-4" autoComplete="off" onSubmit={validation.handleSubmit}>
       <div style={{ position: "relative" }}>
         <div
           style={{
@@ -193,14 +181,14 @@ const CreateClient = (props) => {
             display: "flex",
           }}
         >
-          <select className="form-select focus-width" name="status" onChange={handleClientStatus}>
+          <select className="form-select focus-width" name="status" value={status} onChange={handleClientStatus}>
             <option value="active">Published</option>
             <option value="inactive">Draft</option>
           </select>
           <StyledButton
+            type="submit"
             color={"primary"}
             className={"w-md mx-2"}
-            onClick={onCreateClientClick}
             isLoading={isButtonLoading}
           >
             Submit
@@ -351,12 +339,6 @@ const CreateClient = (props) => {
                     ) : null}
                   </div>
                 </Row>
-              </CardBody>
-            </Card>
-            <Card>
-              <CardBody>
-                <h4 className="card-title">Branch Details</h4>
-                <AddBranch validation={validation} warehouseList={warehouseList} />
               </CardBody>
             </Card>
             <Card>
@@ -520,7 +502,6 @@ const CreateClient = (props) => {
                 </div>
               </CardBody>
             </Card>
-            <AddUser validation={validation} />
           </Col>
         </Row>
       </div>
@@ -528,4 +509,4 @@ const CreateClient = (props) => {
   );
 };
 
-export default connect(null, { setBreadcrumbItems })(CreateClient);
+export default connect(null, { setBreadcrumbItems })(EditClient);

@@ -27,6 +27,7 @@ import "./styles/ViewInvoice.scss";
 
 import { changePreloader } from "../../store/actions";
 import Hero from "../../components/Common/Hero";
+import { formatDate } from "../../utility/formatDate";
 
 const options = {
   filename: "invoice.pdf",
@@ -238,7 +239,7 @@ const ViewInvoice = (props) => {
   };
 
   const getInvoiceInfo = () => {
-    let dateObj = new Date(responseObj.salesorders.date);
+    let dateObj = new Date(responseObj.date);
     let fields = responseObj.custom_fields;
     let poNoVal = undefined,
       poDate = undefined;
@@ -256,7 +257,7 @@ const ViewInvoice = (props) => {
           <tbody>
             <tr>
               <th>Invoice Date</th>
-              <td>{dateObj.toDateString()}</td>
+              <td>{formatDate(dateObj)}</td>
             </tr>
             <tr>
               <th>Order ID</th>

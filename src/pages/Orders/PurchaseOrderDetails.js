@@ -18,6 +18,11 @@ import generatePDF, { Resolution, Margin, Options } from "react-to-pdf";
 import { Cancel, CheckCircle, Print } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
 import Hero from "../../components/Common/Hero";
+import { toast } from "react-toastify";
+import { formatDate } from "../../utility/formatDate";
+import { getAgreement } from "../../api";
+import getPaymentTerm from "../../utility/getPaymentTerm";
+import PdfComponent from "./PdfComponent";
 
 const PurchaseOrderDetails = (props) => {
   const { id } = useParams();
@@ -29,6 +34,7 @@ const PurchaseOrderDetails = (props) => {
   const [approveModal, setApproveModal] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("published");
+  const [paymentTerms, setPaymentTerms] = useState()
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
@@ -37,6 +43,15 @@ const PurchaseOrderDetails = (props) => {
   ];
 
   const effectCalled = useRef(false);
+
+  const statusToTextMap = {
+    "draft": "Draft",
+    "published": "Publish",
+    "sent": "Approve",
+    "accepted": "Accept",
+    "rejected": "Reject",
+    "declined": "Declined"
+  }
 
   async function handlePurchaseOrderStatusChange(status) {
     const body = {
@@ -47,30 +62,42 @@ const PurchaseOrderDetails = (props) => {
     if (status === 'accepted') {
       try {
         const response = await convertToSalesOrderReq({ purchaseOrderId: body.purchaseOrderId });
+        if(response.success){
+          toast.success("Purchase order Accepted")
+          setStatus(status);
+        }
       } catch (error) {
         if (error.response && error.response.status === 400) {
           console.error('Bad Request:', error);
+          toast.error("Something went wrong")
           // Handle the 400 error here, e.g., show an error message to the user
         } else {
           console.error('Failed to convert to sales order', error);
+          toast.error("Something went wrong")
         }
       } finally {
         setIsButtonLoading(false);
-        setStatus(status);
+        setApproveModal(false)
       }
     } else {
       try {
         const response = await purchaseOrderStatusChangeReq(body);
+        if(response.success){
+          toast.success(`Purchase Order ${statusToTextMap[status]}`)
+          setStatus(status);
+        }
       } catch (error) {
         if (error.response && error.response.status === 400) {
           console.error('Bad Request:', error);
+          toast.error("Something went wrong")
           // Handle the 400 error here, e.g., show an error message to the user
         } else {
           console.error('Failed to change purchase order status:', error);
+          toast.error("Something went wrong")
         }
       } finally {
         setIsButtonLoading(false);
-        setStatus(status);
+        setApproveModal(false)
       }
     }
   }
@@ -87,12 +114,17 @@ const PurchaseOrderDetails = (props) => {
   }
 
   const acceptPurchaseOrder = () => {
-    //setSelectedStatus('accepted')
-    handlePurchaseOrderStatusChange('accepted');
+    setSelectedStatus('accepted')
+    setApproveModal(true);
     //setStatus('accepted');
     //setSelectedStatus('accepted');
     //TODO: The handlePurchaseOrderStatusChange(); is taking the old value of selectedStatus
     //TODO: ADD BUTTON LOADER, IN THE BACKEND ADD ZOHO SYNC API CALL
+  }
+
+  const declinePurchaseOrder = () => {
+    setSelectedStatus('declined')
+    setApproveModal(true);
   }
 
   const handleStatusChange = (event) => {
@@ -140,6 +172,17 @@ const PurchaseOrderDetails = (props) => {
     });
   };
 
+  const getAgreementData = async (id) => {
+    try {
+      const data = {clientId: id}
+      const res = await getAgreement(data);
+      
+      setPaymentTerms(res.payload.paymentTerms)
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   useEffect(() => {
     props.setBreadcrumbItems("Purchase Order", breadcrumbItems);
     if (!effectCalled.current) {
@@ -147,6 +190,12 @@ const PurchaseOrderDetails = (props) => {
       effectCalled.current = true;
     }
   }, []);
+
+  useEffect(() => {
+    if(orderInfo.clientId) {
+      getAgreementData(orderInfo.clientId);
+    }
+  }, [orderInfo.clientId]);
 
   const options = {
     filename: "Purchase Order.pdf",
@@ -185,11 +234,11 @@ const PurchaseOrderDetails = (props) => {
             right: 10,
           }}
         >
-          <Modal toggle={() => setPublishModal(!publishModal)} size="sm" isOpen={publishModal} centered={true}>
+          <Modal centered toggle={() => setPublishModal(!publishModal)} isOpen={publishModal}>
             <PublishConfirm setPublishModal={setPublishModal} setStatus={setStatus} id={id} />
           </Modal>
-          <Modal toggle={() => setApproveModal(!approveModal)} size="sm" isOpen={approveModal}>
-            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} />
+          <Modal centered toggle={() => setApproveModal(!approveModal)} isOpen={approveModal}>
+            <ApproveConfirm setApproveModal={setApproveModal} handlePurchaseOrderStatusChange={handlePurchaseOrderStatusChange} status={selectedStatus} isButtonLoading={isButtonLoading} />
           </Modal>
           {
             status === 'draft' ? (
@@ -209,7 +258,7 @@ const PurchaseOrderDetails = (props) => {
               :
               <>
                 {OrderStatusRenderer({ value: status })}
-                <Button color="primary" outline onClick={downloadPDF}>Download PDF</Button>
+                <PdfComponent data={{orderInfo, itemsData, paymentTerms}}/>
               </>
             // : (<Typography variant="body1" component="span">
             //   <strong>Status:</strong> {status}
@@ -221,7 +270,6 @@ const PurchaseOrderDetails = (props) => {
                 <StyledButton
                   color={"success"}
                   className={"w-md mx-2"}
-                  isLoading={isButtonLoading}
                   onClick={submitPurchaseOrder}
                 >
                   <CheckCircle className="me-1" />
@@ -236,7 +284,6 @@ const PurchaseOrderDetails = (props) => {
                 <StyledButton
                   color={"danger"}
                   className={"w-md mx-2"}
-                  isLoading={isButtonLoading}
                   onClick={rejectPurchaseOrder}
                 >
                   <Cancel className="me-1" />
@@ -250,12 +297,23 @@ const PurchaseOrderDetails = (props) => {
               <StyledButton
                 color={"success"}
                 className={"w-md"}
-                isLoading={isButtonLoading}
                 onClick={acceptPurchaseOrder}
               >
                 <CorrectSign className="me-1" />
                 Accept
               </StyledButton>
+            )}
+          </RequireUserType>
+          <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+            {status === 'sent' && (
+              <StyledButton
+              color={"danger"}
+              className={"w-md mx-2"}
+              onClick={declinePurchaseOrder}
+            >
+              <Cancel className="me-1" />
+              Decline
+            </StyledButton>
             )}
           </RequireUserType>
         </div>
@@ -282,11 +340,19 @@ const PurchaseOrderDetails = (props) => {
                   <CardBody>
                     <Row className="py-2 border-bottom">
                       <Col>Order Date</Col>
-                      <Col>{new Date(orderInfo?.createdAt).toLocaleDateString()}</Col>
+                      <Col>{formatDate(orderInfo?.createdAt)}</Col>
                     </Row>
                     <Row className="py-2 border-bottom">
                       <Col>Payment Terms</Col>
-                      <Col></Col>
+                      <Col>
+                        {getPaymentTerm(paymentTerms)}
+                      </Col>
+                    </Row>
+                    <Row className="py-2 border-bottom">
+                      <Col>Sales Order No.</Col>
+                      <Col>
+                        {orderInfo?.salesOrderNumber ? orderInfo?.salesOrderNumber : "-"}
+                      </Col>
                     </Row>
                   </CardBody>
                 </Card>
@@ -308,7 +374,7 @@ const PurchaseOrderDetails = (props) => {
             </Row>
             <Row>
               <Col xl="8">
-                <Card className="mt-3" style={{ height: "100%" }}>
+                <Card className="mt-3" style={{ height: "fit-content" }}>
                   <CardHeader>Sales Information</CardHeader>
                   <CardBody>
                     <Row className="py-2 border-bottom">
@@ -320,13 +386,13 @@ const PurchaseOrderDetails = (props) => {
                     {itemsData && itemsData.map((item, index) => (
                       <Row key={index} className="py-2 border-bottom align-items-center">
                         <Col xl="4">
-                          <h6 className="m-0">{item.itemName}</h6>
-                          <span>{item.itemDescription}</span>
+                          <h6 style={{margin: 0, fontSize: '14px', paddingTop: '3px'}}>{item.itemName}</h6>
+                          <span style={{margin: 0, fontSize: '12px', color: 'grey', paddingTop: '2px'}}>{item.itemDescription}</span>
                         </Col>
                         <Col xl="3">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
                         </Col>
-                        <Col xl="3">{item.quantity} Nos</Col>
+                        <Col xl="3">{item.quantity}&nbsp;{item.itemUnit}</Col>
                         <Col xl="2">
                           <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
                         </Col>
@@ -380,6 +446,21 @@ const PurchaseOrderDetails = (props) => {
                 </Card>
               </Col>
             </Row>
+            <Row>
+            <Col xl="8">
+              <Card className="mt-3">
+                <CardHeader>Terms & Conditions</CardHeader>
+                <CardBody>
+                  {orderInfo.terms ?
+                  <div style={{ whiteSpace: "pre-wrap" }}>
+                    {orderInfo.terms} 
+                  </div> 
+                  : <span style={{color: 'grey'}}>No Terms & Conditions</span>
+                  }
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
           </div>
         </Row>
       </div>

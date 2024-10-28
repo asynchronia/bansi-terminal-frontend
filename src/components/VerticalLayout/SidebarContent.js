@@ -255,12 +255,12 @@ const SidebarContent = (props) => {
                 </li>
               </ul>
             </li>
-            <li>
+            {/* <li>
               <Link to="/expenses" className="waves-effect">
                 <i className="mdi mdi-truck-delivery"></i>
                 <span>Expenses</span>
               </Link>
-            </li>
+            </li> */}
             <RequirePermission module={MODULES_ENUM.USERS}>
               <li>
                 <Link to="/users" className=" waves-effect">

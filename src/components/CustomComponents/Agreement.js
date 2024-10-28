@@ -10,11 +10,13 @@ import StyledButton from "../Common/StyledButton";
 import { debounce } from 'lodash';
 import { toast } from "react-toastify";
 import { Close } from "@mui/icons-material";
+import { PAYMENT_TERM_ENUM } from "../../utility/constants";
 
 const Agreement = (props) => {
   const {
     allTaxes,
     handleSubmitAgreement,
+    tableData,
     agreementData,
     setAgreementData,
     additionalData,
@@ -196,7 +198,7 @@ const Agreement = (props) => {
                 }
                 if (!additionalData.validity) {
                   toast.error('Please enter validity');
-                } else if (!additionalData.paymentTerms) {
+                } else if (additionalData.paymentTerms === null || additionalData.paymentTerms === undefined) {
                   toast.error('Please enter Payment Terms');
                 }
                 else {
@@ -234,20 +236,24 @@ const Agreement = (props) => {
             </Col>
             <Col xs="6">
               <label>Payment Terms</label>
-              <input
+              <select
                 id="paymentTerms"
-                type="number"
                 name="paymentTerms"
                 placeholder="Payment Terms"
-                className="form-control"
                 autoComplete="off"
                 value={additionalData.paymentTerms}
-                maxLength={3}
+                className="form-control form-select focus-width"
                 onChange={e => setAdditionalData((prevData) => ({
                   ...prevData,
                   paymentTerms: e.target.value
                 }))}
-              />
+              >
+                <option value={PAYMENT_TERM_ENUM.ADVANCE}>ADVANCE</option>
+                <option value={PAYMENT_TERM_ENUM["50% ADVANCE"]}>50% ADVANCE</option>
+                <option value={PAYMENT_TERM_ENUM[15]}>15</option>
+                <option value={PAYMENT_TERM_ENUM[30]}>30</option>
+                <option value={PAYMENT_TERM_ENUM[45]}>45</option>
+              </select>
             </Col>
 
             <Col xs="9">
@@ -390,6 +396,7 @@ const Agreement = (props) => {
           <AgreementTable
             editable={true}
             agreementData={agreementData}
+            tableData={tableData}
             displayTableData={displayTableData}
             setAgreementData={setAgreementData}
             setDisplayTableData={setDisplayTableData}

@@ -26,6 +26,7 @@ import RequirePermission from "../../routes/middleware/requirePermission";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import { ReactComponent as Import } from "../../assets/images/svg/import-button.svg";
 import { ReactComponent as Add } from "../../assets/images/svg/add-button.svg";
+import { formatDate } from "../../utility/formatDate";
 
 const AllItems = (props) => {
   document.title = "All Items";
@@ -140,12 +141,15 @@ const AllItems = (props) => {
       checkboxSelection: true,
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      comparator: () => false,
     },
     {
       headerName: "Type",
       field: "itemType",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      comparator: () => false,
+      sortable: false
     },
     {
       headerName: "HSN Code",
@@ -153,12 +157,19 @@ const AllItems = (props) => {
       tooltipField: "hsnCode",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      comparator: () => false,
     },
     {
       headerName: "Status",
       field: "status",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      cellRenderer: (props) => {
+        if(props.value){
+          return <>{props.value}</>;
+        }
+      },
+      comparator: () => false,
     },
     {
       headerName: "Sale Price",
@@ -173,11 +184,14 @@ const AllItems = (props) => {
       headerName: "Created On",
       field: "createdAt",
       cellRenderer: (props) => {
-        let date = new Date(props.value);
-        return <>{date.toDateString()}</>;
+        if(props.value){
+          let date = new Date(props.value);
+          return <>{formatDate(date)}</>;
+        }
       },
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      comparator: () => false,
     },
     {
       headerName: "Category",
@@ -185,6 +199,7 @@ const AllItems = (props) => {
       tooltipField: "category",
       suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
+      comparator: () => false,
     },
     {
       headerName: "Action",
@@ -214,12 +229,15 @@ const AllItems = (props) => {
 
   const [allCategories, setAllCategories] = useState([]);
   const [rowData, setRowData] = useState([]);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(null);
+  const [searchInputValue, setSearchInputValue] = useState(null);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
+  const [sortData, setSortData] = useState(null);
+  const [page, setPage] = useState(1);
 
   const tog_standard = () => {
     setmodal_standard(!modal_standard);
@@ -230,9 +248,16 @@ const AllItems = (props) => {
   }
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
-    let pageSize = gridRef.current.api.paginationGetPageSize();
+    const pageSize = gridRef.current.api.paginationGetPageSize();
 
-    setPaginationPageSize(pageSize);
+    if (pageSize !== paginationPageSize) {
+      setPaginationPageSize(pageSize);
+    }
+    const newPage = gridRef.current.api.paginationGetCurrentPage() + 1;
+
+    if (page !== newPage) {
+      setPage(newPage);
+    }
   }, []);
   /*
 {
@@ -248,17 +273,44 @@ const AllItems = (props) => {
     }
 }
 * */
-  const getListOfRowData = useCallback(async (body) => {
-    dispatch(changePreloader(true));
-    const response = await getItemsReq(body);
+  const getListOfRowData = useCallback(
+    async (body) => {
+      if (rowData[(page - 1) * paginationPageSize]) {
+        return;
+      }
 
-    response.map((val, id) => {
-      val.category = val.category.name;
-      val.salePrice = val.variant?.sellingPrice || "-";
-    });
-    setRowData(response);
-    dispatch(changePreloader(false));
-  });
+      dispatch(changePreloader(true));
+      try {
+        const response = await getItemsReq(body);
+
+        response.items.map((val, id) => {
+          val.category = val.category.name;
+          val.salePrice = val.variant?.sellingPrice || "-";
+        });
+
+        
+        const emptyObjects = Array.from({ length: response.count - response.items.length }, () => null);
+        
+        let filledRows;
+        filledRows = [...response.items];
+        if(rowData.length === 0) {
+          filledRows = [...response.items, ...emptyObjects];
+        }
+
+        // Replace the section of data for the current page
+        const newData = [...rowData];
+
+        newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+
+        setRowData(newData);
+      } catch (error) {
+        console.error("Error fetching purchase orders:", error);
+      } finally {
+        dispatch(changePreloader(false));
+      }
+    },
+    [page, paginationPageSize, searchValue, sortData, bodyData.filter.category]
+  );
 
   const getCategories = useCallback(async () => {
     const response = await getCategoriesReq();
@@ -272,8 +324,21 @@ const AllItems = (props) => {
   }, []);
 
   useEffect(() => {
-    getListOfRowData(bodyDataRefine(bodyData));
-  }, [bodyData]);
+    let body = {
+      page: page,
+      limit: paginationPageSize,
+    }
+    if (searchValue) {
+      body.search = searchValue
+    }
+    if (sortData?.key && sortData?.order) {
+      body.sort = sortData
+    }
+    if (bodyData.filter.category !== null) {
+      body.filter = bodyData.filter
+    }
+    getListOfRowData(body);
+  }, [page, paginationPageSize, searchValue, sortData, bodyData.filter.category]);
 
   //TODO: Pagination size dropdown fix
   /*   useEffect(() => {
@@ -286,16 +351,14 @@ const AllItems = (props) => {
     }, [paginationPageSize]); */
 
   const handleInputChange = (e) => {
-    setSearchValue(e.target.value);
+    setSearchInputValue(e.target.value?.trim());
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
     timerRef.current = setTimeout(() => {
-      console.log("Executing code after delay");
-      setBodyData((prevBodyData) => ({
-        ...prevBodyData,
-        search: e.target.value,
-      }));
+      setRowData([]);
+      setPage(1);
+      setSearchValue(e.target.value?.trim());
     }, 2000);
   };
 
@@ -332,6 +395,22 @@ const onGridReady = useCallback((params) => {
       });
   }, []);
 */
+
+ const handleSortChange = (e) => {
+    const columns = gridRef.current.api.getColumnState();
+    const ele = columns.find(
+      (ele) => ele.sort === "asc" || ele.sort === "desc"
+    );
+
+    if (ele) {
+      setRowData([]);
+      setPage(1);
+      setSortData({
+        key: ele.colId,
+        order: ele.sort,
+      });
+    }
+  };
   return (
     <React.Fragment>
       <Modal
@@ -441,6 +520,8 @@ const onGridReady = useCallback((params) => {
                             categories={allCategories}
                             setCategoryData={setCategoryData}
                             setBodyData={setBodyData}
+                            setRowData={setRowData}
+                            setPage={setPage}
                           />
                         </div>
                       ) : null}
@@ -449,7 +530,7 @@ const onGridReady = useCallback((params) => {
                       <div className="search-box position-relative">
                         <Input
                           type="text"
-                          value={searchValue}
+                          value={searchInputValue}
                           onChange={handleInputChange}
                           className="form-control rounded border"
                           placeholder="Search..."
@@ -504,6 +585,8 @@ const onGridReady = useCallback((params) => {
                     autoSizeStrategy={autoSizeStrategy}
                     rowData={rowData}
                     onPaginationChanged={onPaginationChanged}
+                    onSortChanged={handleSortChange}
+                    sortingOrder={["desc", "asc"]}
                   ></AgGridReact>
                 </div>
               </CardBody>

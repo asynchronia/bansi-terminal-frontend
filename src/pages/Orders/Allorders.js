@@ -14,6 +14,9 @@ import CircleRenderer from "./CircleRenderer";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import './styles/AllOrders.scss'
+import { formatDate } from '../../utility/formatDate';
+import RequireUserType from '../../routes/middleware/requireUserType';
+import { USER_TYPES_ENUM } from '../../utility/constants';
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -36,6 +39,10 @@ const AllOrders = (props) => {
   const [page, setPage] = useState(1);
   const [searchValue, setSearchValue] = useState('');
   const [inputValue, setInputValue] = useState('');
+  const [sortBody, setSortBody] = useState({
+    key: 'date',
+    order: "D"
+  })
 
   const redirectToViewPage = (id) => {
     let path = `/order/${id.salesorder_id}`;
@@ -63,8 +70,11 @@ const AllOrders = (props) => {
     if (searchValue) {
       body.search_text = searchValue;
     }
+    if (sortBody) {
+      body.sort = sortBody;
+    } 
     getListOfRowData(body);
-  }, [page, paginationPageSize, searchValue]);
+  }, [page, paginationPageSize, searchValue, sortBody]);
 
   const getListOfRowData = useCallback(async (body) => {
     if (rowData[(page - 1) * paginationPageSize]) {
@@ -151,9 +161,34 @@ const AllOrders = (props) => {
 
   const gridRef = useRef();
 
+  const headerTemplate = (props) => {
+    const {handleSort, data} = props
+    return (
+      <button onClick={() => handleSort(data, sortBody)} style={{background: 'transparent', border: 'none'}}>
+        <span style={{fontWeight: 600}}>
+          {data?.displayName}&nbsp;
+          {sortBody?.key === data?.column.userProvidedColDef.field ? <i className={sortBody?.order === "A" ? "mdi mdi-arrow-up" : "mdi mdi-arrow-down"}></i> : ''}
+        </span>
+      </button>
+    )
+  }
+
+  const handleSort = (data, sortBody) => {
+    if(data.column.userProvidedColDef.field === sortBody?.key) {
+      setSortBody({...sortBody, order: sortBody?.order === "A" ? "D" : "A"})
+    } else {
+      setSortBody({
+        key: data.column.userProvidedColDef.field,
+        order: "D"
+      })
+    }
+    setPage(1)
+    setRowData([])
+  }
+
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Sales Order", link: "#" },
+    { title: "Ongoing Orders", link: "#" },
   ];
 
   const agRowData = [
@@ -168,39 +203,70 @@ const AllOrders = (props) => {
       status: "invoiced",
     }
   ]
+
   const columnDefs = [
     {
       headerName: "Order Date", field: "date",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: false, width: 110
+      cellRenderer: (props) => {
+        if(props.value) {
+          let date = new Date(props.value);
+          return <>{formatDate(date)}</>;
+        }
+      },
+      sortable: false, minWidth: 110,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
-      headerName: "Order No.", field: "salesorder_id", flex: 1,
+      headerName: "Order No.", field: "salesorder_number",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: false, minWidth: 140
+      sortable: false, minWidth: 140,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
-      headerName: "Client", field: "customer_name", flex: 1,
+      headerName: "Client", field: "customer_name",
       tooltipField: "customer_name",
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: false, minWidth: 180
+      sortable: false, minWidth: 150,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Status", field: "order_status", cellRenderer: OrderStatusRenderer,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status",
-      sortable: false, width: 90
+      sortable: false, minWidth: 120
     },
     {
-      headerName: "Amount", field: "total", width: 100,
+      headerName: "Amount", field: "total", width: 140,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value),
-      sortable: false
+      sortable: false,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
     },
     {
       headerName: "Inovice", field: "invoiced_status", cellRenderer: CircleRenderer,
@@ -223,7 +289,7 @@ const AllOrders = (props) => {
 
     },
     {
-      headerName: "Action", field: "action", sortable: false, width: 100,
+      headerName: "Action", field: "action", sortable: false, width: 80,
       cellClass: "actions-button-cell",
       cellRenderer: DropdownMenuBtn,
       cellRendererParams: {
@@ -247,6 +313,8 @@ const AllOrders = (props) => {
       })
     }
   }
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
 
   return (
     <>
@@ -283,18 +351,36 @@ const AllOrders = (props) => {
                     width: '100%'
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    defaultColDef={{ resizable: false, suppressMovable: true }}
-                    columnDefs={columnDefs}
-                    pagination={pagination}
-                    paginationPageSize={20}
-                    paginationPageSizeSelector={false}
-                    rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}
-                    onGridReady={onGridReady}
-                  >
-                  </AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      autoSizeStrategy={autoSizeStrategy}
+                      columnDefs={columnDefs}
+                      pagination={pagination}
+                      paginationPageSize={20}
+                      paginationPageSizeSelector={false}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                      reactiveCustomComponents
+                      onGridReady={onGridReady}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      autoSizeStrategy={autoSizeStrategy}
+                      columnDefs={clientColumnDefs}
+                      pagination={pagination}
+                      paginationPageSize={20}
+                      paginationPageSizeSelector={false}
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                      reactiveCustomComponents
+                      onGridReady={onGridReady}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>
