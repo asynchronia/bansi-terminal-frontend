@@ -37,7 +37,11 @@ const BranchData = (props) => {
     initialValues: {
       primaryBranch: {
         name: null,
-        address: null,
+        addressLine1: null,
+        addressLine2: "",
+        city: null,
+        state: null,
+        pincode: null,
         associatedWarehouse: null,
         contact: null,
         code: null,
@@ -47,7 +51,11 @@ const BranchData = (props) => {
     validationSchema: Yup.object({
       primaryBranch: Yup.object().shape({
         name: Yup.string().required("Please Enter Branch Name"),
-        address: Yup.string().required("Please Enter Branch Address"),
+        addressLine1: Yup.string().required("Please Enter Branch Address Line 1"),
+        addressLine2: Yup.string().optional(),
+        city: Yup.string().required("Please Enter City"),
+        state: Yup.string().required("Please Enter State"),
+        pincode: Yup.string().required("Please Enter Pincode"),
         associatedWarehouse: Yup.string().required("Please Select Associated Warehouse"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
         code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character"),

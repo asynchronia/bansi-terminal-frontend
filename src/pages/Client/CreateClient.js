@@ -94,7 +94,11 @@ const CreateClient = (props) => {
       status: "active",
       primaryBranch: {
         name: null,
-        address: null,
+        addressLine1: null,
+        addressLine2: "",
+        city: null,
+        state: null,
+        pincode: null,
         associatedWarehouse: "65f4b5d66959ec3852a37e60",
         contact: null,
         code: null,
@@ -125,7 +129,11 @@ const CreateClient = (props) => {
       ifscCode: Yup.string().required("Please Enter IFSC Code"),
       primaryBranch: Yup.object().shape({
         name: Yup.string().required("Please Enter Branch Name"),
-        address: Yup.string().required("Please Enter Branch Address"),
+        addressLine1: Yup.string().required("Please Enter Branch Address Line 1"),
+        addressLine2: Yup.string().optional(),
+        city: Yup.string().required("Please Enter City"),
+        state: Yup.string().required("Please Enter State"),
+        pincode: Yup.string().required("Please Enter Pincode"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
         code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character"),
         zohoAddressId: Yup.string().optional()
