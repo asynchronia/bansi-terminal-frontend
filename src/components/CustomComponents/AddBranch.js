@@ -156,6 +156,37 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
           </p>
         ) : null}
       </FormGroup>
+      <Row>
+        <Col>
+          <FormGroup>
+            <label className="item-name">ZOHO Address Id</label>
+            <Input
+              name="primaryBranch.zohoAddressId"
+              id="zohoAddressId"
+              className="form-control"
+              type="text"
+              placeholder="Enter ZOHO Address Id"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation?.values?.primaryBranch?.zohoAddressId || ""}
+              invalid={
+                validation?.touched?.primaryBranch &&
+                validation?.touched?.primaryBranch?.zohoAddressId &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.zohoAddressId
+              }
+            />
+            {validation?.touched?.primaryBranch &&
+              validation?.touched?.primaryBranch?.zohoAddressId &&
+              validation?.errors?.primaryBranch &&
+              validation?.errors?.primaryBranch?.zohoAddressId ? (
+              <p style={{ color: "red" }}>
+                {validation?.errors?.primaryBranch?.zohoAddressId}
+              </p>
+            ) : null}
+          </FormGroup>
+        </Col>
+      </Row>
     </>
   );
 };
