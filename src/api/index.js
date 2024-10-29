@@ -13,7 +13,7 @@ const API_URL = {
   getInvoices: "/api/invoices/list",
   searchItem: "/api/items/search",
   getOrderList: "/api/orders/list",
-  getPurchaseOrderList: "/api/purchaseorders/list",
+  getPurchaseOrderList: "/api/purchaseorders/listV2",
   getPaymentList: "/api/payments/list",
   login: "/api/users/login",
   signin: "/api/users/signup",
@@ -296,10 +296,10 @@ export async function getClientBranchList() {
   });
 }
 
-export async function getPurchaseOrderList() {
+export async function getPurchaseOrderList(body) {
   return new Promise((resolve) => {
     axios
-      .get(`${baseUrl}${API_URL.getPurchaseOrderList}`, {
+      .post(`${baseUrl}${API_URL.getPurchaseOrderList}`, body, {
         headers: getHeaders(),
       })
       .then((res) => {
