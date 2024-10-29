@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Col, FormGroup, Input, Label, Row } from "reactstrap";
+import { STATES_NAME_ENUM } from "../../utility/constants";
 
 const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) => {
 
@@ -128,34 +129,189 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
           </FormGroup>
         </Col>
       </Row>
-      <FormGroup>
-        <Label>Branch Address</Label>
-        <Input
-          type="textarea"
-          id="address"
-          name="primaryBranch.address"
-          rows="3"
-          placeholder="Enter Branch Address"
-          onChange={validation.handleChange}
-          onBlur={validation.handleBlur}
-          value={validation.values.primaryBranch?.address || ""}
-          invalid={
-            validation.touched?.primaryBranch &&
-            validation.touched?.primaryBranch?.address &&
-            validation.errors?.primaryBranch &&
-            validation.errors?.primaryBranch?.address
-          }
-        />
-        <span className="badgecount badge badge-success"></span>
-        {validation.touched?.primaryBranch &&
-          validation.touched?.primaryBranch?.address &&
-          validation.errors?.primaryBranch &&
-          validation.errors?.primaryBranch?.address ? (
-          <p style={{ color: "red" }}>
-            {validation.errors?.primaryBranch?.address}
-          </p>
-        ) : null}
-      </FormGroup>
+      <Row>
+        <Col>
+          <FormGroup>
+            <Label>Branch Address Line 1</Label>
+            <Input
+              type="text"
+              id="addressLine1"
+              name="primaryBranch.addressLine1"
+              placeholder="Enter Branch Address Line 1"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation.values.primaryBranch?.addressLine1 || ""}
+              invalid={
+                validation.touched?.primaryBranch &&
+                validation.touched?.primaryBranch?.addressLine1 &&
+                validation.errors?.primaryBranch &&
+                validation.errors?.primaryBranch?.addressLine1
+              }
+            />
+            <span className="badgecount badge badge-success"></span>
+            {validation.touched?.primaryBranch &&
+              validation.touched?.primaryBranch?.addressLine1 &&
+              validation.errors?.primaryBranch &&
+              validation.errors?.primaryBranch?.addressLine1 ? (
+              <p style={{ color: "red" }}>
+                {validation.errors?.primaryBranch?.addressLine1}
+              </p>
+            ) : null}
+          </FormGroup>
+          </Col>
+        <Col>
+          <FormGroup>
+            <Label>Branch Address Line 2</Label>
+            <Input
+              type="text"
+              id="addressLine2"
+              name="primaryBranch.addressLine2"
+              placeholder="Enter Branch Address Line 2"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation.values.primaryBranch?.addressLine2 || ""}
+              invalid={
+                validation.touched?.primaryBranch &&
+                validation.touched?.primaryBranch?.addressLine2 &&
+                validation.errors?.primaryBranch &&
+                validation.errors?.primaryBranch?.addressLine2
+              }
+            />
+            <span className="badgecount badge badge-success"></span>
+            {validation.touched?.primaryBranch &&
+              validation.touched?.primaryBranch?.addressLine2 &&
+              validation.errors?.primaryBranch &&
+              validation.errors?.primaryBranch?.addressLine2 ? (
+              <p style={{ color: "red" }}>
+                {validation.errors?.primaryBranch?.addressLine2}
+              </p>
+            ) : null}
+          </FormGroup>
+          </Col>
+      </Row>
+      <Row>
+        <Col>
+          <FormGroup>
+            <Label>City</Label>
+            <Input
+              type="text"
+              id="city"
+              name="primaryBranch.city"
+              placeholder="Enter Branch City"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation.values.primaryBranch?.city || ""}
+              invalid={
+                validation.touched?.primaryBranch &&
+                validation.touched?.primaryBranch?.city &&
+                validation.errors?.primaryBranch &&
+                validation.errors?.primaryBranch?.city
+              }
+            />
+            <span className="badgecount badge badge-success"></span>
+            {validation.touched?.primaryBranch &&
+              validation.touched?.primaryBranch?.city &&
+              validation.errors?.primaryBranch &&
+              validation.errors?.primaryBranch?.city ? (
+              <p style={{ color: "red" }}>
+                {validation.errors?.primaryBranch?.city}
+              </p>
+            ) : null}
+          </FormGroup>
+          </Col>
+        <Col>
+          <FormGroup>
+            <label className="col-form-label">Associated Warehouse</label>
+            <select
+              name="primaryBranch.state"
+              id="state"
+              className="form-select focus-width"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation?.values?.primaryBranch?.state || ""}
+              invalid={
+                validation?.touched?.primaryBranch &&
+                validation?.touched?.primaryBranch?.state &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.state
+              }
+            >
+              <option value="" disabled>Select State</option>
+              {Object.entries(STATES_NAME_ENUM).map(([key, name]) => (
+                <option key={key} value={name}>{name}</option>
+              ))}
+            </select>
+            {validation.touched?.primaryBranch &&
+              validation.touched?.primaryBranch?.state &&
+              validation.errors?.primaryBranch &&
+              validation.errors?.primaryBranch?.state ? (
+              <p style={{ color: "red" }}>
+                {validation.errors?.primaryBranch?.state}
+              </p>
+            ) : null}
+          </FormGroup>
+        </Col>
+      </Row>
+      <Row>
+      <Col>
+          <FormGroup>
+            <Label>Pincode</Label>
+            <Input
+              type="text"
+              id="pincode"
+              name="primaryBranch.pincode"
+              placeholder="Enter Branch pincode"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation.values.primaryBranch?.pincode || ""}
+              invalid={
+                validation.touched?.primaryBranch &&
+                validation.touched?.primaryBranch?.pincode &&
+                validation.errors?.primaryBranch &&
+                validation.errors?.primaryBranch?.pincode
+              }
+            />
+            <span className="badgecount badge badge-success"></span>
+            {validation.touched?.primaryBranch &&
+              validation.touched?.primaryBranch?.pincode &&
+              validation.errors?.primaryBranch &&
+              validation.errors?.primaryBranch?.pincode ? (
+              <p style={{ color: "red" }}>
+                {validation.errors?.primaryBranch?.pincode}
+              </p>
+            ) : null}
+          </FormGroup>
+        </Col>
+        <Col>
+          <FormGroup>
+            <label className="item-name">ZOHO Address Id</label>
+            <Input
+              name="primaryBranch.zohoAddressId"
+              id="zohoAddressId"
+              className="form-control"
+              type="text"
+              placeholder="Enter ZOHO Address Id"
+              onChange={validation.handleChange}
+              onBlur={validation.handleBlur}
+              value={validation?.values?.primaryBranch?.zohoAddressId || ""}
+              invalid={
+                validation?.touched?.primaryBranch &&
+                validation?.touched?.primaryBranch?.zohoAddressId &&
+                validation?.errors?.primaryBranch &&
+                validation?.errors?.primaryBranch?.zohoAddressId
+              }
+            />
+            {validation?.touched?.primaryBranch &&
+              validation?.touched?.primaryBranch?.zohoAddressId &&
+              validation?.errors?.primaryBranch &&
+              validation?.errors?.primaryBranch?.zohoAddressId ? (
+              <p style={{ color: "red" }}>
+                {validation?.errors?.primaryBranch?.zohoAddressId}
+              </p>
+            ) : null}
+          </FormGroup>
+        </Col>
+      </Row>
     </>
   );
 };
