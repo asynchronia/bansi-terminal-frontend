@@ -169,7 +169,8 @@ const ViewPurchaseOrder = (props) => {
     if (page !== newPage) {
       setPage(newPage);
     }
-  }, []);
+  }, [page, paginationPageSize]);
+
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value?.trim());
@@ -275,11 +276,14 @@ const ViewPurchaseOrder = (props) => {
       (ele) => ele.sort === "asc" || ele.sort === "desc"
     );
 
-    console.log("page in sort",page)
-    setSortData({
-      key: ele.colId,
-      order: ele.sort,
-    });
+    if (ele) {
+      setRowData([]);
+      setPage(1);
+      setSortData({
+        key: ele.colId,
+        order: ele.sort,
+      });
+    }
   };
 
   return (
@@ -318,15 +322,13 @@ const ViewPurchaseOrder = (props) => {
                       suppressRowClickSelection={true}
                       columnDefs={columnDefs}
                       pagination={true}
-                      paginationAutoPageSize={true}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
                       autoSizeStrategy={autoSizeStrategy}
                       rowData={rowData}
                       reactiveCustomComponents
                       onPaginationChanged={onPaginationChanged}
-                      onSortChanged={() => {
-                        setRowData([]);
-                        setPage(1);
-                        handleSortChange()}}
+                      onSortChanged={handleSortChange}
                       sortingOrder={["desc", "asc"]}
                     >
                     </AgGridReact>
@@ -337,15 +339,13 @@ const ViewPurchaseOrder = (props) => {
                       suppressRowClickSelection={true}
                       columnDefs={clientColumnDefs}
                       pagination={true}
-                      paginationAutoPageSize={true}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
                       autoSizeStrategy={autoSizeStrategy}
                       rowData={rowData}
                       reactiveCustomComponents
                       onPaginationChanged={onPaginationChanged}
-                      onSortChanged={() => {
-                        setRowData([])
-                        setPage(1);
-                        handleSortChange()}}
+                      onSortChanged={handleSortChange}
                       sortingOrder={["desc", "asc"]}
                     >
                     </AgGridReact>
