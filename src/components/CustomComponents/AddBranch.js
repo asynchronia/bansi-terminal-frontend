@@ -159,13 +159,13 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
       <Row>
         <Col>
           <FormGroup>
-            <label className="item-name">ZOHO Address Id</label>
+            <label className="item-name">Zoho Address Id</label>
             <Input
               name="primaryBranch.zohoAddressId"
               id="zohoAddressId"
               className="form-control"
               type="text"
-              placeholder="Enter ZOHO Address Id"
+              placeholder="Enter Zoho Address Id"
               onChange={validation.handleChange}
               onBlur={validation.handleBlur}
               value={validation?.values?.primaryBranch?.zohoAddressId || ""}
