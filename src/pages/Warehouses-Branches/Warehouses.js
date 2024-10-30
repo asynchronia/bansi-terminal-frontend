@@ -56,34 +56,15 @@ const Warehouses = (props) => {
                         </Row>
                         <Row>
                             <Col xs="6">
-                                <p>Address Line 1:</p>
+                                <p>Address:</p>
                             </Col>
                             <Col xs="6">
-                                {warehouse.addressLine1}
-                            </Col>
-                            <Col xs="6">
-                                <p>Address Line 2:</p>
-                            </Col>
-                            <Col xs="6">
-                                {warehouse.addressLine2}
-                            </Col>
-                            <Col xs="6">
-                                <p>City:</p>
-                            </Col>
-                            <Col xs="6">
-                                {warehouse.city}
-                            </Col>
-                            <Col xs="6">
-                                <p>State:</p>
-                            </Col>
-                            <Col xs="6">
+                            <p>
+                                {warehouse.addressLine1},&nbsp;
+                                {warehouse.addressLine2},&nbsp;
+                                {warehouse.city}&nbsp;-&nbsp;{warehouse.pincode},&nbsp;
                                 {warehouse.state}
-                            </Col>
-                            <Col xs="6">
-                                <p>Pincode:</p>
-                            </Col>
-                            <Col xs="6">
-                                {warehouse.pincode}
+                            </p>
                             </Col>
                         </Row>
                         <Row>
