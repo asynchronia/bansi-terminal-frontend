@@ -196,19 +196,20 @@ const Expenses = (props) => {
     }
   });
 
-  useEffect(() => {
-    const body = {
-      page: page,
-      limit: paginationPageSize,
-    }
-    props.setBreadcrumbItems("Expenses", breadcrumbItems);
-    if (!effectCalled.current) {
-      getListOfRowData(body);
-      effectCalled.current = true;
-    }
-  }, []);
+  // useEffect(() => {
+  //   const body = {
+  //     page: page,
+  //     limit: paginationPageSize,
+  //   }
+  //   props.setBreadcrumbItems("Expenses", breadcrumbItems);
+  //   if (!effectCalled.current) {
+  //     getListOfRowData(body);
+  //     effectCalled.current = true;
+  //   }
+  // }, []);
 
   useEffect(() => {
+    props.setBreadcrumbItems("Expenses", breadcrumbItems);
     const body = {
       page: page,
       limit: paginationPageSize,

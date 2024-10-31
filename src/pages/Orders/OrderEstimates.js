@@ -215,17 +215,17 @@ const OrderEstimates = (props) => {
     }
   });
 
-  useEffect(() => {
-    props.setBreadcrumbItems("Estimates", breadcrumbItems);
-    const bodyObject = {
-      "page": page,
-      "limit": paginationPageSize
-    };
-    if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
-      effectCalled.current = true;
-    }
-  }, []);
+  // useEffect(() => {
+  //   props.setBreadcrumbItems("Estimates", breadcrumbItems);
+  //   const bodyObject = {
+  //     "page": page,
+  //     "limit": paginationPageSize
+  //   };
+  //   if (!effectCalled.current) {
+  //     getListOfRowData(bodyObject);
+  //     effectCalled.current = true;
+  //   }
+  // }, []);
 
 //  const onRowClicked = (event) =>{
 //     console.log(event.data);
@@ -234,6 +234,7 @@ const OrderEstimates = (props) => {
 //  }
 
 useEffect(() => {
+  props.setBreadcrumbItems("Estimates", breadcrumbItems);
   const body = {
     page: page,
     limit: paginationPageSize,
