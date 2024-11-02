@@ -56,7 +56,7 @@ const ActionComponent = (props) => {
           firstName: userValues.firstName,
           lastName: userValues.lastName,
           email: userValues.email,
-          password: userValues.password,
+          password: "",
           contact: userValues.contact.toString(),
           gender: userValues.gender,
           role: userValues.role._id,

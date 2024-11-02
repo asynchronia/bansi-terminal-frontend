@@ -15,6 +15,8 @@ import { changePreloader } from "../../store/actions";
 import { getEstimatesReq } from "../../service/orderService";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { formatDate } from "../../utility/formatDate";
+import RequireUserType from "../../routes/middleware/requireUserType";
+import { USER_TYPES_ENUM } from "../../utility/constants";
 
 const OrderEstimates = (props) => {
     document.title = "Estimates";
@@ -155,6 +157,8 @@ const OrderEstimates = (props) => {
     }
   ];
   
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+
   //TODO to check for autoSizeStrategy
   const autoSizeStrategy = {
     type: 'fitGridWidth'
@@ -261,7 +265,7 @@ useEffect(() => {
           <Col className="col-12">
             <Card>
               <CardBody>
-                <div className="button-section">
+                <div className="button-section" style={{justifyContent: 'flex-end'}}>
                   <div className="button-right-section">
                     <div className="invoice-search-box">
                       <div className="search-box position-relative">
@@ -289,22 +293,42 @@ useEffect(() => {
                     width: '100%'
                   }}
                 >
-                  <AgGridReact
-                    ref={gridRef}
-                    suppressRowClickSelection={true}
-                    columnDefs={columnDefs}
-                    pagination
-                    paginationPageSize={paginationPageSize}
-                    paginationPageSizeSelector={paginationPageSizeSelector}
-                    rowSelection="multiple"
-                    reactiveCustomComponents
-                    rowData={rowData}
-                    onPaginationChanged={onPaginationChanged}
-                    sortingOrder={["desc", "asc"]}
-                    autoSizeStrategy={autoSizeStrategy}
-                    // onRowClicked={onRowClicked}
-                  >
-                  </AgGridReact>
+                  <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                    <AgGridReact
+                      ref={gridRef}
+                      suppressRowClickSelection={true}
+                      columnDefs={columnDefs}
+                      pagination
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      rowSelection="multiple"
+                      reactiveCustomComponents
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                      sortingOrder={["desc", "asc"]}
+                      autoSizeStrategy={autoSizeStrategy}
+                      // onRowClicked={onRowClicked}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
+                  <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                    <AgGridReact
+                      ref={gridRef}
+                      suppressRowClickSelection={true}
+                      columnDefs={clientColumnDefs}
+                      pagination
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
+                      rowSelection="multiple"
+                      reactiveCustomComponents
+                      rowData={rowData}
+                      onPaginationChanged={onPaginationChanged}
+                      sortingOrder={["desc", "asc"]}
+                      autoSizeStrategy={autoSizeStrategy}
+                      // onRowClicked={onRowClicked}
+                    >
+                    </AgGridReact>
+                  </RequireUserType>
                 </div>
               </CardBody>
             </Card>
