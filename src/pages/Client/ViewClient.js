@@ -28,9 +28,9 @@ import { getTaxesReq } from "../../service/itemService";
 import { updateClientStatusReq } from "../../service/statusService";
 import { getClientUsersReq, updateUserReq } from "../../service/usersService";
 import { setBreadcrumbItems } from "../../store/actions";
-import { jsPDF } from 'jspdf'
 
 import ENV from "../../utility/env";
+import AgreementPdfComponent from "./AgreementPdfComponent";
 const ViewClient = (props) => {
   const navigateTo = useNavigate()
   const [clientData, setClientData] = useState({});
@@ -410,111 +410,6 @@ const ViewClient = (props) => {
     }
   };
 
-
-  const downloadPDF = () => {
-    const data = [...displayTableData];
-    const doc = new jsPDF();
-  
-    // Load the image and add it to the PDF after it is loaded
-    const img = new Image();
-    img.src = require("../../assets/images/Willsmeet-Logo.png"); // Ensure correct path in your environment
-  
-    img.onload = function() {
-      // Add the image to the PDF (x, y, width, height)
-      doc.addImage(img, 'PNG', 20, 10, 40, 20); // Adjust position and size as needed
-  
-      // Add company details aligned with the image
-      const textStartX = 80; // Align text with the right side of the image
-      const startY = 10; // Ensure this is aligned with the image vertically
-  
-      doc.setFontSize(14);
-      doc.setFont("helvetica", "bold");
-      doc.text("Bansi Office Solutions Private Limited", textStartX, startY);
-  
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-      doc.text("#1496, 19th Main Road, Opp Park Square Apartment,", textStartX, startY + 6);
-      doc.text("HSR Layout, Bangalore Karnataka 560102, India", textStartX, startY + 12);
-      doc.text("GSTIN: 29AAJCB1807A1Z3 CIN: U74999KA2020PTC137142", textStartX, startY + 18);
-      doc.text("MSME No : UDYAM-KR-03-0065095", textStartX, startY + 24);
-      doc.text("Web: www.willsmeet.com, Email: sales@willsmeet.com", textStartX, startY + 30);
-  
-      // Move cursor down for client details (below company info and image)
-      const clientTableStartY = startY + 40; // Ensure enough space between company info and client table
-  
-      // Client Details Table
-      const clientDetails = [
-        ["Name:", clientData.name],
-        ["Email:", clientData.email],
-        ["Contact", clientData.contact],
-        ["Agreement Validity:", additionalData.validity],
-        ["Payment Terms:", `${additionalData.paymentTerms} Days`]
-      ];
-  
-      doc.autoTable({
-        head: [],
-        body: clientDetails,
-        theme: 'plain',
-        styles: {
-          fontSize: 10,
-        },
-        startY: clientTableStartY, // Start client details table below company info
-        columnWidths: {
-          cellWidth: 30
-        }
-      });
-  
-      // Generate the table columns and rows for your main data
-      const tableColumn = ['S.No.', ...Object.keys(data[0]).filter((key) => key !== 'id')];
-      const tableRows = data.map((obj, index) => [
-        index + 1, // Add the row number as the first column
-        ...Object.values(obj).filter((_, keyIndex) => Object.keys(obj)[keyIndex] !== 'id') // Remove 'id' from the data
-      ]);
-  
-      // Calculate column widths based on the percentages you provided
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 20;
-      const contentWidth = pageWidth - margin * 2;
-      const percentageWidths = [7, 20, 20, 15, 10, 10, 10, 7, 10];
-      const columnWidths = {};
-      percentageWidths.forEach((percentage, index) => {
-        columnWidths[index] = { cellWidth: (percentage / 100) * contentWidth };
-      });
-  
-      // Main Data Table
-      doc.autoTable({
-        head: [tableColumn],
-        body: tableRows,
-        theme: 'grid',
-        styles: {
-          fontSize: 10,
-        },
-        margin: { top: 10 },
-        startY: doc.autoTable.previous.finalY + 10, // Start main table after client details table
-        columnStyles: columnWidths,
-        headStyles: {
-          fillColor: '#0053FF', // Set the header background color to #0053FF
-        },
-      });
-  
-      // Save the PDF
-      doc.save("Agreement.pdf");
-    };
-
-    // const fileKey = additionalData.url;
-    // if (!fileKey) {
-    //   toast.info("No file available for download", {
-    //     position: "top-center",
-    //     theme: "colored",
-    //   return;
-    // }
-    // const fileUrl = `${ENV.FILE_SERVER_BASEURL}/${fileKey}`;
-    // window.open(fileUrl, '_blank');
-  };
-  
-  
-
-
   useEffect(() => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
   }, [breadcrumbItems]);
@@ -596,11 +491,10 @@ const ViewClient = (props) => {
                 <h6 className="m-0">Agreement</h6>
                 {!agreementAvailable.loading && agreementAvailable.value ? (
                   <div className="d-flex gap-2">
-                    <Button color="primary" size="sm"
-                      onClick={downloadPDF}>
-                      <i className="mdi mdi-download mx-2"></i>
-                      Download PDF
-                    </Button>
+                    <AgreementPdfComponent data={{page: 'client' ,displayTableData ,...clientData,
+                      validity: additionalData.validity,
+                      paymentTerms: additionalData.paymentTerms,
+                    }} />
                     <Button color="primary" size="sm"
                       onClick={() => { handleModalToggle("agreement"); }}>
                       <i className="mdi mdi-book-edit mx-2"></i>
