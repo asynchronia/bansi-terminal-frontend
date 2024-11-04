@@ -231,7 +231,6 @@ const OrderDetails = (props) => {
       response.data.line_items &&
       response.data.salesorder_number
     ) {
-      console.log("Adi" + response.data.salesorder_number);
       setOrderData(response?.data);
       setLineItems(response?.data?.line_items);
       setRowCount(gridRef.current.api.getDisplayedRowCount());

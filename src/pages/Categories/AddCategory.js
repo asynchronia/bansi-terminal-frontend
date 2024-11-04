@@ -80,7 +80,6 @@ const AddCategory = (props) => {
         body.parentCategoryId = categoryData.id;
       }
       handleSubmit(body, resetForm);
-      console.log(body);
     },
   });
 

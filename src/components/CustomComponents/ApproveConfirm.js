@@ -4,7 +4,6 @@ import { ModalBody } from "reactstrap";
 import StyledButton from "../Common/StyledButton";
 
 const ApproveConfirm = ({ setApproveModal, handlePurchaseOrderStatusChange, status, isButtonLoading }) => {
-  console.log(`APPROVE CONFIRM MODAL CALLED WITH SET STATUS VALUE: ${status}`);
   const statusToTextMap = {
     "draft": "Draft",
     "published": "Publish",

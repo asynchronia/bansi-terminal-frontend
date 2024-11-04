@@ -35,7 +35,6 @@ const ViewPurchaseOrder = (props) => {
   const [inputValue, setInputValue] = useState('');
 
   // const redirectToViewPage = (id) => {
-  //   console.log(id.order_id);
   //   let path = `/order/${id.order_id}`;
   //   setTimeout(() => {
   //     navigate(path, id.order_id);

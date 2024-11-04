@@ -138,7 +138,6 @@ const AllClients = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Clients", breadcrumbItems);
-    console.log(status);
     if (status && status !== undefined) {
       getListOfRowData("status");
     }
@@ -218,7 +217,6 @@ const AllClients = (props) => {
   );
 
   const handleChange = (e) => {
-    console.log("Status value", e.target.value);
     setRowData([]);
     setPage(1);
     setStatus(e.target.value);

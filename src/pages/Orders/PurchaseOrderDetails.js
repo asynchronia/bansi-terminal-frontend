@@ -110,7 +110,6 @@ const PurchaseOrderDetails = (props) => {
   const rejectPurchaseOrder = () => {
     setSelectedStatus('rejected');
     setApproveModal(true);
-    console.log("PURCHASE ORDER REJECTED")
   }
 
   const acceptPurchaseOrder = () => {

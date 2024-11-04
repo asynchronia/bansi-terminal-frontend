@@ -89,7 +89,6 @@ const ViewEstimate = (props) => {
   const getListOfRowData = useCallback(async (body) => {
     const response = await getEstimateReq(body, estimateId.id);
     const responseObj = response.data;
-    console.log(responseObj);
     let rowData = [];
     let resp = responseObj?.line_items;
     resp.map(val => {

@@ -123,7 +123,6 @@ const AllItems = (props) => {
         handleDeleteResponse(response);
       }
     } catch (error) {
-      console.log("ERROR  " + error);
       handleDeleteResponse(error);
     }
   };

@@ -10,7 +10,6 @@ const PublishConfirm = ({ setPublishModal, setStatus, id }) => {
     try {
       setIsLoading(true);
       const res = await purchaseOrderStatusChangeReq({ purchaseOrderId: id, status: "published" });
-      console.log("Publish Confirm Message", res);
       if (res.payload.success) {
         setStatus("published");
         toast.success("Purchase Order Published Successfully!");

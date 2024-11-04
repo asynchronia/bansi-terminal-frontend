@@ -60,7 +60,6 @@ const Agreement = (props) => {
       unit: item.itemUnit,
       type: item.itemType,
     };
-    // console.log(obj);
     setDisplayTableData([...displayTableData, obj]);
     handleShowData(false);
   };
@@ -137,12 +136,9 @@ const Agreement = (props) => {
       return url;
     };
     const fileUrl = await getUploadUrl();
-    console.log('fileUrl', fileUrl);
 
     const parsedUrl = new URL(fileUrl);
     const fileKey = parsedUrl.pathname.substring(1);
-
-    console.log('fileKey', fileKey);
 
     await axios.put(fileUrl, file, {
       headers: {

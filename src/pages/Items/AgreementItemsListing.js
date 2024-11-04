@@ -167,7 +167,6 @@ const AgreementItemsListing = (props) => {
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
     const response = await getAgreementItemsReq(body);
-    console.log(response, "response")
     response.map((val, id) => {
       val.category = val.category.name;
       val.price = val.variants[0].price;

@@ -170,7 +170,6 @@ const ViewInvoice = (props) => {
   const getListOfRowData = useCallback(async (body) => {
     dispatch(changePreloader(true));
     const responseObj = await getInvoiceReq(body, invoiceId.id);
-    console.log(responseObj);
     let rowData = [];
     let resp = responseObj?.line_items;
     resp.map((val) => {

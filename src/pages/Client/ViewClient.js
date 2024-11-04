@@ -92,7 +92,6 @@ const ViewClient = (props) => {
       const data = { clientId: id };
       const res = await getAgreementReq(data);
       let taxes = await searchAllTaxes("agreement");
-      // console.log(res.payload.items);
 
       let array = [];
 

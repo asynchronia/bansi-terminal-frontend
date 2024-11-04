@@ -475,7 +475,6 @@ const EditItems = (props) => {
     }
 
       const response = await updateItemStatusReq(values);
-      console.log(response)
       if (response.success === true) {
         notify("Success", response.message);
       } else {

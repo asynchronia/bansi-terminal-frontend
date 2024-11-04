@@ -91,8 +91,6 @@ const AllOrders = (props) => {
       // if(searchValue) {
       //   body.search_text = searchValue;
       // }
-      console.log('searchValue', searchValue);
-      console.log('body', body);
       const response = await getOrdersReq(body);
 
       const emptyObjects = Array.from({ length: paginationPageSize }, () => (null));
@@ -154,7 +152,6 @@ const AllOrders = (props) => {
 
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
-    console.log(event.target.value);
     setPage(1);
     setRowData([]);
   }

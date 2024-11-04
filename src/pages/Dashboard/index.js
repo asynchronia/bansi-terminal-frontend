@@ -69,7 +69,6 @@ const Dashboard = (props) => {
 
   const handleViewClick = (id) => {
     redirectToViewPage(id.order_id);
-    console.log(id.order_id);
   };
 
   const handleDeleteResponse = (response) => {
@@ -197,7 +196,6 @@ const Dashboard = (props) => {
   ];
 
    const onRowClicked = (event) =>{
-    console.log(event.data);
     // order_id
     redirectToViewPage(event.data?.order_id);
  }

@@ -160,7 +160,6 @@ const ViewItems = (props, { route, navigate }) => {
     }
 
       const response = await updateItemStatusReq(values);
-      console.log(response)
       if (response.success === true) {
         notify("Success", response.message);
         itemsData.status  = status

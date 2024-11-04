@@ -77,12 +77,10 @@ const AllInvoices = (props) => {
     getListOfRowData();
   };
   const handleEditClick = (id) => {
-    console.log("GRID OBJECT >>>" + id);
     redirectToEditPage(id);
   };
 
   const onClickView = (id) => {
-    console.log("GRID OBJECT >>>" + id);
     redirectToViewPage(id);
   };
 
@@ -411,7 +409,6 @@ const AllInvoices = (props) => {
     // const delay = 2000;
 
     // const timerId = setTimeout(() => {
-    //   console.log("Executing code after delay");
     //   setDelaySearch(e.target.value);
     //   setPage(1)
     //   setRowData([])
@@ -422,7 +419,6 @@ const AllInvoices = (props) => {
 
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
-    console.log(event.target.value);
     setPage(1);
     setRowData([]);
   }

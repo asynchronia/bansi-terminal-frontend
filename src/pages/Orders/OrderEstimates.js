@@ -228,7 +228,6 @@ const OrderEstimates = (props) => {
   }, []);
 
 //  const onRowClicked = (event) =>{
-//     console.log(event.data);
 //     //estimate_id
 //     redirectToViewPage(event.data?.estimate_id);
 //  }
@@ -253,7 +252,6 @@ useEffect(() => {
 
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
-    console.log(event.target.value);
     setPage(1);
     setRowData([]);
   }

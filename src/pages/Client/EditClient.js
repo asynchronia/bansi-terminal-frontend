@@ -89,7 +89,6 @@ const EditClient = (props) => {
       setIsButtonLoading(true)
       const response = await updateClientReq(body);
 
-      console.log("Form submitted");
       if (response.success) {
         notify("Success", response.message, id)
       }

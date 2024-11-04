@@ -292,7 +292,6 @@ const PdfComponent = ({data}) => {
     window.open(url, '_blank');
   };
 
-  console.log(data)
   return (
     <div>
       {/* <PDFDownloadLink document={<PdfDocument data={data} />} fileName={`${data.orderInfo.purchaseOrderNumber}.pdf`}>

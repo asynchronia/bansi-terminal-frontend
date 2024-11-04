@@ -325,7 +325,6 @@ const AllPayments = (props) => {
 
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
-    console.log(event.target.value);
     setPage(1);
     setRowData([]);
   }

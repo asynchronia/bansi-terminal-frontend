@@ -8,7 +8,6 @@ const GenericPdfDownloader = ({rootElementId , downloadFileName}) => {
         let domElement = document.getElementById(rootElementId);
         domtoimage.toPng(domElement)
           .then(function (dataUrl) {
-            console.log(dataUrl);
             const pdf = new jsPDF();
             pdf.addImage(dataUrl, 'PNG', 10, 20, 200, 250);
             pdf.save(downloadFileName+".pdf");

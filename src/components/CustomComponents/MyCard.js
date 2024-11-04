@@ -33,7 +33,6 @@ const MyCard = ({
   };
 
 
-  console.log(rowData);
   const renderRowData = () => {
     if (!loadedData && !rowData) {
       return (
