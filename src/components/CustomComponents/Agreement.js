@@ -11,6 +11,7 @@ import { debounce } from 'lodash';
 import { toast } from "react-toastify";
 import { Close } from "@mui/icons-material";
 import { PAYMENT_TERM_ENUM } from "../../utility/constants";
+import * as XLSX from 'xlsx';
 
 const Agreement = (props) => {
   const {
@@ -161,9 +162,38 @@ const Agreement = (props) => {
   };
 
   const fileInputRef = useRef(null);
+  const csvFileInput = useRef(null);
 
   const handleButtonClick = () => {
     fileInputRef.current.click();
+  };
+
+  const handleCSVButtonClick = () => {
+    csvFileInput.current.click();
+  };
+
+  const importFromCSV = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+          // Take the file data, read the data from sheet and convert to json
+          const data = await file.arrayBuffer();
+          const workbook = XLSX.read(data, { type: 'array' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const importedData = XLSX.utils.sheet_to_json(worksheet);
+
+          // Filter the data
+          const filteredData = importedData.map(item => ({
+            itemId: item.itemId, 
+            price: item.sellingPrice
+          }));
+
+          // Log the filtered data from csv file
+          console.log(filteredData); 
+      } catch (error) {
+          console.error('Error reading file:', error);
+      }
+    }
   };
 
   return (
@@ -256,7 +286,7 @@ const Agreement = (props) => {
               </select>
             </Col>
 
-            <Col xs="9">
+            <Col xs="8" className="pr-0">
               <input
                 id="searchQuery"
                 name="searchQuery"
@@ -266,7 +296,7 @@ const Agreement = (props) => {
                 onChange={handleSearchQuery}
               />
             </Col>
-            <Col xs="3" className="mt-3">
+            <Col xl="2" className="mt-3 pr-0">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -282,11 +312,29 @@ const Agreement = (props) => {
                 {fileData.name ? (
                   <div>{fileData.name}</div>
                 ) : (
-                  <div>
+                  <div className="text-nowrap">
                     <i className="ion ion-md-cloud-download mx-2"></i>
                     Upload PDF
                   </div>
                 )}
+              </StyledButton>
+            </Col>
+            <Col xl="2" className="mt-3 pr-0">
+              <input
+                  type="file"
+                  ref={csvFileInput}
+                  style={{ display: "none" }}
+                  accept=".csv"
+                  onChange={importFromCSV}
+              />
+              <StyledButton
+                  color={"primary"}
+                  className={"w-md"}
+                  onClick={handleCSVButtonClick}
+              >
+                <div>
+                    Upload CSV
+                </div>
               </StyledButton>
             </Col>
           </Row>

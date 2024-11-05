@@ -28,6 +28,7 @@ import { getTaxesReq } from "../../service/itemService";
 import { updateClientStatusReq } from "../../service/statusService";
 import { getClientUsersReq, updateUserReq } from "../../service/usersService";
 import { setBreadcrumbItems } from "../../store/actions";
+import * as XLSX from 'xlsx';
 
 import ENV from "../../utility/env";
 const ViewClient = (props) => {
@@ -447,6 +448,22 @@ const ViewClient = (props) => {
     return matches.join('').substring(0, 2);
   }
 
+
+const exportToCSV = () => {
+   // Filter data for the csv file
+   const agreementData = tableData.map(({ id, ...rest }) => rest);
+
+  // Create a worksheet from the filtered data
+  const worksheet = XLSX.utils.json_to_sheet(agreementData);
+
+  // Create a new workbook and add the worksheet
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+  // Export the workbook to CSV
+  XLSX.writeFile(workbook, "AgreementData.csv", { bookType: "csv" });
+};
+
   return (
     <div style={{ position: "relative" }}>
       <Modal
@@ -517,6 +534,10 @@ const ViewClient = (props) => {
                 <h6 className="m-0">Agreement</h6>
                 {!agreementAvailable.loading && agreementAvailable.value ? (
                   <div className="d-flex gap-2">
+                    <Button color="primary" size="sm"
+                      onClick={() => exportToCSV()}>
+                      Export CSV
+                    </Button>
                     <Button color="primary" size="sm"
                       onClick={downloadPDF}>
                       <i className="mdi mdi-download mx-2"></i>
