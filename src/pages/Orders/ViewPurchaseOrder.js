@@ -31,8 +31,11 @@ const ViewPurchaseOrder = (props) => {
   const [rowData, setRowData] = useState([]);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [page, setPage] = useState(1);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState();
   const [inputValue, setInputValue] = useState('');
+  const [sortData, setSortData] = useState(null);
+
+  const timerRef = useRef(null);
 
   // const redirectToViewPage = (id) => {
   //   console.log(id.order_id);
@@ -55,17 +58,28 @@ const ViewPurchaseOrder = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems('All Orders', breadcrumbItems);
-    const body = {
+  }, []);
+
+  useEffect(() => {
+    let body = {
       page: page,
       limit: paginationPageSize,
     }
     if (searchValue) {
-      body.search_text = searchValue;
+      body.search = searchValue
     }
+    if (sortData?.key && sortData?.order) {
+      body.sort = sortData
+    }
+    console.log("page in useeffect",page)
     getListOfRowData(body);
-  }, [page, paginationPageSize, searchValue]);
-
+  }, [page, paginationPageSize, searchValue, sortData]);
+  
   const getListOfRowData = useCallback(async (body) => {
+    if (rowData[(page - 1) * paginationPageSize]) {
+      return;
+    }
+
     dispatch(changePreloader(true));
 
     try {
@@ -76,7 +90,7 @@ const ViewPurchaseOrder = (props) => {
         return;
       }
 
-      const newData = response.purchaseOrders.map(order => {
+      const res = response.purchaseOrders.map(order => {
         let subTotal = 0;
         let totalQuantity = 0;
         let gstTotal = 0;
@@ -97,18 +111,31 @@ const ViewPurchaseOrder = (props) => {
           client_name: order.clientId.name,
           createdAt: formatDate(order.createdAt),
           total: total,
-          order_status: order.status,
+          status: order.status,
           salesOrderNumber: order.salesOrderNumber
         };
       });
-      
+
+      const emptyObjects = Array.from({ length: res.length }, () => null);
+      let filledRows;
+      if(res.length < paginationPageSize) {
+        filledRows = [...res];
+      } else {
+        filledRows = [...res, ...emptyObjects]
+      }
+
+      // Replace the section of data for the current page
+      const newData = [...rowData];
+
+      newData.splice((page - 1) * paginationPageSize, paginationPageSize, ...filledRows);
+      console.log(newData)
       setRowData(newData);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
     } finally {
       dispatch(changePreloader(false));
     }
-  }, [dispatch]);
+  }, [page, paginationPageSize, searchValue, sortData]);
 
   const redirectToEditPage = (id) => {
     let path = `/purchase-orders/${id.order_id}/edit`;
@@ -131,8 +158,8 @@ const ViewPurchaseOrder = (props) => {
   }
 
   const onPaginationChanged = useCallback((event) => {
-    let pageSize = gridRef.current.api.paginationGetPageSize();
-    setPaginationPageSize(pageSize);
+    // Workaround for bug in events order
+    const pageSize = gridRef.current.api.paginationGetPageSize();
 
     if (pageSize !== paginationPageSize) {
       setPaginationPageSize(pageSize);
@@ -142,11 +169,20 @@ const ViewPurchaseOrder = (props) => {
     if (page !== newPage) {
       setPage(newPage);
     }
-  }, []);
+  }, [page, paginationPageSize]);
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-  }
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value?.trim());
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setRowData([]);
+      setPage(1);
+      setSearchValue(e.target.value?.trim());
+    }, 2000);
+  };
 
   const handleSearch = (event) => {
     setSearchValue(event.target.value);
@@ -166,13 +202,13 @@ const ViewPurchaseOrder = (props) => {
       headerName: "Order No.", field: "order_number", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: true, minWidth: 150,
+      sortable: false, minWidth: 150,
     },
     {
       headerName: "Sales Order No.", field: "salesOrderNumber", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Sales Order No.",
-      sortable: true, minWidth: 150,
+      sortable: false, minWidth: 150,
       cellRenderer: (props) => {
         return <>{props.value ? props.value : "-" }</>
       }
@@ -181,27 +217,29 @@ const ViewPurchaseOrder = (props) => {
       headerName: "Order Date", field: "createdAt", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
-      sortable: true, minWidth: 150
+      sortable: true, minWidth: 150,
+      comparator: () => false,
     },
     {
       headerName: "Client", field: "client_name", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value,
       headerTooltip: "Client",
-      sortable: true, minWidth: 150
+      sortable: false, minWidth: 150
     },
     {
       headerName: "Total Amount", field: "total", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Total Amount",
       valueFormatter: params => formatNumberWithCommasAndDecimal(params.value) + " /-",
-      sortable: true, minWidth: 150
+      sortable: false, minWidth: 150
     },
     {
-      headerName: "Order Status", field: "order_status", suppressMenu: true,
+      headerName: "Order Status", field: "status", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Status", cellRenderer: OrderStatusRenderer,
-      sortable: true, minWidth: 150
+      sortable: true, minWidth: 150,
+      comparator: () => false,
     },
     {
       headerName: "Action", field: "action", sortable: false, width: 100,
@@ -231,6 +269,22 @@ const ViewPurchaseOrder = (props) => {
       })
     }
   }
+
+  const handleSortChange = (e) => {
+    const columns = gridRef.current.api.getColumnState();
+    const ele = columns.find(
+      (ele) => ele.sort === "asc" || ele.sort === "desc"
+    );
+
+    if (ele) {
+      setRowData([]);
+      setPage(1);
+      setSortData({
+        key: ele.colId,
+        order: ele.sort,
+      });
+    }
+  };
 
   return (
     <>
@@ -268,12 +322,14 @@ const ViewPurchaseOrder = (props) => {
                       suppressRowClickSelection={true}
                       columnDefs={columnDefs}
                       pagination={true}
-                      paginationAutoPageSize={true}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
                       autoSizeStrategy={autoSizeStrategy}
                       rowData={rowData}
-                      quickFilterText={inputValue}
                       reactiveCustomComponents
                       onPaginationChanged={onPaginationChanged}
+                      onSortChanged={handleSortChange}
+                      sortingOrder={["desc", "asc"]}
                     >
                     </AgGridReact>
                   </RequireUserType>
@@ -283,12 +339,14 @@ const ViewPurchaseOrder = (props) => {
                       suppressRowClickSelection={true}
                       columnDefs={clientColumnDefs}
                       pagination={true}
-                      paginationAutoPageSize={true}
+                      paginationPageSize={paginationPageSize}
+                      paginationPageSizeSelector={paginationPageSizeSelector}
                       autoSizeStrategy={autoSizeStrategy}
                       rowData={rowData}
-                      quickFilterText={inputValue}
                       reactiveCustomComponents
                       onPaginationChanged={onPaginationChanged}
+                      onSortChanged={handleSortChange}
+                      sortingOrder={["desc", "asc"]}
                     >
                     </AgGridReact>
                   </RequireUserType>
