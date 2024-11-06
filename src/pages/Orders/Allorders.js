@@ -326,6 +326,7 @@ const AllOrders = (props) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
+                    <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
                       <div className="search-box position-relative" style={{ width: '20rem' }}>
                         <Input
                           type="text"
@@ -337,10 +338,28 @@ const AllOrders = (props) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Order number or Client"
+                          placeholder="Search by Client or Order Number"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
+                    </RequireUserType>
+                    <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                      <div className="search-box position-relative" style={{ width: '14rem' }}>
+                        <Input
+                          type="text"
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
+                          className="form-control rounded border"
+                          placeholder="Search by Order Number"
+                        />
+                        <i className="mdi mdi-magnify search-icon"></i>
+                      </div>
+                    </RequireUserType>
                     </div>
                   </div>
                 </div>

@@ -504,7 +504,8 @@ const onGridReady = useCallback((params) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative">
+                    <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                      <div className="search-box position-relative" style={{ width: '20rem' }}>
                         <Input
                           type="text"
                           // value={searchValue}
@@ -516,10 +517,29 @@ const onGridReady = useCallback((params) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Invoice number or Client"
+                          placeholder="Search by Client or Invoice Number"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
+                    </RequireUserType>
+                    <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                      <div className="search-box position-relative" style={{ width: '14rem' }}>
+                        <Input
+                          type="text"
+                          // value={searchValue}
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
+                          className="form-control rounded border"
+                          placeholder="Search by Invoice Number"
+                        />
+                        <i className="mdi mdi-magnify search-icon"></i>
+                      </div>
+                    </RequireUserType>
                     </div>
                     {/* <select
                       onChange={handleChange}
