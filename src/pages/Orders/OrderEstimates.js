@@ -268,7 +268,8 @@ useEffect(() => {
                 <div className="button-section" style={{justifyContent: 'flex-end'}}>
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative">
+                    <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
+                      <div className="search-box position-relative" style={{ width: '20rem' }}>
                         <Input
                           type="text"
                           value={inputValue}
@@ -279,10 +280,28 @@ useEffect(() => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Estimate number or Client"
+                          placeholder="Search by Client or Estimate Number"
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
+                    </RequireUserType>
+                    <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+                      <div className="search-box position-relative" style={{ width: '16rem' }}>
+                        <Input
+                          type="text"
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleSearch(event);
+                            }
+                          }}
+                          className="form-control rounded border"
+                          placeholder="Search by Estimate Number"
+                        />
+                        <i className="mdi mdi-magnify search-icon"></i>
+                      </div>
+                    </RequireUserType>
                     </div>
                   </div>
                 </div>
