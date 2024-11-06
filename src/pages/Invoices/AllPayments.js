@@ -269,20 +269,19 @@ const AllPayments = (props) => {
     }
   });
 
-  // useEffect(() => {
-  //   props.setBreadcrumbItems("Payments", breadcrumbItems);
-  //   const body = {
-  //     page: page,
-  //     limit: paginationPageSize,
-  //   }
-  //   if (!effectCalled.current) {
-  //     getListOfRowData(body);
-  //     effectCalled.current = true;
-  //   }
-  // }, []);
-
   useEffect(() => {
     props.setBreadcrumbItems("Payments", breadcrumbItems);
+    // const body = {
+    //   page: page,
+    //   limit: paginationPageSize,
+    // }
+    // if (!effectCalled.current) {
+    //   getListOfRowData(body);
+    //   effectCalled.current = true;
+    // }
+  }, []);
+
+  useEffect(() => {
     const body = {
       page: page,
       limit: paginationPageSize,
