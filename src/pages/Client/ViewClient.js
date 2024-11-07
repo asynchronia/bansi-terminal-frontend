@@ -28,9 +28,9 @@ import { getTaxesReq } from "../../service/itemService";
 import { updateClientStatusReq } from "../../service/statusService";
 import { getClientUsersReq, updateUserReq } from "../../service/usersService";
 import { setBreadcrumbItems } from "../../store/actions";
-import * as XLSX from 'xlsx';
 
 import ENV from "../../utility/env";
+import { exportToCSVHelper } from "../../utility/ExportCSVHelper";
 const ViewClient = (props) => {
   const navigateTo = useNavigate()
   const [clientData, setClientData] = useState({});
@@ -448,22 +448,6 @@ const ViewClient = (props) => {
     return matches.join('').substring(0, 2);
   }
 
-
-const exportToCSV = () => {
-   // Filter data for the csv file
-   const agreementData = tableData.map(({ id, ...rest }) => rest);
-
-  // Create a worksheet from the filtered data
-  const worksheet = XLSX.utils.json_to_sheet(agreementData);
-
-  // Create a new workbook and add the worksheet
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-  // Export the workbook to CSV
-  XLSX.writeFile(workbook, "AgreementData.csv", { bookType: "csv" });
-};
-
   return (
     <div style={{ position: "relative" }}>
       <Modal
@@ -535,7 +519,7 @@ const exportToCSV = () => {
                 {!agreementAvailable.loading && agreementAvailable.value ? (
                   <div className="d-flex gap-2">
                     <Button color="primary" size="sm"
-                      onClick={() => exportToCSV()}>
+                      onClick={() => exportToCSVHelper(tableData, 'AgreementData.csv')}>
                       Export CSV
                     </Button>
                     <Button color="primary" size="sm"

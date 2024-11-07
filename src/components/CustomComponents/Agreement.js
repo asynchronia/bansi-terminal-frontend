@@ -11,7 +11,8 @@ import { debounce } from 'lodash';
 import { toast } from "react-toastify";
 import { Close } from "@mui/icons-material";
 import { PAYMENT_TERM_ENUM } from "../../utility/constants";
-import * as XLSX from 'xlsx';
+import { importCSVHelper } from "../../utility/ImportCSVHelper";
+import { agreementCsvValidator } from "../../utility/AgreementCsvValidator";
 
 const Agreement = (props) => {
   const {
@@ -175,23 +176,24 @@ const Agreement = (props) => {
   const importFromCSV = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      try {
-          // Take the file data, read the data from sheet and convert to json
-          const data = await file.arrayBuffer();
-          const workbook = XLSX.read(data, { type: 'array' });
-          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-          const importedData = XLSX.utils.sheet_to_json(worksheet);
+      const importedData = await importCSVHelper(file);
+      if (importedData) {
+        try {
+          const validatedData = await agreementCsvValidator(importedData)
 
-          // Filter the data
-          const filteredData = importedData.map(item => ({
-            itemId: item.itemId, 
-            price: item.sellingPrice
-          }));
-
-          // Log the filtered data from csv file
-          console.log(filteredData); 
-      } catch (error) {
-          console.error('Error reading file:', error);
+          if(validatedData.data) {
+            // Filter the data
+            const filteredData = validatedData.data.map(item => ({
+              itemId: item.itemId,
+              price: item.sellingPrice
+            }));
+            console.log('Filtered Data:', filteredData);
+          } else {
+            console.log('Error', validatedData)
+          }
+        } catch (e) {
+          console.log(e)
+        }
       }
     }
   };
