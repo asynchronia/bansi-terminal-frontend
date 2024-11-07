@@ -58,6 +58,8 @@ import ForgotPassword from "../pages/Authentication/ForgotPassword";
 import ResetPassword from "../pages/Authentication/ResetPassword";
 import EditClient from "../pages/Client/EditClient";
 import ExpenseDetails from "../pages/Expenses/ExpenseDetails";
+import Warehouses from "../pages/Warehouses-Branches/Warehouses";
+import Branches from "../pages/Warehouses-Branches/Branches";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -155,6 +157,8 @@ const userRoutes = [
   { path: "/view-agreement-item/:id", component: <AgreementItemView /> },
   { path: "/client/edit/:id", component: <EditClient /> },
   { path: "/view-expense/:id", component: <ExpenseDetails /> },
+  { path: "/warehouses", component: <Warehouses /> },
+  { path: "/branches", component: <Branches /> },
   // // this route should be at the end of all other routes
   {
     path: "/",

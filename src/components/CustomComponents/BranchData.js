@@ -41,7 +41,7 @@ const BranchData = (props) => {
         associatedWarehouse: null,
         contact: null,
         code: null,
-        zohoAddressId: "",
+        zohoAddressId: null,
       },
     },
     validationSchema: Yup.object({

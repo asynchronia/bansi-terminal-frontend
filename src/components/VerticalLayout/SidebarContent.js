@@ -269,6 +269,22 @@ const SidebarContent = (props) => {
                 </Link>
               </li>
             </RequirePermission>
+            <RequirePermission module={MODULES_ENUM.WAREHOUSES}>
+              <li>
+                <Link to="/warehouses" className="waves-effect">
+                  <i className="mdi mdi-warehouse"></i>
+                  <span>Warehouses</span>
+                </Link>
+              </li>
+            </RequirePermission>
+            <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
+              <li>
+                <Link to="/branches" className="waves-effect">
+                  <i className="mdi mdi-warehouse"></i>
+                  <span>Branches</span>
+                </Link>
+              </li>
+            </RequireUserType>
           </ul>
         </div>
       </SimpleBar>

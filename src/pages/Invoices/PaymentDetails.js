@@ -16,6 +16,7 @@ import {
 
 import { changePreloader } from "../../store/actions";
 import Hero from "../../components/Common/Hero";
+import PaymentPdfComponent from "./PaymentPdfComponent";
 
 const options = {
   filename: "payment.pdf",
@@ -165,7 +166,7 @@ const PaymentDetails = (props) => {
             display: "flex",
           }}
         >
-          <button type="submit" className="btn btn-outline-primary w-xl" onClick={downloadPDF}>Download PDF</button>
+          <PaymentPdfComponent data={{paymentData}} />
           <button type="submit" className="btn btn-primary w-xl mx-3 d-none">Send on Mail</button>
         </div>
         <Col id="payment-container">
@@ -258,7 +259,7 @@ const PaymentDetails = (props) => {
               <h4 className="card-title">Payment For</h4>
               <div className="mt-2" style={{ display: "flex", gap: "20px" }}>
                 <div
-                  // className="ag-theme-quartz"
+                  className="ag-theme-quartz"
                   style={{
                     height: "250px",
                     width: "100%",
