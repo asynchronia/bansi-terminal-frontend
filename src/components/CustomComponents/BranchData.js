@@ -40,7 +40,8 @@ const BranchData = (props) => {
         address: null,
         associatedWarehouse: null,
         contact: null,
-        code: null
+        code: null,
+        zohoAddressId: null,
       },
     },
     validationSchema: Yup.object({
@@ -49,7 +50,8 @@ const BranchData = (props) => {
         address: Yup.string().required("Please Enter Branch Address"),
         associatedWarehouse: Yup.string().required("Please Select Associated Warehouse"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
-        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character")
+        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character"),
+        zohoAddressId: Yup.string().optional()
       }),
     }),
     onSubmit: (values) => {

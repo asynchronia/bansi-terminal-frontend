@@ -28,6 +28,7 @@ import "./styles/ViewInvoice.scss";
 import { changePreloader } from "../../store/actions";
 import Hero from "../../components/Common/Hero";
 import { formatDate } from "../../utility/formatDate";
+import InvoicePdfComponent from "./InvoicePdfComponent";
 
 const options = {
   filename: "invoice.pdf",
@@ -414,13 +415,7 @@ const ViewInvoice = (props) => {
           }}
         >
           {responseObj && (
-            <button
-              type="submit"
-              className="btn btn-outline-primary w-xl"
-              onClick={downloadPDF}
-            >
-              Download PDF
-            </button>
+            <InvoicePdfComponent data={{responseObj}} />
           )}
           <button type="submit" className="btn btn-primary w-xl mx-3 d-none">
             Send on Mail
