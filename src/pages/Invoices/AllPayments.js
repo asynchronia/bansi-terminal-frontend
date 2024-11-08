@@ -19,6 +19,7 @@ import "./styles/AllInvoices.scss";
 import { formatDate } from "../../utility/formatDate";
 import RequireUserType from "../../routes/middleware/requireUserType";
 import { USER_TYPES_ENUM } from "../../utility/constants";
+import useAuth from "../../hooks/useAuth";
 
 const AllPayments = (props) => {
   document.title = "Payments";
@@ -29,6 +30,7 @@ const AllPayments = (props) => {
     key: 'date',
     order: "D"
   })
+  const { auth } = useAuth();
 
   const redirectToViewPage = (id) => {
     let path = `/payment/${id.payment_id}`;
@@ -387,8 +389,7 @@ const AllPayments = (props) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                    <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
-                      <div className="search-box position-relative" style={{ width: '20rem' }}>
+                      <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '16rem' }}>
                         <Input
                           type="text"
                           value={inputValue}
@@ -399,28 +400,10 @@ const AllPayments = (props) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Client or Payment Number"
+                          placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Payment Number" : "Search by Payment Number"}
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
-                    </RequireUserType>
-                    <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
-                      <div className="search-box position-relative" style={{ width: '16rem' }}>
-                        <Input
-                          type="text"
-                          value={inputValue}
-                          onChange={handleInputChange}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleSearch(event);
-                            }
-                          }}
-                          className="form-control rounded border"
-                          placeholder="Search by Payment Number"
-                        />
-                        <i className="mdi mdi-magnify search-icon"></i>
-                      </div>
-                    </RequireUserType>
                     </div>
                     {/* <select
                       onChange={handleChange}

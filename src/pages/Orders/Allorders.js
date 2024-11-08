@@ -17,6 +17,7 @@ import './styles/AllOrders.scss'
 import { formatDate } from '../../utility/formatDate';
 import RequireUserType from '../../routes/middleware/requireUserType';
 import { USER_TYPES_ENUM } from '../../utility/constants';
+import useAuth from '../../hooks/useAuth';
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -29,6 +30,7 @@ const AllOrders = (props) => {
   };
   // enables pagination in the grid
   const pagination = true;
+  const { auth } = useAuth();
 
   // sets 10 rows per page (default is 100)
   // allows the user to select the page size from a predefined list of page sizes
@@ -326,8 +328,7 @@ const AllOrders = (props) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                    <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
-                      <div className="search-box position-relative" style={{ width: '20rem' }}>
+                      <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '14rem' }}>
                         <Input
                           type="text"
                           value={inputValue}
@@ -338,28 +339,10 @@ const AllOrders = (props) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Client or Order Number"
+                          placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Order Number" : "Search by Order Number"}
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
-                    </RequireUserType>
-                    <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
-                      <div className="search-box position-relative" style={{ width: '14rem' }}>
-                        <Input
-                          type="text"
-                          value={inputValue}
-                          onChange={handleInputChange}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleSearch(event);
-                            }
-                          }}
-                          className="form-control rounded border"
-                          placeholder="Search by Order Number"
-                        />
-                        <i className="mdi mdi-magnify search-icon"></i>
-                      </div>
-                    </RequireUserType>
                     </div>
                   </div>
                 </div>

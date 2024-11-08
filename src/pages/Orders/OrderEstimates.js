@@ -17,6 +17,7 @@ import DropdownMenuBtn from "./DropdownMenuBtn";
 import { formatDate } from "../../utility/formatDate";
 import RequireUserType from "../../routes/middleware/requireUserType";
 import { USER_TYPES_ENUM } from "../../utility/constants";
+import useAuth from "../../hooks/useAuth";
 
 const OrderEstimates = (props) => {
     document.title = "Estimates";
@@ -30,6 +31,7 @@ const OrderEstimates = (props) => {
       key: 'date',
       order: "D"
     })
+    const { auth } = useAuth();
 
     const redirectToViewPage = (id) => {
         let path = "/view-estimate/" + id;
@@ -269,7 +271,7 @@ useEffect(() => {
                   <div className="button-right-section">
                     <div className="invoice-search-box">
                     <RequireUserType userType={USER_TYPES_ENUM.ADMIN}>
-                      <div className="search-box position-relative" style={{ width: '20rem' }}>
+                      <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '16rem' }}>
                         <Input
                           type="text"
                           value={inputValue}
@@ -280,7 +282,8 @@ useEffect(() => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Client or Estimate Number"
+                          placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Estimate Number" : "Search by Estimate Number"}
+
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
