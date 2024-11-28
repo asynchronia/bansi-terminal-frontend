@@ -24,6 +24,7 @@ import { getDateInFormat, getDifferenceInDays, ifOverDue } from "./invoiceUtil";
 import { formatDate } from "../../utility/formatDate";
 import RequireUserType from "../../routes/middleware/requireUserType";
 import { USER_TYPES_ENUM } from "../../utility/constants";
+import useAuth from "../../hooks/useAuth";
 
 const AllInvoices = (props) => {
   document.title = "Invoices";
@@ -34,6 +35,7 @@ const AllInvoices = (props) => {
     key: 'date',
     order: "D"
   })
+  const { auth } = useAuth();
 
   const redirectToViewPage = (id) => {
     let path = "/view-invoice/" + id;
@@ -504,7 +506,7 @@ const onGridReady = useCallback((params) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative">
+                      <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '14rem' }}>
                         <Input
                           type="text"
                           // value={searchValue}
@@ -516,7 +518,7 @@ const onGridReady = useCallback((params) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Invoice number or Client"
+                          placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Invoice Number" : "Search by Invoice Number"}
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>

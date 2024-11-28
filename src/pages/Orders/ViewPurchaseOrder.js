@@ -15,6 +15,7 @@ import OrderStatusRenderer from "./OrderStatusRenderer";
 import { formatDate } from '../../utility/formatDate';
 import { USER_TYPES_ENUM } from '../../utility/constants';
 import RequireUserType from '../../routes/middleware/requireUserType';
+import useAuth from '../../hooks/useAuth';
 
 const ViewPurchaseOrder = (props) => {
   document.title = "All Purchase Orders";
@@ -27,6 +28,7 @@ const ViewPurchaseOrder = (props) => {
   };
   const pagination = true;
   const paginationPageSizeSelector = [25, 50, 100];
+  const { auth } = useAuth();
 
   const [rowData, setRowData] = useState([]);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
@@ -296,16 +298,17 @@ const ViewPurchaseOrder = (props) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative">
-                        <Input
-                          type="text"
-                          value={inputValue}
-                          onChange={handleInputChange}
-                          className="form-control rounded border"
-                          placeholder="Search"
-                        />
-                        <i className="mdi mdi-magnify search-icon"></i>
-                      </div>
+                        <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '14rem' }}>
+                          <Input
+                            type="text"
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            className="form-control rounded border"
+                            placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Order Number" : "Search by Order Number"}
+
+                          />
+                          <i className="mdi mdi-magnify search-icon"></i>
+                        </div>
                     </div>
                   </div>
                 </div>
