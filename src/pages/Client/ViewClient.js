@@ -30,6 +30,7 @@ import { getClientUsersReq, updateUserReq } from "../../service/usersService";
 import { setBreadcrumbItems } from "../../store/actions";
 
 import ENV from "../../utility/env";
+import { exportToCSVHelper } from "../../utility/ExportCSVHelper";
 const ViewClient = (props) => {
   const navigateTo = useNavigate()
   const [clientData, setClientData] = useState({});
@@ -517,6 +518,10 @@ const ViewClient = (props) => {
                 <h6 className="m-0">Agreement</h6>
                 {!agreementAvailable.loading && agreementAvailable.value ? (
                   <div className="d-flex gap-2">
+                    <Button color="primary" size="sm"
+                      onClick={() => exportToCSVHelper(tableData, 'AgreementData.csv')}>
+                      Export CSV
+                    </Button>
                     <Button color="primary" size="sm"
                       onClick={downloadPDF}>
                       <i className="mdi mdi-download mx-2"></i>
