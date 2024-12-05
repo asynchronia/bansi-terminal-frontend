@@ -32,8 +32,8 @@ export const getWarehouseListReq = async () => {
   return response;
 };
 
-export const getUserRoleReq = async () => {
-  const response = await getUserRole();
+export const getUserRoleReq = async (isAdmin) => {
+  const response = await getUserRole(isAdmin);
   return response;
 };
 

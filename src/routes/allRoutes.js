@@ -60,6 +60,7 @@ import EditClient from "../pages/Client/EditClient";
 import ExpenseDetails from "../pages/Expenses/ExpenseDetails";
 import Warehouses from "../pages/Warehouses-Branches/Warehouses";
 import Branches from "../pages/Warehouses-Branches/Branches";
+import RolesPermissions from "../pages/Users/RolesPermissions";
 
 //Charts
 // import ChartsAppex from "../pages/Charts/charts-appex";
@@ -159,6 +160,7 @@ const userRoutes = [
   { path: "/view-expense/:id", component: <ExpenseDetails /> },
   { path: "/warehouses", component: <Warehouses /> },
   { path: "/branches", component: <Branches /> },
+  { path: "/roles-permissions", component: <RolesPermissions /> },
   // // this route should be at the end of all other routes
   {
     path: "/",
