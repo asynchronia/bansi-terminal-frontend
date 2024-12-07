@@ -16,7 +16,7 @@ import { getEstimatesReq } from "../../service/orderService";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { formatDate } from "../../utility/formatDate";
 import RequireUserType from "../../routes/middleware/requireUserType";
-import { USER_TYPES_ENUM } from "../../utility/constants";
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
 import useAuth from "../../hooks/useAuth";
 
 const OrderEstimates = (props) => {
@@ -160,6 +160,7 @@ const OrderEstimates = (props) => {
   ];
   
   const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+  const clientUserColumnDefs = clientColumnDefs.filter(colDef => colDef.headerName !== "Total Amount")
 
   //TODO to check for autoSizeStrategy
   const autoSizeStrategy = {
@@ -318,7 +319,18 @@ useEffect(() => {
                     <AgGridReact
                       ref={gridRef}
                       suppressRowClickSelection={true}
-                      columnDefs={clientColumnDefs}
+                      columnDefs={auth?.permissions?.some(
+                        (p) =>
+                          p.module === MODULES_ENUM.ORDERS &&
+                          [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+                      )
+                      ? clientColumnDefs
+                      : auth?.permissions?.some(
+                          (p) =>
+                            p.module === MODULES_ENUM.ORDERS && p.operations.includes(PERMISSIONS_ENUM.READ)
+                        )
+                      ?  clientUserColumnDefs
+                      : []}
                       pagination
                       paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={paginationPageSizeSelector}

@@ -22,10 +22,11 @@ import { toast } from "react-toastify";
 import StyledButton from "../../components/Common/StyledButton";
 import { getAgreement } from "../../api";
 import "./styles/Dashboard.scss";
-import { USER_TYPES_ENUM } from "../../utility/constants";
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
 import RequireUserType from "../../routes/middleware/requireUserType";
 import { formatDate } from "../../utility/formatDate";
 import getPaymentTerm from "../../utility/getPaymentTerm";
+import useAuth from "../../hooks/useAuth";
 
 const Dashboard = (props) => {
   document.title = "Willsmeet Portal";
@@ -59,6 +60,7 @@ const Dashboard = (props) => {
     validUntil: "",
     paymentTerms: ""
   })
+  const { auth } = useAuth();
 
   const redirectToViewPage = (id) => {
     let path = `/purchase-orders/${id}`;
@@ -196,6 +198,8 @@ const Dashboard = (props) => {
     // },
   ];
 
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Total Amount")
+
    const onRowClicked = (event) =>{
     console.log(event.data);
     // order_id
@@ -325,7 +329,24 @@ const Dashboard = (props) => {
       </Row>
       <Row>
         <div className="ag-theme-quartz list-grid">
-          <AgGridReact suppressRowClickSelection={true} columnDefs={columnDefs} rowData={rowData} quickFilterText={inputValue} onRowClicked={onRowClicked}></AgGridReact>
+          <AgGridReact 
+            suppressRowClickSelection={true} 
+            columnDefs={auth?.permissions?.some(
+              (p) =>
+                p.module === MODULES_ENUM.DASHBOARD &&
+                [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+            )
+            ? columnDefs
+            : auth?.permissions?.some(
+                (p) =>
+                  p.module === MODULES_ENUM.DASHBOARD && p.operations.includes(PERMISSIONS_ENUM.READ)
+              )
+            ?  clientColumnDefs
+            : []} 
+            rowData={rowData} 
+            quickFilterText={inputValue} 
+            onRowClicked={onRowClicked}
+          ></AgGridReact>
         </div>
         {/* <Col xl="3">
           <MonthlyEarnings />
