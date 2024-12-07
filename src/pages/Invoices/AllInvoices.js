@@ -23,7 +23,7 @@ import InvoiceActionBtn from "./InvoiceActionBtn";
 import { getDateInFormat, getDifferenceInDays, ifOverDue } from "./invoiceUtil";
 import { formatDate } from "../../utility/formatDate";
 import RequireUserType from "../../routes/middleware/requireUserType";
-import { USER_TYPES_ENUM } from "../../utility/constants";
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
 import useAuth from "../../hooks/useAuth";
 
 const AllInvoices = (props) => {
@@ -243,6 +243,9 @@ const AllInvoices = (props) => {
   ];
 
   const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+  const clientUserColumnDefs = clientColumnDefs.filter(
+    (colDef) => !["Total Amount", "Amount Due"].includes(colDef.headerName)
+  );
 
   const autoSizeStrategy = {
     type: "fitGridWidth",
@@ -565,7 +568,18 @@ const onGridReady = useCallback((params) => {
                     <AgGridReact
                       ref={gridRef}
                       rowHeight={60}
-                      columnDefs={clientColumnDefs}
+                      columnDefs={auth?.permissions?.some(
+                        (p) =>
+                          p.module === MODULES_ENUM.INVOICES &&
+                          [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+                      )
+                      ? clientColumnDefs
+                      : auth?.permissions?.some(
+                          (p) =>
+                            p.module === MODULES_ENUM.INVOICES && p.operations.includes(PERMISSIONS_ENUM.READ)
+                        )
+                      ?  clientUserColumnDefs
+                      : []}
                       pagination={pagination}
                       paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={paginationPageSizeSelector}

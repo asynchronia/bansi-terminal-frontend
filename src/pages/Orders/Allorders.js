@@ -16,7 +16,7 @@ import OrderStatusRenderer from "./OrderStatusRenderer";
 import './styles/AllOrders.scss'
 import { formatDate } from '../../utility/formatDate';
 import RequireUserType from '../../routes/middleware/requireUserType';
-import { USER_TYPES_ENUM } from '../../utility/constants';
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from '../../utility/constants';
 import useAuth from '../../hooks/useAuth';
 
 const AllOrders = (props) => {
@@ -31,6 +31,7 @@ const AllOrders = (props) => {
   // enables pagination in the grid
   const pagination = true;
   const { auth } = useAuth();
+  console.log("auth data" , auth)
 
   // sets 10 rows per page (default is 100)
   // allows the user to select the page size from a predefined list of page sizes
@@ -64,7 +65,7 @@ const AllOrders = (props) => {
 
 
   useEffect(() => {
-    props.setBreadcrumbItems('All Orders', breadcrumbItems);
+    props.setBreadcrumbItems('Ongoing Orders', breadcrumbItems);
     const body = {
       page: page,
       limit: paginationPageSize,
@@ -226,9 +227,21 @@ const AllOrders = (props) => {
       })
     },
     {
-      headerName: "Order No.", field: "salesorder_number",
+      headerName: "SO No.", field: "salesorder_number",
       floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
+      tooltipValueGetter: (p) => p.value, headerTooltip: "SO No.",
+      sortable: false, minWidth: 140,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
+    },
+    {
+      headerName: "PO No.", field: "cf_po_no",
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "PO No.",
       sortable: false, minWidth: 140,
       headerComponent: headerTemplate,
       headerComponentParams:  (props) => ({
@@ -317,6 +330,7 @@ const AllOrders = (props) => {
   }
 
   const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+  const clientUserColumnDefs = clientColumnDefs.filter(colDef => colDef.headerName !== "Amount")
 
   return (
     <>
@@ -372,7 +386,18 @@ const AllOrders = (props) => {
                     <AgGridReact
                       ref={gridRef}
                       autoSizeStrategy={autoSizeStrategy}
-                      columnDefs={clientColumnDefs}
+                      columnDefs={auth?.permissions?.some(
+                        (p) =>
+                          p.module === MODULES_ENUM.ORDERS &&
+                          [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+                      )
+                      ? clientColumnDefs
+                      : auth?.permissions?.some(
+                          (p) =>
+                            p.module === MODULES_ENUM.ORDERS && p.operations.includes(PERMISSIONS_ENUM.READ)
+                        )
+                      ?  clientUserColumnDefs
+                      : []}
                       pagination={pagination}
                       paginationPageSize={20}
                       paginationPageSizeSelector={false}

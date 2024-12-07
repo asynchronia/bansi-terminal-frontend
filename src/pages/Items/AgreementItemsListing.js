@@ -21,6 +21,8 @@ import "./styles/datatables.scss";
 import "./styles/AllItems.scss";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import { AgGridReact } from "ag-grid-react";
+import useAuth from "../../hooks/useAuth";
+import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 
 const AgreementItemsListing = (props) => {
   document.title = "All Items";
@@ -129,6 +131,7 @@ const AgreementItemsListing = (props) => {
   const [currRowItem, setCurrRowItem] = useState(null);
   const [modal_standard, setmodal_standard] = useState(false);
   const dispatch = useDispatch();
+  const { auth } = useAuth()
 
   let bodyObject = {
     page: 1,
@@ -150,6 +153,8 @@ const AgreementItemsListing = (props) => {
 
     setPaginationPageSize(pageSize);
   }, []);
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Price")
   /*
 {
     "page": 1,
@@ -191,8 +196,6 @@ const AgreementItemsListing = (props) => {
       effectCalled.current = true;
     }
   }, []);
-
-
 
   useEffect(() => {
     props.setBreadcrumbItems("All Items", breadcrumbItems);
@@ -308,7 +311,18 @@ const AgreementItemsListing = (props) => {
                     ref={gridRef}
                     floatingFilter={true}
                     suppressRowClickSelection={true}
-                    columnDefs={columnDefs}
+                    columnDefs={auth?.permissions?.some(
+                      (p) =>
+                        p.module === MODULES_ENUM.ORDERS &&
+                        [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+                    )
+                    ? columnDefs
+                    : auth?.permissions?.some(
+                        (p) =>
+                          p.module === MODULES_ENUM.ORDERS && p.operations.includes(PERMISSIONS_ENUM.READ)
+                      )
+                    ?  clientColumnDefs
+                    : []}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}

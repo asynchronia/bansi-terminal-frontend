@@ -18,6 +18,7 @@ import { attributesCellRenderer } from './ItemsUtils';
 import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import RequirePermission from "../../routes/middleware/requirePermission";
+import useAuth from "../../hooks/useAuth";
 
 
 const ViewItems = (props, { route, navigate }) => {
@@ -76,7 +77,7 @@ const ViewItems = (props, { route, navigate }) => {
   // allows the user to select the page size from a predefined list of page sizes
   const paginationPageSizeSelector = [5, 10, 25, 50];
   const [paginationPageSize, setPaginationPageSize] = useState(5);
-
+  const { auth } = useAuth()
 
   const columnDefs = [
     {
@@ -93,6 +94,8 @@ const ViewItems = (props, { route, navigate }) => {
       floatingFilterComponentParams: { suppressFilterButton: true }, cellRenderer: attributesCellRenderer
     }
   ]
+
+  const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Price")
 
   const onPaginationChanged = useCallback((event) => {
     // Workaround for bug in events order
@@ -256,7 +259,18 @@ const ViewItems = (props, { route, navigate }) => {
                   <AgGridReact
                     ref={gridRef}
                     suppressRowClickSelection={true}
-                    columnDefs={columnDefs}
+                    columnDefs={auth?.permissions?.some(
+                      (p) =>
+                        p.module === MODULES_ENUM.ORDERS &&
+                        [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+                    )
+                    ? columnDefs
+                    : auth?.permissions?.some(
+                        (p) =>
+                          p.module === MODULES_ENUM.ORDERS && p.operations.includes(PERMISSIONS_ENUM.READ)
+                      )
+                    ?  clientColumnDefs
+                    : []}
                     pagination={pagination}
                     paginationPageSize={paginationPageSize}
                     paginationPageSizeSelector={paginationPageSizeSelector}

@@ -8,7 +8,13 @@ import getPaymentTerm from "../../utility/getPaymentTerm";
 // Define styles for the PDF
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
+    padding: 20,
+    height: '100%',
+  },
+  pageBorder: {
+    borderStyle: 'solid',
+    borderWidth: 1,
+    paddingBottom: 30
   },
   status: {
     borderStyle: 'solid',
@@ -53,19 +59,22 @@ const styles = StyleSheet.create({
     flex: 1,
     borderStyle: 'solid',
     borderWidth: 1,
-    padding: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 3
   },
   firstCol: {
     width: 30,
     borderStyle: 'solid',
     borderWidth: 1,
-    padding: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 3
   },
   descCol: {
     width: 200,
     borderStyle: 'solid',
     borderWidth: 1,
-    padding: 5,
+    paddingHorizontal: 5,
+    paddingVertical: 3
   },
   tableCell: {
     fontSize: 10,
@@ -84,9 +93,9 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   note: {
-    fontSize: 10,
+    fontSize: 8,
     fontStyle: 'italic',
-    marginTop: 10,
+    marginTop: 30,
   },
   divider: {
     borderBottomWidth: 1,
@@ -100,8 +109,8 @@ const TableWithPagination = ({ data }) => {
   return (
     <View>
       {/* Table Header */}
-      <View style={styles.tableRow} fixed>
-        <View style={styles.firstCol}>
+      <View style={[styles.tableRow, { backgroundColor: 'lightgray' }]} fixed>
+        <View style={[styles.firstCol, { borderLeft: 0 }]}>
           <Text style={styles.tableCell}>#</Text>
         </View>
         <View style={styles.descCol}>
@@ -126,7 +135,7 @@ const TableWithPagination = ({ data }) => {
         <View style={styles.tableCol}>
           <Text style={[styles.tableCell, { textAlign: 'left' }]}>Tax %</Text>
         </View>
-        <View style={styles.tableCol}>
+        <View style={[styles.tableCol, { borderRight: 0 }]}>
           <Text style={[styles.tableCell, { textAlign: 'left' }]}>
             Amount
           </Text>
@@ -136,7 +145,7 @@ const TableWithPagination = ({ data }) => {
       {/* Table Rows */}
       {data.map((item, index) => (
         <View style={styles.tableRow} key={index}>
-          <View style={styles.firstCol}>
+          <View style={[styles.firstCol, { borderLeft: 0 }]}>
             <Text style={styles.tableCell}>{index + 1}</Text>
           </View>
           <View style={styles.descCol}>
@@ -174,7 +183,7 @@ const TableWithPagination = ({ data }) => {
               {item.taxes[0].taxPercentage}
             </Text>
           </View>
-          <View style={styles.tableCol}>
+          <View style={[styles.tableCol, { borderRight: 0 }]}>
             <Text style={[styles.tableCell, { textAlign: 'right' }]}>
               {item.unitPrice * item.quantity}
             </Text>
@@ -189,7 +198,8 @@ const TableWithPagination = ({ data }) => {
 const PdfDocument = ({data}) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
+      <View style={styles.pageBorder}>
+      <View style={[styles.section, { padding: 10}]}>
         <View style={styles.address}>
             <Text style={styles.header}>{data.orderInfo.clientName}</Text>
             <Text style={styles.info}>{data.orderInfo.billing?.branchName}</Text>
@@ -207,7 +217,7 @@ const PdfDocument = ({data}) => (
       {/* Divider */}
       <View style={styles.divider} />
 
-      <View>
+      <View style={{ paddingHorizontal: 10}}>
         <View style={styles.section}>
             <Text style={[styles.address, styles.info]}>Purchase Order: {data.orderInfo.purchaseOrderNumber}</Text>
             <Text style={[styles.address, styles.info]}>Date: {formatDate(data.orderInfo.createdAt)}</Text>
@@ -218,35 +228,37 @@ const PdfDocument = ({data}) => (
         </View>
       </View>
 
-      {/* Divider */}
-      <View style={styles.divider} />
-
-      <View style={styles.addressSection}>
-        <View style={styles.address}>
-          <Text style={styles.header}>Vendor Address:</Text>
-          <Text style={styles.info}>Bansi Office Solutions Private Limited</Text>
-          <Text style={styles.info}> #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India</Text>
-          <Text style={styles.info}>Web: www.willsmeet.com, Email:sales@willsmeet.com</Text>
+      <View style={[styles.tableRow, { backgroundColor: 'lightgray' }]}>
+        <View style={[styles.tableCol, { borderLeft: 0, borderRight: 0}]}>
+          <Text style={[styles.tableCell, { textAlign: 'left', }]}>Vendor Address:</Text>
         </View>
-        <View style={styles.address}>
-          <Text style={styles.header}>Deliver To:</Text>
-          <Text style={styles.info}>{data.orderInfo.shipping?.branchName}</Text>
-          <Text style={styles.info}>{data.orderInfo.shipping?.address}</Text>
-          <Text style={styles.info}>{data.orderInfo.shipping?.contact}</Text>
+        <View style={[styles.tableCol, { borderRight: 0}]}>
+          <Text style={[styles.tableCell, { textAlign: 'left' }]}>
+            Deliver To:
+          </Text>
+        </View>
+      </View>
+      <View style={styles.tableRow}>
+        <View style={[styles.tableCol, { paddingVertical: 5, borderLeft: 0, borderRight: 0}]}>
+          <Text style={[styles.tableCell, styles.info, { textAlign: 'left' }]}>Bansi Office Solutions Private Limited</Text>
+          <Text style={[styles.tableCell, styles.info, { textAlign: 'left' }]}>#1496, 19th Main Road, Opp Park Square Apartment, HSR Layout, Bangalore Karnataka 560102, India</Text>
+          <Text style={[styles.tableCell, styles.info, { textAlign: 'left' }]}>Web: www.willsmeet.com, Email:sales@willsmeet.com</Text>
+        </View>
+        <View style={[styles.tableCol, { paddingVertical: 5, borderRight: 0}]}>
+          <Text style={[styles.tableCell, styles.info, { textAlign: 'left' }]}>{data.orderInfo.shipping?.branchName}</Text>
+          <Text style={[styles.tableCell, styles.info, { textAlign: 'left' }]}>{data.orderInfo.shipping?.address}</Text>
+          <Text style={[styles.tableCell, styles.info, { textAlign: 'left' }]}>{data.orderInfo.shipping?.contact}</Text>
         </View>
       </View>
 
-      {/* Divider */}
-      <View style={styles.divider} />
-
       <View style={styles.table}>
-        <Text style={styles.header}>Sales Information</Text>
+        <Text style={[styles.header, { padding: 5}]}>Sales Information</Text>
        
         <TableWithPagination data={[...data.itemsData,]} />
 
         {/* Terms & Conditions and Total Section */}
-        <View style={[styles.tableRow, { height: 150, borderStyle: 'solid', borderWidth: 1 },]}>
-          <View style={styles.terms}>
+        <View style={[styles.tableRow, { height: 150, }]}>
+          <View style={[styles.terms, { borderRight: 0}]}>
             <Text style={[styles.tableCell,  { color: "grey", textAlign: 'left', width: "80%", paddingTop: 20}]}>Terms & Conditions</Text>
             <Text style={[styles.tableCell, { textAlign: 'left', width: "80%"}]}>1.All the invoices should mandatorily be mentioned with Bansi Office
             Solutions Private Limited PO Number & should be attached with PO copy
@@ -256,20 +268,27 @@ const PdfDocument = ({data}) => (
               2.All the invoices should be mentioned with vendor bank details.
               </Text>
           </View>
-          <View style={[styles.tableCol, styles.section, { height: 80}]}>
-            <View style={styles.address}>
-              <Text style={[styles.tableCell, { textAlign: 'right'}]}>Sub Total:</Text>
-              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>GST:</Text>
-              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>Total:</Text>
+          <View style={{ width: '40%',}}>
+            <View style={[styles.tableCol, styles.section, { height: 80, marginBottom: 0, borderRight: 0}]}>
+              <View style={styles.address}>
+                <Text style={[styles.tableCell, { textAlign: 'right'}]}>Sub Total:</Text>
+                <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>GST:</Text>
+                <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>Total:</Text>
+              </View>
+              <View style={styles.address}>
+                <Text style={[styles.tableCell, { textAlign: 'right'}]}>{parseFloat(data.orderInfo.subTotal).toFixed(2)}</Text>
+                <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{parseFloat(data.orderInfo.gstTotal).toFixed(2)}</Text>
+                <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{parseFloat(data.orderInfo.total).toFixed(2)}</Text>
+              </View>
             </View>
-            <View style={styles.address}>
-              <Text style={[styles.tableCell, { textAlign: 'right'}]}>{parseFloat(data.orderInfo.subTotal).toFixed(2)}</Text>
-              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{parseFloat(data.orderInfo.gstTotal).toFixed(2)}</Text>
-              <Text style={[styles.tableCell, { textAlign: 'right', paddingTop: 3}]}>{parseFloat(data.orderInfo.total).toFixed(2)}</Text>
+            <View style={[styles.tableCol, styles.section, { height: 30, marginBottom: 20, borderTop: 0, borderRight: 0}]}>
+              <View>
+                <Text style={styles.note}>***This is a system-generated PO, no signature required.***</Text>
+              </View>
             </View>
           </View>
         </View>
-        <Text style={styles.note}>***This is a system-generated PO, no signature required.***</Text>
+      </View>
       </View>
     </Page>
   </Document>
