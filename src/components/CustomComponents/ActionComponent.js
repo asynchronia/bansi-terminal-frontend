@@ -29,7 +29,8 @@ const ActionComponent = (props) => {
           address: branchValues.address,
           associatedWarehouse: branchValues.associatedWarehouse._id,
           contact: branchValues.contact,
-          code: branchValues.code
+          code: branchValues.code,
+          zohoAddressId: branchValues.zohoAddressId,
         },
       }));
 

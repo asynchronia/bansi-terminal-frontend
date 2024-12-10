@@ -30,6 +30,7 @@ import { getClientUsersReq, updateUserReq } from "../../service/usersService";
 import { setBreadcrumbItems } from "../../store/actions";
 
 import ENV from "../../utility/env";
+import AgreementPdfComponent from "./AgreementPdfComponent";
 const ViewClient = (props) => {
   const navigateTo = useNavigate()
   const [clientData, setClientData] = useState({});
@@ -409,33 +410,6 @@ const ViewClient = (props) => {
     }
   };
 
-
-  const downloadPDF = () => {
-    // const data = [...displayTableData];
-
-    // const doc = new jsPDF();
-    // const tableColumn = Object.keys(data[0]);
-    // const tableRows = data.map((obj) => Object.values(obj));
-
-    // doc.autoTable({
-    //   head: [tableColumn],
-    //   body: tableRows,
-    // });
-
-    // doc.save("Agreement.pdf");
-    const fileKey = additionalData.url;
-    if (!fileKey) {
-      toast.info("No file available for download", {
-        position: "top-center",
-        theme: "colored",
-      });
-      return;
-    }
-    const fileUrl = `${ENV.FILE_SERVER_BASEURL}/${fileKey}`;
-    window.open(fileUrl, '_blank');
-  };
-
-
   useEffect(() => {
     props.setBreadcrumbItems("Client", breadcrumbItems);
   }, [breadcrumbItems]);
@@ -517,11 +491,10 @@ const ViewClient = (props) => {
                 <h6 className="m-0">Agreement</h6>
                 {!agreementAvailable.loading && agreementAvailable.value ? (
                   <div className="d-flex gap-2">
-                    <Button color="primary" size="sm"
-                      onClick={downloadPDF}>
-                      <i className="mdi mdi-download mx-2"></i>
-                      Download PDF
-                    </Button>
+                    <AgreementPdfComponent data={{page: 'client' ,displayTableData ,...clientData,
+                      validity: additionalData.validity,
+                      paymentTerms: additionalData.paymentTerms,
+                    }} />
                     <Button color="primary" size="sm"
                       onClick={() => { handleModalToggle("agreement"); }}>
                       <i className="mdi mdi-book-edit mx-2"></i>

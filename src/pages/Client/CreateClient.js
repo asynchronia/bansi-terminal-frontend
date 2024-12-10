@@ -98,6 +98,7 @@ const CreateClient = (props) => {
         associatedWarehouse: "65f4b5d66959ec3852a37e60",
         contact: null,
         code: null,
+        zohoAddressId: "",
       },
       primaryUser: {
         firstName: null,
@@ -118,7 +119,7 @@ const CreateClient = (props) => {
       email: Yup.string().email("Please Enter Valid Email").required("Please Enter Client Email"),
       gstin: Yup.string().required("Please Enter GST Number"),
       pan: Yup.string().required("Please Enter PAN Number"),
-      zohoCustomerId: Yup.string().required("Please Enter ZOHO Customer Id"),
+      zohoCustomerId: Yup.string().required("Please Enter Zoho Customer Id"),
       bankAccountName: Yup.string().required("Please Enter Bank Account Name"),
       bankAccountNumber: Yup.string().required("Please Enter Back Account Number"),
       ifscCode: Yup.string().required("Please Enter IFSC Code"),
@@ -126,7 +127,8 @@ const CreateClient = (props) => {
         name: Yup.string().required("Please Enter Branch Name"),
         address: Yup.string().required("Please Enter Branch Address"),
         contact: Yup.string().required("Please Enter Valid Contact Number"),
-        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character")
+        code: Yup.string().required("Please Enter Branch Code").max(5,"Branch Code cannot exceed 5 character"),
+        zohoAddressId: Yup.string().optional()
       }),
       primaryUser: Yup.object().shape({
         firstName: Yup.string().required("Please Enter First Name"),
@@ -364,7 +366,7 @@ const CreateClient = (props) => {
                 <h4 className="card-title">Additional Details</h4>
                 <Row className="mt-4">
                   <Col>
-                    <label className="item-name">ZOHO Customer Id</label>
+                    <label className="item-name">Zoho Customer Id</label>
                     <input
                       name="zohoCustomerId"
                       id="zohoCustomerId"
@@ -377,7 +379,7 @@ const CreateClient = (props) => {
                         validation.touched.zohoCustomerId &&
                         validation.errors.zohoCustomerId
                       }
-                      placeholder="Enter ZOHO Customer Id"
+                      placeholder="Enter Zoho Customer Id"
                     />
                     {validation.touched.zohoCustomerId &&
                       validation.errors.zohoCustomerId ? (

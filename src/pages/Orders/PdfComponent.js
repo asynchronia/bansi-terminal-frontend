@@ -30,9 +30,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     gap: 4,
   },
-  bold: {
-    fontWeight: 'bold'
-  },
   addressSection: {
     marginBottom: 10,
     display: 'flex',
@@ -85,12 +82,6 @@ const styles = StyleSheet.create({
   terms: {
     width: '65%',
     padding: 5,
-  },
-  total: {
-    fontSize: 12,
-    marginTop: 10,
-    fontWeight: 'bold',
-    textAlign: 'right',
   },
   note: {
     fontSize: 10,
