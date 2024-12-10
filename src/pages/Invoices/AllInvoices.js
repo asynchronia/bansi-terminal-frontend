@@ -342,14 +342,14 @@ const AllInvoices = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Invoices", breadcrumbItems);
-    const body = {
-      page: page,
-      limit: paginationPageSize,
-    }
-    if (!effectCalled.current) {
-      getListOfRowData(body);
-      effectCalled.current = true;
-    }
+    // const body = {
+    //   page: page,
+    //   limit: paginationPageSize,
+    // }
+    // if (!effectCalled.current) {
+    //   getListOfRowData(body);
+    //   effectCalled.current = true;
+    // }
   }, []);
 
   useEffect(() => {
