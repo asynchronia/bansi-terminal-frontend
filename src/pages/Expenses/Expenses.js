@@ -197,15 +197,15 @@ const Expenses = (props) => {
   });
 
   useEffect(() => {
-    const body = {
-      page: page,
-      limit: paginationPageSize,
-    }
+    // const body = {
+    //   page: page,
+    //   limit: paginationPageSize,
+    // }
     props.setBreadcrumbItems("Expenses", breadcrumbItems);
-    if (!effectCalled.current) {
-      getListOfRowData(body);
-      effectCalled.current = true;
-    }
+    // if (!effectCalled.current) {
+    //   getListOfRowData(body);
+    //   effectCalled.current = true;
+    // }
   }, []);
 
   useEffect(() => {

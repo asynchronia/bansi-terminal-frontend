@@ -25,8 +25,12 @@ import "./styles/Dashboard.scss";
 import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
 import RequireUserType from "../../routes/middleware/requireUserType";
 import { formatDate } from "../../utility/formatDate";
+import { getTaxesReq } from "../../service/itemService";
+import { getClientWithIdReq } from "../../service/clientService";
 import getPaymentTerm from "../../utility/getPaymentTerm";
 import useAuth from "../../hooks/useAuth";
+import AgreementPdfComponent from "../Client/AgreementPdfComponent";
+// import AgreementPdfComponent from "./AgreementPdfComponent";
 
 const Dashboard = (props) => {
   document.title = "Willsmeet Portal";
@@ -57,10 +61,13 @@ const Dashboard = (props) => {
   ]);
   const [agreementData, setAgreementData] = useState({
     AgreementNumber: "",
-    validUntil: "",
+    validity: "",
     paymentTerms: ""
   })
   const { auth } = useAuth();
+  const [allTaxes, setAllTaxes] = useState([]);
+  const [displayTableData, setDisplayTableData] = useState([]);
+  const [clientData, setClientData] = useState({});
 
   const redirectToViewPage = (id) => {
     let path = `/purchase-orders/${id}`;
@@ -241,17 +248,69 @@ const Dashboard = (props) => {
     }
   };
 
+  const searchClient = async (id) => {
+    try {
+      const data = { _id: id };
+      const res = await getClientWithIdReq(data);
+
+      setClientData(res.payload?.client);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  
+  const searchAllTaxes = async (part) => {
+    try {
+      const response = await getTaxesReq();
+      let data = await response;
+      setAllTaxes(data?.payload?.taxes);
+      if (part === "agreement") {
+        return data?.payload?.taxes;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getAgreementData = async (id) => {
     try {
       const data = {clientId: id}
       const res = await getAgreement(data);
+      let taxes = await searchAllTaxes("agreement");
       
       setAgreementData({
         AgreementNumber: res.payload._id        ,
-        validUntil: res.payload.validity,
+        validity: res.payload.validity,
         paymentTerms: res.payload.paymentTerms
       })
 
+      let array;
+
+      array = res?.payload?.items?.flatMap((item) => {
+        return item.variants.map((variant) => {
+          const attributes = variant.variant.attributes;
+          let taxName;
+          for (let i = 0; i < taxes.length; i++) {
+            if (taxes[i]._id === item.item.taxes[0]) {
+              taxName = taxes[i].name;
+            }
+          }
+          return {
+            id: variant.variant._id,
+            itemId: variant.variant.itemId,
+            title: item.item.title,
+            sku: variant.variant.sku,
+            sellingPrice: variant.price,
+            attributes: attributes,
+            tax: taxName,
+            unit: item.item.itemUnit,
+            type: item.item.itemType,
+          };
+        });
+      });
+
+      setDisplayTableData(array);
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -283,14 +342,14 @@ const Dashboard = (props) => {
     props.setBreadcrumbItems('Dashboard' , breadcrumbItems)
     getPurchaseOrderListData();
     getPurchaseOrderStatusList();
-  }, []);
+    searchClient(user.clientId)
+  }, [user.clientId]);
 
   useEffect(() => {
     if(user.userType === "client") {
       getAgreementData(user.clientId);
     }
   }, [user.clientId, user.userType]);
-
 
   return (
     <React.Fragment>
@@ -316,12 +375,9 @@ const Dashboard = (props) => {
                 </div>
                 <div>
                   <h6 className="font-size-12 mb-0">Valid Until</h6>
-                  <h2 className="mb-0 font-size-20 text-black">{agreementData.validUntil ? ordinalFormatDate(agreementData.validUntil): "Day/MM/YYYY"}</h2>
+                  <h2 className="mb-0 font-size-20 text-black">{agreementData.validity ? ordinalFormatDate(agreementData.validity): "Day/MM/YYYY"}</h2>
                 </div>
-                <StyledButton color={'primary'} type="submit" className={'w-md agreement-btn'} disabled={!agreementData.AgreementNumber || !agreementData.validUntil || !agreementData.paymentTerms}>
-                  <i className={'btn-icon mdi mdi-download'}></i>
-                  Download Agreement
-                </StyledButton>
+                <AgreementPdfComponent data={{displayTableData, ...clientData, ...agreementData}} />
               </CardBody>
             </Card>
           </Col>

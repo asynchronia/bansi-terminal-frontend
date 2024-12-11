@@ -373,7 +373,7 @@ const AllOrders = (props) => {
                       autoSizeStrategy={autoSizeStrategy}
                       columnDefs={columnDefs}
                       pagination={pagination}
-                      paginationPageSize={20}
+                      paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={false}
                       rowData={rowData}
                       onPaginationChanged={onPaginationChanged}
@@ -399,7 +399,7 @@ const AllOrders = (props) => {
                       ?  clientUserColumnDefs
                       : []}
                       pagination={pagination}
-                      paginationPageSize={20}
+                      paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={false}
                       rowData={rowData}
                       onPaginationChanged={onPaginationChanged}

@@ -220,14 +220,14 @@ const OrderEstimates = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Estimates", breadcrumbItems);
-    const bodyObject = {
-      "page": page,
-      "limit": paginationPageSize
-    };
-    if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
-      effectCalled.current = true;
-    }
+    // const bodyObject = {
+    //   "page": page,
+    //   "limit": paginationPageSize
+    // };
+    // if (!effectCalled.current) {
+    //   getListOfRowData(bodyObject);
+    //   effectCalled.current = true;
+    // }
   }, []);
 
 //  const onRowClicked = (event) =>{
