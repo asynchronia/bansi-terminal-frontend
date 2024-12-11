@@ -372,7 +372,7 @@ const PurchaseOrderDetails = (props) => {
                 <Card>
                   <CardBody className="d-flex flex-column gap-2">
                     <div style={{ flex: 1 }} className="border-bottom">
-                      <p className="fw-lighter m-0">Billing Address</p>
+                      <p className="fw-lighter m-0">Vendor Address</p>
                       <h5 className="fw-medium text-uppercase m-0">
                         Bansi Office Solutions Private Limited
                         #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,

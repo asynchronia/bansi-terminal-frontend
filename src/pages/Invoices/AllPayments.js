@@ -18,7 +18,7 @@ import "./styles/datatables.scss";
 import "./styles/AllInvoices.scss";
 import { formatDate } from "../../utility/formatDate";
 import RequireUserType from "../../routes/middleware/requireUserType";
-import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from "../../utility/constants";
+import { USER_TYPES_ENUM } from "../../utility/constants";
 import useAuth from "../../hooks/useAuth";
 
 const AllPayments = (props) => {
@@ -189,7 +189,6 @@ const AllPayments = (props) => {
   ];
 
   const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
-  const clientUserColumnDefs = clientColumnDefs.filter(colDef => colDef.headerName !== "Amount Paid")
 
   const autoSizeStrategy = {
     type: "fitGridWidth",
@@ -445,18 +444,7 @@ const AllPayments = (props) => {
                   <RequireUserType userType={USER_TYPES_ENUM.CLIENT}>
                     <AgGridReact
                       ref={gridRef}
-                      columnDefs={auth?.permissions?.some(
-                        (p) =>
-                          p.module === MODULES_ENUM.PAYMENTS &&
-                          [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
-                      )
-                      ? clientColumnDefs
-                      : auth?.permissions?.some(
-                          (p) =>
-                            p.module === MODULES_ENUM.PAYMENTS && p.operations.includes(PERMISSIONS_ENUM.READ)
-                        )
-                      ?  clientUserColumnDefs
-                      : []}
+                      columnDefs={clientColumnDefs}
                       pagination={pagination}
                       paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={paginationPageSizeSelector}
