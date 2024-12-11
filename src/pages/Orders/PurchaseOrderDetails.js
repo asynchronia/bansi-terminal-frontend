@@ -38,7 +38,7 @@ const PurchaseOrderDetails = (props) => {
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Purchase Order", link: "/purchase-orders" },
+    { title: "Purchase Orders", link: "/purchase-orders" },
     { title: "Purchase Order", link: "#" },
   ];
 
@@ -322,7 +322,18 @@ const PurchaseOrderDetails = (props) => {
         <Card>
           <CardBody>
             <div className="card-content">
-              <Hero />
+              <div className="details">
+                  <h3 className="fw-bolder">
+                    {orderInfo.clientName}
+                  </h3>
+                  <p className="m-0">
+                    {orderInfo.billing?.branchName}
+                  </p>
+                  <p className="m-0">
+                    {orderInfo.billing?.address}
+                  </p>
+                  <p className="m-0">{orderInfo.billing?.contact}</p>
+              </div>
               <div>
                 <span className="purchase-order">Purchase Order</span>
                 <br />
@@ -361,8 +372,12 @@ const PurchaseOrderDetails = (props) => {
                 <Card>
                   <CardBody className="d-flex flex-column gap-2">
                     <div style={{ flex: 1 }} className="border-bottom">
-                      <p className="fw-lighter m-0">Billing Address</p>
-                      <h5 className="fw-medium text-uppercase m-0">{orderInfo.billing?.address}</h5>
+                      <p className="fw-lighter m-0">Vendor Address</p>
+                      <h5 className="fw-medium text-uppercase m-0">
+                        Bansi Office Solutions Private Limited
+                        #1496, 19th Main Road, Opp Park Square Apartment, HSR Layout,
+                        Bangalore Karnataka 560102, India
+                      </h5>
                     </div>
                     <div style={{ flex: 1 }}>
                       <p className="fw-lighter m-0">Shipping Address</p>
@@ -379,9 +394,13 @@ const PurchaseOrderDetails = (props) => {
                   <CardBody>
                     <Row className="py-2 border-bottom">
                       <Col xl="4">Item & Description</Col>
-                      <Col xl="3">Rate</Col>
+                      <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+                        <Col xl="3">Rate</Col>
+                      </RequirePermission>
                       <Col xl="3">Ordered</Col>
-                      <Col xl="2">Amount</Col>
+                      <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+                        <Col xl="2">Amount</Col>
+                      </RequirePermission>
                     </Row>
                     {itemsData && itemsData.map((item, index) => (
                       <Row key={index} className="py-2 border-bottom align-items-center">
@@ -389,62 +408,68 @@ const PurchaseOrderDetails = (props) => {
                           <h6 style={{margin: 0, fontSize: '14px', paddingTop: '3px'}}>{item.itemName}</h6>
                           <span style={{margin: 0, fontSize: '12px', color: 'grey', paddingTop: '2px'}}>{item.itemDescription}</span>
                         </Col>
-                        <Col xl="3">
-                          <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
-                        </Col>
+                        <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+                          <Col xl="3">
+                            <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice)}</h6>
+                          </Col>
+                        </RequirePermission>
                         <Col xl="3">{item.quantity}&nbsp;{item.itemUnit}</Col>
-                        <Col xl="2">
-                          <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
-                        </Col>
+                        <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+                          <Col xl="2">
+                            <h6 className="m-0">{formatNumberWithCommasAndDecimal(item.unitPrice * item.quantity)}</h6>
+                          </Col>
+                        </RequirePermission>
                       </Row>
                     ))}
                   </CardBody>
                 </Card>
               </Col>
-              <Col xl="4">
-                <Card className="mt-3">
-                  <CardHeader>Order Info</CardHeader>
-                  <CardBody style={{ display: "flex", flexDirection: "column" }}>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <h5
-                        className="mb-0"
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span>Sub Total :</span>
-                        <span>{formatNumberWithCommasAndDecimal(orderInfo.subTotal)}</span>
-                      </h5>
-                      <div style={{ fontSize: "0.7rem" }}>
-                        Total Quantity: {orderInfo.totalQuantity}
+              <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+                <Col xl="4">
+                  <Card className="mt-3">
+                    <CardHeader>Order Info</CardHeader>
+                    <CardBody style={{ display: "flex", flexDirection: "column" }}>
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <h5
+                          className="mb-0"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span>Sub Total :</span>
+                          <span>{formatNumberWithCommasAndDecimal(orderInfo.subTotal)}</span>
+                        </h5>
+                        <div style={{ fontSize: "0.7rem" }}>
+                          Total Quantity: {orderInfo.totalQuantity}
+                        </div>
+                        <hr />
+                        <h5
+                          className="mb-0"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span>GST :</span>
+                          <span>{formatNumberWithCommasAndDecimal(orderInfo.gstTotal)}</span>
+                        </h5>
+                        <hr />
+                        <h5
+                          className="mb-0"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <span>Total :</span>
+                          <span>{formatNumberWithCommasAndDecimal(orderInfo.total)}</span>
+                        </h5>
                       </div>
-                      <hr />
-                      <h5
-                        className="mb-0"
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span>GST :</span>
-                        <span>{formatNumberWithCommasAndDecimal(orderInfo.gstTotal)}</span>
-                      </h5>
-                      <hr />
-                      <h5
-                        className="mb-0"
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span>Total :</span>
-                        <span>{formatNumberWithCommasAndDecimal(orderInfo.total)}</span>
-                      </h5>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </RequirePermission>
             </Row>
             <Row>
             <Col xl="8">

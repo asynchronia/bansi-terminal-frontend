@@ -64,7 +64,7 @@ const AllOrders = (props) => {
 
 
   useEffect(() => {
-    props.setBreadcrumbItems('All Orders', breadcrumbItems);
+    props.setBreadcrumbItems('Ongoing Orders', breadcrumbItems);
     const body = {
       page: page,
       limit: paginationPageSize,
@@ -226,9 +226,21 @@ const AllOrders = (props) => {
       })
     },
     {
-      headerName: "Order No.", field: "salesorder_number",
+      headerName: "SO No.", field: "salesorder_number",
       floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
+      tooltipValueGetter: (p) => p.value, headerTooltip: "SO No.",
+      sortable: false, minWidth: 140,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
+    },
+    {
+      headerName: "PO No.", field: "cf_po_no",
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "PO No.",
       sortable: false, minWidth: 140,
       headerComponent: headerTemplate,
       headerComponentParams:  (props) => ({
