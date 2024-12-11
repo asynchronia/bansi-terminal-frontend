@@ -19,15 +19,11 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
               value={validation?.values?.primaryBranch?.name || ""}
               name="primaryBranch.name"
               invalid={
-                validation?.touched?.primaryBranch &&
                 validation?.touched?.primaryBranch?.name &&
-                validation?.errors?.primaryBranch &&
                 validation?.errors?.primaryBranch?.name
               }
             />
-            {validation?.touched?.primaryBranch &&
-              validation?.touched?.primaryBranch?.name &&
-              validation?.errors?.primaryBranch &&
+            {validation?.touched?.primaryBranch?.name &&
               validation?.errors?.primaryBranch?.name ? (
               <p style={{ color: "red" }}>
                 {validation.errors?.primaryBranch?.name}
@@ -46,9 +42,8 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
               onBlur={validation.handleBlur}
               value={validation?.values?.primaryBranch?.associatedWarehouse || ""}
               invalid={
-                validation?.touched?.primaryBranch &&
+                
                 validation?.touched?.primaryBranch?.associatedWarehouse &&
-                validation?.errors?.primaryBranch &&
                 validation?.errors?.primaryBranch?.associatedWarehouse
               }
             >
@@ -57,9 +52,7 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
                 <option value={e._id}>{e.name}</option>
               ))}
             </select>
-            {validation?.touched?.primaryBranch &&
-              validation?.touched?.primaryBranch?.associatedWarehouse &&
-              validation?.errors?.primaryBranch &&
+            {validation?.touched?.primaryBranch?.associatedWarehouse &&
               validation?.errors?.primaryBranch?.associatedWarehouse ? (
               <p style={{ color: "red" }}>
                 {validation?.errors?.primaryBranch?.associatedWarehouse}
@@ -82,15 +75,11 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
               onBlur={validation.handleBlur}
               value={validation?.values?.primaryBranch?.contact || ""}
               invalid={
-                validation?.touched?.primaryBranch &&
                 validation?.touched?.primaryBranch?.contact &&
-                validation?.errors?.primaryBranch &&
                 validation?.errors?.primaryBranch?.contact
               }
             />
-            {validation?.touched?.primaryBranch &&
-              validation?.touched?.primaryBranch?.contact &&
-              validation?.errors?.primaryBranch &&
+            {validation?.touched?.primaryBranch?.contact &&
               validation?.errors?.primaryBranch?.contact ? (
               <p style={{ color: "red" }}>
                 {validation?.errors?.primaryBranch?.contact}
@@ -111,15 +100,11 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
               onBlur={validation.handleBlur}
               value={validation?.values?.primaryBranch?.code || ""}
               invalid={
-                validation?.touched?.primaryBranch &&
                 validation?.touched?.primaryBranch?.code &&
-                validation?.errors?.primaryBranch &&
                 validation?.errors?.primaryBranch?.code
               }
             />
-            {validation?.touched?.primaryBranch &&
-              validation?.touched?.primaryBranch?.code &&
-              validation?.errors?.primaryBranch &&
+            {validation?.touched?.primaryBranch?.code &&
               validation?.errors?.primaryBranch?.code ? (
               <p style={{ color: "red" }}>
                 {validation?.errors?.primaryBranch?.code}
@@ -140,16 +125,12 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
           onBlur={validation.handleBlur}
           value={validation.values.primaryBranch?.address || ""}
           invalid={
-            validation.touched?.primaryBranch &&
             validation.touched?.primaryBranch?.address &&
-            validation.errors?.primaryBranch &&
             validation.errors?.primaryBranch?.address
           }
         />
         <span className="badgecount badge badge-success"></span>
-        {validation.touched?.primaryBranch &&
-          validation.touched?.primaryBranch?.address &&
-          validation.errors?.primaryBranch &&
+        {validation.touched?.primaryBranch?.address &&
           validation.errors?.primaryBranch?.address ? (
           <p style={{ color: "red" }}>
             {validation.errors?.primaryBranch?.address}
@@ -170,15 +151,11 @@ const AddBranch = ({ edit = false, setEdit, validation, warehouseList = [] }) =>
               onBlur={validation.handleBlur}
               value={validation?.values?.primaryBranch?.zohoAddressId || ""}
               invalid={
-                validation?.touched?.primaryBranch &&
                 validation?.touched?.primaryBranch?.zohoAddressId &&
-                validation?.errors?.primaryBranch &&
                 validation?.errors?.primaryBranch?.zohoAddressId
               }
             />
-            {validation?.touched?.primaryBranch &&
-              validation?.touched?.primaryBranch?.zohoAddressId &&
-              validation?.errors?.primaryBranch &&
+            {validation?.touched?.primaryBranch?.zohoAddressId &&
               validation?.errors?.primaryBranch?.zohoAddressId ? (
               <p style={{ color: "red" }}>
                 {validation?.errors?.primaryBranch?.zohoAddressId}

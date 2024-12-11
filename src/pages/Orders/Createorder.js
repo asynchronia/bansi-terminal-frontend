@@ -34,12 +34,15 @@ import "./styles/CreateOrderCard.scss";
 
 import { HighlightOff } from "@mui/icons-material";
 import Hero from "../../components/Common/Hero";
+import RequirePermission from "../../routes/middleware/requirePermission";
+import { MODULES_ENUM, PERMISSIONS_ENUM } from "../../utility/constants";
 import { getClientWithIdReq } from "../../service/clientService";
+import useAuth from "../../hooks/useAuth";
 
 const CreateOrder = (props) => {
   let { id } = useParams();
 
-  document.title = "Create Purchase Order";
+  document.title = id ? "Edit Purchase Order" : "Create Purchase Order";
   let navigate = useNavigate();
   const dispatch = useDispatch();
   const [branchList, setBranchList] = useState([]);
@@ -72,11 +75,12 @@ const CreateOrder = (props) => {
   });
 
   const [purchaseOrder, setPurchaseOrder] = useState(null);
+  const { auth } = useAuth()
 
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
     { title: "Purchase Order", link: "#" },
-    { title: "Create Purchase Order", link: "#" },
+    { title: id ? "Edit Purchase Order" : "Create Purchase Order", link: "#" },
   ];
 
   const bodyObject = {
@@ -84,7 +88,12 @@ const CreateOrder = (props) => {
     limit: 200,
   };
 
+  const columnDefs = ["Item Name", "HSN Code", "Category", "Cost", "Quantity", "Unit", "Total", "GST", "",]
+  const clientColumnDefs = columnDefs.filter(
+    (colDef) => !["Cost", "Total"].includes(colDef)
+  );
   const clientId = JSON.parse(localStorage.getItem("user")).clientId
+  const [clientName, setClientName] = useState()
 
   const redirectToPurchaseDetails = (id) => {
     let path = `/purchase-orders/${id}`;
@@ -166,17 +175,17 @@ const CreateOrder = (props) => {
     }
   };
 
-  // const fetchUserData = async () => {
-  //   try {
-  //     const data = { _id: clientId };
-  //     const res = await getClientWithIdReq(data);
+  const fetchClientData = async () => {
+    try {
+      const data = { _id: clientId };
+      const res = await getClientWithIdReq(data);
 
-  //     // set the client poPrefix
-  //     setPoPrefix(res.payload.client.poPrefix)
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //   }
-  // };
+      setClientName(res.payload.client.name)
+
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   const fetchPurchaseOrderSequence = async () => {
     try {
@@ -293,9 +302,11 @@ const CreateOrder = (props) => {
           </td>
           <td>{item.hsnCode}</td>
           <td style={{ whiteSpace: "nowrap" }}>{item.category}</td>
-          <td style={{ whiteSpace: "nowrap" }}>
-            {formatNumberWithCommasAndDecimal(item.unitPrice)}
-          </td>
+          <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+            <td style={{ whiteSpace: "nowrap" }}>
+              {formatNumberWithCommasAndDecimal(item.unitPrice)}
+            </td>
+          </RequirePermission>
           <td style={{ width: "10%" }}>
             <Input
               type="number"
@@ -312,12 +323,14 @@ const CreateOrder = (props) => {
             />
           </td>
           <td style={{ whiteSpace: "nowrap" }}>{item.itemUnit}</td>
-          <td style={{ whiteSpace: "nowrap" }}>
-            {formatNumberWithCommasAndDecimal(
-              item.unitPrice *
-                (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
-            )}
-          </td>
+          <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+            <td style={{ whiteSpace: "nowrap" }}>
+              {formatNumberWithCommasAndDecimal(
+                item.unitPrice *
+                  (selectedQuantities[`${item.itemId}-${item.variantId}`] || 1)
+              )}
+            </td>
+          </RequirePermission>
           <td style={{ whiteSpace: "nowrap" }}>{item.gst}</td>
           <td>
             <HighlightOff
@@ -410,11 +423,12 @@ const CreateOrder = (props) => {
   }
 
   useEffect(() => {
-    props.setBreadcrumbItems("Create Purchase Order", breadcrumbItems);
+    props.setBreadcrumbItems(id ? "Edit Purchase Order" : "Create Purchase Order", breadcrumbItems);
     if (!effectCalled.current) {
       getBranchData();
       getListOfRowData();
       fetchPurchaseOrderSequence()
+      fetchClientData()
       effectCalled.current = true;
     }
   }, [props, breadcrumbItems, getBranchData]);
@@ -560,7 +574,38 @@ const CreateOrder = (props) => {
       <Card>
         <CardBody>
           <div className="card-content">
-            <Hero />
+            <div className="details">
+              <h3 className="fw-bolder">
+                {clientName}
+              </h3>
+              <p className="m-0">
+                {formik.values.billingAddress ?
+                  branchList.find(
+                    (branch) =>
+                      branch._id === formik.values.billingAddress
+                  )?.name
+                  : branchList[0]?.name
+                }
+              </p>
+              <p className="m-0">
+                {formik.values.billingAddress ?
+                  branchList.find(
+                    (branch) =>
+                      branch._id === formik.values.billingAddress
+                  )?.address
+                  : branchList[0]?.address
+                }
+              </p>
+              <p className="m-0">
+                {formik.values.billingAddress ?
+                  branchList.find(
+                    (branch) =>
+                      branch._id === formik.values.billingAddress
+                  )?.contact
+                  : branchList[0]?.contact
+                }
+              </p>
+            </div>
             <div>
               <span className="purchase-order">Purchase Order</span>
               <br />
@@ -818,15 +863,18 @@ const CreateOrder = (props) => {
                     <Table hover striped>
                       <thead>
                         <tr>
-                          <th>Item Name</th>
-                          <th>HSN Code</th>
-                          <th>Category</th>
-                          <th>Cost</th>
-                          <th>Quantity</th>
-                          <th>Unit</th>
-                          <th>Total</th>
-                          <th>GST</th>
-                          <th></th>
+                          {auth?.permissions?.some(
+                            (p) =>
+                              p.module === MODULES_ENUM.ORDERS &&
+                              [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+                          )
+                          ? columnDefs.map((col, index) => <th key={`col-${col}-${index}`}>{col}</th>)
+                          : auth?.permissions?.some(
+                              (p) =>
+                                p.module === MODULES_ENUM.ORDERS && p.operations.includes(PERMISSIONS_ENUM.READ)
+                            )
+                          ?  clientColumnDefs.map((col, index) => <th key={`col-${col}-${index}`}>{col}</th>)
+                          : []}
                         </tr>
                       </thead>
                       <tbody>{renderSelectedItems()}</tbody>
@@ -835,50 +883,52 @@ const CreateOrder = (props) => {
                 </CardBody>
               </Card>
             </Col>
-            <Col xl="4">
-              <Card className="mt-3">
-                <CardHeader>Order Info</CardHeader>
-                <CardBody style={{ display: "flex", flexDirection: "column" }}>
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <h5
-                      className="mb-0"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>Sub Total :</span>
-                      <span>{formatNumberWithCommasAndDecimal(subTotal)}</span>
-                    </h5>
-                    <div style={{ fontSize: "0.7rem" }}>
-                      Total Quantity: {selectedItems.length}
+            <RequirePermission module={MODULES_ENUM.ORDERS} permission={PERMISSIONS_ENUM.CREATE}>
+              <Col xl="4">
+                <Card className="mt-3">
+                  <CardHeader>Order Info</CardHeader>
+                  <CardBody style={{ display: "flex", flexDirection: "column" }}>
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <h5
+                        className="mb-0"
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>Sub Total :</span>
+                        <span>{formatNumberWithCommasAndDecimal(subTotal)}</span>
+                      </h5>
+                      <div style={{ fontSize: "0.7rem" }}>
+                        Total Quantity: {selectedItems.length}
+                      </div>
+                      <hr />
+                      <h5
+                        className="mb-0"
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>GST :</span>
+                        <span>{formatNumberWithCommasAndDecimal(gstTotal)}</span>
+                      </h5>
+                      <hr />
+                      <h5
+                        className="mb-0"
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <span>Total :</span>
+                        <span>{formatNumberWithCommasAndDecimal(total)}</span>
+                      </h5>
                     </div>
-                    <hr />
-                    <h5
-                      className="mb-0"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>GST :</span>
-                      <span>{formatNumberWithCommasAndDecimal(gstTotal)}</span>
-                    </h5>
-                    <hr />
-                    <h5
-                      className="mb-0"
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>Total :</span>
-                      <span>{formatNumberWithCommasAndDecimal(total)}</span>
-                    </h5>
-                  </div>
-                </CardBody>
-              </Card>
-            </Col>
+                  </CardBody>
+                </Card>
+              </Col>
+            </RequirePermission>
           </Row>
           <Row>
             <Col xl="8">

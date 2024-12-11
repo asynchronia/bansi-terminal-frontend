@@ -17,6 +17,7 @@ import './styles/AllOrders.scss'
 import { formatDate } from '../../utility/formatDate';
 import RequireUserType from '../../routes/middleware/requireUserType';
 import { USER_TYPES_ENUM } from '../../utility/constants';
+import useAuth from '../../hooks/useAuth';
 
 const AllOrders = (props) => {
   document.title = "All Orders";
@@ -29,6 +30,7 @@ const AllOrders = (props) => {
   };
   // enables pagination in the grid
   const pagination = true;
+  const { auth } = useAuth();
 
   // sets 10 rows per page (default is 100)
   // allows the user to select the page size from a predefined list of page sizes
@@ -62,7 +64,7 @@ const AllOrders = (props) => {
 
 
   useEffect(() => {
-    props.setBreadcrumbItems('All Orders', breadcrumbItems);
+    props.setBreadcrumbItems('Ongoing Orders', breadcrumbItems);
     const body = {
       page: page,
       limit: paginationPageSize,
@@ -224,9 +226,21 @@ const AllOrders = (props) => {
       })
     },
     {
-      headerName: "Order No.", field: "salesorder_number",
+      headerName: "SO No.", field: "salesorder_number",
       floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
+      tooltipValueGetter: (p) => p.value, headerTooltip: "SO No.",
+      sortable: false, minWidth: 140,
+      headerComponent: headerTemplate,
+      headerComponentParams:  (props) => ({
+        handleSort: handleSort,
+        data: props,
+        sortBody,
+      })
+    },
+    {
+      headerName: "PO No.", field: "cf_po_no",
+      floatingFilterComponentParams: { suppressFilterButton: true },
+      tooltipValueGetter: (p) => p.value, headerTooltip: "PO No.",
       sortable: false, minWidth: 140,
       headerComponent: headerTemplate,
       headerComponentParams:  (props) => ({
@@ -326,7 +340,7 @@ const AllOrders = (props) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative" style={{ width: '20rem' }}>
+                      <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '14rem' }}>
                         <Input
                           type="text"
                           value={inputValue}
@@ -337,7 +351,7 @@ const AllOrders = (props) => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Order number or Client"
+                          placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Order Number" : "Search by Order Number"}
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
@@ -357,7 +371,7 @@ const AllOrders = (props) => {
                       autoSizeStrategy={autoSizeStrategy}
                       columnDefs={columnDefs}
                       pagination={pagination}
-                      paginationPageSize={20}
+                      paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={false}
                       rowData={rowData}
                       onPaginationChanged={onPaginationChanged}
@@ -372,7 +386,7 @@ const AllOrders = (props) => {
                       autoSizeStrategy={autoSizeStrategy}
                       columnDefs={clientColumnDefs}
                       pagination={pagination}
-                      paginationPageSize={20}
+                      paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={false}
                       rowData={rowData}
                       onPaginationChanged={onPaginationChanged}

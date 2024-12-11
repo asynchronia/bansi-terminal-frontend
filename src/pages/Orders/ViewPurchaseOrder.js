@@ -13,8 +13,9 @@ import { formatNumberWithCommasAndDecimal } from "../Invoices/invoiceUtil";
 import DropdownMenuBtn from "./DropdownMenuBtn";
 import OrderStatusRenderer from "./OrderStatusRenderer";
 import { formatDate } from '../../utility/formatDate';
-import { USER_TYPES_ENUM } from '../../utility/constants';
+import { MODULES_ENUM, PERMISSIONS_ENUM, USER_TYPES_ENUM } from '../../utility/constants';
 import RequireUserType from '../../routes/middleware/requireUserType';
+import useAuth from '../../hooks/useAuth';
 
 const ViewPurchaseOrder = (props) => {
   document.title = "All Purchase Orders";
@@ -27,13 +28,17 @@ const ViewPurchaseOrder = (props) => {
   };
   const pagination = true;
   const paginationPageSizeSelector = [25, 50, 100];
+  const { auth } = useAuth();
 
   const [rowData, setRowData] = useState([]);
   const [paginationPageSize, setPaginationPageSize] = useState(25);
   const [page, setPage] = useState(1);
   const [searchValue, setSearchValue] = useState();
   const [inputValue, setInputValue] = useState('');
-  const [sortData, setSortData] = useState(null);
+  const [sortData, setSortData] = useState({
+    key: 'createdAt',
+    order: "desc"
+  });
 
   const timerRef = useRef(null);
 
@@ -57,7 +62,7 @@ const ViewPurchaseOrder = (props) => {
   }
 
   useEffect(() => {
-    props.setBreadcrumbItems('All Orders', breadcrumbItems);
+    props.setBreadcrumbItems('Purchase Orders', breadcrumbItems);
   }, []);
 
   useEffect(() => {
@@ -68,7 +73,7 @@ const ViewPurchaseOrder = (props) => {
     if (searchValue) {
       body.search = searchValue
     }
-    if (sortData?.key && sortData?.order) {
+    if (sortData) {
       body.sort = sortData
     }
     console.log("page in useeffect",page)
@@ -107,7 +112,7 @@ const ViewPurchaseOrder = (props) => {
       
         return {
           order_id: order._id,
-          order_number: order.purchaseOrderNumber ? order.purchaseOrderNumber : "-",
+          purchaseOrderNumber: order.purchaseOrderNumber ? order.purchaseOrderNumber : "-",
           client_name: order.clientId.name,
           createdAt: formatDate(order.createdAt),
           total: total,
@@ -194,24 +199,26 @@ const ViewPurchaseOrder = (props) => {
   
   const breadcrumbItems = [
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Purchase Order", link: "#" },
+    { title: "Purchase Orders", link: "#" },
   ];
 
   const columnDefs = [
     {
-      headerName: "Order No.", field: "order_number", suppressMenu: true,
+      headerName: "PO No.", field: "purchaseOrderNumber", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
-      tooltipValueGetter: (p) => p.value, headerTooltip: "Order No.",
-      sortable: false, minWidth: 150,
+      tooltipValueGetter: (p) => p.value, headerTooltip: "Purchase Order No.",
+      sortable: true, minWidth: 150,
+      comparator: () => false,
     },
     {
-      headerName: "Sales Order No.", field: "salesOrderNumber", suppressMenu: true,
+      headerName: "SO No.", field: "salesOrderNumber", suppressMenu: true,
       floatingFilterComponentParams: { suppressFilterButton: true },
       tooltipValueGetter: (p) => p.value, headerTooltip: "Sales Order No.",
-      sortable: false, minWidth: 150,
+      sortable: true, minWidth: 150,
       cellRenderer: (props) => {
         return <>{props.value ? props.value : "-" }</>
-      }
+      },
+      comparator: () => false,
     },
     {
       headerName: "Order Date", field: "createdAt", suppressMenu: true,
@@ -219,6 +226,7 @@ const ViewPurchaseOrder = (props) => {
       tooltipValueGetter: (p) => p.value, headerTooltip: "Order Date",
       sortable: true, minWidth: 150,
       comparator: () => false,
+      sort: sortData.key === "createdAt" && sortData.order
     },
     {
       headerName: "Client", field: "client_name", suppressMenu: true,
@@ -255,6 +263,7 @@ const ViewPurchaseOrder = (props) => {
   ];
 
   const clientColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Client")
+  const clientUserColumnDefs = columnDefs.filter(colDef => colDef.headerName !== "Total Amount")
 
   const notify = (type, message) => {
     if (type === "Error") {
@@ -296,16 +305,17 @@ const ViewPurchaseOrder = (props) => {
                 <div className="button-section">
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative">
-                        <Input
-                          type="text"
-                          value={inputValue}
-                          onChange={handleInputChange}
-                          className="form-control rounded border"
-                          placeholder="Search"
-                        />
-                        <i className="mdi mdi-magnify search-icon"></i>
-                      </div>
+                        <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '14rem' }}>
+                          <Input
+                            type="text"
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            className="form-control rounded border"
+                            placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Order Number" : "Search by Order Number"}
+
+                          />
+                          <i className="mdi mdi-magnify search-icon"></i>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -337,7 +347,18 @@ const ViewPurchaseOrder = (props) => {
                     <AgGridReact
                       ref={gridRef}
                       suppressRowClickSelection={true}
-                      columnDefs={clientColumnDefs}
+                      columnDefs={auth?.permissions?.some(
+                        (p) =>
+                          p.module === MODULES_ENUM.ORDERS &&
+                          [PERMISSIONS_ENUM.READ, PERMISSIONS_ENUM.CREATE].every((perm) => p.operations.includes(perm))
+                      )
+                      ? clientColumnDefs
+                      : auth?.permissions?.some(
+                          (p) =>
+                            p.module === MODULES_ENUM.ORDERS && p.operations.includes(PERMISSIONS_ENUM.READ)
+                        )
+                      ?  clientUserColumnDefs
+                      : []}
                       pagination={true}
                       paginationPageSize={paginationPageSize}
                       paginationPageSizeSelector={paginationPageSizeSelector}

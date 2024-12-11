@@ -17,6 +17,7 @@ import DropdownMenuBtn from "./DropdownMenuBtn";
 import { formatDate } from "../../utility/formatDate";
 import RequireUserType from "../../routes/middleware/requireUserType";
 import { USER_TYPES_ENUM } from "../../utility/constants";
+import useAuth from "../../hooks/useAuth";
 
 const OrderEstimates = (props) => {
     document.title = "Estimates";
@@ -30,6 +31,7 @@ const OrderEstimates = (props) => {
       key: 'date',
       order: "D"
     })
+    const { auth } = useAuth();
 
     const redirectToViewPage = (id) => {
         let path = "/view-estimate/" + id;
@@ -217,14 +219,14 @@ const OrderEstimates = (props) => {
 
   useEffect(() => {
     props.setBreadcrumbItems("Estimates", breadcrumbItems);
-    const bodyObject = {
-      "page": page,
-      "limit": paginationPageSize
-    };
-    if (!effectCalled.current) {
-      getListOfRowData(bodyObject);
-      effectCalled.current = true;
-    }
+    // const bodyObject = {
+    //   "page": page,
+    //   "limit": paginationPageSize
+    // };
+    // if (!effectCalled.current) {
+    //   getListOfRowData(bodyObject);
+    //   effectCalled.current = true;
+    // }
   }, []);
 
 //  const onRowClicked = (event) =>{
@@ -268,7 +270,7 @@ useEffect(() => {
                 <div className="button-section" style={{justifyContent: 'flex-end'}}>
                   <div className="button-right-section">
                     <div className="invoice-search-box">
-                      <div className="search-box position-relative">
+                      <div className="search-box position-relative" style={{ width: auth.userType === USER_TYPES_ENUM.ADMIN ? '20rem' : '16rem' }}>
                         <Input
                           type="text"
                           value={inputValue}
@@ -279,7 +281,8 @@ useEffect(() => {
                             }
                           }}
                           className="form-control rounded border"
-                          placeholder="Search by Estimate number or Client"
+                          placeholder={auth.userType === USER_TYPES_ENUM.ADMIN ? "Search by Client or Estimate Number" : "Search by Estimate Number"}
+
                         />
                         <i className="mdi mdi-magnify search-icon"></i>
                       </div>
