@@ -224,7 +224,7 @@ const AllClients = (props) => {
     setStatus(e.target.value);
   };
   const handleInputChange = (e) => {
-    setSearchInputValue(e.target.value?.trim());
+    setSearchInputValue(e.target.value);
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
