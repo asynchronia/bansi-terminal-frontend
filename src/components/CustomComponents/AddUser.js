@@ -57,6 +57,22 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
     
   }, []);
 
+  const handleWarehouseChange = (event) => {
+    const selectedIDs = event.target.value.map(item => item._id);
+    
+    const uniqueSelectedItems = selectedIDs.reduce((acc, id) => {
+        const exists = acc.find(item => item._id === id);
+        if (exists) {
+            return acc.filter(item => item._id !== id);
+        } else {
+            const itemToAdd = event.target.value.find(item => item._id === id);
+            return [...acc, itemToAdd];
+        }
+    }, []);
+
+    setSelectedItems(uniqueSelectedItems);
+  };
+
   if (modal) {
     return (
       <Card>
@@ -243,7 +259,7 @@ const AddUser = ({selectedItems, setSelectedItems, clientId, modal, validation }
                 id="multiple-select"
                 multiple
                 value={selectedItems}
-                onChange={handleChange}
+                onChange={handleWarehouseChange}
                 renderValue={(selected) => (
                   <div>
                     {selected.map((value) => (
