@@ -214,7 +214,7 @@ const ViewClient = (props) => {
 
   const [breadcrumbItems, setBreadCrubmsItems] = useState([
     { title: "Dashboard", link: "/dashboard" },
-    { title: "Client", link: "/clients" },
+    { title: "Clients", link: "/clients" },
     { title: "View", link: "/client/:id" },
   ]);
 
